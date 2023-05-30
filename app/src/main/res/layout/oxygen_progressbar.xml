@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/toast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondary_bg_black"
+        android:textColor="@color/grabblue"
+        android:text="Welcome back Alok , your content is loaded!"
+        android:gravity="center"
+        android:padding="15dp"
+        android:minHeight="50dp"
+        android:visibility="gone"
+        android:textSize="16dp"
+        android:fontFamily="@font/outfitmedium"
+
+        />
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="2dp"-->
+<!--        android:background="#182127"-->
+<!--        />-->
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/linearProgressIndicator"
+        android:layout_width="match_parent"
+        android:indeterminate="true"
+        android:layout_height="5dp"
+        android:visibility="gone"
+        app:indicatorColor="@color/grabblue"
+        app:indicatorDirectionLinear="leftToRight"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:trackColor="@color/item_bg_glow"
+        />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

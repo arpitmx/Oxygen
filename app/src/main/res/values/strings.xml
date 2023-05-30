@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">OXYGEN</string>
+
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="bottom_nav_item_tasks">Tasks</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="aboutLoot">An android application available on Play Store based on live location tracking. It\'s an annual event in Zealicon.
+    An android application available on Play Store based on live location tracking. It\'s an annual event in Zealicon.
+    An android application available on Play Store based on live location tracking. It\'s an annual event in Zealicon.
+    An android application available on Play Store based on live location tracking. It\'s an annual event in Zealicon.
+    An android application available on Play Store based on live location tracking. It\'s an annual event in Zealicon.
+    An android application available on Play Store based on live location tracking. It\'s an annual event in Zealicon.
+    </string>
+    <string name="installBtnTag">INSTALL</string>
+    <string name="appName">VERSA</string>
+    <string name="open" />
+    <string name="close" />
+    <string name="qr_label">Scan Token QR</string>
+
+    <string name="bottom_nav_item_assigned">Assigned</string>
+    <string name="bottom_nav_item_done">Completed</string>
+    <string name="no_app_is_installed_yet">No App is Installed Yet</string>
+    <string name="appimage_downloads">AppImage_downloads</string>
+    <string name="app_name_main_layout">App name</string>
+    <string name="mainappimage">mainAppImage</string>
+    <string name="launch">LAUNCHER</string>
+    <string name="versa">Versa</string>
+    <string name="bottom_launcher">LAUNCHER</string>
+
+
+    <string name="truetime_initialization_failure">TrueTime initialization failure...</string>
+    <string name="truetime_initialized_correctly">TrueTime initialized correctly...</string>
+    <string name="wrong_timezone">Wrong TimeZone</string>
+    <string name="timezone_is_correct">TimeZone is correct...</string>
+    <string name="everything_seems_fine">Everything seems fine...</string>
+    <string name="no_internet_connectivity">No internet connectivity</string>
+    <string name="Search">Search</string>
+    <string name="bottom_home">Home</string>
+    <string name="jsonUrl">https://assets6.lottiefiles.com/packages/lf20_bpsjo66d.json</string>
+</resources>

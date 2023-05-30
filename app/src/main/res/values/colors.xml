@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#86ff7c</color>
+    <color name="secondaryPink">#ff89b3</color>
+    <color name="secondaryBlue">#0061ff</color>
+    <color name="black">#0d0c0b</color>
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="darkTheme_bg">#242222</color>
+
+
+    <color name="s1bg">#A7FFA5</color>
+    <color name="s2bg">#F19FFF</color>
+    <color name="s3bg">#FFE871</color>
+    <color name="DarkBgGray">#2B2B2B</color>
+    <color name="darkbg_main">#131313</color>
+    <color name="secondary_bg_black">#202020</color>
+    <color name="grabblue">#41FFAF</color>
+    <color name="item_bg_glow">#1D2930</color>
+    <color name="better_white">#E3E1E1</color>
+    <color name="status_bar">#D2191919</color>
+    <color name="item_bg_dark">#2E3031</color>
+    <color name="card_bg">#3F4041</color>
+    <color name="starts_in">#DCFFF7</color>
+    <color name="purple">#7E57C2</color>
+    <color name="menu_item">#F3F3F3</color>
+    <color name="primary_text_color">#454545</color>
+</resources>

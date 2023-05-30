@@ -1,0 +1,124 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.ncs.o2'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.ncs.o2"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+
+
+    //ViewModel
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+
+
+    //Dagger Hilt
+    implementation 'com.google.dagger:hilt-android:2.44'
+    annotationProcessor "com.google.dagger:hilt-android-compiler:2.44.2"
+
+
+    //Timber
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+
+
+    //Bottom Navigation
+    def navigation_version = "2.4.2"
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
+    implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
+
+
+    //Circle image view
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //EventBus
+    implementation 'org.greenrobot:eventbus:3.1.1'
+
+
+    //bottomsheet
+    implementation 'com.google.android.material:material:1.9.0'
+
+    // Qr library:
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.6.0")
+
+    //Glide and Pager2
+    def viewPagerVersion = "1.0.0"
+    implementation "androidx.viewpager2:viewpager2:$viewPagerVersion"
+
+    def glide_version = "4.13.2"
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    implementation "com.github.bumptech.glide:okhttp3-integration:$glide_version"
+
+
+    //Qr generator
+    implementation 'com.google.zxing:core:3.4.0'
+
+    //Qr fetch
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    //Firebase
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+
+    //Analytics
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    //Authentication
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    //Firestore Database
+    implementation 'com.google.firebase:firebase-firestore'
+    //Firebase Storage
+    implementation 'com.google.firebase:firebase-storage'
+
+
+    //Utils library
+    implementation "com.github.Shouheng88:utils-core:2.6.0"
+
+    //EasyPermission
+    implementation 'pub.devrel:easypermissions:3.0.0'
+    //Timber
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+
+    //Circular ImageView
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    //Lottie Animations
+    def lottieVersion = "3.4.0"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+
+
+
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+

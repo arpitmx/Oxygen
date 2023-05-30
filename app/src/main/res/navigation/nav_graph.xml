@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/home_item">
+
+    <fragment
+        android:id="@+id/home_item"
+        android:name="com.ncs.versa.UI.Home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_home_item_to_app1Fragment2"
+            app:destination="@id/app1Fragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/app1Fragment2"
+        android:name="com.ncs.versa.UI.Home.Detail.App1Fragment"
+        android:label="fragment_app1"
+        tools:layout="@layout/fragment_app1" >
+        <action
+            android:id="@+id/action_app1Fragment2_to_home_item"
+            app:destination="@id/home_item" />
+    </fragment>
+
+
+</navigation>
