@@ -3,25 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/home_item">
+    app:startDestination="@id/task_item">
 
     <fragment
-        android:id="@+id/home_item"
-        android:name="com.ncs.versa.UI.Home.HomeFragment"
+        android:id="@+id/task_item"
+        android:name="com.ncs.o2.UI.Tasks.TasksFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_tasks" >
+
         <action
-            android:id="@+id/action_home_item_to_app1Fragment2"
-            app:destination="@id/app1Fragment2" />
+            android:id="@+id/action_task_item_to_assignedFragment"
+            app:destination="@id/assigned_item" />
     </fragment>
     <fragment
-        android:id="@+id/app1Fragment2"
-        android:name="com.ncs.versa.UI.Home.Detail.App1Fragment"
-        android:label="fragment_app1"
-        tools:layout="@layout/fragment_app1" >
+        android:id="@+id/assigned_item"
+        android:name="com.ncs.o2.UI.Assigned.AssignedFragment"
+        android:label="fragment_assigned"
+        tools:layout="@layout/fragment_assigned" >
         <action
-            android:id="@+id/action_app1Fragment2_to_home_item"
-            app:destination="@id/home_item" />
+            android:id="@+id/action_assignedFragment_to_doneFragment"
+            app:destination="@id/done_item" />
+    </fragment>
+    <fragment
+        android:id="@+id/done_item"
+        android:name="com.ncs.o2.UI.Done.DoneFragment"
+        android:label="fragment_done"
+        tools:layout="@layout/fragment_done" >
+        <action
+            android:id="@+id/action_doneFragment_to_task_item"
+            app:destination="@id/task_item" />
     </fragment>
 
 
