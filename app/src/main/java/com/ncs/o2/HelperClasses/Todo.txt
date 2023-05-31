@@ -1,0 +1,24 @@
+// Make sure these are checked before production
+
+1. Make sure on double clicking a button it doesnt register two clicks.
+
+
+
+Build optimization changes (Remove this before production level build, only for developmental build)
+@https://blog.devgenius.io/top-10-tips-to-improve-the-build-speed-of-your-android-projects-8526bcf97cd4 (Followed from)
+
+1. Enable crunch pngs from (application) gradle
+2. Remove org.gradle.caching=true from gradle.properties
+3. Remove org.gradle.parallel=true from gradle.properties
+4. Remove -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError
+
+
+2. Todo list
+
+1. Make home page
+ -1. Search bar
+ -2. Carousel (Slider)
+ -3. Gridview opportunities on Grab
+ -4. Watchlist
+ -5. Recenty viewed
+ -5. Trending sections

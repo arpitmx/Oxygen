@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.O2" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/secondarybg</item>
-        <item name="android:navigationBarColor">@color/secondarybg</item>
+        <item name="android:statusBarColor">@color/darkbg_main</item>
+        <item name="android:navigationBarColor">@color/darkbg_main</item>
     </style>
 
     <style name="Theme.O2" parent="Base.Theme.O2" />

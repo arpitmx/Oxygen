@@ -4,10 +4,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.ListAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
 import com.google.protobuf.Internal
 import com.ncs.o2.ProjectCallback
 import com.ncs.o2.R
@@ -18,6 +21,7 @@ import com.ncs.o2.Utility.ExtensionsUtil.animSlideUp
 import com.ncs.o2.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Utility.ExtensionsUtil.progressVisible
+import com.ncs.o2.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Utility.GlobalUtils
 import com.ncs.o2.databinding.ActivityMainBinding
@@ -32,6 +36,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
     val easyElements : GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+    lateinit var toggle:ActionBarDrawerToggle
     val binding : ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -51,9 +56,29 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
     private fun setUpActionBar() {
 
+
+        val drawerLayout = binding.drawer
+        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
         binding.gioActionbar.titleTv.animFadein(this,500)
+        binding.gioActionbar.btnHam.setOnClickListener {
+            if (!drawerLayout.isDrawerOpen(GravityCompat.START)){
+                drawerLayout.openDrawer(GravityCompat.START)
+                Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
+            }
+            else drawerLayout.closeDrawer(GravityCompat.END)
+        }
+
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
     private fun setUpProjects() {
         viewModel.fetchUserProjectsFromRepository()
 

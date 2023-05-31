@@ -66,15 +66,15 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="55dp"
             android:layout_gravity="bottom"
-            android:background="@color/secondarybg"
+            android:background="@color/darkbg_main"
             android:elevation="8dp"
+            app:labelVisibilityMode="unlabeled"
             android:padding="5dp"
             app:itemIconSize="25sp"
             app:itemActiveIndicatorStyle="@color/primary"
             app:itemIconTint="@drawable/itembg"
-            app:labelVisibilityMode="unlabeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -100,7 +100,7 @@
         android:layout_gravity="start"
         android:background="@color/secondary_bg_black"
         android:visibility="gone"
-        app:headerLayout="@layout/empty_layout">
+        app:headerLayout="@layout/drawer_header">
 
         <LinearLayout
             android:id="@+id/drawer_menu_list"

@@ -5,4 +5,5 @@
     <dimen name="app_ss_width">150dp</dimen>
     <dimen name="app_ss_height">270dp</dimen>
     <dimen name="actionbarsize">60dp</dimen>
+    <dimen name="action_bar">50dp</dimen>
 </resources>
