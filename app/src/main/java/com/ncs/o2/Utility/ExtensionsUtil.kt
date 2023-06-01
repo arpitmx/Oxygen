@@ -7,6 +7,7 @@ import android.content.res.Resources
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.SystemClock
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
@@ -18,6 +19,8 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.Snackbar
 import com.ncs.o2.R
+import com.ncs.o2.Utility.ExtensionsUtil.bounce
+import com.ncs.o2.Utility.ExtensionsUtil.setSingleClickListener
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -196,6 +199,15 @@ object ExtensionsUtil {
         this.startAnimation(animation)
     }
 
+    fun View.animSlideDown(context: Context, animDuration: Long = 1500L) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context, me.shouheng.utils.R.anim.slide_top_to_bottom)
+            .apply {
+                duration = animDuration
+            }
+        this.startAnimation(animation)
+    }
+
     fun View.animSlideLeft(context: Context, animDuration: Long = 1500L) = run {
         this.clearAnimation()
         val animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_left)
@@ -231,7 +243,52 @@ object ExtensionsUtil {
                 duration = animDuration
             }
         this.startAnimation(animation)
+
     }
 
+    fun View.bounce(context: Context, animDuration: Long = 500L) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context, R.anim.bounce)
+            .apply {
+                duration = animDuration
+            }
+        this.startAnimation(animation)
+    }
+
+    fun View.setOnClickBounceListener(throttleTime: Long = 600L,onClick : ()->Unit){
+
+        this.setOnClickListener(object : View.OnClickListener {
+
+            private var lastClickTime: Long = 0
+            override fun onClick(v: View) {
+                v.bounce(context)
+                if (SystemClock.elapsedRealtime() - lastClickTime < throttleTime) return
+                else onClick()
+                lastClickTime = SystemClock.elapsedRealtime()
+            }
+        })
+   }
+
+    inline fun View.setOnClickFadeInListener(crossinline onClick : ()->Unit){
+        setOnClickListener{
+            it.animFadein(context,100)
+            onClick()
+        }
+    }
+
+
+
+
+    fun View.setSingleClickListener(throttleTime: Long = 600L, action: () -> Unit) {
+        this.setOnClickListener(object : View.OnClickListener {
+            private var lastClickTime: Long = 0
+
+            override fun onClick(v: View) {
+                if (SystemClock.elapsedRealtime() - lastClickTime < throttleTime) return
+                else action()
+                lastClickTime = SystemClock.elapsedRealtime()
+            }
+        })
+    }
 
 }

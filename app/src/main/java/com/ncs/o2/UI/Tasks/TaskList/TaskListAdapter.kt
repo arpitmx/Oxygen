@@ -1,12 +1,11 @@
 package com.ncs.o2.UI.Tasks.TaskList
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ncs.o2.Models.Task
-import com.ncs.o2.UI.Tasks.TasksFragment
+import com.ncs.o2.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.databinding.TaskItemBinding
 
 /*
@@ -74,7 +73,7 @@ class TaskListAdapter(
             is TaskItemViewHolder -> {
                 holder.bind(taskList!![position])
 
-                holder.itemView.setOnClickListener {
+                holder.itemView.setOnClickFadeInListener {
                     if (onClickListener != null) {
                         onClickListener!!.onCLick(position, taskList!![position])
                     }

@@ -23,6 +23,7 @@
     <color name="s2bg">#F19FFF</color>
     <color name="s3bg">#FFE871</color>
     <color name="darkbg_main">#131313</color>
+    <color name="darkbg_main_a80">#94131313</color>
     <color name="secondary_bg_black">#202020</color>
     <color name="grabblue">#41FFAF</color>
     <color name="item_bg_glow">#1D2930</color>
@@ -35,4 +36,5 @@
     <color name="menu_item">#F3F3F3</color>
     <color name="primary_text_color">#454545</color>
     <color name="prioritymax">#F30056</color>
+    <color name="pureblack">#000000</color>
 </resources>
