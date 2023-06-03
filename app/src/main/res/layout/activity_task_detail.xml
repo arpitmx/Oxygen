@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/darkbg_main"
     android:orientation="vertical"
-    tools:context=".UI.Tasks.TaskDetailActivity">
+    tools:context=".UI.Tasks.TaskDetails.TaskDetailActivity">
 
     <include
         android:id="@+id/gio_actionbar"
@@ -371,7 +371,7 @@ Versions of the Lorem ipsum text have been used in typesetting at least since th
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linearLayoutCompat"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         android:background="@color/darkbg_main_a80"
         android:elevation="5dp"
         android:orientation="vertical"
@@ -379,20 +379,51 @@ Versions of the Lorem ipsum text have been used in typesetting at least since th
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/request_button"
-            android:layout_width="match_parent"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/request_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:elevation="6dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/card_view_background_green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="start|center_vertical"
+            android:elevation="3dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:layout_marginEnd="5dp"
+            android:indeterminateTint="#03A9F4"
+            app:layout_constraintBottom_toBottomOf="@+id/request_text"
+            app:layout_constraintEnd_toStartOf="@+id/request_text"
+            app:layout_constraintTop_toTopOf="@+id/request_text" />
+
+        <TextView
+            android:id="@+id/request_text"
+            android:layout_width="wrap_content"
             android:layout_height="45dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/card_view_background_green"
             android:fontFamily="@font/outfitmedium"
+            android:gravity="center"
             android:text="Wanna Work"
             android:textAllCaps="false"
             android:textColor="@color/darkbg_main"
-            android:textSize="18dp" />
+            android:textSize="18dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

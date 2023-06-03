@@ -10,8 +10,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Models.Task
+import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskList.TaskListAdapter
-import com.ncs.o2.Utility.ExtensionsUtil.toast
 import com.ncs.o2.databinding.FragmentTasksBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,6 +79,6 @@ class TasksFragment : Fragment(),TaskListAdapter.OnClickListener {
     }
 
     override fun onCLick(position: Int, task: Task) {
-        startActivity(Intent(requireContext(),TaskDetailActivity::class.java))
+        startActivity(Intent(requireContext(), TaskDetailActivity::class.java))
     }
 }

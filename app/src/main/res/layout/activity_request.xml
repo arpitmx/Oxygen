@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/darkbg_main"
     android:orientation="vertical"
-    tools:context=".UI.Tasks.TaskDetailActivity">
+    tools:context=".UI.Tasks.TaskDetails.TaskDetailActivity">
 
     <include
         android:id="@+id/gio_actionbar"
@@ -245,8 +245,9 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
                     android:ems="10"
+                    android:clickable="false"
                     android:paddingStart="15dp"
-                    android:hint="Set Deadline here"
+                    android:hint="Set Deadline using Calender below"
                     android:drawableTint="@color/white"
                     android:background="@drawable/card_bg"
                     android:textColorHint="#94D1D1D1"
@@ -308,6 +309,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
+            android:gravity="center"
             android:background="@drawable/card_view_background_green"
             android:fontFamily="@font/outfitmedium"
             android:text="Accept"

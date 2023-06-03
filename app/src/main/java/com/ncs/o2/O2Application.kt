@@ -1,8 +1,13 @@
 package com.ncs.o2
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.work.Configuration
+import androidx.work.ListenableWorker
+import androidx.work.WorkerFactory
+import androidx.work.WorkerParameters
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.tabs.TabLayout.TabGravity
 import com.google.firebase.FirebaseApp
@@ -14,6 +19,10 @@ import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import com.ncs.o2.BuildConfig
+import com.ncs.o2.Services.NotificationApiService
+import com.ncs.o2.Workers.TaskRequestWorker
+import dagger.assisted.Assisted
+import javax.inject.Inject
 
 /*
 File : O2Application.kt -> com.ncs.o2
@@ -34,9 +43,12 @@ Tasks FUTURE ADDITION :
 */
 
 @HiltAndroidApp
-class O2Application : Application(){
+class O2Application : Application(), Configuration.Provider{
 
     private val TAG = O2Application::class.java.simpleName
+    @Inject
+    lateinit var customWorkerFactory: CustomWorkerFactory
+
     override fun onCreate() {
         super.onCreate()
 
@@ -60,5 +72,24 @@ class O2Application : Application(){
             Timber.tag("FCM TOKEN").d("FCM registration %s", token)
 
         }
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration =
+        Configuration.Builder()
+            .setMinimumLoggingLevel(Log.DEBUG)
+            .setWorkerFactory(customWorkerFactory)
+            .build()
+
+
+    class CustomWorkerFactory @Inject constructor(private val notificationApiService: NotificationApiService): WorkerFactory(){
+        override fun createWorker(
+            appContext: Context,
+            workerClassName: String,
+            workerParameters: WorkerParameters
+        ): ListenableWorker
+        = TaskRequestWorker(
+            appContext,
+            workerParameters,
+            notificationApiService)
     }
 }

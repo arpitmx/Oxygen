@@ -255,16 +255,15 @@ object ExtensionsUtil {
         this.startAnimation(animation)
     }
 
-    fun View.setOnClickBounceListener(throttleTime: Long = 600L,onClick : ()->Unit){
+    fun View.setOnClickBounceListener(onClick : ()->Unit){
 
         this.setOnClickListener(object : View.OnClickListener {
-
-            private var lastClickTime: Long = 0
+            private var clicked : Boolean = false
             override fun onClick(v: View) {
                 v.bounce(context)
-                if (SystemClock.elapsedRealtime() - lastClickTime < throttleTime) return
+                if (clicked) return
                 else onClick()
-                lastClickTime = SystemClock.elapsedRealtime()
+                clicked = true
             }
         })
    }

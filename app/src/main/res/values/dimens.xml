@@ -1,9 +1,4 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="app_fragment_title_text">16dp</dimen>
-    <dimen name="app_fragment_text">14dp</dimen>
-    <dimen name="app_ss_width">150dp</dimen>
-    <dimen name="app_ss_height">270dp</dimen>
-    <dimen name="actionbarsize">60dp</dimen>
     <dimen name="action_bar">50dp</dimen>
 </resources>

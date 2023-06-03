@@ -1,6 +1,8 @@
 package com.ncs.o2.Hilt
 
+import android.app.Application
 import android.content.Context
+import com.ncs.o2.O2Application
 import com.ncs.o2.Utility.GlobalUtils
 import dagger.Module
 import dagger.Provides
@@ -38,6 +40,13 @@ object UtilModule {
     fun providesEasyElements(context : Context):
             GlobalUtils.EasyElements{
         return GlobalUtils.EasyElements(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApplication(): Application
+    {
+        return Application()
     }
 
 

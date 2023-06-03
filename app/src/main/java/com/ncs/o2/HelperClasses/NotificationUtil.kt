@@ -48,6 +48,7 @@ Tasks FUTURE ADDITION :
 
 
         // Create a notification builder
+
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.round_task_alt_24)
             .setContentTitle(title)

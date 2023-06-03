@@ -2,17 +2,12 @@ package com.ncs.o2.UI
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.ncs.o2.Models.ServerResult
 import com.ncs.o2.Models.User
 import com.ncs.versa.Constants.Endpoints
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
-import java.lang.NullPointerException
-import java.security.PrivateKey
 import javax.inject.Inject
 
 /*
@@ -33,20 +28,19 @@ Tasks FUTURE ADDITION :
 
 */
 class FirestoreRepository @Inject constructor(
-    private val firestore : FirebaseFirestore
-    ){
+    private val firestore: FirebaseFirestore
+) {
 
     private val TAG: String = FirestoreRepository::class.java.simpleName
 
-    fun getUserInfo(serverResult: (ServerResult<User?>)->Unit)
-    {
+    fun getUserInfo(serverResult: (ServerResult<User?>) -> Unit) {
         serverResult(ServerResult.Progress)
         Handler(Looper.getMainLooper()).postDelayed({
             var user: User?
             firestore.collection(Endpoints.USERS)
                 .document(Endpoints.TESTUSERID)
                 .get(Source.SERVER)
-                .addOnSuccessListener {snap->
+                .addOnSuccessListener { snap ->
                     if (snap.exists()) {
                         user = snap.toObject(User::class.java)
 
@@ -57,26 +51,29 @@ class FirestoreRepository @Inject constructor(
                         serverResult(ServerResult.Success(user))
                     }
                 }
-                .addOnFailureListener{ error->
+                .addOnFailureListener { error ->
                     Timber.tag(TAG).d("failed %s", error.stackTrace)
                     serverResult(ServerResult.Failure(error))
                 }
-        },1000)
+        }, 1000)
 
 
     }
-    fun fetchUserProjectIDs(projectListCallback : (ServerResult<List<String>>)->Unit){
-        getUserInfo{result->
 
-            when(result){
-                is ServerResult.Success->{
+    fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit) {
+        getUserInfo { result ->
+
+            when (result) {
+                is ServerResult.Success -> {
                     projectListCallback(ServerResult.Success(result.data!!.PROJECTS))
                 }
-                is ServerResult.Progress->{
+
+                is ServerResult.Progress -> {
                     projectListCallback(ServerResult.Progress)
 
                 }
-                is ServerResult.Failure->{
+
+                is ServerResult.Failure -> {
                     projectListCallback(ServerResult.Failure(result.exception))
                 }
 

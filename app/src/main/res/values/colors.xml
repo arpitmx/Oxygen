@@ -8,8 +8,6 @@
     <color name="secondarybg">#2B2B2B</color>
 
 
-
-    <color name="purple_200">#FFBB86FC</color>
     <color name="darkTheme_bg">#242222</color>
 
     <color name="green">@color/s1bg</color>
@@ -28,13 +26,8 @@
     <color name="grabblue">#41FFAF</color>
     <color name="item_bg_glow">#1D2930</color>
     <color name="better_white">#E3E1E1</color>
-    <color name="status_bar">#D2191919</color>
-    <color name="item_bg_dark">#2E3031</color>
     <color name="card_bg">#3F4041</color>
     <color name="starts_in">#DCFFF7</color>
-    <color name="purple">#7E57C2</color>
-    <color name="menu_item">#F3F3F3</color>
-    <color name="primary_text_color">#454545</color>
     <color name="prioritymax">#F30056</color>
     <color name="pureblack">#000000</color>
 </resources>
