@@ -13,10 +13,12 @@ android {
 
     defaultConfig {
         applicationId "com.ncs.o2"
-        minSdk 24
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
+
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -56,7 +58,7 @@ dependencies {
     //  Add these line in your project
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.7.1'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
     //ViewModel
@@ -75,7 +77,7 @@ dependencies {
 
 
     //Bottom Navigation
-    def navigation_version = "2.4.2"
+    def navigation_version = "2.5.3"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
@@ -141,6 +143,12 @@ dependencies {
     //Lottie Animations
     def lottieVersion = "3.4.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    //MultiDex support
+    implementation 'com.android.support:multidex:1.0.3'
+
+    //Flexbox
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
 
 

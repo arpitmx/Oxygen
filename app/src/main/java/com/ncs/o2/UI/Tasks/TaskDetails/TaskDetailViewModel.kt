@@ -56,7 +56,7 @@ class TaskDetailViewModel @Inject constructor(val notificationApiService: Notifi
 
 
     fun sendNotification(){
-        val payloadJsonObject = buildNotificationPayload(test_fcmtokenMI)
+        val payloadJsonObject = buildNotificationPayload(test_fcmtokenEmulator)
 
         val payloadInputData = Data.Builder()
             .putString(TaskRequestWorker.PAYLOAD_DATA,payloadJsonObject.toString())
@@ -67,7 +67,7 @@ class TaskDetailViewModel @Inject constructor(val notificationApiService: Notifi
             .build()
 
         val workRequest = OneTimeWorkRequestBuilder<TaskRequestWorker>()
-          //  .setConstraints(contraints)
+           .setConstraints(contraints)
             .setBackoffCriteria(BackoffPolicy.LINEAR,500L,TimeUnit.MICROSECONDS)
             .setInputData(payloadInputData)
             .build()

@@ -99,7 +99,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@color/secondary_bg_black"
-        android:visibility="gone"
         app:headerLayout="@layout/drawer_header">
 
         <LinearLayout

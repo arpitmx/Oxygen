@@ -2,6 +2,7 @@ package com.ncs.o2
 
 import android.app.Application
 import android.content.Context
+import android.support.multidex.MultiDexApplication
 import android.util.Log
 import android.widget.Toast
 import androidx.work.Configuration
@@ -43,7 +44,7 @@ Tasks FUTURE ADDITION :
 */
 
 @HiltAndroidApp
-class O2Application : Application(), Configuration.Provider{
+class O2Application : MultiDexApplication(), Configuration.Provider{
 
     private val TAG = O2Application::class.java.simpleName
     @Inject

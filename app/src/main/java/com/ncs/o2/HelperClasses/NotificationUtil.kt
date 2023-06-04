@@ -2,6 +2,8 @@ package com.ncs.o2.HelperClasses
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DownloadManager.Request
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -10,8 +12,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Models.O2Notification
 import com.ncs.o2.R
+import com.ncs.o2.UI.Notifications.Requests.RequestActivity
+import com.ncs.o2.Utility.ExtensionsUtil.isNull
 
 /*
 File : NotificationUtil.kt -> com.ncs.o2.HelperClasses
@@ -32,31 +39,65 @@ Tasks FUTURE ADDITION :
 
 */object NotificationUtil {
 
-    fun showNotification(context: Context, title: String, message: String, targetActivity: Class<*>) {
+    fun showNotification(context: Context, notification: O2Notification) {
         val channelId = "fcm1"
         val channelName = "FCM Channel"
         val notificationId = System.currentTimeMillis().toInt()
 
-        val intent = Intent(context, targetActivity)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+
+        val notificationBuilder : Notification.Builder
+
 
 
         // Create a notification builder
+        when (notification.notificationType){
 
-        val notificationBuilder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.round_task_alt_24)
-            .setContentTitle(title)
-            .setContentText(message)
-            .setAutoCancel(false)
-            .setColor(Color.RED)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)) // Set default notification sound
-            .setContentIntent(pendingIntent)
+              NotificationType.TASK_REQUEST_RECIEVED ->
+              {
+                  val intent = Intent(context,RequestActivity::class.java)
+                  intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                  val pendingIntent = PendingIntent.getActivity(
+                      context,
+                      0,
+                      intent,
+                      PendingIntent.FLAG_IMMUTABLE
+                  )
+
+                  notificationBuilder = Notification.Builder(context, channelId)
+                .setSmallIcon(R.drawable.round_task_alt_24)
+                .setContentTitle(notification.title)
+                .setContentText(notification.message)
+                .setAutoCancel(false)
+                .setColor(Color.GREEN)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)) // Set default notification sound
+                .setContentIntent(pendingIntent)
+              }
+            NotificationType.REQUEST_FAILED ->
+
+            {
+                val intent = Intent(context,RequestActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+
+                notificationBuilder = Notification.Builder(context,channelId)
+                    .setContentTitle(notification.title)
+                    .setContentText(notification.message)
+                    .setSmallIcon(R.drawable.baseline_refresh_24)
+                    .setColor(Color.RED)
+                    .setAutoCancel(false)
+                    .setStyle(Notification.BigTextStyle()
+                        .bigText(notification.longDesc))
+                    .setContentIntent(pendingIntent)
+
+            }
+
+        }
+
 
 
         // Create a notification manager

@@ -1,4 +1,5 @@
 package com.ncs.o2.Utility
 
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS, AnnotationTarget.EXPRESSION)
 annotation class Later(val todo : String)

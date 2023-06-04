@@ -9,12 +9,15 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.HelperClasses.NotificationUtil
+import com.ncs.o2.Models.O2Notification
 import com.ncs.o2.Models.ServerResult
 import com.ncs.o2.Services.NotificationApiService
 import com.ncs.o2.UI.Notifications.Requests.RequestActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
@@ -76,26 +79,30 @@ class TaskRequestWorker @AssistedInject constructor(
                 Result.retry()
             }
 
-//        } catch (e: UnknownHostException){
-//            Timber.tag(TAG).d("Retrying Connection : ${e.message}")
-//            _resultLiveData.postValue(ServerResult.Failure(e))
-//            Result.retry()
-//        }
-//        catch (e: ConnectException){
-//            Timber.tag(TAG).d("Retrying Connection : ${e.message}")
-//            _resultLiveData.postValue(ServerResult.Failure(e))
-//            Result.retry()
-//        }
-//
-//        catch (e:TimeoutException){
-//            Timber.tag(TAG).d("Request timeout exception: ${e.message}")
-//            _resultLiveData.postValue(ServerResult.Failure(e))
-//            Result.retry()
+        } catch (e: UnknownHostException){
+            Timber.tag(TAG).d("Retrying Connection : ${e.message}")
+            _resultLiveData.postValue(ServerResult.Failure(e))
+            Result.retry()
+        }
+        catch (e: ConnectException){
+            Timber.tag(TAG).d("Retrying Connection : ${e.message}")
+            _resultLiveData.postValue(ServerResult.Failure(e))
+            Result.retry()
+        }
+
+        catch (e:TimeoutException){
+            Timber.tag(TAG).d("Request timeout exception: ${e.message}")
+            _resultLiveData.postValue(ServerResult.Failure(e))
+            Result.retry()
         }
          catch (e:Exception){
             Timber.tag(TAG).d("Failed : ${e.message}")
             _resultLiveData.postValue(ServerResult.Failure(e))
-            NotificationUtil.showNotification(applicationContext,"Request Failed","Your request for task #1234 has failed, tap here to resend \nReason : ${e.message}", RequestActivity::class.java)
+             val failedNotif = O2Notification(
+                 NotificationType.REQUEST_FAILED,
+                 "Request Sending Failed for #12345","Click here for resending request",
+                 "Cause due to -> ${e.message}")
+            NotificationUtil.showNotification(notification = failedNotif, context = applicationContext)
             Result.failure()
         }
     }

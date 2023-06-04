@@ -10,7 +10,9 @@ import androidx.core.app.NotificationCompat
 import com.google.android.gms.common.util.AndroidUtilsLight
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.HelperClasses.NotificationUtil.showNotification
+import com.ncs.o2.Models.O2Notification
 import com.ncs.o2.R
 import com.ncs.o2.UI.Notifications.Requests.RequestActivity
 import timber.log.Timber
@@ -49,7 +51,8 @@ class FCMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         Timber.tag("SellerFirebaseService ").i("Message :: %s", message.data["body"])
-        showNotification(baseContext,message.data["title"]!!, message.data["body"]!!, RequestActivity::class.java)
+        val notif = O2Notification(NotificationType.TASK_REQUEST_RECIEVED,"Work Request from armax","#ID12345 has a work request from Armax")
+        showNotification(notification = notif, context = applicationContext)
 
     }
 
