@@ -8,6 +8,10 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.SystemClock
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
@@ -15,9 +19,11 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.integrity.internal.l
 import com.ncs.o2.R
 import com.ncs.o2.Utility.ExtensionsUtil.bounce
 import com.ncs.o2.Utility.ExtensionsUtil.setSingleClickListener
@@ -25,6 +31,7 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 /*
 File : ExtensionsUtil.kt -> com.ncs.versa.Utility
@@ -255,11 +262,37 @@ object ExtensionsUtil {
         this.startAnimation(animation)
     }
 
-    fun View.setOnClickBounceListener(onClick : ()->Unit){
+    private const val SHORT_HAPTIC_FEEDBACK_DURATION = 5L
+    fun Context.performHapticFeedback() {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        val vibrationEffect = VibrationEffect.createOneShot(100L, VibrationEffect.DEFAULT_AMPLITUDE)
+        vibrator.vibrate(vibrationEffect)
+    }
+
+
+    fun View.setOnClickThrottleBounceListener(throttleTime: Long = 600L,onClick : ()->Unit){
+
+        this.setOnClickListener(object : View.OnClickListener {
+
+            private var lastClickTime: Long = 0
+            override fun onClick(v: View) {
+                v.bounce(context)
+                if (SystemClock.elapsedRealtime() - lastClickTime < throttleTime) return
+                else onClick()
+                lastClickTime = SystemClock.elapsedRealtime()
+            }
+        })
+    }
+
+
+
+
+    fun View.setOnClickSingleTimeBounceListener(onClick : ()->Unit){
 
         this.setOnClickListener(object : View.OnClickListener {
             private var clicked : Boolean = false
             override fun onClick(v: View) {
+                context.performHapticFeedback()
                 v.bounce(context)
                 if (clicked) return
                 else onClick()
@@ -270,6 +303,7 @@ object ExtensionsUtil {
 
     inline fun View.setOnClickFadeInListener(crossinline onClick : ()->Unit){
         setOnClickListener{
+            context.performHapticFeedback()
             it.animFadein(context,100)
             onClick()
         }

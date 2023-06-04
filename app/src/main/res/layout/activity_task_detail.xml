@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkbg_main"
+    android:background="@color/secondary_bg_black"
     android:orientation="vertical"
     tools:context=".UI.Tasks.TaskDetails.TaskDetailActivity">
 
@@ -48,20 +48,25 @@
                 android:nestedScrollingEnabled="false"
                 />
 
+<androidx.appcompat.widget.LinearLayoutCompat
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
 
             <TextView
                 android:id="@+id/taskid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:fontFamily="@font/outfitmedium"
                 android:gravity="start"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="#ID1234"
                 android:textColor="@color/yello"
-                android:textSize="16dp"
+                android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -156,21 +161,59 @@
                     app:layout_constraintVertical_bias="0.0" />
 
 
-            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/openedBy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/outfitmedium"
+        android:gravity="start"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="Alok created this task 2 days ago"
+        android:textColor="#DCFFFFFF"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/btnBack"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
 
 
-            <TextView
-                android:id="@+id/openedBy"
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:background="#56838383" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:orientation="vertical"
+                >
+
+            <TextView
+                android:id="@+id/contributors_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:fontFamily="@font/outfitmedium"
                 android:gravity="start"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="Alok created this task 2 days ago"
-                android:textColor="#DCFFFFFF"
-                android:textSize="15dp"
+                android:text="Contributors :"
+                android:textColor="@color/s2bg"
+                android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -179,13 +222,25 @@
                 app:layout_constraintVertical_bias="0.0" />
 
 
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/contributorsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                android:layout_margin="10dp"
+                />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="20dp"
                 android:layout_marginEnd="15dp"
                 android:background="#56838383" />
+
+
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -197,16 +252,13 @@
                     android:id="@+id/dd"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@color/primarybg"
+                    android:layout_marginTop="10dp"
                     android:fontFamily="@font/outfitmedium"
                     android:gravity="start"
-                    android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="Task description :"
-                    android:textColor="@color/s3bg"
-                    android:textSize="18dp"
+                    android:text="Task Description :"
+                    android:textColor="@color/grabblue"
+                    android:textSize="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -218,7 +270,6 @@
                     android:id="@+id/description_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/primarybg"
                     android:fontFamily="@font/outfitregular"
                     android:gravity="start"
                     android:padding="10dp"
@@ -250,7 +301,6 @@ Versions of the Lorem ipsum text have been used in typesetting at least since th
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:layout_marginBottom="5dp"
-                    android:background="@color/primarybg"
                     android:fontFamily="@font/outfitmedium"
                     android:gravity="start"
                     android:paddingStart="10dp"
@@ -269,7 +319,6 @@ Versions of the Lorem ipsum text have been used in typesetting at least since th
                     android:id="@+id/links_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/primarybg"
                     android:fontFamily="@font/outfitregular"
                     android:gravity="start"
                     android:padding="10dp"
