@@ -1,10 +1,8 @@
 package com.ncs.versa.Hilt
 
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.ncs.o2.UI.FirestoreRepository
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,7 +46,7 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun provideFirestore(firestore: FirebaseFirestore): FirestoreRepository{
+    fun provideFirestore(firestore: FirebaseFirestore): FirestoreRepository {
         return FirestoreRepository(firestore)
     }
 

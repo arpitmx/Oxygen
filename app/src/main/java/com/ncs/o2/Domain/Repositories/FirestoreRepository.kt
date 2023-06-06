@@ -1,13 +1,16 @@
-package com.ncs.o2.UI
+package com.ncs.o2.Domain.Repositories
 
 import android.os.Handler
 import android.os.Looper
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
-import com.ncs.o2.Models.ServerResult
-import com.ncs.o2.Models.User
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.User
 import com.ncs.versa.Constants.Endpoints
+import kotlinx.coroutines.tasks.await
 import timber.log.Timber
+import java.lang.StringBuilder
 import javax.inject.Inject
 
 /*
@@ -32,6 +35,31 @@ class FirestoreRepository @Inject constructor(
 ) {
 
     private val TAG: String = FirestoreRepository::class.java.simpleName
+
+    fun getTaskPath(task:Task):String{
+        return Endpoints.PROJECTS +
+                "/${task.PROJECTID}" +
+                "/${Endpoints.Project.SEGMENT}"+
+                "/${task.SEGMENT}"+
+                "/${Endpoints.SEGMENT.TASKS}"+
+                "/${task.ID}"+
+                "/"
+
+    }
+
+     fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit){
+        serverResult(ServerResult.Progress)
+        firestore.document(getTaskPath(task))
+            .set(task)
+            .addOnSuccessListener {
+                serverResult(ServerResult.Success(200))
+            }
+            .addOnFailureListener{
+                serverResult(ServerResult.Failure(it))
+            }
+
+
+    }
 
     fun getUserInfo(serverResult: (ServerResult<User?>) -> Unit) {
         serverResult(ServerResult.Progress)

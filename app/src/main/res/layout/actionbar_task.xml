@@ -25,7 +25,7 @@
             android:fontFamily="@font/outfitbold"
             android:gravity="center"
             android:layout_marginStart="10dp"
-            android:text="#ID1234"
+            android:text="Title"
             android:textColor="@color/primary"
             android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"

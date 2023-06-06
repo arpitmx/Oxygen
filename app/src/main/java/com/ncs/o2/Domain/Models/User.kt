@@ -1,4 +1,4 @@
-package com.ncs.o2.Models
+package com.ncs.o2.Domain.Models
 
 /*
 File : User.kt -> com.ncs.o2.Models

@@ -30,4 +30,6 @@
     <color name="starts_in">#DCFFF7</color>
     <color name="prioritymax">#F30056</color>
     <color name="pureblack">#000000</color>
+    <color name="dim_purple">#C3BCED</color>
+    <color name="purple">#C06AFD</color>
 </resources>

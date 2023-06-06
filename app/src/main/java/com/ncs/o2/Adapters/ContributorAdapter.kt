@@ -1,11 +1,8 @@
 package com.ncs.o2.Adapters
 
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -14,13 +11,11 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.ncs.o2.Models.Contributor
+import com.ncs.o2.Domain.Models.Contributor
 import com.ncs.o2.R
-import com.ncs.o2.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.databinding.ContriItemBinding
-import com.ncs.o2.databinding.TagItemBinding
 
 /*
 File : ContributorAdapter.kt -> com.ncs.o2.Adapters
@@ -96,9 +91,12 @@ class ContributorAdapter constructor(val contriList: List<Contributor>, val onCl
                    return false
                }
            })
+           .encodeQuality(50)
+           .override(40,40)
            .apply(
                RequestOptions().
-               diskCacheStrategy(DiskCacheStrategy.NONE)
+               diskCacheStrategy(DiskCacheStrategy.ALL)
+
            )
            .error(R.drawable.profile_pic_placeholder)
            .into(holder.binding.contriProfileImage)

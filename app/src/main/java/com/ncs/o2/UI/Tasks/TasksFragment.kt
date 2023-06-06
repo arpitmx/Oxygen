@@ -9,15 +9,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ncs.o2.Models.Task
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
-import com.ncs.o2.UI.Tasks.TaskList.TaskListAdapter
+import com.ncs.o2.Adapters.TaskListAdapter
 import com.ncs.o2.databinding.FragmentTasksBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class TasksFragment : Fragment(),TaskListAdapter.OnClickListener {
+class TasksFragment : Fragment(), TaskListAdapter.OnClickListener {
 
 
     private val viewModel: TasksViewModel by viewModels()
@@ -50,12 +50,12 @@ class TasksFragment : Fragment(),TaskListAdapter.OnClickListener {
 
 
         val task1 = Task("Appbar not working in the new implementation",
-        "Have to implement that.","#1234",2, listOf("link1,link2"),3,1, listOf("mod1"),
-            "Assigner1","31/2/23", "3H+"
+        "Have to implement that.","#1234",2, listOf("link1,link2"),3,1, ASSIGNEE = listOf("mod1"),
+            "Assigner1","31/2/23", "31/2/23","3H+", emptyList(), PROJECTID = "Versa123", SEGMENT = "SEG1"
         )
         val task2 = Task("Window navigation not working in Versa 2.0",
             "Have to implement that.","#1364",1, listOf("link1,link2"),2,3, listOf("mod1"),
-            "Assigner1","31/2/22", "4H+"
+            "Assigner1","31/2/22", "31/2/23","3H+", emptyList(), PROJECTID = "Versa123", SEGMENT = "SEG1"
         )
 
         taskList = arrayListOf(task1,task2,task1,task2,task1,task2,task1,task2,task1)

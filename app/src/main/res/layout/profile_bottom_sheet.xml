@@ -14,12 +14,11 @@
         android:layout_marginBottom="5dp"
         android:gravity="center"
         android:orientation="vertical"
-
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp">
+            android:layout_width="100dp"
+            android:layout_height="100dp">
 
             <ProgressBar
                 android:id="@+id/progressbar"
@@ -56,7 +55,7 @@
             android:fontFamily="@font/outfitmedium"
             android:gravity="center"
             android:text="Armax"
-            android:textColor="@color/better_white"
+            android:textColor="@color/white"
             android:textSize="22sp" />
 
         <TextView
@@ -68,7 +67,7 @@
             android:gravity="center"
             android:text="sudoarmax@gmail.com"
             android:textColor="#C1536DFE"
-            android:textSize="12sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/time"

@@ -1,4 +1,4 @@
-package com.ncs.o2.Utility
+package com.ncs.o2.Domain.Utility
 
 import android.app.ProgressDialog
 import android.content.Context

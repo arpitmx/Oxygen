@@ -1,4 +1,4 @@
-package com.ncs.o2.Utility
+package com.ncs.o2.Domain.Utility
 
 import android.app.Activity
 import android.content.Context
@@ -25,8 +25,8 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MOD
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.integrity.internal.l
 import com.ncs.o2.R
-import com.ncs.o2.Utility.ExtensionsUtil.bounce
-import com.ncs.o2.Utility.ExtensionsUtil.setSingleClickListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.bounce
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setSingleClickListener
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date

@@ -1,4 +1,4 @@
-package com.ncs.o2.Utility
+package com.ncs.o2.Domain.Utility
 
 import kotlin.String
 
@@ -24,7 +24,7 @@ object codes {
             override val code: String = "FAULTY_CODE"
             override val fullcode: String = "Error code : FAULTY_ERROR_CODE"
             override val description: String = "Fault in unknown error code"
-            override val solution: String = Companion.common_solution
+            override val solution: String = common_solution
             override val actionText: String = common_action_restart
         }
 

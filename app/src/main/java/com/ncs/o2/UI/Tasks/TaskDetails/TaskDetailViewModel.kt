@@ -1,29 +1,17 @@
 package com.ncs.o2.UI.Tasks.TaskDetails
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.google.gson.JsonObject
-import com.ncs.o2.O2Application
 import com.ncs.o2.Services.NotificationApiService
-import com.ncs.o2.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Utility.ExtensionsUtil.snackbar
-import com.ncs.o2.Workers.TaskRequestWorker
+import com.ncs.o2.Domain.Workers.FCMWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
-import retrofit2.Response
-import java.sql.Time
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -59,14 +47,14 @@ class TaskDetailViewModel @Inject constructor(val notificationApiService: Notifi
         val payloadJsonObject = buildNotificationPayload(test_fcmtokenEmulator)
 
         val payloadInputData = Data.Builder()
-            .putString(TaskRequestWorker.PAYLOAD_DATA,payloadJsonObject.toString())
+            .putString(FCMWorker.PAYLOAD_DATA,payloadJsonObject.toString())
             .build()
 
         val contraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<TaskRequestWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
            .setConstraints(contraints)
             .setBackoffCriteria(BackoffPolicy.LINEAR,500L,TimeUnit.MICROSECONDS)
             .setInputData(payloadInputData)

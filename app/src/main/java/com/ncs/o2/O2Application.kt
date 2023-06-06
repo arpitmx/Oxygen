@@ -1,28 +1,17 @@
 package com.ncs.o2
 
-import android.app.Application
 import android.content.Context
 import android.support.multidex.MultiDexApplication
 import android.util.Log
-import android.widget.Toast
 import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.material.tabs.TabLayout.TabGravity
-import com.google.firebase.FirebaseApp
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.iid.FirebaseInstanceIdReceiver
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
-import com.ncs.o2.BuildConfig
 import com.ncs.o2.Services.NotificationApiService
-import com.ncs.o2.Workers.TaskRequestWorker
-import dagger.assisted.Assisted
+import com.ncs.o2.Domain.Workers.FCMWorker
 import javax.inject.Inject
 
 /*
@@ -88,7 +77,7 @@ class O2Application : MultiDexApplication(), Configuration.Provider{
             workerClassName: String,
             workerParameters: WorkerParameters
         ): ListenableWorker
-        = TaskRequestWorker(
+        = FCMWorker(
             appContext,
             workerParameters,
             notificationApiService)

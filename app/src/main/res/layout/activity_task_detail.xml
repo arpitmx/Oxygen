@@ -10,7 +10,7 @@
 
     <include
         android:id="@+id/gio_actionbar"
-        layout="@layout/actionbar_task_details"
+        layout="@layout/actionbar_task"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="visible"
@@ -46,6 +46,7 @@
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
+                android:layoutAnimation="@anim/layout_animation_slidedown"
                 />
 
 <androidx.appcompat.widget.LinearLayoutCompat
@@ -230,6 +231,7 @@
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
                 android:layout_margin="10dp"
+                android:layoutAnimation="@anim/layout_animation_popscale"
                 />
             </androidx.appcompat.widget.LinearLayoutCompat>
 

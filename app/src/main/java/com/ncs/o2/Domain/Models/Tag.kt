@@ -1,7 +1,7 @@
-package com.ncs.o2.Models
+package com.ncs.o2.Domain.Models
 
 import android.graphics.Color
-import com.ncs.o2.Utility.Later
+import com.ncs.o2.Domain.Utility.Later
 
 /*
 File : Tag.kt -> com.ncs.o2.Models

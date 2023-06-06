@@ -1,15 +1,20 @@
 package com.ncs.o2.Hilt
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
+import androidx.navigation.NavInflater
+import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.O2Application
-import com.ncs.o2.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Inject
 import javax.inject.Scope
 import javax.inject.Singleton
 
@@ -35,19 +40,16 @@ Tasks FUTURE ADDITION :
 @InstallIn(ActivityComponent::class)
 object UtilModule {
 
-    @Singleton
     @Provides
     fun providesEasyElements(context : Context):
             GlobalUtils.EasyElements{
         return GlobalUtils.EasyElements(context)
     }
 
-    @Singleton
-    @Provides
-    fun provideApplication(): Application
-    {
-        return Application()
-    }
 
+    @Provides
+    fun provideNavigator(context:Activity): Navigator {
+        return Navigator(context)
+    }
 
 }

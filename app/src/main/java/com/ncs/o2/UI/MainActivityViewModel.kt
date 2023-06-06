@@ -3,7 +3,8 @@ package com.ncs.o2.UI
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.ncs.o2.Models.ServerResult
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

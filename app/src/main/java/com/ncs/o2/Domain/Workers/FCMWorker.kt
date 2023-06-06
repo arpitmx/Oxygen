@@ -1,33 +1,25 @@
-package com.ncs.o2.Workers
+package com.ncs.o2.Domain.Workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.ncs.o2.Constants.NotificationType
-import com.ncs.o2.HelperClasses.NotificationUtil
-import com.ncs.o2.Models.O2Notification
-import com.ncs.o2.Models.ServerResult
+import com.ncs.o2.HelperClasses.LocalNotificationUtil
+import com.ncs.o2.Domain.Models.O2Notification
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Services.NotificationApiService
-import com.ncs.o2.UI.Notifications.Requests.RequestActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Response
 import timber.log.Timber
-import java.io.IOException
 import java.lang.Exception
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.concurrent.TimeoutException
-import javax.inject.Inject
 
 /*
 File : FCMWorker.kt -> com.ncs.o2.Workers
@@ -48,7 +40,7 @@ Tasks FUTURE ADDITION :
 */
 
 @HiltWorker
-class TaskRequestWorker @AssistedInject constructor(
+class FCMWorker @AssistedInject constructor(
             @Assisted context: Context,
             @Assisted workerParameters: WorkerParameters,
             @Assisted val notificationApiService: NotificationApiService,
@@ -60,7 +52,6 @@ class TaskRequestWorker @AssistedInject constructor(
     private fun getJsonPayload(str:String):JsonObject{
         return Gson().fromJson(str,JsonObject::class.java)
     }
-
 
     override suspend fun doWork(): Result {
 
@@ -99,10 +90,10 @@ class TaskRequestWorker @AssistedInject constructor(
             Timber.tag(TAG).d("Failed : ${e.message}")
             _resultLiveData.postValue(ServerResult.Failure(e))
              val failedNotif = O2Notification(
-                 NotificationType.REQUEST_FAILED,
+                 NotificationType.REQUEST_FAILED_NOTIFICATION,
                  "Request Sending Failed for #12345","Click here for resending request",
                  "Cause due to -> ${e.message}")
-            NotificationUtil.showNotification(notification = failedNotif, context = applicationContext)
+            LocalNotificationUtil.showNotification(notification = failedNotif, context = applicationContext)
             Result.failure()
         }
     }

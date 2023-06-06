@@ -1,4 +1,4 @@
-package com.ncs.o2.Models
+package com.ncs.o2.Domain.Models
 
 import com.ncs.o2.Constants.NotificationType
 

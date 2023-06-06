@@ -9,13 +9,13 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.ncs.o2.Adapters.ContributorAdapter
 import com.ncs.o2.Adapters.TagAdapter
 import com.ncs.o2.BottomSheets.ProfileBottomSheet
-import com.ncs.o2.Models.Contributor
-import com.ncs.o2.Models.Tag
-import com.ncs.o2.Utility.Colors
-import com.ncs.o2.Utility.ExtensionsUtil.animFadein
-import com.ncs.o2.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
-import com.ncs.o2.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Utility.Later
+import com.ncs.o2.Domain.Models.Contributor
+import com.ncs.o2.Domain.Models.Tag
+import com.ncs.o2.Domain.Utility.Colors
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.databinding.ActivityTaskDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 

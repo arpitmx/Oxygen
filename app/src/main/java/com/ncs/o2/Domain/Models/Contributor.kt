@@ -1,6 +1,6 @@
-package com.ncs.o2.Models
+package com.ncs.o2.Domain.Models
 
-import com.ncs.o2.Utility.Later
+import com.ncs.o2.Domain.Utility.Later
 
 /*
 File : Contributor.kt -> com.ncs.o2.Models

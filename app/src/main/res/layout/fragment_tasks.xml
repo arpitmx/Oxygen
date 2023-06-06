@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
-        android:layoutAnimation="@anim/layout_animation"
+        android:layoutAnimation="@anim/layout_animation_popscale"
         android:nestedScrollingEnabled="false"
         android:paddingBottom="40dp"
         android:elevation="2dp"

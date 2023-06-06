@@ -14,7 +14,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.ncs.o2.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.databinding.ProfileBottomSheetBinding
 
 
@@ -81,7 +81,9 @@ class ProfileBottomSheet (
                 }
             })
             .apply(
-                RequestOptions().override(80, 80)
+                RequestOptions()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL).override(100, 100)
+
             )
             .into(binding.roomDp)
 

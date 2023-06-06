@@ -1,5 +1,6 @@
 package com.ncs.o2.UI
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
@@ -7,14 +8,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.ProjectCallback
 import com.ncs.o2.R
-import com.ncs.o2.Utility.ExtensionsUtil.animFadein
-import com.ncs.o2.Utility.ExtensionsUtil.progressGone
-import com.ncs.o2.Utility.ExtensionsUtil.progressVisible
-import com.ncs.o2.Utility.GlobalUtils
+import com.ncs.o2.UI.CreateTask.CreateTaskActivity
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ProjectCallback {
@@ -28,6 +33,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    @Inject
+    lateinit var navigator: Navigator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -38,7 +46,14 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
     private fun setUpViews() {
         setUpProjects()
         setUpActionBar()
+        setUpViewsOnClicks()
 
+    }
+
+    private fun setUpViewsOnClicks() {
+        binding.gioActionbar.createTaskButton.setOnClickThrottleBounceListener{
+           navigator.startSingleTopActivity(CreateTaskActivity::class.java)
+        }
     }
 
     private fun setUpActionBar() {
