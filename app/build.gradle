@@ -150,6 +150,8 @@ dependencies {
     //Flexbox
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
+    //Faker data
+    implementation 'net.datafaker:datafaker:1.9.0'
 
 
     implementation 'androidx.core:core-ktx:1.10.1'

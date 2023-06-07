@@ -34,8 +34,8 @@ data class Task(
     val STARTDATE: String = "",
     val DURATION: String = "",
     val TAGS: List<Tag> = listOf(),
-    val PROJECTID: String,
-    val SEGMENT: String,
+    val PROJECTID: String="",
+    val SEGMENT: String="",
 ) {
 
     @Exclude
