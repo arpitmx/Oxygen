@@ -3,8 +3,9 @@ package com.ncs.o2.UI
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -27,7 +28,9 @@ Tasks FUTURE ADDITION :
 */
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(private val repository: FirestoreRepository) :
+class MainActivityViewModel @Inject constructor(
+    @FirebaseRepository val repository: Repository
+    ) :
     ViewModel() {
 
     private val _showprogressLD = MutableLiveData<Boolean>()

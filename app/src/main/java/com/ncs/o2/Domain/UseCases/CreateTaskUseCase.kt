@@ -1,12 +1,12 @@
 package com.ncs.o2.Domain.UseCases
 
-import android.util.Log
-import android.widget.Toast
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.random.Random
 
 /*
 File : CreateTaskUseCase.kt -> com.ncs.o2.UseCases
@@ -28,31 +28,38 @@ Tasks FUTURE ADDITION :
 */
 
 
-class CreateTaskUseCase @Inject constructor(val repository: FirestoreRepository){
+class CreateTaskUseCase @Inject constructor(
+    @FirebaseRepository val repository: Repository
+) {
 
-    fun getTaskID(){
+    fun getTaskID() {
     }
 
-    fun publishTask(task : Task, result : (ServerResult<Int>)->Unit){
-            repository.postTask(task){repoResult->
-                Timber.tag(TAG).d(repoResult.toString())
-                result(repoResult)
-            }
+    fun publishTask(task: Task, result: (ServerResult<Int>) -> Unit) {
+        repository.postTask(task) { repoResult ->
+            Timber.tag(TAG).d(repoResult.toString())
+            result(repoResult)
+        }
     }
 
-    fun notifyTaskCreationResultLocal(){
-
-    }
-
-    fun notifyProjectUsersAboutTaskCreation(){
+    fun notifyTaskCreationResultLocal() {
 
     }
 
-    companion object{
+    fun notifyProjectUsersAboutTaskCreation() {
+
+    }
+
+    private fun createRandomTaskID(): String {
+        val random = Random(System.currentTimeMillis())
+        val randomNumber = random.nextInt(1000, 9999)
+        return "#T$randomNumber"
+
+    }
+
+    companion object {
         const val TAG = "CreateTaskUseCase"
     }
-
-
 
 
 }

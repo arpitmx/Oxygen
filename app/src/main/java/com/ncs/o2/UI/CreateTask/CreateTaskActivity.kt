@@ -2,12 +2,17 @@ package com.ncs.o2.UI.CreateTask
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.UUID
+import kotlin.random.Random
 
 
 @AndroidEntryPoint
@@ -21,7 +26,7 @@ class CreateTaskActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_task)
+        setContentView(binding.root)
 
         val testTask : Task = Task(
             "Test Title1",
@@ -30,8 +35,11 @@ class CreateTaskActivity : AppCompatActivity() {
             "Versa","Development"
         )
 
-        binding.addContributorsBtn.setOnClickSingleTimeBounceListener {
+        binding.addContributorsBtn.setOnClickThrottleBounceListener{
+            Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show()
             viewmodel.createTask(testTask)
         }
     }
+
+
 }

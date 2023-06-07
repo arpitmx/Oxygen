@@ -1,12 +1,16 @@
 package com.ncs.versa.Hilt
 
+import androidx.navigation.Navigator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 /*
@@ -46,7 +50,7 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun provideFirestore(firestore: FirebaseFirestore): FirestoreRepository {
+    fun provideFirestoreRepository(firestore: FirebaseFirestore): Repository {
         return FirestoreRepository(firestore)
     }
 

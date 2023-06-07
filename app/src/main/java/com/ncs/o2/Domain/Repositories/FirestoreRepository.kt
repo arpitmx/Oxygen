@@ -4,9 +4,11 @@ import android.os.Handler
 import android.os.Looper
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -32,7 +34,7 @@ Tasks FUTURE ADDITION :
 */
 class FirestoreRepository @Inject constructor(
     private val firestore: FirebaseFirestore
-) {
+) : Repository {
 
     private val TAG: String = FirestoreRepository::class.java.simpleName
 
@@ -47,7 +49,7 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-     fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit){
+    override fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit){
         serverResult(ServerResult.Progress)
         firestore.document(getTaskPath(task))
             .set(task)
@@ -61,7 +63,7 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    fun getUserInfo(serverResult: (ServerResult<User?>) -> Unit) {
+  override fun getUserInfo(serverResult: (ServerResult<User?>) -> Unit) {
         serverResult(ServerResult.Progress)
         Handler(Looper.getMainLooper()).postDelayed({
             var user: User?
@@ -88,7 +90,7 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit) {
+    override fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit) {
         getUserInfo { result ->
 
             when (result) {

@@ -29,7 +29,7 @@ Tasks FUTURE ADDITION :
 
 @InstallIn(SingletonComponent::class)
 @Module
-object UserCasesModule {
+object UseCasesModule {
 
     @Singleton
     @Provides
