@@ -1,4 +1,4 @@
-package com.ncs.o2.Adapters
+package com.ncs.o2.UI.UIComponents.Adapters
 
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater

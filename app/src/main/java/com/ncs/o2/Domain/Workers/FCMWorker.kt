@@ -59,7 +59,7 @@ class FCMWorker @AssistedInject constructor(
 
 
             val payloadJson: JsonObject = getJsonPayload(inputData.getString(PAYLOAD_DATA)!!)
-            val response = notificationApiService.sendNotification(payloadJson).execute()
+            val response = notificationApiService.sendNotification(payloadJson)
             if (response.isSuccessful) {
                 Timber.tag(TAG).d("Successful : ${response.body()}")
                 _resultLiveData.postValue(ServerResult.Success("Success"))

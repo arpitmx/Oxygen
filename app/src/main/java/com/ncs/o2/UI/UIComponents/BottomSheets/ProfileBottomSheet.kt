@@ -1,6 +1,5 @@
-package com.ncs.o2.BottomSheets
+package com.ncs.o2.UI.UIComponents.BottomSheets
 
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater

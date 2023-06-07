@@ -1,4 +1,4 @@
-package com.ncs.o2.Adapters
+package com.ncs.o2.UI.UIComponents.Adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

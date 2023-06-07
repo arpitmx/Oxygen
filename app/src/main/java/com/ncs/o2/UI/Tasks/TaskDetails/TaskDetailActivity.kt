@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
-import com.ncs.o2.Adapters.ContributorAdapter
-import com.ncs.o2.Adapters.TagAdapter
-import com.ncs.o2.BottomSheets.ProfileBottomSheet
+import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.Domain.Models.Contributor
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.Colors

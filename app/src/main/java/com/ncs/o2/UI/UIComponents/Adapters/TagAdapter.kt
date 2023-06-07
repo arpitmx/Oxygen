@@ -1,13 +1,10 @@
-package com.ncs.o2.Adapters
+package com.ncs.o2.UI.UIComponents.Adapters
 
 import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Tag
-import com.ncs.o2.R
 import com.ncs.o2.databinding.TagItemBinding
 
 /*

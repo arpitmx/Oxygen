@@ -1,4 +1,4 @@
-package com.ncs.o2
+package com.ncs.o2.UI.UIComponents.Adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,9 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import android.widget.Toast
+import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
-import kotlinx.coroutines.flow.callbackFlow
 
 /*
 File : ListAdapter.kt -> com.ncs.o2

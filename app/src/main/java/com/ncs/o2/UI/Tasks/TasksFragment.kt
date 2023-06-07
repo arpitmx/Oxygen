@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
-import com.ncs.o2.Adapters.TaskListAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.TaskListAdapter
 import com.ncs.o2.databinding.FragmentTasksBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint

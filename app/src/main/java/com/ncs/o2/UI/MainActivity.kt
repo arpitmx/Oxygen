@@ -1,6 +1,5 @@
 package com.ncs.o2.UI
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
@@ -9,7 +8,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.ncs.o2.HelperClasses.Navigator
-import com.ncs.o2.ProjectCallback
+import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
@@ -17,6 +16,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
         viewModel.projectListLiveData.observe(this) { projectList ->
 
-            val projectListAdapter = com.ncs.o2.ListAdapter(this, projectList!!)
+            val projectListAdapter = ListAdapter(this, projectList!!)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }
     }
