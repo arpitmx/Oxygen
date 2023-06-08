@@ -12,7 +12,7 @@ import retrofit2.http.POST
 
 
 interface NotificationApiService {
-    @Headers(*["Authorization: key=" + BuildConfig.FCM_SERVER_KEY, "Content-Type: application/json"])
+    @Headers("Authorization: key=" + BuildConfig.FCM_SERVER_KEY, "Content-Type: application/json")
     @POST("fcm/send")
    suspend fun sendNotification(@Body payload: JsonObject?): Response<JsonObject>
 }

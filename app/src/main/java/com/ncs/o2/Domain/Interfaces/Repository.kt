@@ -2,7 +2,7 @@ package com.ncs.o2.Domain.Interfaces
 
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Models.CurrentUser
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
@@ -28,7 +28,7 @@ interface Repository {
     fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit)
 
     //User related
-    fun getUserInfo(serverResult: (ServerResult<User?>) -> Unit)
+    fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
 
     //Project related
     fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit)

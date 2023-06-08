@@ -11,7 +11,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.ncs.o2.Domain.Models.Contributor
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.R
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -52,7 +52,7 @@ Tasks FUTURE ADDITION :
 
 
 */
-class ContributorAdapter constructor(val contriList: List<Contributor>, val onClickCallback: OnClickCallback) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
+class ContributorAdapter constructor(val contriList: List<User>, val onClickCallback: OnClickCallback) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -67,7 +67,6 @@ class ContributorAdapter constructor(val contriList: List<Contributor>, val onCl
        Glide.with(holder.itemView.context)
            .load(contributor.profileUrl)
            .listener(object : RequestListener<Drawable> {
-
 
 
                override fun onLoadFailed(
@@ -115,6 +114,6 @@ class ContributorAdapter constructor(val contriList: List<Contributor>, val onCl
         RecyclerView.ViewHolder(binding.root)
 
     interface OnClickCallback{
-        fun onClick(contributor : Contributor, position : Int)
+        fun onClick(user : User, position : Int)
     }
 }

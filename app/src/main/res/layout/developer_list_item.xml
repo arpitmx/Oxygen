@@ -66,7 +66,7 @@
         android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:buttonTint="@color/purple"
+        android:foregroundTint="@color/purple"
         />
 
 </LinearLayout>

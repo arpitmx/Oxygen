@@ -9,7 +9,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
-import com.ncs.o2.Domain.Models.Contributor
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.Colors
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
@@ -75,16 +75,16 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallba
 
 
         val dataList = listOf(
-            Contributor("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj"),
-            Contributor("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"),
-            Contributor("https://picsum.photos/200"),
-            Contributor("https://picsum.photos/300"),
-            Contributor("https://picsum.photos/350"),
-            Contributor("https://picsum.photos/450"),
-            Contributor("https://picsum.photos/230"),
-            Contributor("https://picsum.photos/231"),
-            Contributor("https://picsum.photos/202"),
-            Contributor("https://picsum.photos/234")
+            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj"),
+            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"),
+            User("https://picsum.photos/200"),
+            User("https://picsum.photos/300"),
+            User("https://picsum.photos/350"),
+            User("https://picsum.photos/450"),
+            User("https://picsum.photos/230"),
+            User("https://picsum.photos/231"),
+            User("https://picsum.photos/202"),
+            User("https://picsum.photos/234")
         )
         val adapter = ContributorAdapter(dataList, this)
         contriRecyclerView.adapter = adapter
@@ -110,8 +110,8 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallba
         tagsRecyclerView.adapter = adapter
     }
 
-    override fun onClick(contributor: Contributor, position: Int) {
-        val bottomSheet = ProfileBottomSheet(contributor.profileUrl)
+    override fun onClick(user: User, position: Int) {
+        val bottomSheet = ProfileBottomSheet(user.profileUrl)
         bottomSheet.show(supportFragmentManager, "bottomsheet")
     }
 

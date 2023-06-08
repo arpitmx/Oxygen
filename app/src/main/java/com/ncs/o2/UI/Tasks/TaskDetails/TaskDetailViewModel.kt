@@ -55,7 +55,7 @@ class TaskDetailViewModel @Inject constructor(val notificationApiService: Notifi
             .build()
 
         val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
-           .setConstraints(contraints)
+             .setConstraints(contraints)
             .setBackoffCriteria(BackoffPolicy.LINEAR,500L,TimeUnit.MICROSECONDS)
             .setInputData(payloadInputData)
             .build()

@@ -7,12 +7,9 @@ import com.google.firebase.firestore.Source
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.Domain.Models.User
-import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.versa.Constants.Endpoints
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
-import java.lang.StringBuilder
 import javax.inject.Inject
 
 /*
@@ -63,22 +60,22 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-  override fun getUserInfo(serverResult: (ServerResult<User?>) -> Unit) {
+  override fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit) {
         serverResult(ServerResult.Progress)
         Handler(Looper.getMainLooper()).postDelayed({
-            var user: User?
+            var currentUser: CurrentUser?
             firestore.collection(Endpoints.USERS)
                 .document(Endpoints.TESTUSERID)
                 .get(Source.SERVER)
                 .addOnSuccessListener { snap ->
                     if (snap.exists()) {
-                        user = snap.toObject(User::class.java)
+                        currentUser = snap.toObject(CurrentUser::class.java)
 
-                        Timber.tag(TAG).d(user?.USERNAME)
-                        Timber.tag(TAG).d(user?.EMAIL)
-                        Timber.tag(TAG).d(user?.PROJECTS.toString())
+                        Timber.tag(TAG).d(currentUser?.USERNAME)
+                        Timber.tag(TAG).d(currentUser?.EMAIL)
+                        Timber.tag(TAG).d(currentUser?.PROJECTS.toString())
 
-                        serverResult(ServerResult.Success(user))
+                        serverResult(ServerResult.Success(currentUser))
                     }
                 }
                 .addOnFailureListener { error ->
