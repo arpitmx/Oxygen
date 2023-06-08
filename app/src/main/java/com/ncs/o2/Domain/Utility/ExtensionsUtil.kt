@@ -243,6 +243,15 @@ object ExtensionsUtil {
     }
 
 
+    fun View.rotate180(context: Context, animDuration: Long = 500L) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context, R.anim.rotate180)
+            .apply {
+                duration = animDuration
+            }
+        this.startAnimation(animation)
+    }
+
     fun View.animFadeOut(context: Context, animDuration: Long = 1500L) = run {
         this.clearAnimation()
         val animation = AnimationUtils.loadAnimation(context, androidx.appcompat.R.anim.abc_fade_out)

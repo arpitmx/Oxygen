@@ -38,7 +38,7 @@
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="30dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:src="@drawable/ic_back_arrow"
             android:visibility="visible"
@@ -47,6 +47,24 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
+
+        <TextView
+            android:id="@+id/done_item"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="15dp"
+            android:fontFamily="@font/outfitbold"
+            android:gravity="center"
+            android:text="Done"
+            android:textColor="@color/primary"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.98"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

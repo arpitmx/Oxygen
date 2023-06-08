@@ -2,4 +2,5 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="action_bar">50dp</dimen>
     <dimen name="tag_height">30dp</dimen>
+    <dimen name="_53dp">53dp</dimen>
 </resources>

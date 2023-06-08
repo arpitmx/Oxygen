@@ -13,9 +13,11 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.Colors
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.Later
+import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityTaskDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,6 +46,7 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallba
 
         setTagsView()
         setContributors()
+        setActionbar()
 
         binding.requestButton.setOnClickSingleTimeBounceListener {
 
@@ -59,10 +62,15 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallba
         binding.difficulty.setOnClickThrottleBounceListener {}
 
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
 
 
+    }
+
+    private fun setActionbar() {
+        binding.gioActionbar.titleTv.text = getString(R.string.details)
+        binding.gioActionbar.doneItem.gone()
     }
 
     private fun setContributors() {

@@ -71,7 +71,7 @@ class UserListAdapter constructor(val contriList: List<User>, val onClickCallbac
                    return false
                }
            })
-           .encodeQuality(40)
+           .encodeQuality(80)
            .override(40,40)
            .apply(
                RequestOptions().

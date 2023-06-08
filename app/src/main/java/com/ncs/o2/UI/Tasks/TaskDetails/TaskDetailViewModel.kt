@@ -38,13 +38,13 @@ class TaskDetailViewModel @Inject constructor(val notificationApiService: Notifi
 ) : AndroidViewModel(app) {
 
     private val test_fcmtokenMI =
-        "cmMiVraYTkyhLGCWh8aorx:APA91bGe-6OkspkpxE9-fpxsOwslGHAlwRxG45gbeg2dxY6MckcpS-PnOl1TQvOVaZ9E90VFtWCBw3qftKJS2DkdYCEgqgGrWxRrjnsbIz4SD0j40oeLbC3OfXRe9ebC38-2xoLMDjmN"
+        "cQiVebLLTPutKWl2t_13mY:APA91bH-fGRZ06pGDDMx70JwOqB3DI_n-CDbmEzcXGMGSOXrubXSTMx63T11TYFe5WnHT3Tc-wNTcpA7hIY4moZUNzglEjL8pe5Bm21WUh_u5-TaY_mkTxm5BIVlDHfOdTCPz4hL-45F"
     private val test_fcmtokenEmulator =
         "es4CBA66TeCyvGXjAwNnOi:APA91bFMqBwGPNp-g__CEw3EHSAQabLrVwnTBJnU-zYL1_5t_qnIZX06t96xkoXtBm7m1ZZzyqHzsOlv2-WgMEhnYHLCCJM5x7n8cnoAJb9Em3m5HCWd8t-ueocKX1cpfUopmmL1TVan"
 
 
     fun sendNotification(){
-        val payloadJsonObject = buildNotificationPayload(test_fcmtokenEmulator)
+        val payloadJsonObject = buildNotificationPayload(test_fcmtokenMI)
 
         val payloadInputData = Data.Builder()
             .putString(FCMWorker.PAYLOAD_DATA,payloadJsonObject.toString())

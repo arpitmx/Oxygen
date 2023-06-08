@@ -17,20 +17,43 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <TextView
-            android:id="@+id/title_tv"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/segment_parent"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:fontFamily="@font/outfitbold"
-            android:gravity="center"
-            android:text="Development"
-            android:textColor="@color/primary"
-            android:textSize="20dp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/create_task_button"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/btnHam"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0">
+
+
+            <TextView
+                android:id="@+id/title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/outfitbold"
+                android:gravity="center"
+                android:text="Development"
+                android:textColor="@color/primary"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnHam"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/switch_segment_button"
+                android:layout_width="15dp"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:layout_marginStart="8dp"
+                app:srcCompat="@android:drawable/arrow_down_float"
+                app:tint="@color/primary" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <ImageView
             android:id="@+id/btnBack"
@@ -56,19 +79,7 @@
             app:tint="@color/primary" />
 
 
-        <ImageButton
-            android:id="@+id/switch_segment_button"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:background="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/create_task_button"
-            app:layout_constraintHorizontal_bias="0.07"
-            app:layout_constraintStart_toEndOf="@+id/title_tv"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@android:drawable/arrow_down_float"
-            app:tint="@color/primary" />
+
 
         <ImageButton
             android:id="@+id/create_task_button"

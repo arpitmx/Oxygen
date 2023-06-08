@@ -11,7 +11,7 @@
         android:id="@+id/gio_actionbar"
         layout="@layout/actionbar_task"
         android:layout_width="0dp"
-        android:layout_height="@dimen/action_bar"
+        android:layout_height="@dimen/_53dp"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

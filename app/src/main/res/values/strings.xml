@@ -9,6 +9,10 @@
 
     <string name="bottom_nav_item_assigned">Assigned</string>
     <string name="bottom_nav_item_done">Completed</string>
+    <string name="new_task">New Task</string>
+    <string name="select_members">Select Members</string>
+    <string name="select_segment">Select Segment</string>
+    <string name="details">Details</string>
 
 
 </resources>

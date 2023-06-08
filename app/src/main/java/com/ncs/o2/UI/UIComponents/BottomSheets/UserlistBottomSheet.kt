@@ -11,6 +11,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
 import com.ncs.o2.databinding.DeveloperListBottomSheetBinding
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,7 @@ Tasks FUTURE ADDITION :
 
 */
 
+@Issue("1. Unknown behaviour when bottom sheet shows sometime : Back elements can be clickable when dismissed , Doesn't dismiss ")
 class UserlistBottomSheet : BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
 
     lateinit var binding: DeveloperListBottomSheetBinding
@@ -62,7 +64,6 @@ class UserlistBottomSheet : BottomSheetDialogFragment(), UserListAdapter.OnClick
 
         setViews()
 
-
     }
 
     private fun setViews() {
@@ -70,15 +71,15 @@ class UserlistBottomSheet : BottomSheetDialogFragment(), UserListAdapter.OnClick
 
         setBottomSheetConfig()
 
-        CoroutineScope(Dispatchers.IO).launch {
+       val job =  CoroutineScope(Dispatchers.IO).launch {
 
             val userList = mutableListOf<User>()
 
-            repeat(100000) {
+            repeat(100) {
                 val user = User(
                     username = faker.funnyName().name(),
                     post = faker.pokemon().name(),
-                    url = "https://picsum.photos/4${it}"
+                    url = faker.avatar().image()
                 )
                 synchronized(userList) {
                     userList.add(user)
@@ -91,7 +92,8 @@ class UserlistBottomSheet : BottomSheetDialogFragment(), UserListAdapter.OnClick
         }
 
         binding.closeBtn.setOnClickThrottleBounceListener {
-            dismissNow()
+            job.cancel()
+            dismiss()
         }
     }
 

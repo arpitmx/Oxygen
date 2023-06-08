@@ -90,8 +90,8 @@ class ContributorAdapter constructor(val contriList: List<User>, val onClickCall
                    return false
                }
            })
-           .encodeQuality(50)
-           .override(40,40)
+           .encodeQuality(80)
+           .override(80,80)
            .apply(
                RequestOptions().
                diskCacheStrategy(DiskCacheStrategy.ALL)
