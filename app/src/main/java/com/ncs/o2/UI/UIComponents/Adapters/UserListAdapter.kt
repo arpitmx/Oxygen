@@ -15,7 +15,8 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.R
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
-import com.ncs.o2.databinding.DeveloperListItemBinding
+import com.ncs.o2.databinding.ContributorListBottomSheetBinding
+import com.ncs.o2.databinding.ContributorListItemBinding
 
 /*
 File : ContributorAdapter.kt -> com.ncs.o2.Adapters
@@ -39,7 +40,7 @@ class UserListAdapter constructor(val contriList: List<User>, val onClickCallbac
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
-           DeveloperListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+           ContributorListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -114,7 +115,7 @@ class UserListAdapter constructor(val contriList: List<User>, val onClickCallbac
         return contriList.size
     }
 
-    inner class ViewHolder(val binding: DeveloperListItemBinding) :
+    inner class ViewHolder(val binding: ContributorListItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     interface OnClickCallback{

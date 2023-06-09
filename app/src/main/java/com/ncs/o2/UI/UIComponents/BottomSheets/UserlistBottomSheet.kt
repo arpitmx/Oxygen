@@ -13,7 +13,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
-import com.ncs.o2.databinding.DeveloperListBottomSheetBinding
+import com.ncs.o2.databinding.ContributorListBottomSheetBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,7 +43,7 @@ Tasks FUTURE ADDITION :
 @Issue("1. Unknown behaviour when bottom sheet shows sometime : Back elements can be clickable when dismissed , Doesn't dismiss ")
 class UserlistBottomSheet : BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
 
-    lateinit var binding: DeveloperListBottomSheetBinding
+    lateinit var binding: ContributorListBottomSheetBinding
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewDevelopers
     }
@@ -55,7 +55,7 @@ class UserlistBottomSheet : BottomSheetDialogFragment(), UserListAdapter.OnClick
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DeveloperListBottomSheetBinding.inflate(inflater, container, false)
+        binding = ContributorListBottomSheetBinding.inflate(inflater, container, false)
         return binding.root
     }
 

@@ -8,6 +8,11 @@
     >
 
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/purple"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -51,12 +56,13 @@
     </RelativeLayout>
 
 
+
+
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/purple"
+        android:background="@color/card_bg"
         />
-
 
 
 

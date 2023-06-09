@@ -15,8 +15,6 @@
     <color name="red">@color/secondaryPink</color>
 
 
-
-
     <color name="s1bg">#A7FFA5</color>
     <color name="s2bg">#F19FFF</color>
     <color name="s3bg">#FFE871</color>
@@ -32,4 +30,9 @@
     <color name="pureblack">#000000</color>
     <color name="dim_purple">#C3BCED</color>
     <color name="purple">#C06AFD</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
 </resources>
