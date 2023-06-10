@@ -9,11 +9,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.ncs.o2.HelperClasses.Navigator
-import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
-import com.ncs.o2.R
-import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
@@ -21,7 +16,11 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
+import com.ncs.o2.HelperClasses.Navigator
+import com.ncs.o2.R
+import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,8 +56,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
     }
 
     private fun setUpViewsOnClicks() {
-        binding.gioActionbar.createTaskButton.setOnClickThrottleBounceListener{
-           navigator.startSingleTopActivity(CreateTaskActivity::class.java)
+        binding.gioActionbar.createTaskButton.setOnClickThrottleBounceListener {
+            navigator.startSingleTopActivity(CreateTaskActivity::class.java)
         }
     }
 
@@ -67,7 +66,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
-        },1000)
+        }, 1000)
 
         val drawerLayout = binding.drawer
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
@@ -77,8 +76,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         binding.gioActionbar.titleTv.animFadein(this, 500)
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
-           val segment = SegmentSelectionBottomSheet()
-            segment.show(supportFragmentManager,"Segment Selection")
+            val segment = SegmentSelectionBottomSheet()
+            segment.show(supportFragmentManager, "Segment Selection")
             binding.gioActionbar.switchSegmentButton.rotate180(this)
         }
 

@@ -150,7 +150,8 @@ dependencies {
     //Flexbox
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
-    //Faker data
+
+    //Faker data TODO "Remove in production"
     implementation 'net.datafaker:datafaker:1.9.0'
 
 

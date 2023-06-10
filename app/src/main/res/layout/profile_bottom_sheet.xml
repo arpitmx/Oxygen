@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:elevation="10dp"
     android:gravity="center_horizontal"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/better_white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -25,7 +25,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/s3bg"
+                android:indeterminateTint="@color/prioritymax"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +55,7 @@
             android:fontFamily="@font/outfitmedium"
             android:gravity="center"
             android:text="Armax"
-            android:textColor="@color/white"
+            android:textColor="@color/red"
             android:textSize="22sp" />
 
         <TextView

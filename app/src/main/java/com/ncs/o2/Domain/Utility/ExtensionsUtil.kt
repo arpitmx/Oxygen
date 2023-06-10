@@ -178,7 +178,6 @@ object ExtensionsUtil {
 
 
     //Network check
-    @RequiresApi(Build.VERSION_CODES.M)
     fun Context.isNetworkAvailable(): Boolean {
         val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val capabilities = manager.getNetworkCapabilities(manager.activeNetwork)

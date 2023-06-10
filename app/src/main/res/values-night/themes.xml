@@ -7,8 +7,13 @@
 
     <style name="Theme.O2" parent="Base.Theme.O2" />
 
-    <style name="ThemeOverlay.O2.FullscreenContainer" parent="">
-        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
-        <item name="fullscreenTextColor">@color/light_blue_A400</item>
+    <style name="SplashTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">#000000</item>
+        <item name="android:statusBarColor">#000000</item>
     </style>
+
+
 </resources>
