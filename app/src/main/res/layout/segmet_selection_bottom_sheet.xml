@@ -11,7 +11,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/secondaryPink"
+        android:background="@color/purple"
         />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -30,7 +30,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_keyboard_arrow_down_24"
-            app:tint="@color/red" />
+            app:tint="@color/dim_purple" />
 
     <TextView
             android:layout_width="0dp"
@@ -39,7 +39,7 @@
             android:fontFamily="@font/outfitbold"
             android:gravity="center"
             android:layout_gravity="center"
-            android:text="Segments ⚡"
+            android:text="Segments"
             android:textColor="@color/better_white"
             android:textSize="18dp" />
 
@@ -53,7 +53,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/outline_add_24"
-            app:tint="@color/yello" />
+            app:tint="@color/dim_purple" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

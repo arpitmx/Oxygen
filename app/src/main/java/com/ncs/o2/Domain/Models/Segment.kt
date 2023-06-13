@@ -1,5 +1,7 @@
 package com.ncs.o2.Domain.Models
 
+import com.google.firebase.firestore.Exclude
+
 /*
 File : Segment.kt -> com.ncs.o2.Domain.Models
 Description : Model class for Segment 
@@ -20,6 +22,12 @@ Tasks FUTURE ADDITION :
 
 */
 data class Segment (
-        val segID : String,
-        val segName : String,
+        val SEGMENT_NAME : String="",
+        val SEGMENT_ID : String="",
+        val DESCRIPTION : String="",
+        val TASK_IDS : MutableList<String> = mutableListOf(),
+        val CONTRIBUTERS : MutableList<String> = mutableListOf(),
+        val SEGMENT_CREATOR : String="",
+        val PROJECT_ID: String="",
+        @Exclude val CREATION_DATETIME : String="",
         )

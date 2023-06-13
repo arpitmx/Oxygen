@@ -3,6 +3,7 @@ package com.ncs.o2.Domain.Interfaces
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.Domain.Models.Segment
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
@@ -24,6 +25,7 @@ Tasks FUTURE ADDITION :
 */
 
 interface Repository {
+
     //Task related
     fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit)
 
@@ -32,4 +34,8 @@ interface Repository {
 
     //Project related
     fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit)
+
+    fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit)
+
+    fun checkIfSegmentNameExists(fieldName : String, projectID : String, result: (ServerResult<Boolean>) -> Unit)
 }

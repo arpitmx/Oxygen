@@ -1,6 +1,7 @@
 package com.ncs.o2.Hilt
 
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.UseCases.CreateSegmentUseCase
 import com.ncs.o2.Domain.UseCases.CreateTaskUseCase
 import dagger.Module
 import dagger.Provides
@@ -33,7 +34,15 @@ object UseCasesModule {
 
     @Singleton
     @Provides
-    fun provideCreateTaskUseCase(repository: FirestoreRepository):CreateTaskUseCase{
+    fun provideCreateTaskUseCase(repository: FirestoreRepository):CreateTaskUseCase {
         return CreateTaskUseCase(repository)
     }
+
+    @Singleton
+    @Provides
+    fun provideCreateSegmentUseCase(repository: FirestoreRepository): CreateSegmentUseCase {
+        return CreateSegmentUseCase(repository)
+    }
+
 }
+

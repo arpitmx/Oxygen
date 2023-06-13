@@ -12,16 +12,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.Adapters.TaskListAdapter
-import com.ncs.o2.databinding.FragmentTasksBinding
+import com.ncs.o2.databinding.FragmentTasksHolderBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class TasksFragment : Fragment(), TaskListAdapter.OnClickListener {
+class TasksHolderFragment : Fragment(), TaskListAdapter.OnClickListener {
 
 
-    private val viewModel: TasksViewModel by viewModels()
-    private lateinit var binding: FragmentTasksBinding
+    private val viewModel: TasksHolderViewModel by viewModels()
+    private lateinit var binding: FragmentTasksHolderBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter : TaskListAdapter
     private lateinit var taskList: ArrayList<Task>
@@ -31,7 +31,7 @@ class TasksFragment : Fragment(), TaskListAdapter.OnClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentTasksBinding.inflate(inflater,container,false)
+        binding = FragmentTasksHolderBinding.inflate(inflater,container,false)
         return binding.root
     }
 

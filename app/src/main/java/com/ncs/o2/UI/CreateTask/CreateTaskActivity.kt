@@ -33,6 +33,9 @@ class CreateTaskActivity : AppCompatActivity() {
             "Versa", "Development"
         )
 
+       // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
+
+
         binding.duration.setOnClickThrottleBounceListener {
             Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show()
             viewmodel.createTask(testTask)

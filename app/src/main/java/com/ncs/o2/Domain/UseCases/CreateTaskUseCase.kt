@@ -1,5 +1,6 @@
 package com.ncs.o2.Domain.UseCases
 
+import androidx.compose.runtime.rememberCoroutineScope
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
@@ -27,7 +28,6 @@ Tasks FUTURE ADDITION :
 
 */
 
-
 class CreateTaskUseCase @Inject constructor(
     @FirebaseRepository val repository: Repository
 ) {
@@ -40,6 +40,7 @@ class CreateTaskUseCase @Inject constructor(
             Timber.tag(TAG).d(repoResult.toString())
             result(repoResult)
         }
+
     }
 
     fun notifyTaskCreationResultLocal() {
@@ -50,12 +51,6 @@ class CreateTaskUseCase @Inject constructor(
 
     }
 
-    private fun createRandomTaskID(): String {
-        val random = Random(System.currentTimeMillis())
-        val randomNumber = random.nextInt(1000, 9999)
-        return "#T$randomNumber"
-
-    }
 
     companion object {
         const val TAG = "CreateTaskUseCase"

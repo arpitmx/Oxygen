@@ -39,8 +39,7 @@ class SegmentListAdapter constructor(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val segment = segments[position]
 
-        holder.binding.segmentTitle.text = segment.segName
-
+        holder.binding.segmentTitle.text = segment.SEGMENT_NAME
         holder.binding.root.setOnClickThrottleBounceListener {
             onClickCallback.onClick(segment, position)
         }

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:elevation="10dp"
     android:gravity="center_horizontal"
-    android:background="@color/better_white"
+    android:background="@color/darkbg_main"
     android:orientation="vertical">
 
     <LinearLayout
@@ -55,7 +55,7 @@
             android:fontFamily="@font/outfitmedium"
             android:gravity="center"
             android:text="Armax"
-            android:textColor="@color/red"
+            android:textColor="@color/purple"
             android:textSize="22sp" />
 
         <TextView

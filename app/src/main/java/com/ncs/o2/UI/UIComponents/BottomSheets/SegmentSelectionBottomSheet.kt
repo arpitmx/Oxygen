@@ -13,7 +13,10 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
 import com.ncs.o2.databinding.SegmetSelectionBottomSheetBinding
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.internal.lifecycle.HiltViewModelMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,6 +41,7 @@ Tasks FUTURE ADDITION :
 
 
 */
+@AndroidEntryPoint
 class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
     SegmentListAdapter.OnClickCallback {
 
@@ -74,8 +78,8 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
             val segList = mutableListOf<Segment>()
             repeat(4) {
                 val segment = Segment(
-                    segID = faker.idNumber().toString(),
-                    segName = faker.clashOfClans().defensiveBuilding().toString()
+                    SEGMENT_ID = faker.idNumber().toString(),
+                    SEGMENT_NAME = faker.clashOfClans().defensiveBuilding().toString()
                 )
                 synchronized(segList) {
                     segList.add(segment)
@@ -92,6 +96,15 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
     private fun setActionbar() {
         binding.closeBtn.setOnClickThrottleBounceListener{
             dismiss()
+        }
+
+        binding.createSegmentBtn.setOnClickThrottleBounceListener {
+
+            dismiss()
+            val createSegmentBottomSheet = CreateSegmentBottomSheet()
+            createSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
+
+
         }
     }
 
@@ -113,7 +126,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
     }
 
     override fun onClick(segment: Segment, position: Int) {
-        Toast.makeText(requireContext(), segment.segName, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), segment.SEGMENT_NAME, Toast.LENGTH_SHORT).show()
         dismiss()
     }
 }

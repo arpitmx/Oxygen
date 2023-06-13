@@ -2,12 +2,10 @@ package com.ncs.o2.Domain.Utility
 
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.Intent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
-import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import java.util.TimeZone
 
@@ -70,7 +68,7 @@ object GlobalUtils {
 
         fun checkTimeZoneValid(timeZone: TimeZone): Boolean {
             Timber.tag("GlobalUtils-Debug101").d(timeZone.displayName)
-            if (timeZone.displayName != codes.STRINGS.TIME_ZONE_INDIA) {
+            if (timeZone.displayName != Codes.STRINGS.TIME_ZONE_INDIA) {
                 return false
             }
 

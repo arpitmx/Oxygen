@@ -16,6 +16,12 @@
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_create_segment">CreateSegmentActivity</string>
+    <string name="ommphs_this_segment_name_already_exists_choose_another_one">*Ommphs, This Segment name already exists, Choose another one...</string>
+    <string name="this_project_doesn_t_exist">*This Project doesn\'t exist</string>
+    <string name="creating_your_segment">Creating your Segment...</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

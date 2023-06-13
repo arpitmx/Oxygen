@@ -2,13 +2,19 @@ package com.ncs.o2.Domain.Utility
 
 import kotlin.String
 
-object codes {
+object Codes {
 
 
     object STRINGS {
 
         const val TIME_ZONE_INDIA = "Asia/Kolkata"
         const val INTENT_ERROR_CODE = "errorCode"
+    }
+
+    object Status {
+        const val RESULT_OK = 200
+        const val RESULT_FAILED = 400
+        const val VALID_INPUT = "Valid"
     }
 
     sealed class Error {

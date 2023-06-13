@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/task_item"
-        android:name="com.ncs.o2.UI.Tasks.TasksFragment"
+        android:name="com.ncs.o2.UI.Tasks.TasksHolderFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_tasks" >
+        tools:layout="@layout/fragment_tasks_holder" >
 
         <action
             android:id="@+id/action_task_item_to_assignedFragment"

@@ -136,6 +136,15 @@ object ExtensionsUtil {
         }
     }
 
+    fun Fragment.showKeyboard() {
+        activity?.apply {
+            val imm: InputMethodManager =
+                getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            val view = currentFocus ?: View(this)
+            imm.showSoftInputFromInputMethod(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+    }
+
 
     // Convert px to dp
     val Int.dp: Int

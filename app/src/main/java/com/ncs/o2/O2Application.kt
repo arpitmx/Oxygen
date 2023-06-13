@@ -2,7 +2,7 @@ package com.ncs.o2
 
 import android.app.Application
 import android.content.Context
-import android.support.multidex.MultiDexApplication
+import androidx.multidex.MultiDexApplication
 import android.util.Log
 import androidx.work.Configuration
 import androidx.work.ListenableWorker

@@ -13,6 +13,7 @@ object Endpoints {
     }
 
     object Project{
+        const val ALL_SEGMENT = "ALL_SEGMENT"
         const val SEGMENT = "SEGMENTS"
         const val CONTRIBUTERS = "CONTRIBUTERS"
         const val PROJECTID = "PROJECT_ID"

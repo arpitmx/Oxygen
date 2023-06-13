@@ -57,6 +57,7 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallba
             binding.requestButton.alpha = 0.7f
         }
 
+
         binding.taskStatus.setOnClickThrottleBounceListener {}
         binding.duration.setOnClickThrottleBounceListener {}
         binding.difficulty.setOnClickThrottleBounceListener {}
