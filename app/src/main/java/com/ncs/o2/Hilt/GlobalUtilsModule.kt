@@ -8,17 +8,18 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.util.Calendar
 import javax.inject.Singleton
 
 /*
-File : UserCasesModule.kt -> com.ncs.o2.Hilt
-Description : Module for use cases 
+File : GlobalUtils.kt -> com.ncs.o2.Hilt
+Description : DI for global utils  
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
 From : Bitpolarity x Noshbae (@Project : O2 Android)
 
-Creation : 7:32 pm on 06/06/23
+Creation : 1:02 am on 15/06/23
 
 Todo >
 Tasks CLEAN CODE : 
@@ -28,28 +29,12 @@ Tasks FUTURE ADDITION :
 
 
 */
-
 @InstallIn(SingletonComponent::class)
 @Module
-object UseCasesModule {
+object GlobalUtilsModule {
 
-    @Singleton
-    @Provides
-    fun provideCreateTaskUseCase(repository: FirestoreRepository):CreateTaskUseCase {
-        return CreateTaskUseCase(repository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideCreateSegmentUseCase(repository: FirestoreRepository): CreateSegmentUseCase {
-        return CreateSegmentUseCase(repository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideLoadSectionUseCase(repository: FirestoreRepository): LoadSectionsUseCase{
-        return LoadSectionsUseCase(repository)
-    }
-
+        @Provides
+        @Singleton
+        fun provideCalendar():Calendar = Calendar.getInstance()
 }
 

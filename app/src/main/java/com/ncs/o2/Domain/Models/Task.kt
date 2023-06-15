@@ -2,6 +2,7 @@ package com.ncs.o2.Domain.Models
 
 import android.graphics.Color
 import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.FieldValue
 
 /*
 File : Task.kt -> com.ncs.o2.Models
@@ -22,20 +23,23 @@ Tasks FUTURE ADDITION :
 */
 data class Task(
     val TITLE: String = "",
-    val DESC: String = "",
-    val ID: String = "",
+    val DESCRIPTION: String = "",
+    var ID: String,
     val DIFFICULTY: Int = 0,
     val LINKS: List<String> = emptyList(),
     val PRIORITY: Int = 0,
     val STATUS: Int = -1,
     val ASSIGNEE: List<String> = emptyList(),
     val ASSIGNER: String = "",
+
     val DEADLINE: String = "",
-    val STARTDATE: String = "",
+    var TIME_STAMP: FieldValue = FieldValue.serverTimestamp(),
     val DURATION: String = "",
+
     val TAGS: List<Tag> = listOf(),
-    val PROJECTID: String="",
-    val SEGMENT: String="",
+    val PROJECT_ID: String = "",
+    val SEGMENT: String = "",
+    val SECTION: String = "",
 ) {
 
     @Exclude

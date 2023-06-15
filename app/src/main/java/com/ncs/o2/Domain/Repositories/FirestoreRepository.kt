@@ -2,16 +2,24 @@ package com.ncs.o2.Domain.Repositories
 
 import android.os.Handler
 import android.os.Looper
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import com.ncs.o2.Constants.IDS
 import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.versa.Constants.Endpoints
+import kotlinx.coroutines.tasks.await
+import net.datafaker.Faker
 import timber.log.Timber
+import java.lang.Exception
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -41,26 +49,99 @@ class FirestoreRepository @Inject constructor(
 ) : Repository {
 
     private val TAG: String = FirestoreRepository::class.java.simpleName
+    lateinit var serverErrorCallback : ServerErrorCallback
 
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
-                "/${task.PROJECTID}" +
+                "/${task.PROJECT_ID}" +
                 "/${Endpoints.Project.SEGMENT}" +
                 "/${task.SEGMENT}" +
-                "/${Endpoints.SEGMENT.TASKS}" +
+                "/${task.SECTION}"+
                 "/${task.ID}" +
                 "/"
 
     }
 
-    fun getProject(projectID: String): String {
-        return Endpoints.PROJECTS + "/${projectID}"
+    fun getProjectRef(projectID: String): DocumentReference {
+        return firestore.collection(Endpoints.PROJECTS).document(projectID)
+    // return Endpoints.PROJECTS + "/${projectID}"
     }
 
-    fun createRandomTaskID(): String {
+    fun generateRandomID(id:IDS): String {
+
         val random = Random(System.currentTimeMillis())
-        val randomNumber = random.nextInt(1000, 9999)
-        return "#T$randomNumber"
+        val randomNumber = random.nextInt(10000, 99999)
+
+        when(id){
+            IDS.UserID -> return "#U$randomNumber"
+            IDS.TaskID -> return "#T$randomNumber"
+            IDS.SegmentID -> return "#S$randomNumber"
+        }
+
+    }
+
+
+    fun getProjectPath(projectID: String):String{
+        return Endpoints.PROJECTS + "/${projectID}" + "/"
+    }
+
+    fun getTasksRepository(projectPath: String, isDuplicate : (List<String>)->Unit){
+            firestore.document(projectPath)
+                .get(Source.SERVER)
+                .addOnSuccessListener { snap->
+                    if (snap.exists()){
+                        val taskArrayList = snap.get(Endpoints.Project.ALL_TASK_IDS) as List<String>
+                        isDuplicate(taskArrayList)
+
+                    }else{
+                        Timber.tag(tag = TAG).d("No tasks exists")
+                       isDuplicate(listOf())
+                    }
+                }
+                .addOnFailureListener{
+                    serverErrorCallback.handleServerException(it.message!!)
+                }
+
+    }
+
+
+   fun uniqueIDfromList(idType: IDS, list: List<String>):String{
+       var uniqueID : String
+
+       when(idType){
+           IDS.UserID -> {
+               do {
+                   uniqueID = generateRandomID(idType)
+               } while (list.contains(uniqueID))
+           }
+           IDS.TaskID ->{
+               uniqueID = generateRandomID(idType)
+
+           }
+           IDS.SegmentID -> {
+               uniqueID = generateRandomID(idType)
+
+           }
+       }
+
+       return uniqueID
+   }
+
+
+    override fun createUniqueID(idType: IDS, projectID: String, generatedID:(String)->Unit){
+
+        val projectPath = getProjectPath(projectID)
+        when(idType){
+            IDS.TaskID ->{
+                    getTasksRepository(projectPath) { tasksArray->
+                            generatedID(uniqueIDfromList(idType,tasksArray))
+                }
+            }
+
+            IDS.UserID -> {}
+            IDS.SegmentID -> {}
+        }
+
     }
 
     fun createRandomSegmentID(): String {
@@ -69,16 +150,46 @@ class FirestoreRepository @Inject constructor(
         return "#S$randomNumber"
     }
 
-    override fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit) {
+    override fun setCallback(callback: ServerErrorCallback) {
+        this.serverErrorCallback = callback
+    }
+
+//    override fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit) {
+//        serverResult(ServerResult.Progress)
+//        firestore.document(getTaskPath(task))
+//            .set(task)
+//            .addOnSuccessListener {
+//                serverResult(ServerResult.Success(200))
+//            }
+//            .addOnFailureListener {
+//                serverResult(ServerResult.Failure(it))
+//            }
+//
+//    }
+
+    @Later("All task id not working ")
+    override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
+
+        return try {
         serverResult(ServerResult.Progress)
-        firestore.document(getTaskPath(task))
-            .set(task)
-            .addOnSuccessListener {
-                serverResult(ServerResult.Success(200))
-            }
-            .addOnFailureListener {
-                serverResult(ServerResult.Failure(it))
-            }
+        firestore.document(getTaskPath(task)).set(task).await()
+//        getProjectRef(task.PROJECT_ID)
+//            .update(Endpoints.Project.ALL_TASK_IDS,FieldValue.arrayUnion(task.ID))
+//            .await()
+
+        val updatedData = hashMapOf<String, Any>(
+                "TASKS.${task.ID}" to "${task.SEGMENT}.${task.SECTION}"
+            )
+
+        getProjectRef(task.PROJECT_ID)
+            .update(updatedData).await()
+
+       serverResult(ServerResult.Success(200))
+
+        }
+        catch (exception:Exception) {
+            serverResult(ServerResult.Failure(exception))
+        }
 
     }
 
@@ -146,6 +257,7 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+
     override fun checkIfSegmentNameExists(
         fieldName: String,
         projectID: String,
@@ -154,7 +266,7 @@ class FirestoreRepository @Inject constructor(
 
         result(ServerResult.Progress)
 
-        firestore.document(getProject(projectID)).get(Source.SERVER)
+        getProjectRef(projectID).get(Source.SERVER)
             .addOnSuccessListener { snapshot ->
 
 

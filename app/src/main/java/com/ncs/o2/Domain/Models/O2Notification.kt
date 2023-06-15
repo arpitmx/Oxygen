@@ -19,9 +19,10 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION : 
 
 */
+
 data class O2Notification constructor(
-            val notificationType: NotificationType,
-            val title : String = "",
-            val message : String = "",
-            val longDesc : String = "",
+    val notificationType: NotificationType,
+    val title: String = "",
+    val message: String = "",
+    val longDesc: String = "",
 )

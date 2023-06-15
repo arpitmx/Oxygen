@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.UseCases.LoadSectionsUseCase
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,19 +27,17 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION : 
 
 */
-
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    @FirebaseRepository val repository: Repository
-    ) :
+    @FirebaseRepository val repository: Repository,
+    val sectionsUseCase: LoadSectionsUseCase
+) :
     ViewModel() {
 
     private val _showprogressLD = MutableLiveData<Boolean>()
     val showprogressLD: LiveData<Boolean> get() = _showprogressLD
-
     private val _showdialogLD = MutableLiveData<List<String>>()
     val showDialogLD: LiveData<List<String>> get() = _showdialogLD
-
     private val _projectListLiveData = MutableLiveData<List<String>?>()
     val projectListLiveData: LiveData<List<String>?> get() = _projectListLiveData
 

@@ -9,13 +9,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import com.google.firebase.firestore.FieldValue
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.Navigator
@@ -36,7 +34,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         GlobalUtils.EasyElements(this)
     }
     private lateinit var toggle: ActionBarDrawerToggle
-    private val binding: ActivityMainBinding by lazy {
+    val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
@@ -51,6 +49,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
     @Later("1. Select a default segment if no segment was selected , or select the previously chosed one")
     private fun setUpViews() {
+
         setUpProjects()
         setUpActionBar()
         setUpViewsOnClicks()
@@ -65,6 +64,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
     private fun setUpActionBar() {
 
+        //binding.gioActionbar.border.gone()
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
         }, 1000)
