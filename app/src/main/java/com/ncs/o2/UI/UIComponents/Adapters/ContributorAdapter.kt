@@ -16,6 +16,7 @@ import com.ncs.o2.R
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.databinding.ContriItemBinding
+import timber.log.Timber
 
 /*
 File : ContributorAdapter.kt -> com.ncs.o2.Adapters
@@ -52,7 +53,7 @@ Tasks FUTURE ADDITION :
 
 
 */
-class ContributorAdapter constructor(val contriList: List<User>, val onClickCallback: OnClickCallback) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
+class ContributorAdapter constructor(private var contriList: MutableList<User>, private val onProfileClickCallback: OnProfileClickCallback) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -65,7 +66,7 @@ class ContributorAdapter constructor(val contriList: List<User>, val onClickCall
         val contributor = contriList[position]
 
        Glide.with(holder.itemView.context)
-           .load(contributor.profileUrl)
+           .load(contributor.profileDPUrl)
            .listener(object : RequestListener<Drawable> {
 
 
@@ -89,22 +90,34 @@ class ContributorAdapter constructor(val contriList: List<User>, val onClickCall
                    holder.binding.progressbar.gone()
                    return false
                }
+
            })
            .encodeQuality(80)
            .override(80,80)
            .apply(
                RequestOptions().
                diskCacheStrategy(DiskCacheStrategy.ALL)
-
            )
            .error(R.drawable.profile_pic_placeholder)
            .into(holder.binding.contriProfileImage)
 
         holder.binding.contriProfileImage.setOnClickThrottleBounceListener {
-            onClickCallback.onClick(contributor, position)
+            onProfileClickCallback.onProfileClick(contributor, position)
         }
 
     }
+
+    fun addUser(user: User){
+        this.contriList.add(user)
+        Timber.tag(TAG).d(user.profileDPUrl)
+        notifyDataSetChanged()
+    }
+
+    fun removeUser(user: User){
+        this.contriList.remove(user)
+        notifyDataSetChanged()
+    }
+
 
     override fun getItemCount(): Int {
         return contriList.size
@@ -113,7 +126,12 @@ class ContributorAdapter constructor(val contriList: List<User>, val onClickCall
     inner class ViewHolder(val binding: ContriItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    interface OnClickCallback{
-        fun onClick(user : User, position : Int)
+    interface OnProfileClickCallback{
+        fun onProfileClick(user : User, position : Int)
+    }
+
+    companion object{
+        const val TAG = "ConstributorAdapter"
     }
 }
+

@@ -108,7 +108,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:tabIndicatorColor="@color/primary"
-        app:tabMode="scrollable"
+        app:tabMode="auto"
         app:tabRippleColor="@color/item_bg_glow"
         app:tabSelectedTextColor="@color/primary"
         app:tabTextColor="@color/better_white" />

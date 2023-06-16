@@ -1,8 +1,6 @@
 package com.ncs.o2.Domain.UseCases
 
-import android.os.Looper
-import androidx.compose.runtime.rememberCoroutineScope
-import com.ncs.o2.Constants.IDS
+import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
@@ -12,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.random.Random
 
 /*
 File : CreateTaskUseCase.kt -> com.ncs.o2.UseCases
@@ -42,19 +39,17 @@ class CreateTaskUseCase @Inject constructor(
 
     fun publishTask(task: Task, result: (ServerResult<Int>) -> Unit) {
 
-        repository.createUniqueID(idType = IDS.TaskID,task.PROJECT_ID) { taskID ->
+        repository.createUniqueID(idType = IDType.TaskID, task.PROJECT_ID) { taskID ->
 
-               CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(Dispatchers.IO).launch {
+                task.ID = taskID
+                repository.postTask(task) { repoResult ->
+                    Timber.tag(TAG).d(repoResult.toString())
+                    result(repoResult)
+                }
 
-               task.ID = taskID
-               repository.postTask(task) { repoResult ->
-                   Timber.tag(TAG).d(repoResult.toString())
-                   result(repoResult)
-               }
-
-           }
-       }
-
+            }
+        }
 
 
     }

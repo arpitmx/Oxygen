@@ -3,21 +3,18 @@ package com.ncs.o2.Domain.Repositories
 import android.os.Handler
 import android.os.Looper
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
-import com.ncs.o2.Constants.IDS
+import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
-import net.datafaker.Faker
 import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
@@ -67,15 +64,15 @@ class FirestoreRepository @Inject constructor(
     // return Endpoints.PROJECTS + "/${projectID}"
     }
 
-    fun generateRandomID(id:IDS): String {
+    fun generateRandomID(id:IDType): String {
 
         val random = Random(System.currentTimeMillis())
         val randomNumber = random.nextInt(10000, 99999)
 
         when(id){
-            IDS.UserID -> return "#U$randomNumber"
-            IDS.TaskID -> return "#T$randomNumber"
-            IDS.SegmentID -> return "#S$randomNumber"
+            IDType.UserID -> return "#U$randomNumber"
+            IDType.TaskID -> return "#T$randomNumber"
+            IDType.SegmentID -> return "#S$randomNumber"
         }
 
     }
@@ -90,7 +87,8 @@ class FirestoreRepository @Inject constructor(
                 .get(Source.SERVER)
                 .addOnSuccessListener { snap->
                     if (snap.exists()){
-                        val taskArrayList = snap.get(Endpoints.Project.ALL_TASK_IDS) as List<String>
+                        val taskMap = snap.get(Endpoints.Project.TASKS) as Map<String, String>
+                        val taskArrayList = taskMap.keys.toList()
                         isDuplicate(taskArrayList)
 
                     }else{
@@ -105,20 +103,20 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-   fun uniqueIDfromList(idType: IDS, list: List<String>):String{
+   fun uniqueIDfromList(idType: IDType, list: List<String>):String{
        var uniqueID : String
 
        when(idType){
-           IDS.UserID -> {
+           IDType.UserID -> {
                do {
                    uniqueID = generateRandomID(idType)
                } while (list.contains(uniqueID))
            }
-           IDS.TaskID ->{
+           IDType.TaskID ->{
                uniqueID = generateRandomID(idType)
 
            }
-           IDS.SegmentID -> {
+           IDType.SegmentID -> {
                uniqueID = generateRandomID(idType)
 
            }
@@ -128,18 +126,18 @@ class FirestoreRepository @Inject constructor(
    }
 
 
-    override fun createUniqueID(idType: IDS, projectID: String, generatedID:(String)->Unit){
+    override fun createUniqueID(idType: IDType, projectID: String, generatedID:(String)->Unit){
 
         val projectPath = getProjectPath(projectID)
         when(idType){
-            IDS.TaskID ->{
+            IDType.TaskID ->{
                     getTasksRepository(projectPath) { tasksArray->
                             generatedID(uniqueIDfromList(idType,tasksArray))
                 }
             }
 
-            IDS.UserID -> {}
-            IDS.SegmentID -> {}
+            IDType.UserID -> {}
+            IDType.SegmentID -> {}
         }
 
     }
@@ -154,38 +152,25 @@ class FirestoreRepository @Inject constructor(
         this.serverErrorCallback = callback
     }
 
-//    override fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit) {
-//        serverResult(ServerResult.Progress)
-//        firestore.document(getTaskPath(task))
-//            .set(task)
-//            .addOnSuccessListener {
-//                serverResult(ServerResult.Success(200))
-//            }
-//            .addOnFailureListener {
-//                serverResult(ServerResult.Failure(it))
-//            }
-//
-//    }
+    private fun getSegmentRef(task: Task):DocumentReference{
+        return firestore.collection(Endpoints.PROJECTS)
+            .document(task.PROJECT_ID)
+            .collection(Endpoints.Project.SEGMENT)
+            .document(task.SEGMENT)
 
-    @Later("All task id not working ")
+    }
+
     override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
 
+        val appendTaskID = hashMapOf<String, Any>("TASKS.${task.ID}" to "${task.SEGMENT}.${task.SECTION}")
+
         return try {
+
         serverResult(ServerResult.Progress)
         firestore.document(getTaskPath(task)).set(task).await()
-//        getProjectRef(task.PROJECT_ID)
-//            .update(Endpoints.Project.ALL_TASK_IDS,FieldValue.arrayUnion(task.ID))
-//            .await()
-
-        val updatedData = hashMapOf<String, Any>(
-                "TASKS.${task.ID}" to "${task.SEGMENT}.${task.SECTION}"
-            )
-
-        getProjectRef(task.PROJECT_ID)
-            .update(updatedData).await()
-
-       serverResult(ServerResult.Success(200))
-
+        getSegmentRef(task).apply { update(appendTaskID).await() }
+        getProjectRef(task.PROJECT_ID).apply { update(appendTaskID).await() }
+        serverResult(ServerResult.Success(200))
         }
         catch (exception:Exception) {
             serverResult(ServerResult.Failure(exception))
@@ -216,8 +201,6 @@ class FirestoreRepository @Inject constructor(
                     serverResult(ServerResult.Failure(error))
                 }
         }, 1000)
-
-
     }
 
     override fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit) {
@@ -238,14 +221,6 @@ class FirestoreRepository @Inject constructor(
                 }
 
             }
-
-
-//            Timber.tag(TAG).d(user?.PROJECTS.toString())
-//            if (user!=null){
-//                ServerResult.Success(user.PROJECTS)
-//            }else {
-//                ServerResult.Failure()
-//            }
 
         }
 

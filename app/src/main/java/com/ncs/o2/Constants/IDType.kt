@@ -18,7 +18,7 @@ Tasks FUTURE ADDITION :
 
 
 */
-enum class IDS {
+enum class IDType {
     UserID,
     TaskID,
     SegmentID

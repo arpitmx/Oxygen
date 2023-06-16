@@ -22,8 +22,9 @@ Tasks FUTURE ADDITION :
 */
 @Later("Add name")
 data class User (
-        val profileUrl : String = "",
-        val username : String="" ,
-        val post: String= "", val url : String="",
+        val profileDPUrl : String = "",
+        val username : String="",
+        val post: String= "",
+        val profileIDUrl : String="",
         @Exclude var isChecked : Boolean = false,
         )

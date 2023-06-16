@@ -5,18 +5,27 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FieldValue
+import androidx.compose.material3.contentColorFor
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
+import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
 import net.datafaker.Faker
-import java.lang.reflect.Field
+import net.datafaker.providers.base.Bool
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -24,7 +33,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CreateTaskActivity : AppCompatActivity() {
+class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback {
 
     private val binding: ActivityCreateTaskBinding by lazy {
         ActivityCreateTaskBinding.inflate(layoutInflater)
@@ -34,6 +43,12 @@ class CreateTaskActivity : AppCompatActivity() {
     private val easyElements : GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+
+    private val contriRecyclerView : RecyclerView by lazy {
+        binding.contributorsRecyclerView
+    }
+
+    lateinit var contriAdapter : ContributorAdapter
 
     @Inject lateinit var calendar : Calendar
 
@@ -50,18 +65,36 @@ class CreateTaskActivity : AppCompatActivity() {
 
        // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
 
-
         binding.duration.setOnClickThrottleBounceListener {
-            Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show()
             viewmodel.createTask(testTask)
         }
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
-            val userListBottomSheet = UserlistBottomSheet()
+            val userListBottomSheet = UserlistBottomSheet(this)
             userListBottomSheet.show(supportFragmentManager, "userlist")
         }
 
         setUpViews()
+        setUpLiveData()
+    }
+
+    private fun setUpLiveData() {
+        //Progress listener
+        viewmodel.progressLiveData.observe(this){ visibility ->
+            if (visibility){
+                binding.progressCircularInclude.root.visible()
+            }else {
+                binding.progressCircularInclude.root.gone()
+            }
+        }
+
+        viewmodel.successLiveData.observe(this){
+            if (it){
+                toast("Task Published...")
+                finish()
+            }
+        }
+
     }
 
     private fun setUpViews() {
@@ -69,6 +102,19 @@ class CreateTaskActivity : AppCompatActivity() {
         setUpDatePicker()
         setUpClickListeners()
         setUpCallbacks()
+        setupSelectedMembersRecyclerView()
+    }
+
+    private fun setupSelectedMembersRecyclerView() {
+        val layoutManager = FlexboxLayoutManager(this)
+        layoutManager.flexDirection = FlexDirection.ROW
+        layoutManager.flexWrap = FlexWrap.WRAP
+
+        contriRecyclerView.layoutManager = layoutManager
+        contriAdapter = ContributorAdapter(mutableListOf(),this)
+        contriRecyclerView.adapter = contriAdapter
+        contriRecyclerView.visible()
+
     }
 
     private fun setUpCallbacks() {
@@ -126,7 +172,6 @@ class CreateTaskActivity : AppCompatActivity() {
             calendar.get(Calendar.DAY_OF_MONTH)
         )
 
-
         startdatePickerDialog.datePicker.minDate = calendar.timeInMillis
         enddatePickerDialog.datePicker.minDate = calendar.timeInMillis
 
@@ -141,6 +186,17 @@ class CreateTaskActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
             finish()
         }
+    }
+
+    override fun onProfileClick(user: User, position: Int) {
+    }
+
+    override fun onSelectedContributors(contributor: User, isChecked: Boolean) {
+       if (isChecked){
+           contriAdapter.addUser(user = contributor)
+       }else {
+            contriAdapter.removeUser(contributor)
+       }
     }
 
 

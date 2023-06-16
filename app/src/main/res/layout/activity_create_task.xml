@@ -7,6 +7,7 @@
     android:background="@color/secondary_bg_black"
     tools:context=".UI.CreateTask.CreateTaskActivity">
 
+
     <include
         android:id="@+id/gio_actionbar"
         layout="@layout/actionbar_task"
@@ -17,14 +18,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/scrollView2" />
 
+    <include
+        android:id="@+id/progress_circular_include"
+        layout="@layout/circular_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:scrollbarThumbVertical="@color/s3bg"
         android:paddingTop="@dimen/action_bar"
         android:paddingBottom="80dp"
+        android:scrollbarThumbVertical="@color/s3bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -43,11 +55,10 @@
                 android:id="@+id/taskid"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="20dp"
                 android:fontFamily="@font/outfitmedium"
                 android:gravity="center"
-                app:tint="@color/s2bg"
                 android:scaleType="centerCrop"
                 android:src="@drawable/baseline_groups_24"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -55,7 +66,8 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/btnBack"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintVertical_bias="0.0"
+                app:tint="@color/s2bg" />
 
             <TextView
                 android:id="@+id/taskisd"
@@ -76,71 +88,64 @@
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/task_title_parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="15dp"
-            >
-
-
-            <TextView
-                android:id="@+id/tt"
+                android:id="@+id/task_title_parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="3"
-                android:fontFamily="@font/outfitmedium"
-                android:gravity="start"
-                android:layout_marginTop="5dp"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp"
-                android:text="Task Title"
-                android:textColor="@color/better_white"
-                android:textSize="15dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/btnBack"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
 
 
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                android:layout_width="match_parent"
-                android:layout_weight="7"
-                android:layout_height="wrap_content"
-                app:hintEnabled="false"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="15dp"
-                app:boxBackgroundColor="#C3BCED"
-                >
-
-                <com.google.android.material.textfield.TextInputEditText
+                <TextView
+                    android:id="@+id/tt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Set Title here..."
-                    android:textColorHint="@color/darkbg_main_a80"
-                    />
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="start"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:text="Task Title"
+                    android:textColor="@color/better_white"
+                    android:textSize="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/btnBack"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_weight="7"
+                    app:boxBackgroundColor="#C3BCED"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Set Title here..."
+                        android:textColorHint="@color/darkbg_main_a80" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/description_title_parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="20dp"
-                >
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/dd"
@@ -163,34 +168,30 @@
                     app:layout_constraintVertical_bias="0.0" />
 
 
-
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                     android:layout_width="match_parent"
-                    android:layout_weight="7"
                     android:layout_height="wrap_content"
-                    app:hintEnabled="false"
                     android:layout_marginStart="15dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginEnd="15dp"
                     android:layout_marginBottom="15dp"
+                    android:layout_weight="7"
                     app:boxBackgroundColor="@color/dim_purple"
-                    >
+                    app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Set Description here..."
-                        android:minHeight="100dp"
                         android:inputType="textMultiLine"
-                        android:textColorHint="@color/darkbg_main_a80"
-                        />
+                        android:minHeight="100dp"
+                        android:textColorHint="@color/darkbg_main_a80" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -223,66 +224,63 @@
                     android:id="@+id/start_date"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:elevation="6dp"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp"
-                    android:text="Set Start Date"
-                    android:textColor="@color/better_white"
-                    android:textAllCaps="false"
-                    android:fontFamily="@font/outfitmedium"
-                    android:textSize="18dp"
                     android:background="@drawable/card_view_background_green_outline"
+                    android:elevation="6dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:orientation="vertical"
+                    android:text="Set Start Date"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/end_date"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:elevation="6dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Set Deadline Date"
-                    android:gravity="center"
-                    android:textColor="@color/better_white"
-                    android:textAllCaps="false"
-                    android:fontFamily="@font/outfitmedium"
-                    android:textSize="18dp"
                     android:background="@drawable/card_view_background_green_outline"
+                    android:elevation="6dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:text="Set Deadline Date"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent" />
 
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/duration"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:elevation="6dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:text="Set Duration"
-                    android:gravity="center"
-                    android:textColor="@color/better_white"
-                    android:textAllCaps="false"
-                    android:fontFamily="@font/outfitmedium"
-                    android:textSize="18dp"
                     android:background="@drawable/card_view_background_purple"
+                    android:elevation="6dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:text="Set Duration"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -315,14 +313,14 @@
                     android:id="@+id/contributorsRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:nestedScrollingEnabled="false"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:visibility="gone"
                     android:layout_marginBottom="15dp"
+                    android:clipToPadding="false"
                     android:layoutAnimation="@anim/layout_animation_popscale"
-                    />
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
 
 
 
@@ -331,25 +329,25 @@
                     android:id="@+id/add_contributors_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="50dp"
-                    android:orientation="vertical"
-                    android:elevation="6dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
+                    android:background="@drawable/card_view_background_purple"
                     android:drawableEnd="@drawable/outline_add_24"
+                    android:drawablePadding="-50dp"
                     android:drawableTint="@color/white"
+                    android:elevation="6dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:minHeight="50dp"
+                    android:orientation="vertical"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
-                    android:drawablePadding="-50dp"
                     android:text="Add Contributors"
-                    android:textColor="@color/white"
                     android:textAllCaps="false"
-                    android:fontFamily="@font/outfitmedium"
+                    android:textColor="@color/white"
                     android:textSize="18dp"
-                    android:background="@drawable/card_view_background_purple"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -384,20 +382,20 @@
                     android:id="@+id/status"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:elevation="6dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:text="Set Status"
-                    android:gravity="center"
-                    android:textColor="@color/better_white"
-                    android:textAllCaps="false"
-                    android:fontFamily="@font/outfitmedium"
-                    android:textSize="18dp"
                     android:background="@drawable/card_view_background_purple"
+                    android:elevation="6dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:text="Set Status"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -431,97 +429,90 @@
                     android:id="@+id/addtags"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:elevation="6dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:text="Add Tags"
-                    android:gravity="center"
-                    android:textColor="@color/better_white"
-                    android:textAllCaps="false"
-                    android:fontFamily="@font/outfitmedium"
-                    android:textSize="18dp"
                     android:background="@drawable/card_view_background_purple"
+                    android:elevation="6dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:text="Add Tags"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_margin="10dp"
-                >
-            <TextView
-                android:id="@+id/dddd3d"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/outfitmedium"
-                android:gravity="start"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                android:layout_marginTop="5dp"
-                android:text="Difficulty 🧑🏽‍💻:"
-                android:textColor="@color/white"
-                android:textSize="18dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/btnBack"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                android:orientation="vertical">
 
-            <com.google.android.material.chip.ChipGroup
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:singleLine="true"
-                app:singleSelection="true"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginTop="10dp"
-                >
-
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipe"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/dddd3d"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Easy"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:backgroundTint="@color/dim_purple"
-                    />
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="start"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Difficulty 🧑🏽‍💻:"
+                    android:textColor="@color/white"
+                    android:textSize="18dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/btnBack"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipm"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Medium"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:backgroundTint="@color/dim_purple"
-                    android:layout_marginStart="20dp"
-                    />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:backgroundTint="@color/dim_purple"
-                    android:text="Difficult"
-                    android:layout_marginStart="20dp"
-                    />
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="15dp"
+                    app:singleLine="true"
+                    app:singleSelection="true">
 
 
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipe"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/dim_purple"
+                        android:text="Easy" />
 
-            </com.google.android.material.chip.ChipGroup>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipm"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:backgroundTint="@color/dim_purple"
+                        android:text="Medium" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipd"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:backgroundTint="@color/dim_purple"
+                        android:text="Difficult" />
 
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                </com.google.android.material.chip.ChipGroup>
 
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
 
         </androidx.appcompat.widget.LinearLayoutCompat>

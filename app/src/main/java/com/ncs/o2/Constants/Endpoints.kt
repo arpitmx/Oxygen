@@ -13,8 +13,9 @@ object Endpoints {
     }
 
     object Project{
+
         const val ALL_SEGMENT = "ALL_SEGMENT"
-        const val ALL_TASK_IDS = "ALL_TASK_IDS"
+        const val TASKS = "TASKS"
         const val SEGMENT = "SEGMENTS"
         const val CONTRIBUTERS = "CONTRIBUTERS"
         const val PROJECTID = "PROJECT_ID"

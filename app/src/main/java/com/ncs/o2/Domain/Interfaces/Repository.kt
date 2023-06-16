@@ -1,6 +1,6 @@
 package com.ncs.o2.Domain.Interfaces
 
-import com.ncs.o2.Constants.IDS
+import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.CurrentUser
@@ -29,7 +29,7 @@ interface Repository {
 
 
     fun setCallback(callback: ServerErrorCallback)
-    fun createUniqueID(idType: IDS, projectID: String, generatedID:(String)->Unit)
+    fun createUniqueID(idType: IDType, projectID: String, generatedID:(String)->Unit)
     //Task related
     suspend fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit)
 

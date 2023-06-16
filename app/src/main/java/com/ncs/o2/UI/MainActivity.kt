@@ -10,10 +10,12 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.Navigator
@@ -99,13 +101,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
     }
 
     private fun setUpProjects() {
+
+        binding.lottieProgressInclude.progressbarStrip.visible()
+        binding.lottieProgressInclude.progressbarBlock.gone()
+
         viewModel.fetchUserProjectsFromRepository()
 
         viewModel.showprogressLD.observe(this) { show ->
             if (show) {
-                binding.progressbar.progressVisible(this, 600)
+                binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
             } else {
-                binding.progressbar.progressGone(this, 400)
+                binding.lottieProgressInclude.progressLayout.progressGone(this, 400)
+
             }
         }
 

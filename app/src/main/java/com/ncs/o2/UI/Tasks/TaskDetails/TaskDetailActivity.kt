@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallback {
+class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback {
 
     private val binding: ActivityTaskDetailBinding by lazy {
         ActivityTaskDetailBinding.inflate(layoutInflater)
@@ -95,7 +95,8 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallba
             User("https://picsum.photos/202"),
             User("https://picsum.photos/234")
         )
-        val adapter = ContributorAdapter(dataList, this)
+
+        val adapter = ContributorAdapter(dataList as MutableList<User>, this)
         contriRecyclerView.adapter = adapter
     }
 
@@ -119,8 +120,8 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnClickCallba
         tagsRecyclerView.adapter = adapter
     }
 
-    override fun onClick(user: User, position: Int) {
-        val bottomSheet = ProfileBottomSheet(user.profileUrl)
+    override fun onProfileClick(user: User, position: Int) {
+        val bottomSheet = ProfileBottomSheet(user.profileDPUrl)
         bottomSheet.show(supportFragmentManager, "bottomsheet")
     }
 
