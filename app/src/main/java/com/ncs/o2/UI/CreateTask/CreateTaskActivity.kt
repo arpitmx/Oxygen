@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback {
+class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsListCallback {
 
     private val binding: ActivityCreateTaskBinding by lazy {
         ActivityCreateTaskBinding.inflate(layoutInflater)
@@ -49,6 +49,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     lateinit var contriAdapter : ContributorAdapter
+    private var localContributorList : MutableList<User> = mutableListOf()
+    lateinit var dataList : MutableList<User>
 
     @Inject lateinit var calendar : Calendar
 
@@ -69,8 +71,27 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             viewmodel.createTask(testTask)
         }
 
+
+        dataList = mutableListOf(
+            User(
+                "https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj",
+                "armax",
+                "android",
+                "url1"
+            ),
+            User(
+                "https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*",
+                "abhishek", "android", "url2",
+            ),
+            User("https://picsum.photos/200", "vivek", "design", "url3"),
+            User("https://picsum.photos/300", "lalit", "web", "url4"),
+            User("https://picsum.photos/350", "yogita", "design", "url5"),
+            User("https://picsum.photos/450", "aditi", "design", "url6"),
+        )
+
+
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
-            val userListBottomSheet = UserlistBottomSheet(this)
+            val userListBottomSheet = UserlistBottomSheet(this, dataList)
             userListBottomSheet.show(supportFragmentManager, "userlist")
         }
 
@@ -106,12 +127,13 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     private fun setupSelectedMembersRecyclerView() {
+
         val layoutManager = FlexboxLayoutManager(this)
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
 
         contriRecyclerView.layoutManager = layoutManager
-        contriAdapter = ContributorAdapter(mutableListOf(),this)
+        contriAdapter = ContributorAdapter(localContributorList,this)
         contriRecyclerView.adapter = contriAdapter
         contriRecyclerView.visible()
 
@@ -191,12 +213,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onProfileClick(user: User, position: Int) {
     }
 
-    override fun onSelectedContributors(contributor: User, isChecked: Boolean) {
-       if (isChecked){
-           contriAdapter.addUser(user = contributor)
-       }else {
-            contriAdapter.removeUser(contributor)
-       }
+    override fun onGetContributorsList(selectedContributorsList: MutableList<User>) {
+        this.localContributorList = selectedContributorsList
+        contriAdapter.updateList(selectedContributorsList)
     }
 
 

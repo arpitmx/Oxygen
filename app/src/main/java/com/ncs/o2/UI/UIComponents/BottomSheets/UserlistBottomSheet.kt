@@ -11,6 +11,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.snackbar
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
@@ -21,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.datafaker.Faker
 import okhttp3.internal.userAgent
+import timber.log.Timber
 
 
 /*
@@ -43,7 +46,7 @@ Tasks FUTURE ADDITION :
 */
 
 @Issue("1. Unknown behaviour when bottom sheet shows sometime : Back elements can be clickable when dismissed , Doesn't dismiss ")
-class UserlistBottomSheet (private val callback : getContributorsCallback): BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
+class UserlistBottomSheet (private val callback : getContributorsListCallback, private var dataList : MutableList<User>): BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
 
     lateinit var binding: ContributorListBottomSheetBinding
     private val recyclerView: RecyclerView by lazy {
@@ -51,6 +54,8 @@ class UserlistBottomSheet (private val callback : getContributorsCallback): Bott
     }
 
     private val faker: Faker by lazy { Faker() }
+    private var selectedContributerList : MutableList<User> = mutableListOf()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,7 +75,6 @@ class UserlistBottomSheet (private val callback : getContributorsCallback): Bott
 
     private fun setViews() {
 
-
         setBottomSheetConfig()
 
        val job =  CoroutineScope(Dispatchers.IO).launch {
@@ -88,15 +92,6 @@ class UserlistBottomSheet (private val callback : getContributorsCallback): Bott
 //                }
 //            }
 
-           val dataList = mutableListOf(
-               User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj","armax","android","url1"),
-               User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"
-               ,"abhishek","android","url2", true),
-               User("https://picsum.photos/200","vivek","design","url3"),
-               User("https://picsum.photos/300","lalit","web","url4"),
-               User("https://picsum.photos/350","yogita","design","url5"),
-               User("https://picsum.photos/450","aditi","design","url6"),
-           )
 
             withContext(Dispatchers.Main) {
                 setRecyclerView(dataList)
@@ -109,7 +104,9 @@ class UserlistBottomSheet (private val callback : getContributorsCallback): Bott
         }
 
         binding.submitBtn.setOnClickThrottleBounceListener {
-            job.cancel()
+            //toast(selectedContributerList.toString())
+            Timber.tag(TAG).d(dataList.toString())
+            callback.onGetContributorsList(dataList)
             dismiss()
         }
 
@@ -132,15 +129,25 @@ class UserlistBottomSheet (private val callback : getContributorsCallback): Bott
     }
 
     override fun onClick(contributor: User, position: Int, isChecked : Boolean) {
-        Toast.makeText(requireActivity(), "Clicked ${contributor.username}", Toast.LENGTH_SHORT).show()
-        callback.onSelectedContributors(contributor, isChecked)
+
+        if (isChecked){
+            selectedContributerList.add(contributor)
+        }
+        else {
+
+        }
+
     }
 
 
-    interface getContributorsCallback{
-        fun onSelectedContributors(contributor : User, isChecked: Boolean)
+    interface getContributorsListCallback{
+        fun onGetContributorsList(selectedContributorsList : MutableList<User>)
     }
 
+
+    companion object{
+        const val TAG = "UserlistBottomSheet"
+    }
 }
 
 

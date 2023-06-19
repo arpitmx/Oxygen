@@ -33,7 +33,7 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION : 
 
 */
-class UserListAdapter constructor(private val contriList: List<User>, private val onClickCallback: OnClickCallback) : RecyclerView.Adapter<UserListAdapter.ViewHolder>(){
+class UserListAdapter constructor(private val dataList: List<User>, private val onClickCallback: OnClickCallback) : RecyclerView.Adapter<UserListAdapter.ViewHolder>(){
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -43,7 +43,7 @@ class UserListAdapter constructor(private val contriList: List<User>, private va
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contributor = contriList[position]
+        val contributor = dataList[position]
 
        Glide.with(holder.itemView.context)
            .load(contributor.profileDPUrl)
@@ -75,7 +75,6 @@ class UserListAdapter constructor(private val contriList: List<User>, private va
            .apply(
                RequestOptions().
                diskCacheStrategy(DiskCacheStrategy.ALL)
-
            )
            .error(R.drawable.profile_pic_placeholder)
            .into(holder.binding.userDp)
@@ -86,32 +85,35 @@ class UserListAdapter constructor(private val contriList: List<User>, private va
 
 
         holder.binding.checkbox.setOnCheckedChangeListener{ btn,isChecked->
-
-            contriList[position].isChecked = isChecked
-            onClickCallback.onClick(contributor, position, isChecked)
-
+            dataList[position].isChecked = isChecked
+            //onClickCallback.onClick(contributor, position, isChecked)
         }
 
         holder.binding.root.setOnClickListener {
 
             val isCheckedC = holder.binding.checkbox.isChecked
             if (isCheckedC){
+
                 holder.binding.checkbox.isChecked = false
-                contriList[position].isChecked = false
+                contributor.isChecked = false
+
+                onClickCallback.onClick(contributor, position, false)
+
             }else {
                 holder.binding.checkbox.isChecked = true
-                contriList[position].isChecked = true
+                contributor.isChecked = true
+
+                onClickCallback.onClick(contributor, position, true)
+
             }
-            onClickCallback.onClick(contributor, position, isCheckedC)
         }
 
         holder.binding.checkbox.isChecked = contributor.isChecked
 
-
     }
 
     override fun getItemCount(): Int {
-        return contriList.size
+        return dataList.size
     }
 
     inner class ViewHolder(val binding: ContributorListItemBinding) :

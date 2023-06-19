@@ -55,15 +55,20 @@ Tasks FUTURE ADDITION :
 */
 class ContributorAdapter constructor(private var contriList: MutableList<User>, private val onProfileClickCallback: OnProfileClickCallback) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
 
+    lateinit var binding : ContriItemBinding
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding =
+         binding =
             ContriItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val contributor = contriList[position]
+
+        if(!contributor.isChecked){
+            return
+        }
 
        Glide.with(holder.itemView.context)
            .load(contributor.profileDPUrl)
@@ -105,6 +110,11 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
             onProfileClickCallback.onProfileClick(contributor, position)
         }
 
+    }
+
+    fun updateList(contriList: MutableList<User>){
+        this.contriList = contriList
+        notifyDataSetChanged()
     }
 
     fun addUser(user: User){
