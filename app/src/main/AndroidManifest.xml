@@ -18,6 +18,9 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.Auth.AuthScreen"
+            android:exported="false" />
+        <activity
             android:name=".UI.CreateSegment.CreateSegmentActivity"
             android:exported="false"
             android:label="@string/title_activity_create_segment"
