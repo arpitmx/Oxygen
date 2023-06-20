@@ -20,7 +20,7 @@ import timber.log.Timber
 
 /*
 File : ContributorAdapter.kt -> com.ncs.o2.Adapters
-Description : Adapter for contributors  
+Description : Adapter for contributors
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
@@ -29,15 +29,15 @@ From : Bitpolarity x Noshbae (@Project : O2 Android)
 Creation : 1:35 am on 05/06/23
 
 Todo >
-Tasks CLEAN CODE : 
-Tasks BUG FIXES : 
-Tasks FEATURE MUST HAVE : 
-Tasks FUTURE ADDITION : 
+Tasks CLEAN CODE :
+Tasks BUG FIXES :
+Tasks FEATURE MUST HAVE :
+Tasks FUTURE ADDITION :
 
 
 *//*
 File : ContributorAdapter.kt -> com.ncs.o2.Adapters
-Description : Adapter for contributors  
+Description : Adapter for contributors
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
@@ -46,19 +46,18 @@ From : Bitpolarity x Noshbae (@Project : O2 Android)
 Creation : 1:35 am on 05/06/23
 
 Todo >
-Tasks CLEAN CODE : 
-Tasks BUG FIXES : 
-Tasks FEATURE MUST HAVE : 
-Tasks FUTURE ADDITION : 
+Tasks CLEAN CODE :
+Tasks BUG FIXES :
+Tasks FEATURE MUST HAVE :
+Tasks FUTURE ADDITION :
 
 
 */
 class ContributorAdapter constructor(private var contriList: MutableList<User>, private val onProfileClickCallback: OnProfileClickCallback) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
 
-    lateinit var binding : ContriItemBinding
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-         binding =
+        val binding =
             ContriItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
@@ -66,55 +65,49 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val contributor = contriList[position]
 
-        if(!contributor.isChecked){
-            return
-        }
-
-       Glide.with(holder.itemView.context)
-           .load(contributor.profileDPUrl)
-           .listener(object : RequestListener<Drawable> {
+        Glide.with(holder.itemView.context)
+            .load(contributor.profileDPUrl)
+            .listener(object : RequestListener<Drawable> {
 
 
-               override fun onLoadFailed(
-                   e: GlideException?,
-                   model: Any?,
-                   target: Target<Drawable>?,
-                   isFirstResource: Boolean
-               ): Boolean {
-                   holder.binding.progressbar.gone()
-                   return false
-               }
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    holder.binding.progressbar.gone()
+                    return false
+                }
 
-               override fun onResourceReady(
-                   resource: Drawable?,
-                   model: Any?,
-                   target: Target<Drawable>?,
-                   dataSource: DataSource?,
-                   isFirstResource: Boolean
-               ): Boolean {
-                   holder.binding.progressbar.gone()
-                   return false
-               }
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    holder.binding.progressbar.gone()
+                    return false
+                }
 
-           })
-           .encodeQuality(80)
-           .override(80,80)
-           .apply(
-               RequestOptions().
-               diskCacheStrategy(DiskCacheStrategy.ALL)
-           )
-           .error(R.drawable.profile_pic_placeholder)
-           .into(holder.binding.contriProfileImage)
+            })
+            .encodeQuality(80)
+            .override(80,80)
+            .apply(
+                RequestOptions().
+                diskCacheStrategy(DiskCacheStrategy.ALL)
+            )
+            .error(R.drawable.profile_pic_placeholder)
+            .into(holder.binding.contriProfileImage)
 
         holder.binding.contriProfileImage.setOnClickThrottleBounceListener {
             onProfileClickCallback.onProfileClick(contributor, position)
         }
+        holder.binding.remove.setOnClickListener {
+            onProfileClickCallback.removeClick(contributor,position)
+        }
 
-    }
-
-    fun updateList(contriList: MutableList<User>){
-        this.contriList = contriList
-        notifyDataSetChanged()
     }
 
     fun addUser(user: User){
@@ -127,6 +120,9 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
         this.contriList.remove(user)
         notifyDataSetChanged()
     }
+    fun isUserAdded(contributor: User): Boolean {
+        return contriList.contains(contributor)
+    }
 
 
     override fun getItemCount(): Int {
@@ -138,10 +134,11 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
 
     interface OnProfileClickCallback{
         fun onProfileClick(user : User, position : Int)
+        fun removeClick(user : User, position : Int)
+
     }
 
     companion object{
         const val TAG = "ConstributorAdapter"
     }
 }
-

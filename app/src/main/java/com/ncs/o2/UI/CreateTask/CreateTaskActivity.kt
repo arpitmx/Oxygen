@@ -2,30 +2,22 @@ package com.ncs.o2.UI.CreateTask
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.contentColorFor
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
-import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
 import net.datafaker.Faker
-import net.datafaker.providers.base.Bool
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -33,13 +25,16 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsListCallback {
+class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback {
+    private var OList: MutableList<User> = mutableListOf()
+
 
     private val binding: ActivityCreateTaskBinding by lazy {
         ActivityCreateTaskBinding.inflate(layoutInflater)
     }
 
-    private val viewmodel: CreateTaskViewModel by viewModels()
+//    private val viewmodel: CreateTaskViewModel by viewModels()
+
     private val easyElements : GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
@@ -49,8 +44,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     lateinit var contriAdapter : ContributorAdapter
-    private var localContributorList : MutableList<User> = mutableListOf()
-    lateinit var dataList : MutableList<User>
 
     @Inject lateinit var calendar : Calendar
 
@@ -58,41 +51,32 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        OList = mutableListOf(
+            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj","armax","android","url1"),
+            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"
+                ,"abhishek","android","url2" ),
+            User("https://picsum.photos/200","vivek","design","url3"),
+            User("https://picsum.photos/300","lalit","web","url4"),
+            User("https://picsum.photos/350","yogita","design","url5"),
+            User("https://picsum.photos/450","aditi","design","url6"),
+        )
         val testTask = Task(
             Faker().animal().scientificName().toString(),
             Faker().code().asin(), ID= "", 1, emptyList(), 1, 1, emptyList(),
             "userid1", "01/04/2023", DURATION = "3Hr+", PROJECT_ID =  "Versa", SEGMENT = "Development", SECTION = "TaskSection4",
-            )
-
-       // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
-
-        binding.duration.setOnClickThrottleBounceListener {
-            viewmodel.createTask(testTask)
-        }
-
-
-        dataList = mutableListOf(
-            User(
-                "https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj",
-                "armax",
-                "android",
-                "url1"
-            ),
-            User(
-                "https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*",
-                "abhishek", "android", "url2",
-            ),
-            User("https://picsum.photos/200", "vivek", "design", "url3"),
-            User("https://picsum.photos/300", "lalit", "web", "url4"),
-            User("https://picsum.photos/350", "yogita", "design", "url5"),
-            User("https://picsum.photos/450", "aditi", "design", "url6"),
         )
 
+        // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
+
+        binding.duration.setOnClickThrottleBounceListener {
+//            viewmodel.createTask(testTask)
+        }
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
-            val userListBottomSheet = UserlistBottomSheet(this, dataList)
-            userListBottomSheet.show(supportFragmentManager, "userlist")
+
+            val userListBottomSheet = UserlistBottomSheet(OList,this)
+            userListBottomSheet.show(supportFragmentManager, "OList")
+
         }
 
         setUpViews()
@@ -101,20 +85,20 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     private fun setUpLiveData() {
         //Progress listener
-        viewmodel.progressLiveData.observe(this){ visibility ->
-            if (visibility){
-                binding.progressCircularInclude.root.visible()
-            }else {
-                binding.progressCircularInclude.root.gone()
-            }
-        }
-
-        viewmodel.successLiveData.observe(this){
-            if (it){
-                toast("Task Published...")
-                finish()
-            }
-        }
+//        viewmodel.progressLiveData.observe(this){ visibility ->
+//            if (visibility){
+//                binding.progressCircularInclude.root.visible()
+//            }else {
+//                binding.progressCircularInclude.root.gone()
+//            }
+//        }
+//
+//        viewmodel.successLiveData.observe(this){
+//            if (it){
+//                toast("Task Published...")
+//                finish()
+//            }
+//        }
 
     }
 
@@ -127,22 +111,21 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     private fun setupSelectedMembersRecyclerView() {
-
         val layoutManager = FlexboxLayoutManager(this)
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
 
         contriRecyclerView.layoutManager = layoutManager
-        contriAdapter = ContributorAdapter(localContributorList,this)
+        contriAdapter = ContributorAdapter(mutableListOf(),this)
         contriRecyclerView.adapter = contriAdapter
         contriRecyclerView.visible()
 
     }
 
     private fun setUpCallbacks() {
-        viewmodel.serverExceptionLiveData.observe(this){exceptionMsg->
-            easyElements.dialog("Server error",exceptionMsg,{},{})
-        }
+//        viewmodel.serverExceptionLiveData.observe(this){exceptionMsg->
+//            easyElements.dialog("Server error",exceptionMsg,{},{})
+//        }
     }
 
     private fun setUpClickListeners() {
@@ -213,9 +196,25 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onProfileClick(user: User, position: Int) {
     }
 
-    override fun onGetContributorsList(selectedContributorsList: MutableList<User>) {
-        this.localContributorList = selectedContributorsList
-        contriAdapter.updateList(selectedContributorsList)
+    override fun removeClick(user: User, position: Int) {
+        contriAdapter.removeUser(user)
+        val pos =OList.indexOf(user)
+        OList[pos].isChecked=false
+    }
+
+    override fun onSelectedContributors(contributor: User, isChecked: Boolean) {
+        if (isChecked) {
+            if (!contriAdapter.isUserAdded(contributor)) {
+                contriAdapter.addUser(contributor)
+            }
+        } else {
+            contriAdapter.removeUser(contributor)
+        }
+    }
+
+    override fun onTListUpdated(TList: MutableList<User>) {
+        OList.clear()
+        OList=TList
     }
 
 
