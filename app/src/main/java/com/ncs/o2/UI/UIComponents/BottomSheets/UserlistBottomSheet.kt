@@ -11,8 +11,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.snackbar
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
@@ -22,13 +20,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.datafaker.Faker
-import okhttp3.internal.userAgent
-import timber.log.Timber
 
 
 /*
 File : ProfileBottomSheet.kt -> com.ncs.o2.BottomSheets
-Description : Profile bottom sheet  
+Description : Profile bottom sheet
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
@@ -37,32 +33,39 @@ From : Bitpolarity x Noshbae (@Project : O2 Android)
 Creation : 3:14 am on 05/06/23
 
 Todo >
-Tasks CLEAN CODE : 
-Tasks BUG FIXES : 
-Tasks FEATURE MUST HAVE : 
-Tasks FUTURE ADDITION : 
+Tasks CLEAN CODE :
+Tasks BUG FIXES :
+Tasks FEATURE MUST HAVE :
+Tasks FUTURE ADDITION :
 
 
 */
 
 @Issue("1. Unknown behaviour when bottom sheet shows sometime : Back elements can be clickable when dismissed , Doesn't dismiss ")
-class UserlistBottomSheet (private val callback : getContributorsListCallback, private var dataList : MutableList<User>): BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
+class UserlistBottomSheet (private val OList: MutableList<User>,private val callback : getContributorsCallback): BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
+    private var TList: MutableList<User> = mutableListOf()
+
+
 
     lateinit var binding: ContributorListBottomSheetBinding
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewDevelopers
     }
+    init {
+        TList = OList.toMutableList()
+    }
 
     private val faker: Faker by lazy { Faker() }
-    private var selectedContributerList : MutableList<User> = mutableListOf()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         binding = ContributorListBottomSheetBinding.inflate(inflater, container, false)
+        binding.submitBtn.setOnClickListener {
+        }
         return binding.root
     }
 
@@ -74,41 +77,28 @@ class UserlistBottomSheet (private val callback : getContributorsListCallback, p
     }
 
     private fun setViews() {
-
         setBottomSheetConfig()
-
-       val job =  CoroutineScope(Dispatchers.IO).launch {
-
-//            val userList = mutableListOf<User>()
-//
-//            repeat(100) {
-//                val user = User(
-//                    username = faker.funnyName().name(),
-//                    post = faker.pokemon().name(),
-//                    url = faker.avatar().image()
-//                )
-//                synchronized(userList) {
-//                    userList.add(user)
-//                }
-//            }
-
-
+        val job =  CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.Main) {
-                setRecyclerView(dataList)
+                setRecyclerView(OList)
             }
         }
+
 
         binding.closeBtn.setOnClickThrottleBounceListener {
             job.cancel()
             dismiss()
         }
-
+//        binding.submitBtn.setOnClickThrottleBounceListener {
+//            job.cancel()
+//            dismiss()
+//        }
         binding.submitBtn.setOnClickThrottleBounceListener {
-            //toast(selectedContributerList.toString())
-            Timber.tag(TAG).d(dataList.toString())
-            callback.onGetContributorsList(dataList)
+            job.cancel()
             dismiss()
         }
+
+
 
     }
 
@@ -128,28 +118,32 @@ class UserlistBottomSheet (private val callback : getContributorsListCallback, p
 
     }
 
-    override fun onClick(contributor: User, position: Int, isChecked : Boolean) {
+    override fun onClick(contributor: User, position: Int, isChecked: Boolean) {
+        Toast.makeText(requireActivity(), "Clicked ${contributor.username}", Toast.LENGTH_SHORT).show()
 
-        if (isChecked){
-            selectedContributerList.add(contributor)
+        if (isChecked) {
+            TList[position].isChecked=isChecked
+
+        } else {
+            TList[position].isChecked=isChecked
+
         }
-        else {
+        callback.onSelectedContributors(contributor, isChecked)
 
-        }
+
 
     }
 
 
-    interface getContributorsListCallback{
-        fun onGetContributorsList(selectedContributorsList : MutableList<User>)
-    }
 
 
-    companion object{
-        const val TAG = "UserlistBottomSheet"
+    interface getContributorsCallback{
+        fun onSelectedContributors(contributor : User, isChecked: Boolean)
+        fun onTListUpdated(TList: MutableList<User>)
+
     }
+
 }
-
 
 
 

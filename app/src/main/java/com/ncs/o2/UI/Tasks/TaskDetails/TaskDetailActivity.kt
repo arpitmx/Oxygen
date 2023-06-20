@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
-import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.Domain.Models.User
@@ -18,6 +17,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListen
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.R
+import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.databinding.ActivityTaskDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -123,6 +123,10 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onProfileClick(user: User, position: Int) {
         val bottomSheet = ProfileBottomSheet(user.profileDPUrl)
         bottomSheet.show(supportFragmentManager, "bottomsheet")
+    }
+
+    override fun removeClick(user: User, position: Int) {
+        TODO("Not yet implemented")
     }
 
 
