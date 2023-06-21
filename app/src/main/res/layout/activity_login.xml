@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/darkbg_main"
+        >
+        <include
+            android:id="@+id/toolbar"
+            style="@style/ToolbarStyle"
+            layout="@layout/action_bar_back"
+            >
+        </include>
+
+
+    <ImageView
+        android:id="@+id/splashBg"
+        android:layout_width="200dp"
+        android:layout_height="250dp"
+        android:layout_alignParentEnd="true"
+        android:scaleType="fitXY"
+        android:translationX="50dp"
+        android:translationY="-50dp"
+        android:src="@drawable/curves"
+        app:tint="@color/primary_txt" />
+
+    <RelativeLayout
+        android:id="@+id/containerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_marginStart="@dimen/container_layout_margin"
+        android:layout_marginTop="@dimen/container_layout_margin"
+        android:layout_marginEnd="@dimen/container_layout_margin"
+        android:layout_marginBottom="@dimen/container_layout_margin">
+
+        <TextView
+            android:id="@+id/login_title"
+            style="@style/LabelStyle"
+            android:layout_marginTop="0dp"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:text="@string/login_title"
+            android:textColor="@color/orange" />
+
+        <TextView
+            android:id="@+id/login_welcome_msg"
+            style="@style/LabelStyle"
+            android:layout_below="@id/login_title"
+            android:layout_marginTop="@dimen/layout_in_between_margins"
+            android:text="@string/login_welcome_txt" />
+
+        <EditText
+            android:id="@+id/et_email_address"
+            style="@style/EditTextStyle"
+            android:layout_below="@id/login_welcome_msg"
+            android:layout_marginTop="@dimen/layout_in_between_margins"
+            android:hint="@string/email_address_hint"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/et_password"
+            style="@style/EditTextStyle"
+            android:layout_below="@id/et_email_address"
+            android:layout_marginTop="@dimen/layout_in_between_margins"
+            android:hint="@string/password_hint"
+            android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/forgot_password"
+            style="@style/LabelStyle"
+            android:layout_below="@id/et_password"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/layout_in_between_margins"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:text="@string/forgot_password"
+            android:textColor="@color/orange"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_login"
+            style="@style/SolidButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_below="@id/forgot_password"
+            android:layout_marginTop="25dp"
+            android:textSize="22dp"
+            android:background="@drawable/solid_bg_orange"
+            android:text="@string/login_btn_label"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            />
+
+
+
+
+
+        <RelativeLayout
+            android:id="@+id/sign_up_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/no_account"
+                style="@style/LabelStyle"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:text="@string/no_account"
+                android:textColor="@color/account"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/sign_up"
+                style="@style/LabelStyle"
+                android:layout_toEndOf="@id/no_account"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:onClick="signup"
+                android:text="@string/signup_label"
+                android:textColor="@color/primary"
+                android:textSize="16sp" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+    </RelativeLayout>

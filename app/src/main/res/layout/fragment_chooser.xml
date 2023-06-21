@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkbg_main"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+
+    <ImageView
+        android:id="@+id/splashBg"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        android:src="@drawable/curves"
+        app:tint="@color/purple" />
+
+    <RelativeLayout
+        android:id="@+id/containerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/container_layout_margin"
+        android:layout_marginTop="@dimen/container_layout_margin"
+        android:layout_marginEnd="@dimen/container_layout_margin"
+        android:layout_marginBottom="@dimen/container_layout_margin">
+
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/LabelStyle"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="146dp"
+            android:text="@string/splash_welcome_txt" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_login"
+                style="@style/StrokeButtonStyle"
+                android:minWidth="@dimen/splash_btn_width"
+                android:onClick="login"
+                android:textColor="@color/colorAccent"
+                android:text="@string/login_btn_label"
+
+                android:background="@drawable/card_view_background_green_outline"
+                android:textSize="14sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_get_started"
+                style="@style/SolidButtonStyle"
+                android:layout_alignParentEnd="true"
+                android:minWidth="@dimen/splash_btn_width"
+                android:onClick="getStarted"
+                android:text="@string/get_started_btn_label"
+                android:textSize="14sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

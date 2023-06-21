@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/auth_nav"
+    app:startDestination="@id/chooserFragment">
+
+    <fragment
+        android:id="@+id/chooserFragment"
+        android:name="com.ncs.o2.UI.Auth.ChooserScreen.ChooserFragment"
+        android:label="ChooserFragment"
+
+        >
+        <action
+            android:id="@+id/action_chooserFragment_to_loginScreenFragment"
+            app:destination="@id/loginScreenFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_chooserFragment_to_signUpScreenFragment"
+            app:destination="@id/signUpScreenFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginScreenFragment"
+        android:name="com.ncs.o2.UI.Auth.LoginScreen.LoginScreenFragment"
+        android:label="fragment_login_screen"
+        tools:layout="@layout/fragment_login_screen" >
+        <action
+            android:id="@+id/action_loginScreenFragment_to_signUpScreenFragment"
+            app:destination="@id/signUpScreenFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_loginScreenFragment_to_chooserFragment"
+            app:destination="@id/chooserFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpScreenFragment"
+        android:name="com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment"
+        android:label="fragment_sign_up"
+        tools:layout="@layout/fragment_sign_up" >
+        <action
+            android:id="@+id/action_signUpScreenFragment_to_loginScreenFragment"
+            app:destination="@id/loginScreenFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_signUpScreenFragment_to_chooserFragment"
+            app:destination="@id/chooserFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+</navigation>

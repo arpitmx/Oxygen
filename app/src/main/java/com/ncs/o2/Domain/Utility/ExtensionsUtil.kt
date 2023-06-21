@@ -6,32 +6,24 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.view.HapticFeedbackConstants
-import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.play.integrity.internal.l
 import com.ncs.o2.R
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.bounce
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.setSingleClickListener
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 /*
 File : ExtensionsUtil.kt -> com.ncs.versa.Utility
@@ -136,13 +128,18 @@ object ExtensionsUtil {
         }
     }
 
-    fun Fragment.showKeyboard() {
+    fun Fragment.showKeyboard(editBox : EditText) {
         activity?.apply {
             val imm: InputMethodManager =
                 getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            val view = currentFocus ?: View(this)
-            imm.showSoftInputFromInputMethod(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            imm.showSoftInputFromInputMethod(editBox.windowToken, InputMethodManager.SHOW_FORCED)
         }
+    }
+
+    fun EditText.showKeyboardB() {
+        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        requestFocus()
+        inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
     }
 
 
@@ -257,6 +254,19 @@ object ExtensionsUtil {
             .apply {
                 duration = animDuration
             }
+        this.startAnimation(animation)
+    }
+
+
+    fun View.rotateInfinity(context: Context) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context, R.anim.rotateinfi)
+        this.startAnimation(animation)
+    }
+
+    fun View.rotateInfinityReverse(context: Context) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context, R.anim.rotateinfirev)
         this.startAnimation(animation)
     }
 
