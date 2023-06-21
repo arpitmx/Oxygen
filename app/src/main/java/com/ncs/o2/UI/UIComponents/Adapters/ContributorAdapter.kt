@@ -15,6 +15,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.R
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.databinding.ContriItemBinding
 import timber.log.Timber
 
@@ -53,7 +54,7 @@ Tasks FUTURE ADDITION :
 
 
 */
-class ContributorAdapter constructor(private var contriList: MutableList<User>, private val onProfileClickCallback: OnProfileClickCallback) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
+class ContributorAdapter constructor(private var contriList: MutableList<User>, private val onProfileClickCallback: OnProfileClickCallback,private val showButton: Boolean = true) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -64,7 +65,11 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val contributor = contriList[position]
-
+        if (showButton) {
+            holder.binding.remove.visible()
+        } else {
+            holder.binding.remove.gone()
+        }
         Glide.with(holder.itemView.context)
             .load(contributor.profileDPUrl)
             .listener(object : RequestListener<Drawable> {
