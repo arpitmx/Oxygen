@@ -5,8 +5,11 @@ import android.os.Bundle
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.ChooserScreen.ChooserFragment
 import com.ncs.o2.databinding.ActivityAuthScreenBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class AuthScreenActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class AuthScreenActivity @Inject constructor() : AppCompatActivity() {
 
     private val binding: ActivityAuthScreenBinding by lazy {
         ActivityAuthScreenBinding.inflate(layoutInflater)
@@ -17,7 +20,6 @@ class AuthScreenActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setUpViews()
-
 
     }
 

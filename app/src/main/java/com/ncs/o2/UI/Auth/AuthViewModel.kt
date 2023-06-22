@@ -1,6 +1,8 @@
 package com.ncs.o2.UI.Auth
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 /*
 File : AuthViewModel.kt -> com.ncs.o2.UI.Auth
@@ -18,5 +20,7 @@ Tasks BUG FIXES :
 Tasks FEATURE MUST HAVE : 
 Tasks FUTURE ADDITION :
 */
-class AuthViewModel : ViewModel() {
+
+@HiltViewModel
+class AuthViewModel @Inject constructor() : ViewModel() {
 }

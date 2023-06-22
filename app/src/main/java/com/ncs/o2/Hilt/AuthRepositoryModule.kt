@@ -1,8 +1,9 @@
 package com.ncs.o2.Hilt
 
-import com.ncs.o2.Domain.Interfaces.Repository
-import com.ncs.o2.Domain.Repositories.FirestoreRepository
-import com.ncs.o2.Domain.Utility.FirebaseRepository
+
+import com.ncs.o2.Domain.Interfaces.AuthRepository
+import com.ncs.o2.Domain.Repositories.FirebaseAuthRepository
+import com.ncs.o2.Domain.Utility.FirebaseAuthorizationRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -28,12 +29,12 @@ Tasks FUTURE ADDITION :
 */
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
+abstract class AuthRepositoryModule {
 
     @Singleton
     @Binds
-    @FirebaseRepository
-    abstract fun bindsRepository(firestoreRepository: FirestoreRepository): Repository
+    @FirebaseAuthorizationRepository
+    abstract fun bindsAuthRepository(firestoreAuthRepository: FirebaseAuthRepository): AuthRepository
 
 
 }

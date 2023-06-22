@@ -51,8 +51,8 @@
             android:layout_marginTop="16dp"
             android:text="@string/signup_welcome_txt" />
 
-        <EditText
-            android:id="@+id/et_full_name"
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_email"
             style="@style/EditTextStyle"
             android:layout_below="@id/signup_welcome_msg"
             android:layout_marginTop="16dp"
@@ -60,19 +60,19 @@
             android:hint="@string/email_address_hint"
             android:inputType="textEmailAddress" />
 
-        <EditText
-            android:id="@+id/et_email_address"
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_pass"
             style="@style/EditTextStyle"
-            android:layout_below="@id/et_full_name"
+            android:layout_below="@id/et_email"
             android:layout_marginTop="16dp"
             android:textColor="@color/primary"
             android:hint="@string/password_hint"
             android:inputType="textPassword" />
 
-        <EditText
-            android:id="@+id/et_password"
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_confirmation_pass"
             style="@style/EditTextStyle"
-            android:layout_below="@id/et_email_address"
+            android:layout_below="@id/et_pass"
             android:layout_marginTop="16dp"
             android:textColor="@color/primary"
             android:hint="Confirm Password"
@@ -82,7 +82,7 @@
             android:id="@+id/btn_signup"
             style="@style/SolidButtonStyle"
             android:layout_width="match_parent"
-            android:layout_below="@id/et_password"
+            android:layout_below="@id/et_confirmation_pass"
             android:layout_marginTop="20dp"
             android:background="@drawable/solid_bg_orange"
             android:text="@string/signup_btn_label"

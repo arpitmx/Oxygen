@@ -61,6 +61,7 @@
     <string name="next">Next</string>
     <string name="designation">Designation</string>
     <string name="organisation">Organisation</string>
+    <string name="set_profile_picture">Set profile picture</string>
 
 
 </resources>

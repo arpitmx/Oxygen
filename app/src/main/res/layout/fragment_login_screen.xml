@@ -52,7 +52,7 @@
             android:text="@string/login_welcome_txt" />
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_email_address"
+            android:id="@+id/et_pass"
             style="@style/EditTextStyle"
             android:layout_below="@id/login_welcome_msg"
             android:layout_marginTop="@dimen/layout_in_between_margins"
@@ -61,9 +61,9 @@
             android:inputType="textEmailAddress" />
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_password"
+            android:id="@+id/et_confirmation_pass"
             style="@style/EditTextStyle"
-            android:layout_below="@id/et_email_address"
+            android:layout_below="@id/et_pass"
             android:layout_marginTop="@dimen/layout_in_between_margins"
             android:hint="@string/password_hint"
             android:textColor="@color/primary"
@@ -72,7 +72,7 @@
         <TextView
             android:id="@+id/forgot_password"
             style="@style/LabelStyle"
-            android:layout_below="@id/et_password"
+            android:layout_below="@id/et_confirmation_pass"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="@dimen/layout_in_between_margins"
             android:fontFamily="@font/sf_pro_display_medium"

@@ -1,4 +1,4 @@
-package com.ncs.o2.UI.Done
+package com.ncs.o2.UI.DoneScreen
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle

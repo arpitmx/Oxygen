@@ -26,7 +26,7 @@
     </fragment>
     <fragment
         android:id="@+id/done_item"
-        android:name="com.ncs.o2.UI.Done.DoneFragment"
+        android:name="com.ncs.o2.UI.DoneScreen.DoneFragment"
         android:label="fragment_done"
         tools:layout="@layout/fragment_done" >
         <action

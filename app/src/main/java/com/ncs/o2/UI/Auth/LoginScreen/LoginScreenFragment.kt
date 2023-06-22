@@ -18,6 +18,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.showKeyboardB
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentLoginScreenBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 class LoginScreenFragment : Fragment() {
 

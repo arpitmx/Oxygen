@@ -4,6 +4,9 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.UseCases.CreateSegmentUseCase
 import com.ncs.o2.Domain.UseCases.CreateTaskUseCase
 import com.ncs.o2.Domain.UseCases.LoadSectionsUseCase
+import com.ncs.o2.UI.Auth.usecases.ValidationEmail
+import com.ncs.o2.UI.Auth.usecases.ValidationPassword
+import com.ncs.o2.UI.Auth.usecases.ValidationRepeatedPassword
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,6 +53,19 @@ object UseCasesModule {
     fun provideLoadSectionUseCase(repository: FirestoreRepository): LoadSectionsUseCase{
         return LoadSectionsUseCase(repository)
     }
+
+    @Singleton
+    @Provides
+    fun provideEmailValidationUseCase(): ValidationEmail =  ValidationEmail()
+
+    @Singleton
+    @Provides
+    fun providePasswordValidationUseCase(): ValidationPassword = ValidationPassword()
+
+
+    @Singleton
+    @Provides
+    fun provideRepeatedPasswordValidationUseCase(): ValidationRepeatedPassword =  ValidationRepeatedPassword()
 
 }
 

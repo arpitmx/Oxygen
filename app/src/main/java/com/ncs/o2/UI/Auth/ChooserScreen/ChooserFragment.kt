@@ -17,8 +17,10 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.LoginScreen.LoginScreenFragment
 import com.ncs.o2.databinding.FragmentChooserBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.random.Random
 
+@AndroidEntryPoint
 class ChooserFragment : Fragment() {
 
 

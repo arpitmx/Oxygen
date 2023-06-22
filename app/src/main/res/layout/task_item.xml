@@ -1,31 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="2dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+
     android:paddingTop="5dp"
-    android:paddingBottom="12dp"
-    android:background="@drawable/curvedbggraybg"
-    android:orientation="horizontal"
+    android:background="@color/darkbg_main"
+    android:orientation="vertical"
     android:weightSum="10">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        >
+
+        <TextView
+            android:id="@+id/task_id"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="@dimen/margin_top"
+            android:layout_toEndOf="@+id/difficulty"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:text="#12345"
+            android:textColor="#858585"
+            android:textSize="14dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/difficulty"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/rounded_corner_shape"
+            android:fontFamily="@font/outfitbold"
+            android:layout_marginTop="@dimen/margin_top"
+            android:gravity="center"
+            android:text="H"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/darkTheme_bg"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.207" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/progress_bar"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="22dp"
+            android:layout_toStartOf="@+id/task_duration"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/task_duration"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/asignee_dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/margin_top"
+            android:src="@drawable/remove"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/task_duration"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/task_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/asignee_dp"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:gravity="center"
+            android:text="about 5 hours ago"
+            android:textColor="#858585"
+            android:textSize="14dp"
+            app:layout_constraintVertical_bias="0.136" />
+
+
+    </RelativeLayout>
+
 
 
     <TextView
         android:id="@+id/task_title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/outfitregular"
-        android:maxLines="2"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:maxLines="3"
         android:minLines="1"
         android:text="Appbar integration on to be redesigned"
         android:textColor="@color/white"
-        android:textSize="17dp"
+        android:textSize="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -33,76 +122,15 @@
         app:layout_constraintTop_toBottomOf="@+id/difficulty"
         app:layout_constraintVertical_bias="0.545" />
 
-    <TextView
-        android:id="@+id/task_duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
 
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
         android:layout_marginTop="10dp"
-        android:fontFamily="@font/outfitregular"
-        android:gravity="center"
-        android:text="about 5 hours ago"
-        android:textColor="#858585"
-        android:textSize="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/task_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.812"
-        app:layout_constraintStart_toEndOf="@+id/task_id"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.136" />
+        android:background="#4A3F4041"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
-    <TextView
-        android:id="@+id/task_id"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:fontFamily="@font/outfitregular"
-        android:gravity="center"
-        android:text="#12345"
-        android:textColor="#858585"
-        android:textSize="14dp"
-        app:layout_constraintBottom_toTopOf="@+id/task_title"
-        app:layout_constraintStart_toEndOf="@+id/difficulty"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.433" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/difficulty"
-        android:layout_width="20dp"
-        android:layout_height="22dp"
-        android:background="@drawable/rounded_corner_shape"
-        android:fontFamily="@font/outfitbold"
-        android:gravity="center"
-        android:text="H"
-        android:textColor="@color/darkTheme_bg"
-        android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.207" />
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/progress_bar"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/task_duration"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/asignee_dp"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/remove"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/task_duration"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <!--        <TextView-->
 <!--        android:id="@+id/priority"-->
@@ -126,5 +154,5 @@
 <!--        app:layout_constraintTop_toTopOf="parent"-->
 <!--        app:layout_constraintVertical_bias="0.235" />-->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>
 

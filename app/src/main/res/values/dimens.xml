@@ -12,4 +12,6 @@
     <dimen name="layout_in_between_margins">18dp</dimen>
     <dimen name="divider_start_and_end_margins">8dp</dimen>
     <dimen name="divider_top_and_bottom_margins">8dp</dimen>
+    <dimen name="_5dp">5dp</dimen>
+    <dimen name="margin_top">5dp</dimen>
 </resources>

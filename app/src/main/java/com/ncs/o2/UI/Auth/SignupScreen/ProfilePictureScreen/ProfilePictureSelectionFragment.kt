@@ -16,10 +16,8 @@ class ProfilePictureSelectionFragment : Fragment() {
 
     private lateinit var viewModel: ProfilePictureSelectionViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_profile_picture_selection, container, false)
     }
 
