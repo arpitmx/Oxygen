@@ -52,17 +52,20 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
     private fun setupRecyclerView() {
 
 
-        val task1 = Task("Appbar not working in the new implementation",
+        val task1 = Task("Appbar not working in the new implementation Appbar not working in the new implementation",
             "Have to implement that.","#1234",2, listOf("link1,link2"),3,1, ASSIGNEE = listOf("mod1"),
-            "Assigner1","31/2/23", DURATION = "3H+", PROJECT_ID = "Versa123", SEGMENT = "SEG1"
+            "Assigner1","31/2/23", DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/200", isCompleted = true
         )
 
         val task2 = Task("Window navigation not working in Versa 2.0",
             "Have to implement that.","#1364",1, listOf("link1,link2"),2,3, listOf("mod1"),
-            "Assigner1","31/2/22",DURATION = "3H+", PROJECT_ID = "Versa123", SEGMENT = "SEG1"
+            "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300"
         )
-
-        taskList = arrayListOf(task1,task2,task1,task2,task1,task2,task1,task2,task1)
+        val task3 = Task("Window navigation not working in Versa 2.0",
+            "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
+            "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300"
+        )
+        taskList = arrayListOf(task1,task2,task3,task2,task1,task2,task1,task2,task1)
         taskList.add(task1)
         taskList.add(task2)
 

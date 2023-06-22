@@ -3,156 +3,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/parent"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:background="@drawable/curvedbggraybg"
+    android:layout_height="wrap_content"
+    android:background="@color/darkbg_main"
     android:orientation="horizontal"
     android:elevation="5dp"
-    android:weightSum="10">
+    >
 
-
-    <TextView
-        android:id="@+id/task_id"
-        android:layout_width="0dp"
-        android:layout_weight="1.4"
-        android:layout_height="match_parent"
-        android:background="@color/secondary_bg_black"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginStart="5dp"
-        android:fontFamily="@font/outfitbold"
-        android:gravity="center"
-        android:text="#ID"
-        android:textColor="@color/green"
-        android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
-
-
-
-
-    <TextView
-        android:id="@+id/task_title"
-        android:layout_width="0dp"
-        android:maxWidth="200dp"
-        android:layout_weight="5.8"
-        android:background="@color/secondary_bg_black"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="5dp"
-        android:ellipsize="end"
-        android:fontFamily="@font/outfitsemibold"
-        android:gravity="center"
-        android:padding="2dp"
-        android:maxLines="2"
-        android:minLines="1"
-        android:text="Task Title"
-        android:textColor="@color/white"
-        android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
-
- <androidx.appcompat.widget.LinearLayoutCompat
-     android:layout_width="0dp"
-     android:layout_height="match_parent"
-     android:layout_weight="2.2"
-     android:background="@color/secondary_bg_black"
-     android:orientation="vertical"
-     android:gravity="center"
-     android:layout_marginStart="5dp"
-     >
-
-    <TextView
-        android:id="@+id/task_status"
+    <androidx.appcompat.widget.AppCompatEditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/difficulty_color"
-        android:fontFamily="@font/outfitmedium"
-        android:gravity="center"
-        android:text="Status"
-        android:textColor="@color/s2bg"
-        android:textSize="14dp"
-        android:ellipsize="end"
+        android:layout_height="40dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/item_bg_curve"
+        android:drawableStart="@drawable/ic_searchico"
+        android:paddingStart="30dp"
+        android:paddingEnd="90dp"
+        android:hint="Search tasks"
+        android:textAllCaps="false"
+        android:drawablePadding="25dp"
+        android:fontFamily="@font/outfitregular"
+        android:transitionName="searchActivityTransition"
+        android:textSize="18dp"
+        android:textColor="#DEE3E3E3"
+        android:drawableTint="#DEE3E3E3"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
-
-    <TextView
-        android:id="@+id/task_duration"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/task_title"
-        android:fontFamily="@font/outfitmedium"
-        android:gravity="center"
-        android:layout_marginTop="5dp"
-        android:text="Duration"
-        android:textColor="#89FF86"
-        android:textSize="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:inputType="textAutoCorrect" />
 
 
- </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <TextView
-        android:id="@+id/difficulty"
-        android:layout_width="0dp"
-        android:layout_weight="0.4"
-        android:background="@color/secondary_bg_black"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:fontFamily="@font/outfitbold"
-        android:gravity="center"
-        android:text="D"
-        android:textColor="@color/prioritymax"
-        android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
-
-    <TextView
-        android:id="@+id/priority"
-        android:layout_width="0dp"
-        android:layout_weight="0.4"
-        android:background="@color/secondary_bg_black"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginEnd="12dp"
-        android:fontFamily="@font/outfitbold"
-        android:gravity="center"
-        android:text="P"
-        android:textColor="@color/prioritymax"
-        android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
 

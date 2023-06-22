@@ -31,7 +31,6 @@ data class Task(
     val STATUS: Int = -1,
     val ASSIGNEE: List<String> = emptyList(),
     val ASSIGNER: String = "",
-
     val DEADLINE: String = "",
     var TIME_STAMP: FieldValue = FieldValue.serverTimestamp(),
     val DURATION: String = "",
@@ -40,7 +39,9 @@ data class Task(
     val PROJECT_ID: String = "",
     val SEGMENT: String = "",
     val SECTION: String = "",
-) {
+    val ASSIGNEE_DP_URL : String = "",
+    val isCompleted:Boolean=false
+    ) {
 
     @Exclude
     fun getPriorityColor(): Int {
