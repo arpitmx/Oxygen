@@ -96,7 +96,7 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             User("https://picsum.photos/234")
         )
 
-        val adapter = ContributorAdapter(dataList as MutableList<User>, this)
+        val adapter = ContributorAdapter(dataList as MutableList<User>, this,false)
         contriRecyclerView.adapter = adapter
     }
 

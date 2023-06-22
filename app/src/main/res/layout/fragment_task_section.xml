@@ -12,7 +12,7 @@
 
     <include
         layout="@layout/task_item_legend"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginBottom="2dp"
         android:elevation="5dp"
