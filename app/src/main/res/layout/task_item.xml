@@ -1,126 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
     android:layout_width="match_parent"
-    android:layout_height="95dp"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="2dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="12dp"
     android:background="@drawable/curvedbggraybg"
     android:orientation="horizontal"
     android:weightSum="10">
 
 
     <TextView
-        android:id="@+id/task_id"
-        android:layout_width="0dp"
-        android:layout_weight="1.4"
-        android:layout_height="match_parent"
-        android:background="@color/secondary_bg_black"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginStart="5dp"
-        android:fontFamily="@font/outfitbold"
-        android:gravity="center"
-        android:text="#12345"
-        android:textColor="@color/dim_purple"
-        android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
-
-
-
-
-    <TextView
         android:id="@+id/task_title"
-        android:layout_width="0dp"
-        android:maxWidth="200dp"
-        android:layout_weight="5.8"
-        android:background="@color/secondary_bg_black"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="5dp"
-        android:ellipsize="end"
-        android:fontFamily="@font/outfitsemibold"
-        android:gravity="center"
-        android:padding="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/outfitregular"
         android:maxLines="2"
         android:minLines="1"
         android:text="Appbar integration on to be redesigned"
         android:textColor="@color/white"
-        android:textSize="15dp"
+        android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
-
- <androidx.appcompat.widget.LinearLayoutCompat
-     android:layout_width="0dp"
-     android:layout_height="match_parent"
-     android:layout_weight="2.2"
-     android:background="@color/secondary_bg_black"
-     android:orientation="vertical"
-     android:gravity="center"
-     android:layout_marginStart="5dp"
-     >
-
-    <TextView
-        android:id="@+id/task_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/difficulty_color"
-        android:fontFamily="@font/outfitmedium"
-        android:gravity="center"
-        android:text="In progress"
-        android:textColor="@color/s2bg"
-        android:textSize="14dp"
-        android:ellipsize="end"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/difficulty"
+        app:layout_constraintTop_toBottomOf="@+id/difficulty"
+        app:layout_constraintVertical_bias="0.545" />
 
     <TextView
         android:id="@+id/task_duration"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/task_title"
-        android:fontFamily="@font/outfitmedium"
+
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/outfitregular"
         android:gravity="center"
-        android:layout_marginTop="5dp"
-        android:text="2Hr+"
-        android:textColor="#89FF86"
+        android:text="about 5 hours ago"
+        android:textColor="#858585"
         android:textSize="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
- </androidx.appcompat.widget.LinearLayoutCompat>
+        app:layout_constraintBottom_toTopOf="@+id/task_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.812"
+        app:layout_constraintStart_toEndOf="@+id/task_id"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.136" />
 
     <TextView
-        android:id="@+id/difficulty"
+        android:id="@+id/task_id"
         android:layout_width="0dp"
-        android:layout_weight="0.4"
-        android:background="@color/secondary_bg_black"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/outfitregular"
+        android:gravity="center"
+        android:text="#12345"
+        android:textColor="#858585"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toTopOf="@+id/task_title"
+        app:layout_constraintStart_toEndOf="@+id/difficulty"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.433" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/difficulty"
+        android:layout_width="20dp"
+        android:layout_height="22dp"
+        android:background="@drawable/rounded_corner_shape"
         android:fontFamily="@font/outfitbold"
         android:gravity="center"
         android:text="H"
@@ -129,30 +81,50 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
+        app:layout_constraintVertical_bias="0.207" />
 
-    <TextView
-        android:id="@+id/priority"
-        android:layout_width="0dp"
-        android:layout_weight="0.4"
-        android:background="#F64B4B"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginEnd="12dp"
-        android:fontFamily="@font/outfitbold"
-        android:gravity="center"
-        android:text="3"
-        android:textColor="@color/darkbg_main"
-        android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/progress_bar"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/task_duration"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/asignee_dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/remove"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/task_duration"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--        <TextView-->
+<!--        android:id="@+id/priority"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_weight="0.4"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_alignParentTop="true"-->
+<!--        android:padding="2dp"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_marginTop="0dp"-->
+<!--        android:layout_marginBottom="0dp"-->
+<!--        android:layout_marginEnd="12dp"-->
+<!--        android:fontFamily="@font/outfitbold"-->
+<!--        android:gravity="center"-->
+<!--        android:text="3"-->
+<!--        android:textColor="@color/darkbg_main"-->
+<!--        android:textSize="14dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.235" />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 
