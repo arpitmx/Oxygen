@@ -62,6 +62,8 @@
     <string name="designation">Designation</string>
     <string name="organisation">Organisation</string>
     <string name="set_profile_picture">Set profile picture</string>
+    <string name="hold_on">Hold on...</string>
+    <string name="register">Register</string>
 
 
 </resources>

@@ -91,6 +91,23 @@
             android:textSize="22dp" />
 
 
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/btn_signup"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:visibility="visible"
+            android:indeterminate="true"
+            android:layout_marginTop="@dimen/margin_top_30dp"
+            android:indeterminateTint="@color/primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+
         <RelativeLayout
             android:id="@+id/login_nav"
             android:layout_width="match_parent"

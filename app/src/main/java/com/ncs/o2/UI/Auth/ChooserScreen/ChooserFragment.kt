@@ -18,11 +18,11 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.LoginScreen.LoginScreenFragment
 import com.ncs.o2.databinding.FragmentChooserBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.random.Random
 
 @AndroidEntryPoint
-class ChooserFragment : Fragment() {
-
+class ChooserFragment @Inject constructor() : Fragment() {
 
     companion object {
         fun newInstance() = ChooserFragment()
@@ -45,10 +45,11 @@ class ChooserFragment : Fragment() {
     }
 
     private fun setUpViews() {
+
         binding.splashBg.rotateInfinity(requireActivity())
 
         binding.title.animFadein(requireContext(),2000)
-        binding.btnLogin.setOnClickThrottleBounceListener{
+        binding.btnLogin.setOnClickThrottleBounceListener {
             findNavController().navigate(R.id.action_chooserFragment_to_loginScreenFragment)
         }
 
