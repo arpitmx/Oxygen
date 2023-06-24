@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -62,7 +63,9 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
     }
 
     private fun setUpBackPress() {
-        findNavController().navigate(R.id.action_signUpScreenFragment_to_chooserFragment)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner){
+            findNavController().navigate(R.id.action_signUpScreenFragment_to_chooserFragment)
+        }
     }
 
     private fun setUpValidation() {
@@ -74,65 +77,65 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                     SignUpViewModel.ValidationEvent.Success -> {
 
                         authResource.let { liveData ->
-                            liveData.observe(viewLifecycleOwner) { result ->
-
-                                when (result) {
-                                    is ServerResult.Failure -> {
-
-                                        binding.progressbar.gone()
-                                        binding.btnSignup.isEnabled = true
-                                        binding.btnSignup.isClickable = true
-                                        binding.btnSignup.text = getString(R.string.register)
-                                        Toast.makeText(
-                                            activity,
-                                            "Registration Failed : ${result.exception.message}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        Timber.tag(TAG)
-                                            .d("Registration Failed : ${result.exception.message}")
-
-                                    }
-
-                                    ServerResult.Progress -> {
-
-                                        binding.progressbar.visible()
-                                        binding.btnSignup.isEnabled = false
-                                        binding.btnSignup.isClickable = false
-                                        binding.btnSignup.text = getString(R.string.hold_on)
-
-                                    }
-
-                                    is ServerResult.Success -> {
-
-                                        binding.progressbar.gone()
-                                        Toast.makeText(
-                                            activity,
-                                            "Registration success",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        Timber.tag(TAG).d(
-                                            "Registration success : ${result.data.uid}"
-                                        )
-
-                                        findNavController().navigate(
-                                            R.id.action_signUpScreenFragment_to_userDetailsFragment,
-                                            null,
-                                            NavOptions.Builder()
-                                                .setPopUpTo(R.id.signUpScreenFragment,true)
-                                                .build()
-
-
-                                        )
-                                    }
-
-                                    else -> {}
-                                }
+                            liveData.observe(viewLifecycleOwner) { authResult ->
+                                handleAuthResult(result = authResult)
                             }
                         }
-
                     }
                 }
             }
+        }
+    }
+
+    private fun handleAuthResult(result: ServerResult<FirebaseUser>?){
+        when (result) {
+            is ServerResult.Failure -> {
+
+                binding.progressbar.gone()
+                binding.btnSignup.isEnabled = true
+                binding.btnSignup.isClickable = true
+                binding.btnSignup.text = getString(R.string.register)
+                Toast.makeText(
+                    activity,
+                    "Registration Failed : ${result.exception.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Timber.tag(TAG)
+                    .d("Registration Failed : ${result.exception.message}")
+
+            }
+
+            ServerResult.Progress -> {
+
+                binding.progressbar.visible()
+                binding.btnSignup.isEnabled = false
+                binding.btnSignup.isClickable = false
+                binding.btnSignup.text = getString(R.string.hold_on)
+
+            }
+
+            is ServerResult.Success -> {
+
+                binding.progressbar.gone()
+                Toast.makeText(
+                    activity,
+                    "Registration success",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Timber.tag(TAG).d(
+                    "Registration success : ${result.data.uid}"
+                )
+
+//                findNavController().navigate(
+//                    R.id.action_signUpScreenFragment_to_userDetailsFragment,
+//                    null,
+//                    NavOptions.Builder()
+//                        .setPopUpTo(R.id.signUpScreenFragment,true)
+//                        .build()
+//                )
+            }
+
+            else -> {}
         }
     }
 

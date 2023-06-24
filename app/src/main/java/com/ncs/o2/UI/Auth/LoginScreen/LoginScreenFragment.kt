@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -85,7 +86,9 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
     }
 
     private fun setUpBackPress() {
-        findNavController().navigate(R.id.action_loginScreenFragment_to_chooserFragment)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner){
+            findNavController().navigate(R.id.action_loginScreenFragment_to_chooserFragment)
+        }
     }
 
 
