@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.ncs.o2.Domain.Models.state.RegistrationFormEvent
 import com.ncs.o2.Domain.Models.state.RegistrationFormState
@@ -47,24 +48,36 @@ class SignUpScreenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpValidation()
         setUpViews()
+        setUpValidation()
+
     }
 
     private fun setUpValidation() {
-        state = viewModel.state
-        CoroutineScope(Dispatchers.Main).launch {
-            viewModel.validationEvents.collect{ event->
-                when(event){
-                    SignUpViewModel.ValidationEvent.Success -> {
-                        Toast.makeText(activity, "Registration success", Toast.LENGTH_SHORT).show()
-                    }
+        handleValidation()
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+            viewModel.validationEvents.collect{ event ->
+            when(event){
+                SignUpViewModel.ValidationEvent.Success -> {
+                    Toast.makeText(activity, "Registration success", Toast.LENGTH_SHORT).show()
+
                 }
             }
+         }
         }
     }
 
-
+    private fun handleValidation() {
+        binding.btnSignup.setOnClickThrottleBounceListener {
+            val email = binding.etEmail.text.toString()
+            val pass = binding.etPass.text.toString()
+            val confirmPass = binding.etConfirmationPass.text.toString()
+            viewModel.validateInput(
+                email = email,
+                password = pass,
+                repeatedPassword = confirmPass)
+            }
+    }
 
 
     private fun setUpViews() {
@@ -76,68 +89,17 @@ class SignUpScreenFragment : Fragment() {
             findNavController().navigate(R.id.action_signUpScreenFragment_to_chooserFragment)
         }
 
-
-        with(binding.etEmail){
-            setText(state.email)
-
-            addTextChangedListener(object : TextWatcher{
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-
-                override fun afterTextChanged(email: Editable?) {
-                    viewModel.onEvent(RegistrationFormEvent.EmailChanged(email = email.toString().trim()))
-                }
-
-            })
+        viewModel.emailError.observe(requireActivity()){error ->
+            binding.etEmail.error = error
         }
 
-        with(binding.etPass){
-            setText(state.password)
-            if (state.passwordError!=null){
-                error = state.passwordError
-            }
-
-            addTextChangedListener(object : TextWatcher{
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-
-                override fun afterTextChanged(pass: Editable?) {
-                    viewModel.onEvent(RegistrationFormEvent.PasswordChanged(password = pass.toString().trim()))
-                }
-
-            })
-
+        viewModel.passwordError.observe(requireActivity()){error->
+            binding.etPass.error = error
         }
 
-        with(binding.etConfirmationPass){
-            setText(state.repeatedPassword)
-            if (state.repeatedPasswordError==null){
-                error = state.repeatedPasswordError
-            }
-
-            addTextChangedListener(object : TextWatcher{
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-
-                override fun afterTextChanged(confirmation_pass: Editable?) {
-                    viewModel.onEvent(RegistrationFormEvent.RepeatedPasswordChanged(repeatedPassword = confirmation_pass.toString().trim()))
-                }
-            })
+        viewModel.repeatpasswordError.observe(requireActivity()){error->
+            binding.etConfirmationPass.error = error
         }
-
-        binding.btnSignup.setOnClickThrottleBounceListener{
-            viewModel.onEvent(RegistrationFormEvent.Submit)
-            if (state.emailError!=null){
-                binding.etEmail.error = state.emailError
-            }
-        }
-
 
     }
 

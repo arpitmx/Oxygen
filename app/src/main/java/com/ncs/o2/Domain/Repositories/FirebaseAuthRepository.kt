@@ -20,18 +20,22 @@ Creation : 3:04 pm on 21/06/23
 Todo >
 Tasks CLEAN CODE : 
 Tasks BUG FIXES : 
-Tasks FEATURE MUST HAVE : 
+Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION : 
 
 */
 
- class FirebaseAuthRepository @Inject constructor(val firebaseAuth: FirebaseAuth) : AuthRepository {
+class FirebaseAuthRepository @Inject constructor(val firebaseAuth: FirebaseAuth) : AuthRepository {
 
 
     override val currentUser: FirebaseUser
         get() = firebaseAuth.currentUser!!
 
-    override suspend fun login(email: String, password: String): ServerResult<FirebaseUser> {
+    override suspend fun login(
+        email: String,
+        password: String
+    ): ServerResult<FirebaseUser> {
+
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).awaitt()
             ServerResult.Success(result.user!!)
@@ -41,7 +45,7 @@ Tasks FUTURE ADDITION :
         }
     }
 
-    override suspend fun signup(
+    override suspend fun register(
         email: String,
         password: String
     ): ServerResult<FirebaseUser> {

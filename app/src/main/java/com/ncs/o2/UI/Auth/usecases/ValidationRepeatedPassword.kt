@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Auth.usecases
 
 import android.util.Patterns
+import androidx.compose.runtime.remember
 import com.ncs.o2.Domain.Models.ValidationResult
 
 /*
@@ -24,6 +25,13 @@ class ValidationRepeatedPassword {
 
     fun execute(password:String, repeatedPassword: String) : ValidationResult {
 
+        if (repeatedPassword.isBlank()){
+            return ValidationResult(
+                false,
+                "Repeated password cannot be blank."
+            )
+            
+        }
 
         if (password != repeatedPassword){
             return ValidationResult(

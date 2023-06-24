@@ -41,7 +41,7 @@ class TasksHolderFragment : Fragment() {
     }
 
     private fun setUpViewPager() {
-        val adapter = TaskSectionViewPagerAdapter(this, 2)
+        val adapter = TaskSectionViewPagerAdapter(this, 4)
         binding.viewPager2.adapter = adapter
     }
 

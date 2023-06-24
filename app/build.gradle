@@ -25,6 +25,7 @@ android {
     }
 
     buildFeatures{
+// Enables build configuration, view binding, data binding, and Jetpack Compose in an Android project.
         buildConfig true
         viewBinding true
         dataBinding true
@@ -34,14 +35,17 @@ android {
 
     buildTypes {
 
+// This code sets two build configuration fields, FCM_BASE_URL and FCM_SERVER_KEY, with specific string values for Firebase Cloud Messaging.
         debug{
             buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")
+// This code enables minification and resource shrinking, and applies ProGuard rules to optimize the Android app.
             buildConfigField("String", "FCM_SERVER_KEY", "\"AAAAmReJ314:APA91bGdEcp1FOt43szF1N7xbG-Pdjuct_0gZzhuDP5GvpSt_ECeXV3mQhKq3Gqq1Rgqa6FGcUwTlCyJYqbo0f89Flb5Y6X44nNMVkqW5Q1XsXZZXwE-77N3bORGbEdQ1TbM24Cb90Dw\"")
 
         }
 
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
