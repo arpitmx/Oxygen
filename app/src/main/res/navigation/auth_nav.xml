@@ -55,5 +55,20 @@
             app:exitAnim="@anim/slide_out_right"
             app:popEnterAnim="@anim/slide_in_right"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_signUpScreenFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/userDetailsFragment"
+        android:name="com.ncs.o2.UI.Auth.SignupScreen.UserDetailsScreen.UserDetailsFragment"
+        android:label="UserDetailsFragment" >
+        <action
+            android:id="@+id/action_userDetailsFragment_to_profilePictureSelectionFragment"
+            app:destination="@id/profilePictureSelectionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profilePictureSelectionFragment"
+        android:name="com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionFragment"
+        android:label="ProfilePictureSelectionFragment" />
 </navigation>

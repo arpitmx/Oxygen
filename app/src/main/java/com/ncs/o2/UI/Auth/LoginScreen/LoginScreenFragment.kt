@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class LoginScreenFragment @Inject constructor(): Fragment() {
 
@@ -75,6 +76,16 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
 //                email = email,
 //                password = pass)
 //        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setUpBackPress()
+    }
+
+    private fun setUpBackPress() {
+        findNavController().navigate(R.id.action_loginScreenFragment_to_chooserFragment)
     }
 
 

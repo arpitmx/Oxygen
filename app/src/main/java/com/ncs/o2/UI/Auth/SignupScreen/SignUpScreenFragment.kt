@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseUser
 import com.ncs.o2.Domain.Models.ServerResult
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class SignUpScreenFragment @Inject constructor() : Fragment() {
 
@@ -51,6 +53,16 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
         setUpViews()
         setUpValidation()
 
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setUpBackPress()
+    }
+
+    private fun setUpBackPress() {
+        findNavController().navigate(R.id.action_signUpScreenFragment_to_chooserFragment)
     }
 
     private fun setUpValidation() {
@@ -99,7 +111,17 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         Timber.tag(TAG).d(
-                                            "Registration success : ${result.data.uid}  ${result.data}"
+                                            "Registration success : ${result.data.uid}"
+                                        )
+
+                                        findNavController().navigate(
+                                            R.id.action_signUpScreenFragment_to_userDetailsFragment,
+                                            null,
+                                            NavOptions.Builder()
+                                                .setPopUpTo(R.id.signUpScreenFragment,true)
+                                                .build()
+
+
                                         )
                                     }
 
