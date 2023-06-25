@@ -13,12 +13,18 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseUser
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.showKeyboard
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.showKeyboardB
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
+import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpViewModel
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentLoginScreenBinding
@@ -26,6 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -39,6 +46,8 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
 
     private val viewModel: LoginScreenViewModel by viewModels()
     lateinit var binding: FragmentLoginScreenBinding
+    lateinit var authResource: LiveData<ServerResult<FirebaseUser>?>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,26 +66,83 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
 
     private fun setUpValidation() {
         handleValidation()
-// This code launches a coroutine on the main thread and collects validation events from a ViewModel. If the event is a success, it displays a short toast message.
+        authResource = viewModel.loginLiveData
         CoroutineScope(Dispatchers.Main).launch {
             viewModel.validationEvents.collect{ event->
                 when(event){
                     LoginScreenViewModel.ValidationEvent.Success -> {
-                        Toast.makeText(activity, "Checking...", Toast.LENGTH_SHORT).show()
+                        //requireActivity().startActivity(Intent(requireContext(),MainActivity::class.java))
+                        authResource.let { liveData ->
+                            liveData.observe(viewLifecycleOwner){ result ->
+                                handleLoginResult(result)
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
+    private fun handleLoginResult(result: ServerResult<FirebaseUser>?) {
+                    when(result){
+                        is ServerResult.Failure -> {
+                            Toast.makeText(activity, "Authentication failsed, Toast.LENGTH_SHORT).show()",Toast.LENGTH_SHORT).show()
+                            binding.progressbar.gone()
+                            binding.btnLogin.isEnabled = true
+                            binding.btnLogin.isClickable = true
+                            binding.btnLogin.text = getString(R.string.login)
+                            Toast.makeText(
+                                activity,
+                                "Registration Failed : ${result.exception.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            Timber.tag(SignUpScreenFragment.TAG)
+                                .d("Registration Failed : ${result.exception.message}")
+
+
+                        }
+                        ServerResult.Progress -> {
+
+
+                            binding.progressbar.visible()
+                            binding.btnLogin.isEnabled = false
+                            binding.btnLogin.isClickable = false
+                            binding.btnLogin.text = getString(R.string.hold_on)
+
+
+                        }
+                        is ServerResult.Success -> {
+                            Toast.makeText(activity, "Authenticated", Toast.LENGTH_SHORT).show()
+                            binding.progressbar.gone()
+                            Toast.makeText(
+                                activity,
+                                "Login success ",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            Timber.tag(SignUpScreenFragment.TAG).d(
+                                "Login success : ${result.data.uid}"
+                            )
+
+                            requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+                            requireActivity().finish()
+
+
+
+                        }
+                        null -> {
+
+                        }
+                    }
+    }
+
     private fun handleValidation() {
-//        binding.btnLogin.setOnClickThrottleBounceListener {
-//            val email = binding.etEmail.text.toString()
-//            val pass = binding.etPass.text.toString()
-//            viewModel.validateInput(
-//                email = email,
-//                password = pass)
-//        }
+        binding.btnLogin.setOnClickThrottleBounceListener {
+            val email = binding.etEmail.text.toString()
+            val pass = binding.etPass.text.toString()
+            viewModel.validateInput(
+                email = email,
+                password = pass)
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -93,6 +159,9 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
 
 
     private fun setUpViews() {
+
+        setUpVisibilities()
+
         binding.signUp.setOnClickListener {
             findNavController().navigate(R.id.action_loginScreenFragment_to_signUpScreenFragment)
 
@@ -117,10 +186,14 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
 //            viewModel.validateInput(email = email, password = pass)
 //        }
 
-        binding.btnLogin.setOnClickThrottleBounceListener {
-            requireActivity().startActivity(Intent(requireContext(),MainActivity::class.java))
-        }
+//        binding.btnLogin.setOnClickThrottleBounceListener {
+//            requireActivity().startActivity(Intent(requireContext(),MainActivity::class.java))
+//        }
 
+    }
+
+    private fun setUpVisibilities() {
+        binding.progressbar.gone()
     }
 
     fun hideKeyboard(activity: Activity) {

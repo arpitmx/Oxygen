@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Auth.SignupScreen
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -126,14 +128,11 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                     "Registration success : ${result.data.uid}"
                 )
 
-//                findNavController().navigate(
-//                    R.id.action_signUpScreenFragment_to_userDetailsFragment,
-//                    null,
-//                    NavOptions.Builder()
-//                        .setPopUpTo(R.id.signUpScreenFragment,true)
-//                        .build()
-//                )
+                requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+                requireActivity().finish()
+
             }
+
 
             else -> {}
         }
