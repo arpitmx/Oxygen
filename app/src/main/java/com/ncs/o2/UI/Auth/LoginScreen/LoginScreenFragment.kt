@@ -124,8 +124,6 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                             requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                             requireActivity().finish()
 
-
-
                         }
                         null -> {
 
