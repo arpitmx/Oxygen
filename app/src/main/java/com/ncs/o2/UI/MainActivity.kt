@@ -3,7 +3,10 @@ package com.ncs.o2.UI
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Layout
 import android.view.MenuItem
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -11,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
@@ -21,6 +25,7 @@ import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
+import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
@@ -32,6 +37,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), ProjectCallback {
 
     private val viewModel: MainActivityViewModel by viewModels()
+    private lateinit var search:LinearLayout
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
@@ -65,7 +71,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
 
     private fun setUpActionBar() {
-
+        search=binding.searchCont
         //binding.gioActionbar.border.gone()
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
@@ -89,6 +95,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
                 drawerLayout.openDrawer(GravityCompat.START)
                 Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
             } else drawerLayout.closeDrawer(GravityCompat.END)
+        }
+        binding.gioActionbar.notifications.setOnClickListener {
+            val drawerLayout = binding.drawer
+            if (!drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                drawerLayout.openDrawer(GravityCompat.END)
+                Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
+            } else {
+                drawerLayout.closeDrawer(GravityCompat.END)
+            }
         }
 
     }
@@ -130,5 +145,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
     override fun onClick(projectID: String) {
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
     }
+
 
 }

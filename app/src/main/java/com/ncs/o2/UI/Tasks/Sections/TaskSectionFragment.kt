@@ -2,6 +2,7 @@ package com.ncs.o2.UI.Tasks.Sections
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Layout
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FieldValue
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.TaskListAdapter
+import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
 import com.ncs.o2.databinding.FragmentTasksHolderBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -38,7 +43,9 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
         binding= FragmentTaskSectionBinding.inflate(inflater,container,false)
         return binding.root
         }
-
+    private val activityBinding: ActivityMainBinding by lazy {
+        (requireActivity() as MainActivity).binding
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,7 +88,15 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
             adapter = taskListAdapter
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
-
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 && activityBinding.searchCont.visibility == View.VISIBLE) {
+                    activityBinding.searchCont.gone()
+                } else if (dy < 0 && activityBinding.searchCont.visibility  != View.VISIBLE) {
+                    activityBinding.searchCont.visible()
+                }
+            }
+        })
     }
 
     override fun onCLick(position: Int, task: Task) {
