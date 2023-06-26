@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.ncs.o2.Domain.Interfaces.AuthRepository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseAuthorizationRepository
+import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpViewModel
 import com.ncs.o2.UI.Auth.usecases.ValidationEmail
 import com.ncs.o2.UI.Auth.usecases.ValidationPassword
@@ -32,8 +33,6 @@ class LoginScreenViewModel @Inject constructor(
     private val _passwordError = MutableLiveData<String?>(null)
     val passwordError: LiveData<String?> get() = _passwordError
 
-    private val _repeatpasswordError = MutableLiveData<String?>(null)
-
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
@@ -41,6 +40,7 @@ class LoginScreenViewModel @Inject constructor(
     val loginLiveData: LiveData<ServerResult<FirebaseUser>?> = _loginLiveData
 
 
+    @Issue("Running multiple times on wrong input...")
     fun validateInput(email: String, password: String) {
         val isEmailValid = emailValidator.execute(email)
         val isPasswordValid = passwordValidator.execute(password)
@@ -76,6 +76,7 @@ class LoginScreenViewModel @Inject constructor(
         _loginLiveData.postValue(ServerResult.Progress)
         val result = authRepository.login(email, password)
         _loginLiveData.postValue(result)
+
     }
 
 

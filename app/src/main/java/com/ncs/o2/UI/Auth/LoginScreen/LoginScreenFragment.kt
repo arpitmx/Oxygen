@@ -65,7 +65,6 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
 
 
     private fun setUpValidation() {
-        handleValidation()
         authResource = viewModel.loginLiveData
         CoroutineScope(Dispatchers.Main).launch {
             viewModel.validationEvents.collect{ event->
@@ -86,7 +85,6 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
     private fun handleLoginResult(result: ServerResult<FirebaseUser>?) {
                     when(result){
                         is ServerResult.Failure -> {
-                            Toast.makeText(activity, "Authentication failsed, Toast.LENGTH_SHORT).show()",Toast.LENGTH_SHORT).show()
                             binding.progressbar.gone()
                             binding.btnLogin.isEnabled = true
                             binding.btnLogin.isClickable = true
@@ -96,9 +94,9 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                                 "Registration Failed : ${result.exception.message}",
                                 Toast.LENGTH_SHORT
                             ).show()
+
                             Timber.tag(SignUpScreenFragment.TAG)
                                 .d("Registration Failed : ${result.exception.message}")
-
 
                         }
                         ServerResult.Progress -> {
@@ -135,15 +133,6 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                     }
     }
 
-    private fun handleValidation() {
-        binding.btnLogin.setOnClickThrottleBounceListener {
-            val email = binding.etEmail.text.toString()
-            val pass = binding.etPass.text.toString()
-            viewModel.validateInput(
-                email = email,
-                password = pass)
-        }
-    }
 
     @Deprecated("Deprecated in Java")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -180,15 +169,15 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
             findNavController().navigate(R.id.action_loginScreenFragment_to_chooserFragment)
         }
 
-//        binding.btnLogin.setOnClickThrottleBounceListener {
-//            val email = binding.etEmail.text.toString()
-//            val pass = binding.etPass.text.toString()
-//            viewModel.validateInput(email = email, password = pass)
-//        }
+        binding.btnLogin.setOnClickThrottleBounceListener {
+            val email = binding.etEmail.text.toString()
+            val pass = binding.etPass.text.toString()
+            viewModel.validateInput(
+                email = email,
+                password = pass)
+        }
 
-//        binding.btnLogin.setOnClickThrottleBounceListener {
-//            requireActivity().startActivity(Intent(requireContext(),MainActivity::class.java))
-//        }
+
 
     }
 
