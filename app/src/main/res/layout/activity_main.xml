@@ -26,6 +26,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="visible" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:id="@+id/search_cont"
+                android:layout_height="wrap_content">
+                <include
+                    layout="@layout/task_item_legend"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:elevation="5dp"
+                    />
+
+            </LinearLayout>
+
 
 
             <FrameLayout
@@ -102,6 +115,7 @@
         android:layout_width="340dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:visibility="gone"
         android:background="@color/secondary_bg_black"
         app:headerLayout="@layout/drawer_header">
 
@@ -117,5 +131,24 @@
         </LinearLayout>
 
     </com.google.android.material.navigation.NavigationView>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view2"
+        android:layout_width="340dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@color/secondary_bg_black"
+        app:headerLayout="@layout/drawer_header">
+
+        <LinearLayout
+            android:id="@+id/drawer_menu_list2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+        </LinearLayout>
+
+    </com.google.android.material.navigation.NavigationView>
+
 
 </androidx.drawerlayout.widget.DrawerLayout>
