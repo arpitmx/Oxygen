@@ -11,13 +11,11 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
             android:orientation="vertical">
 
             <include
@@ -26,20 +24,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="visible" />
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:id="@+id/search_cont"
-                android:layout_height="wrap_content">
-                <include
-                    layout="@layout/task_item_legend"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:elevation="5dp"
-                    />
-
-            </LinearLayout>
-
-
 
             <FrameLayout
                 android:id="@+id/container"
@@ -80,22 +64,36 @@
 
 
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_nav"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_gravity="bottom"
-            android:background="@color/darkbg_main"
-            android:elevation="8dp"
-            app:labelVisibilityMode="unlabeled"
-            android:padding="5dp"
-            app:itemIconSize="25sp"
-            app:itemActiveIndicatorStyle="@color/primary"
-            app:itemIconTint="@drawable/itembg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:menu="@menu/bottom_navigation_menu" />
+            android:orientation="vertical"
+            >
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/border_zero_alpha"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_nav"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:background="@color/darkbg_main"
+                android:elevation="8dp"
+                app:labelVisibilityMode="unlabeled"
+                android:padding="5dp"
+                app:itemIconSize="25sp"
+                app:itemActiveIndicatorStyle="@color/primary"
+                app:itemIconTint="@drawable/itembg"
+                app:menu="@menu/bottom_navigation_menu" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <include
             android:id="@+id/progress_include"

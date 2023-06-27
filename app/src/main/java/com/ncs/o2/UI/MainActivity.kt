@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
 
     private fun setUpActionBar() {
-        search=binding.searchCont
+        search=binding.gioActionbar.searchCont
         //binding.gioActionbar.border.gone()
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)

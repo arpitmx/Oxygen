@@ -2,6 +2,8 @@ package com.ncs.o2.UI.Tasks.Sections
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Layout
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FieldValue
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGoneSlide
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
@@ -45,6 +50,10 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
         }
     private val activityBinding: ActivityMainBinding by lazy {
         (requireActivity() as MainActivity).binding
+    }
+
+    private val searchCont by lazy {
+        activityBinding.gioActionbar.searchCont
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -88,15 +97,22 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
             adapter = taskListAdapter
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0 && activityBinding.searchCont.visibility == View.VISIBLE) {
-                    activityBinding.searchCont.gone()
-                } else if (dy < 0 && activityBinding.searchCont.visibility  != View.VISIBLE) {
-                    activityBinding.searchCont.visible()
-                }
-            }
-        })
+
+//        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+//                if (dy > 100 && searchCont.visibility == View.VISIBLE) {
+//                   Handler(Looper.getMainLooper()).postDelayed({
+//                       searchCont.progressGoneSlide(requireContext(),200)
+//                   },200)
+//                } else if (dy < -20 && searchCont.visibility  != View.VISIBLE) {
+//
+//                    Handler(Looper.getMainLooper()).postDelayed({
+//                        searchCont.progressVisible(requireContext(),200)
+//                    },200)
+//                }
+//            }
+//
+//        })
     }
 
     override fun onCLick(position: Int, task: Task) {

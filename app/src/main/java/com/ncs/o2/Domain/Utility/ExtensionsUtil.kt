@@ -15,6 +15,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
@@ -77,10 +79,21 @@ object ExtensionsUtil {
     }
     fun View.progressVisible(context: Context, duration: Long = 1500L) = run {
         visibility = View.VISIBLE
-        animFadein(context, duration )
+        animFadein(context,duration )
     }
 
 
+
+
+    fun View.progressGoneSlide(context: Context, duration: Long = 1500L) = run {
+        animSlideUp(context,duration )
+        visibility = View.GONE
+
+    }
+    fun View.progressVisibleSlide(context: Context, duration: Long = 1500L) = run {
+        visibility = View.VISIBLE
+        animSlideDown(context, duration )
+    }
 
     // Toasts
 
