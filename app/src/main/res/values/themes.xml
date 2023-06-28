@@ -20,9 +20,9 @@
     </style>
 
     <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:fontFamily">@font/sf_pro_display_semibold</item>
-        <item name="textAllCaps">true</item>
+        <item name="textAllCaps">false</item>
     </style>
 
 </resources>

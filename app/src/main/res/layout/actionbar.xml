@@ -146,7 +146,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:tabIndicatorColor="@color/better_white"
-        app:tabMode="auto"
+        app:tabMode="scrollable"
         android:layoutAnimation="@anim/layout_animation_fadein"
         app:tabIndicatorAnimationMode="fade"
         app:tabRippleColor="@color/item_bg_glow"

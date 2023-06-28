@@ -19,6 +19,7 @@
         <item name="android:textSize">28sp</item>
         <item name="android:fontFamily">@font/sf_pro_display_regular</item>
         <item name="android:textColor">@color/better_white</item>
+.
     </style>
 
     <style name="SolidButtonStyle" parent="Widget.AppCompat.Button.Borderless">

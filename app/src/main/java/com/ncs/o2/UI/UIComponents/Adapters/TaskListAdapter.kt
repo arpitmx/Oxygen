@@ -46,7 +46,6 @@ class TaskListAdapter(
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         ViewHolder(binding.root) {
 
-
         fun bind(task: Task) {
             Glide.with(binding.root)
                 .load(task.ASSIGNEE_DP_URL)
@@ -89,13 +88,12 @@ class TaskListAdapter(
 
 
             }
+
             binding.taskDuration.text= "about "+task.DURATION+" hours ago"
             binding.taskId.text = task.ID
             binding.taskTitle.text = task.TITLE
             binding.difficulty.text = task.getDifficultyString()
             binding.difficulty.setBackgroundColor(task.getDifficultyColor())
-
-
 
         }
 

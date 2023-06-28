@@ -49,7 +49,15 @@ class TasksHolderFragment : Fragment() {
 
         TabLayoutMediator(
             activityBinding.gioActionbar.tabLayout, binding.viewPager2
-        ) { tab, position -> tab.text = "Task Section " + (position + 1) }.attach()
+        ) { tab, position ->
+            when (position){
+                0-> tab.text = "Ongoing Progress"
+                1-> tab.text = "Ready for Test"
+                2-> tab.text = "Testing"
+                3-> tab.text = "Completed"
+            }
+
+        }.attach()
 
     }
 
