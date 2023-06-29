@@ -157,14 +157,57 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/search_cont"
-        android:layout_height="wrap_content">
+        android:orientation="horizontal"
+        android:layout_height="55dp">
 
-        <include
-            layout="@layout/task_item_legend"
-            android:layout_height="55dp"
-            android:layout_width="match_parent"
-            android:elevation="5dp"
-            />
+<!--        <include-->
+<!--            layout="@layout/task_item_legend"-->
+<!--            android:layout_height="55dp"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:elevation="5dp"-->
+<!--            />-->
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="7dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="7dp"
+            android:background="@drawable/item_bg_curve"
+            android:drawableStart="@drawable/ic_searchico"
+            android:paddingStart="15dp"
+            android:paddingBottom="1dp"
+            android:gravity="start|center_vertical"
+            android:hint="Search tasks, tags, etc."
+            android:textAllCaps="false"
+            android:textColorHint="@color/account"
+            android:drawablePadding="15dp"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:transitionName="searchActivityTransition"
+            android:textSize="18dp"
+            android:textColor="#DEE3E3E3"
+            android:drawableTint="#DEE3E3E3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:inputType="textAutoCorrect" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="7dp"
+            android:scaleX="0.8"
+            android:scaleY="0.8"
+            android:layout_marginBottom="7dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/filter"
+            android:id="@+id/filterBtn"
+            app:tint="@color/primary" />
+
 
     </LinearLayout>
 

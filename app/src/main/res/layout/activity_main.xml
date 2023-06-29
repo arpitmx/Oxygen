@@ -113,7 +113,6 @@
         android:layout_width="340dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:visibility="gone"
         android:background="@color/secondary_bg_black"
         app:headerLayout="@layout/drawer_header">
 
