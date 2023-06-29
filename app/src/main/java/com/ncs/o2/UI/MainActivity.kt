@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.unit.DpSize
 import androidx.core.view.GravityCompat
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
     private fun setUpActionBar() {
         search=binding.gioActionbar.searchCont
+        binding.gioActionbar.tabLayout.height
         //binding.gioActionbar.border.gone()
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
