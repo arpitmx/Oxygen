@@ -1,11 +1,9 @@
-package com.ncs.o2.UI.UIComponents.Adapters
-
-import android.graphics.drawable.Drawable
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.graphics.Paint
+import android.graphics.drawable.Drawable
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -19,32 +17,13 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
 import com.ncs.o2.databinding.TaskItemBinding
 
-/*
-File : TaskListAdapter.kt -> com.ncs.o2.UI.Tasks.TaskList
-Description : Adapter class for Task page 
-
-Author : Alok Ranjan (VC uname : apple)
-Link : https://github.com/arpitmx
-From : Bitpolarity x Noshbae (@Project : O2 Android)
-
-Creation : 1:40 pm on 31/05/23
-
-Todo >
-Tasks CLEAN CODE :
-Tasks BUG FIXES :
-Tasks FEATURE MUST HAVE :
-Tasks FUTURE ADDITION :
-
-*/
-class TaskListAdapter(
-) : RecyclerView.Adapter<ViewHolder>() {
+class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
-    private var taskList: ArrayList<Task>? = null
-
+    private var taskList: ArrayList<Task> = ArrayList()
 
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
-        ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: Task) {
             Glide.with(binding.root)
@@ -77,7 +56,6 @@ class TaskListAdapter(
                 .apply(
                     RequestOptions().
                     diskCacheStrategy(DiskCacheStrategy.ALL)
-
                 )
                 .error(R.drawable.profile_pic_placeholder)
                 .into(binding.asigneeDp)
@@ -85,45 +63,39 @@ class TaskListAdapter(
             if (task.isCompleted){
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.taskTitle.paintFlags=binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-
-
             }
 
-            binding.taskDuration.text= "about "+task.DURATION+" hours ago"
+            binding.taskDuration.text = "about ${task.DURATION} hours ago"
             binding.taskId.text = task.ID
             binding.taskTitle.text = task.TITLE
             binding.difficulty.text = task.getDifficultyString()
             binding.difficulty.setBackgroundColor(task.getDifficultyColor())
-
         }
-
-
     }
 
-
-    fun setTaskList(newTaskList: ArrayList<Task>){
-        this.taskList = newTaskList
+    fun setTaskList(newTaskList: ArrayList<Task>) {
+        val diffCallback = TaskDiffCallback(taskList, newTaskList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        taskList.clear()
+        taskList.addAll(newTaskList)
+        diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemViewHolder {
         val binding = TaskItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TaskItemViewHolder(binding)
     }
 
     override fun getItemCount(): Int {
-        return taskList!!.size
+        return taskList.size
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        when (holder) {
-            is TaskItemViewHolder -> {
-                holder.bind(taskList!![position])
+    override fun onBindViewHolder(holder: TaskItemViewHolder, position: Int) {
+        holder.bind(taskList[position])
 
-                holder.itemView.setOnClickFadeInListener {
-                    if (onClickListener != null) {
-                        onClickListener!!.onCLick(position, taskList!![position])
-                    }
-                }
+        holder.itemView.setOnClickFadeInListener {
+            if (onClickListener != null) {
+                onClickListener!!.onCLick(position, taskList[position])
             }
         }
     }
@@ -136,4 +108,26 @@ class TaskListAdapter(
         fun onCLick(position: Int, task: Task)
     }
 
+    private class TaskDiffCallback(private val oldList: List<Task>, private val newList: List<Task>) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldTask = oldList[oldItemPosition]
+            val newTask = newList[newItemPosition]
+            return oldTask.ID == newTask.ID
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldTask = oldList[oldItemPosition]
+            val newTask = newList[newItemPosition]
+            return oldTask == newTask
+        }
+    }
 }
