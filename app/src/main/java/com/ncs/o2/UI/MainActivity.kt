@@ -1,5 +1,6 @@
 package com.ncs.o2.UI
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,7 +13,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
+import com.google.android.material.navigation.NavigationView
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
@@ -29,6 +32,7 @@ import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,7 +49,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
     private lateinit var toggle: ActionBarDrawerToggle
     val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
+
     }
+
 
     @Inject
     lateinit var navigator: Navigator
@@ -54,6 +60,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setUpViews()
+
     }
 
     @Later("1. Select a default segment if no segment was selected , or select the previously chosed one")
@@ -68,6 +75,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         binding.gioActionbar.createTaskButton.setOnClickThrottleBounceListener {
             navigator.startSingleTopActivity(CreateTaskActivity::class.java)
         }
+
     }
 
 
@@ -82,8 +90,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
         binding.gioActionbar.titleTv.animFadein(this, 500)
+
+
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
             val segment = SegmentSelectionBottomSheet()
@@ -106,9 +115,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
                 drawerLayout.closeDrawer(GravityCompat.END)
             }
         }
+        val add_button: AppCompatButton = drawerLayout.findViewById(R.id.add_project_btn)
+        add_button.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            val project = AddProjectBottomSheet()
+            project.show(supportFragmentManager, " Add Project ")
+
+        }
+
+
 
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (toggle.onOptionsItemSelected(item)) {
             return true

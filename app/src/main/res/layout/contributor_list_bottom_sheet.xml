@@ -3,8 +3,8 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="@color/darkbg_main"
     android:minHeight="200dp"
-    android:background="@color/secondary_bg_black"
     >
 
 
@@ -15,6 +15,7 @@
         />
 
     <RelativeLayout
+        android:background="@color/secondary_bg_black"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         >
@@ -64,8 +65,32 @@
         android:background="@color/card_bg"
         />
 
-
-
+    <androidx.appcompat.widget.AppCompatEditText
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/item_bg_curve"
+        android:drawableStart="@drawable/ic_searchico"
+        android:paddingStart="15dp"
+        android:paddingBottom="1dp"
+        android:gravity="start|center_vertical"
+        android:hint="Search"
+        android:textAllCaps="false"
+        android:textColorHint="@color/account"
+        android:drawablePadding="15dp"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:transitionName="searchActivityTransition"
+        android:textSize="18dp"
+        android:textColor="#DEE3E3E3"
+        android:drawableTint="#DEE3E3E3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:inputType="textAutoCorrect" />
 
 
     <ProgressBar
@@ -73,15 +98,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:layout_marginTop="15dp"
         android:indeterminate="true"
-        android:layout_marginTop="50dp"
         android:indeterminateTint="@color/s3bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <androidx.recyclerview.widget.RecyclerView
