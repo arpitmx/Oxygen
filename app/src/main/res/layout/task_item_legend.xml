@@ -39,6 +39,7 @@
         android:inputType="textAutoCorrect" />
 
     <ImageView
+        android:id="@+id/filterBtn"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_gravity="center"
@@ -49,7 +50,6 @@
         android:layout_marginBottom="7dp"
         android:layout_height="match_parent"
         android:src="@drawable/filter"
-        android:id="@+id/filterBtn"
         app:tint="@color/primary" />
 
 

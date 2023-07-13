@@ -73,9 +73,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
 
     private fun setUpActionBar() {
+
         search=binding.gioActionbar.searchCont
         binding.gioActionbar.tabLayout.height
-        //binding.gioActionbar.border.gone()
+
+
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
         }, 1000)
@@ -93,17 +95,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
             binding.gioActionbar.switchSegmentButton.rotate180(this)
         }
 
-        binding.gioActionbar.btnHam.setOnClickListener {
+        binding.gioActionbar.btnHam.setOnClickThrottleBounceListener {
             if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.openDrawer(GravityCompat.START)
                 Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
             } else drawerLayout.closeDrawer(GravityCompat.END)
         }
-        binding.gioActionbar.notifications.setOnClickListener {
+        binding.gioActionbar.notifications.setOnClickThrottleBounceListener {
             val drawerLayout = binding.drawer
             if (!drawerLayout.isDrawerOpen(GravityCompat.END)) {
                 drawerLayout.openDrawer(GravityCompat.END)
-                Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
+             //   Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
             } else {
                 drawerLayout.closeDrawer(GravityCompat.END)
             }

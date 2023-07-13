@@ -15,6 +15,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
@@ -48,13 +49,13 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         setContributors()
         setActionbar()
 
-        binding.requestButton.setOnClickSingleTimeBounceListener {
+        binding.gioActionbar.btnRequestWork.setOnClickSingleTimeBounceListener {
 
-            binding.requestText.animFadein(this)
-            binding.requestText.text = "Work Request Sent"
+            binding.gioActionbar.btnRequestWork.animFadein(this)
             viewModel.sendNotification()
-            binding.requestButton.isClickable = false
-            binding.requestButton.alpha = 0.7f
+            binding.gioActionbar.btnRequestWork.isClickable = false
+            binding.gioActionbar.btnRequestWork.alpha= 0.7f
+            toast("Request sent.")
         }
 
 

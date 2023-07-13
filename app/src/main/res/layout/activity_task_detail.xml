@@ -19,6 +19,33 @@
         app:layout_constraintTop_toTopOf="@+id/scrollView2" />
 
 
+   <androidx.constraintlayout.widget.ConstraintLayout
+       android:id="@+id/progress_bar"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:elevation="5dp"
+       android:background="@color/darkbg_main_a80"
+       android:visibility="gone"
+       >
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:elevation="3dp"
+            android:scaleX="0.2"
+            android:scaleY="0.2"
+            android:indeterminate="true"
+            android:indeterminateTint="#03A9F4"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
@@ -55,38 +82,18 @@
     android:orientation="vertical"
     >
 
-            <TextView
-                android:id="@+id/taskid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/outfitmedium"
-                android:gravity="start"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="#ID1234"
-                android:textColor="@color/yello"
-                android:textSize="18dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/btnBack"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
+    <TextView
                 android:id="@+id/title_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:fontFamily="@font/outfitmedium"
                 android:gravity="start"
                 android:paddingStart="10dp"
+                style="@style/CustomTabTextAppearance"
                 android:paddingEnd="10dp"
                 android:text="Versa needs revamp for its appbar design"
                 android:textColor="@color/white"
-                android:textSize="28dp"
+                android:textSize="22dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -197,24 +204,20 @@
                 android:layout_marginEnd="15dp"
                 android:background="#56838383" />
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
-
             <TextView
-                android:id="@+id/contributors_tv"
+                android:id="@+id/description_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/outfitmedium"
+                android:fontFamily="@font/outfitregular"
                 android:gravity="start"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="Contributors :"
-                android:textColor="@color/s2bg"
-                android:textSize="16dp"
+                android:padding="10dp"
+                android:text="In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available. It is also used to temporarily replace text in a process called greeking, which allows designers to consider the form of a webpage or publication, without the meaning of the text influencing the design.
+
+Lorem ipsum is typically a corrupted version of De finibus bonorum et malorum, a 1st-century BC text by the Roman statesman and philosopher Cicero, with words altered, added, and removed to make it nonsensical and improper Latin. The first two words themselves are a truncation of 'dolorem ipsum' ('pain itself').
+
+Versions of the Lorem ipsum text have been used in typesetting at least since the 1960s, when it was popularized by advertisements for Letraset transfer sheets.[1] Lorem ipsum was introduced to the digital world in the mid-1980s, when Aldus employed it in graphic and word-processing templates for its desktop publishing program PageMaker. Other popular word processors, including Pages and Microsoft Word, have since adopted Lorem ipsum,[2] as have many LaTeX packages,[3][4][5] web content managers such as Joomla! and WordPress, and CSS libraries such as Semantic UI.[6]"
+                android:textColor="#CEFFFFFF"
+                android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -222,18 +225,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
 
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/contributorsRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:layout_margin="10dp"
-                android:layoutAnimation="@anim/layout_animation_popscale"
-                />
-            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <View
                 android:layout_width="match_parent"
@@ -250,44 +241,44 @@
                 android:layout_margin="10dp"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/dd"
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="start"
-                    android:paddingEnd="10dp"
-                    android:text="Task Description :"
-                    android:textColor="@color/grabblue"
-                    android:textSize="16dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    android:orientation="vertical"
+                    >
 
-                <TextView
-                    android:id="@+id/description_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/outfitregular"
-                    android:gravity="start"
-                    android:padding="10dp"
-                    android:text="In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available. It is also used to temporarily replace text in a process called greeking, which allows designers to consider the form of a webpage or publication, without the meaning of the text influencing the design.
+                    <TextView
+                        android:id="@+id/contributors_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/outfitmedium"
+                        android:gravity="start"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:text="Contributors :"
+                        android:textColor="@color/s2bg"
+                        android:textSize="16dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toEndOf="@+id/btnBack"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
 
-Lorem ipsum is typically a corrupted version of De finibus bonorum et malorum, a 1st-century BC text by the Roman statesman and philosopher Cicero, with words altered, added, and removed to make it nonsensical and improper Latin. The first two words themselves are a truncation of 'dolorem ipsum' ('pain itself').
 
-Versions of the Lorem ipsum text have been used in typesetting at least since the 1960s, when it was popularized by advertisements for Letraset transfer sheets.[1] Lorem ipsum was introduced to the digital world in the mid-1980s, when Aldus employed it in graphic and word-processing templates for its desktop publishing program PageMaker. Other popular word processors, including Pages and Microsoft Word, have since adopted Lorem ipsum,[2] as have many LaTeX packages,[3][4][5] web content managers such as Joomla! and WordPress, and CSS libraries such as Semantic UI.[6]"
-                    android:textColor="#CEFFFFFF"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/contributorsRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_margin="10dp"
+                        android:layoutAnimation="@anim/layout_animation_popscale"
+                        />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
 
                 <View
                     android:layout_width="match_parent"
@@ -340,65 +331,5 @@ Versions of the Lorem ipsum text have been used in typesetting at least since th
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </ScrollView>
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/linearLayoutCompat"
-        android:layout_width="0dp"
-        android:layout_height="65dp"
-        android:background="@color/darkbg_main_a80"
-        android:elevation="5dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/request_button"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:elevation="6dp"
-        android:layout_margin="10dp"
-        android:background="@drawable/card_view_background_green"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="start|center_vertical"
-            android:elevation="3dp"
-            android:indeterminate="true"
-            android:visibility="gone"
-            android:layout_marginEnd="5dp"
-            android:indeterminateTint="#03A9F4"
-            app:layout_constraintBottom_toBottomOf="@+id/request_text"
-            app:layout_constraintEnd_toStartOf="@+id/request_text"
-            app:layout_constraintTop_toTopOf="@+id/request_text" />
-
-        <TextView
-            android:id="@+id/request_text"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:fontFamily="@font/outfitmedium"
-            android:gravity="center"
-            android:text="Wanna Work"
-            android:textAllCaps="false"
-            android:textColor="@color/darkbg_main"
-            android:textSize="18dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
