@@ -97,7 +97,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
         taskListAdapter.setOnClickListener(this)
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-
+        layoutManager.reverseLayout = true
         with(recyclerView){
             this.layoutManager = layoutManager
             adapter = taskListAdapter
@@ -128,6 +128,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 //                "Have to implement that.","#0987",3, listOf("link1,link2"),2,3, listOf("mod1"),
 //                "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300", isCompleted = false
 //            )
+
 //            taskList.add(newTask)
 //            Toast.makeText(requireContext(),"New Task Added",Toast.LENGTH_SHORT).show()
 
@@ -138,14 +139,17 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
                 "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
                 "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300", isCompleted = false
             )
+
             val id=update.ID
             for(i in taskList.indices){
                 if(taskList[i].ID==id){
                     taskList[i]=update
                 }
             }
+
             Toast.makeText(requireContext(),"task updated",Toast.LENGTH_SHORT).show()
             taskListAdapter.setTaskList(taskList)
+
         }
 
 //        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
