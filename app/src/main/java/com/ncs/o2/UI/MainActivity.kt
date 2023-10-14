@@ -14,6 +14,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.unit.DpSize
 import androidx.core.view.GravityCompat
+import androidx.navigation.NavHostController
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
@@ -27,6 +28,7 @@ import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
+import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
@@ -98,17 +100,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         binding.gioActionbar.btnHam.setOnClickThrottleBounceListener {
             if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.openDrawer(GravityCompat.START)
-                Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
             } else drawerLayout.closeDrawer(GravityCompat.END)
         }
+
         binding.gioActionbar.notifications.setOnClickThrottleBounceListener {
-            val drawerLayout = binding.drawer
-            if (!drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                drawerLayout.openDrawer(GravityCompat.END)
-             //   Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
-            } else {
-                drawerLayout.closeDrawer(GravityCompat.END)
-            }
+                navigator.startSingleTopActivity(NotificationsActivity::class.java)
+                this.overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_left)
         }
 
     }

@@ -16,4 +16,5 @@
     <dimen name="margin_top">5dp</dimen>
     <dimen name="margin_top_30dp">30dp</dimen>
     <dimen name="padding_bottom_offset">4dp</dimen>
+    <dimen name="action_bar_title">20dp</dimen>
 </resources>
