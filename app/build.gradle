@@ -184,6 +184,10 @@ dependencies {
     //Faker data TODO "Remove in production"
     implementation 'net.datafaker:datafaker:1.9.0'
 
+    //color picker
+    implementation 'com.github.Dhaval2404:ColorPicker:2.3'
+
+
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'

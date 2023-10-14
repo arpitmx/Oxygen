@@ -22,9 +22,6 @@
         <activity
             android:name=".UI.Auth.AuthScreenActivity"
             android:exported="true" >
-
-
-
         </activity>
 
         <activity

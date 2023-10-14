@@ -26,4 +26,6 @@ data class Tag(
     val tagText: String,
     val bgColor : String,
     val textColor : String,
+    val tagID:String?="",
+    var isChecked: Boolean = false
 )
