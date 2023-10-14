@@ -110,11 +110,11 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         tagsRecyclerView.layoutManager = layoutManager
 
         val dataList = listOf(
-            Tag("Critical", Colors.WHITE, Colors.BLACK),
-            Tag("Bug", Colors.RED, Colors.WHITE),
-            Tag("Feature", Colors.BLUE, Colors.WHITE),
-            Tag("New", Colors.GREEN, Colors.BLACK),
-            Tag("Critical", Colors.WHITE, Colors.BLACK),
+            Tag("Critical", Colors.WHITE, Colors.BLACK,""),
+            Tag("Bug", Colors.RED, Colors.WHITE,""),
+            Tag("Feature", Colors.BLUE, Colors.WHITE,""),
+            Tag("New", Colors.GREEN, Colors.BLACK,""),
+            Tag("Critical", Colors.WHITE, Colors.BLACK,""),
 
             )
         val adapter = TagAdapter(dataList)
