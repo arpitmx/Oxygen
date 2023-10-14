@@ -22,12 +22,21 @@
         <activity
             android:name=".UI.Auth.AuthScreenActivity"
             android:exported="true" >
+
         </activity>
 
         <activity
-            android:name=".UI.UIComponents.SplashScreen"
+            android:name=".UI.UIComponents.StartScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true" />
+            android:exported="true" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".UI.CreateTask.CreateTaskActivity"
             android:exported="false" />
@@ -43,11 +52,6 @@
         <activity
             android:name=".UI.MainActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <service

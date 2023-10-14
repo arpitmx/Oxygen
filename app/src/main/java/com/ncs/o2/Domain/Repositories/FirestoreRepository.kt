@@ -59,6 +59,10 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+    fun sendNotification(){
+
+    }
+
     fun getProjectRef(projectID: String): DocumentReference {
         return firestore.collection(Endpoints.PROJECTS).document(projectID)
     // return Endpoints.PROJECTS + "/${projectID}"
