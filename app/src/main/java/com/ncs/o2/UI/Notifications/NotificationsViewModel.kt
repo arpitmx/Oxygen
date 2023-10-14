@@ -1,6 +1,18 @@
 package com.ncs.o2.UI.Notifications
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.FirebaseRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
 /*
 File : NotificationsViewModel.kt -> com.ncs.o2.UI.Notifications
@@ -20,5 +32,35 @@ Tasks FUTURE ADDITION :
 
 
 */
-class NotificationsViewModel : ViewModel() {
+@HiltViewModel
+class NotificationsViewModel @Inject constructor
+    (@FirebaseRepository val repository: Repository) : ViewModel()
+{
+    private val _serverResultLiveData = MutableLiveData<ServerResult<Int>>()
+    val serverResultLiveData: LiveData<ServerResult<Int>> get() = _serverResultLiveData
+
+    fun updateNotificationViewTimeStamp(){
+        CoroutineScope(Dispatchers.IO).launch{
+            repository.updateNotificationTimeStampPath { result->
+
+                when(result){
+                    is ServerResult.Failure -> {
+                        _serverResultLiveData.postValue(result)
+                        Timber.tag("Notification Viewmodel : Failure : ${result}")
+                    }
+                    ServerResult.Progress -> {
+                        _serverResultLiveData.postValue(result)
+                        Timber.tag("Notification Viewmodel : Progress : ${result}")
+
+                    }
+                    is ServerResult.Success -> {
+                        _serverResultLiveData.postValue(result)
+                        Timber.tag("Notification Viewmodel : Success: ${result}")
+                    }
+                }
+
+            }
+        }
+    }
+
 }

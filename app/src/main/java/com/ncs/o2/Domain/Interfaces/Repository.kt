@@ -41,5 +41,7 @@ interface Repository {
 
     fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit)
 
+    suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit)
+
     fun checkIfSegmentNameExists(fieldName : String, projectID : String, result: (ServerResult<Boolean>) -> Unit)
 }

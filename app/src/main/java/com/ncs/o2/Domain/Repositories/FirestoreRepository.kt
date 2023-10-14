@@ -2,7 +2,10 @@ package com.ncs.o2.Domain.Repositories
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.ncs.o2.Constants.IDType
@@ -12,6 +15,7 @@ import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
@@ -48,7 +52,7 @@ class FirestoreRepository @Inject constructor(
     private val TAG: String = FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback : ServerErrorCallback
 
-    fun getTaskPath(task: Task): String {
+   public fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
                 "/${task.PROJECT_ID}" +
                 "/${Endpoints.Project.SEGMENT}" +
@@ -59,7 +63,26 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    fun sendNotification(){
+    fun getNotificationTimeStampPath():String{
+//        return Endpoints.USERS +
+//                "/${FirebaseAuth.getInstance().currentUser!!.email}"
+
+        return Endpoints.USERS +
+                "/userid1"
+
+    }
+    override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit) {
+
+        val currentTimeStamp = HashMap<String,Any>()
+        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_TIME_STAMP] = FieldValue.serverTimestamp()
+
+        return try {
+            serverResult(ServerResult.Progress)
+            firestore.document(getNotificationTimeStampPath()).update(currentTimeStamp).await()
+            serverResult(ServerResult.Success(200))
+        } catch (e:Exception){
+            serverResult(ServerResult.Failure(e))
+        }
 
     }
 
