@@ -1,19 +1,29 @@
 package com.ncs.o2.UI.CreateTask
 
 import android.app.DatePickerDialog
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.material.chip.Chip
+import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Utility.Colors
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,8 +35,14 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback {
+class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback,AddTagsBottomSheet.getSelectedTagsCallback{
     private var OList: MutableList<User> = mutableListOf()
+    private var List: MutableList<Tag> = mutableListOf()
+    private var TagList: MutableList<Tag> = mutableListOf()
+    private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
+
+    private val selectedTags = mutableListOf<Tag>()
+
 
 
     private val binding: ActivityCreateTaskBinding by lazy {
@@ -35,35 +51,73 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
 //    private val viewmodel: CreateTaskViewModel by viewModels()
 
-    private val easyElements : GlobalUtils.EasyElements by lazy {
+    private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
 
-    private val contriRecyclerView : RecyclerView by lazy {
+    private val contriRecyclerView: RecyclerView by lazy {
         binding.contributorsRecyclerView
     }
 
-    lateinit var contriAdapter : ContributorAdapter
+    lateinit var contriAdapter: ContributorAdapter
 
-    @Inject lateinit var calendar : Calendar
+    @Inject
+    lateinit var calendar: Calendar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         OList = mutableListOf(
-            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj","armax","android","url1"),
-            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"
-                ,"abhishek","android","url2" ),
-            User("https://picsum.photos/200","vivek","design","url3"),
-            User("https://picsum.photos/300","lalit","web","url4"),
-            User("https://picsum.photos/350","yogita","design","url5"),
-            User("https://picsum.photos/450","aditi","design","url6"),
+            User(
+                "https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj",
+                "armax",
+                "android",
+                "url1"
+            ),
+            User(
+                "https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*",
+                "abhishek",
+                "android",
+                "url2"
+            ),
+            User("https://picsum.photos/200", "vivek", "design", "url3"),
+            User("https://picsum.photos/300", "lalit", "web", "url4"),
+            User("https://picsum.photos/350", "yogita", "design", "url5"),
+            User("https://picsum.photos/450", "aditi", "design", "url6"),
         )
+        TagList = mutableListOf(
+            Tag(
+                tagText = "Critical",
+                bgColor = Colors.WHITE,
+                textColor = Colors.BLACK,
+                tagID = "1111"
+            ),
+            Tag(tagText = "Bug", bgColor = Colors.RED, textColor = Colors.WHITE, tagID = "2222"),
+            Tag(
+                tagText = "Feature",
+                bgColor = Colors.BLUE,
+                textColor = Colors.WHITE,
+                tagID = "3333"
+            ),
+            Tag(tagText = "New", bgColor = Colors.GREEN, textColor = Colors.BLACK, tagID = "4444"),
+        )
+
         val testTask = Task(
             Faker().animal().scientificName().toString(),
-            Faker().code().asin(), ID= "", 1, emptyList(), 1, 1, emptyList(),
-            "userid1", "01/04/2023", DURATION = "3Hr+", PROJECT_ID =  "Versa", SEGMENT = "Development", SECTION = "TaskSection4",
+            Faker().code().asin(),
+            ID = "",
+            1,
+            emptyList(),
+            1,
+            1,
+            emptyList(),
+            "userid1",
+            "01/04/2023",
+            DURATION = "3Hr+",
+            PROJECT_ID = "Versa",
+            SEGMENT = "Development",
+            SECTION = "TaskSection4",
         )
 
         // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
@@ -74,14 +128,53 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
 
-            val userListBottomSheet = UserlistBottomSheet(OList,this)
+            val userListBottomSheet = UserlistBottomSheet(OList, this)
             userListBottomSheet.show(supportFragmentManager, "OList")
+
+        }
+        binding.addtags.setOnClickThrottleBounceListener {
+            val firestore = FirebaseFirestore.getInstance()
+            val projectDocRef = firestore.collection("Projects").document("Versa") // Replace with actual project name
+
+            projectDocRef.get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        val tags = documentSnapshot.get("TAGS") as List<HashMap<String, Any>>
+
+                        for (tagData in tags) {
+                            val tag = Tag(
+                                tagData["tagText"].toString(),
+                                tagData["bgColor"].toString(),
+                                tagData["textColor"].toString(),
+                                tagData["tagID"].toString()
+                            )
+                            TagListfromFireStore.add(tag)
+                        }
+
+                        // Now, TagListfromFireStore contains the data
+                    } else {
+                        // Document doesn't exist
+                    }
+//                    binding.progressbar.gone()
+//                    binding.chipGroup.visible()
+                    TagList = (TagList + TagListfromFireStore).distinct().toMutableList()
+                    val addTagsBottomSheet = AddTagsBottomSheet(TagList, this)
+                    addTagsBottomSheet.show(supportFragmentManager, "OList")
+                }
+                .addOnFailureListener { e ->
+                    // Handle the failure
+                }
+
 
         }
 
         setUpViews()
         setUpLiveData()
+
+
     }
+
+
 
     private fun setUpLiveData() {
         //Progress listener
@@ -116,7 +209,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         layoutManager.flexWrap = FlexWrap.WRAP
 
         contriRecyclerView.layoutManager = layoutManager
-        contriAdapter = ContributorAdapter(mutableListOf(),this)
+        contriAdapter = ContributorAdapter(mutableListOf(), this)
         contriRecyclerView.adapter = contriAdapter
         contriRecyclerView.visible()
 
@@ -133,14 +226,39 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             startdatePickerDialog.show()
         }
 
-        binding.endDate.setOnClickThrottleBounceListener{
+        binding.endDate.setOnClickThrottleBounceListener {
             enddatePickerDialog.show()
+        }
+    }
+    private fun updateChipGroup() {
+        val chipGroup = binding.chipGroup
+        chipGroup.removeAllViews()
+        for (tag in selectedTags) {
+            val chip = Chip(this)
+            chip.text = tag.tagText
+            chip.isCloseIconVisible = true
+            chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.bgColor)))
+            chip.setTextColor(ColorStateList.valueOf(Color.parseColor(tag.textColor)))
+            chip.setOnCloseIconClickListener {
+                selectedTags.remove(tag)
+                val index=TagList.indexOf(tag)
+                TagList[index].isChecked=false
+                updateChipGroup()
+            }
+            chipGroup.addView(chip)
+            chip.setOnClickListener {
+                selectedTags.remove(tag)
+                val index=TagList.indexOf(tag)
+                TagList[index].isChecked=false
+                updateChipGroup()
+
+            }
         }
     }
 
 
-    lateinit var startdatePickerDialog : DatePickerDialog
-    lateinit var enddatePickerDialog : DatePickerDialog
+    lateinit var startdatePickerDialog: DatePickerDialog
+    lateinit var enddatePickerDialog: DatePickerDialog
     private fun setUpDatePicker() {
 
         startdatePickerDialog = DatePickerDialog(
@@ -152,7 +270,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
                 // Update the text on the button with the selected date
-                val selectedDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(calendar.time)
+                val selectedDate =
+                    SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(calendar.time)
                 binding.startDate.text = selectedDate
             },
             calendar.get(Calendar.YEAR),
@@ -169,7 +288,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
                 // Update the text on the button with the selected date
-                val selectedDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(calendar.time)
+                val selectedDate =
+                    SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(calendar.time)
                 binding.endDate.text = selectedDate
             },
             calendar.get(Calendar.YEAR),
@@ -198,8 +318,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     override fun removeClick(user: User, position: Int) {
         contriAdapter.removeUser(user)
-        val pos =OList.indexOf(user)
-        OList[pos].isChecked=false
+        val pos = OList.indexOf(user)
+        OList[pos].isChecked = false
     }
 
     override fun onSelectedContributors(contributor: User, isChecked: Boolean) {
@@ -214,7 +334,25 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     override fun onTListUpdated(TList: MutableList<User>) {
         OList.clear()
-        OList=TList
+        OList = TList
+    }
+
+    override fun onSelectedTags(tag: Tag,isChecked: Boolean) {
+        if (isChecked) {
+            selectedTags.add(tag)
+            updateChipGroup()
+
+        }
+        else{
+            selectedTags.remove(tag)
+            updateChipGroup()
+        }
+
+    }
+
+    override fun onTagListUpdated(tagList: MutableList<Tag>) {
+        TagList.clear()
+        TagList=tagList
     }
 
 
