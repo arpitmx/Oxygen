@@ -36,5 +36,7 @@ object GlobalUtilsModule {
         @Provides
         @Singleton
         fun provideCalendar():Calendar = Calendar.getInstance()
+
+
 }
 

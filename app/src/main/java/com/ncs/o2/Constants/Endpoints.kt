@@ -9,6 +9,11 @@ object Endpoints {
     const val PROJECTS = "Projects"
     const val TESTUSERID = "userid1"
 
+
+    object SharedPref{
+        const val SHAREDPREFERENCES = "O2PREF"
+    }
+
     object User {
         const val PROJECTS = "PROJECTS"
         const val EMAIL = "email"
@@ -29,6 +34,8 @@ object Endpoints {
 
     object Notifications{
         const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_STAMP"
+        const val NOTIFICATIONS = "NOTIFICATIONS"
+
     }
 
 

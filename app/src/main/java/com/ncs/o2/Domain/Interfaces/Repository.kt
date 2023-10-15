@@ -4,7 +4,9 @@ import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.versa.Constants.Endpoints
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
@@ -41,7 +43,11 @@ interface Repository {
 
     fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit)
 
+    //Notifications Related
     suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit)
+    suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit)
+
+    suspend fun addNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
 
     fun checkIfSegmentNameExists(fieldName : String, projectID : String, result: (ServerResult<Boolean>) -> Unit)
 }
