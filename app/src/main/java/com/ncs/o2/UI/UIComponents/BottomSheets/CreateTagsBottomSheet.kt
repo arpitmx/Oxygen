@@ -19,7 +19,7 @@ import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.databinding.CreateTagBottomSheetBinding
 import net.datafaker.Faker
 
-class CreateTagsBottomSheet (private var TagsList: MutableList<Tag>): BottomSheetDialogFragment(){
+class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,private var TagsList: MutableList<Tag>,private var callback: AddTagsBottomSheet.getSelectedTagsCallback): BottomSheetDialogFragment(){
 
 
 
@@ -52,8 +52,6 @@ class CreateTagsBottomSheet (private var TagsList: MutableList<Tag>): BottomShee
     private fun setActionbar() {
         binding.closeBottmSheet.setOnClickThrottleBounceListener{
             dismiss()
-            val addTagsBottomSheet = AddTagsBottomSheet(TagsList,null)
-            addTagsBottomSheet.show(requireActivity().supportFragmentManager,"this")
         }
 
         binding.doneButton.setOnClickThrottleBounceListener {
@@ -72,38 +70,12 @@ class CreateTagsBottomSheet (private var TagsList: MutableList<Tag>): BottomShee
                     .addOnSuccessListener {
                         binding.progressBar.visibility = View.GONE
                         dismiss()
-                        val addTagsBottomSheet = AddTagsBottomSheet(TagsList, null)
-                        addTagsBottomSheet.show(requireActivity().supportFragmentManager, "this")
+                        val addTagsBottomSheet = AddTagsBottomSheet(TagsList,callback,selectedTagsList)
+                        addTagsBottomSheet.show(requireActivity().supportFragmentManager,"this")
+
                     }
                     .addOnFailureListener { e ->
 
-                    }
-                val firestore = FirebaseFirestore.getInstance()
-                val projectDocRef = firestore.collection("Projects").document("Versa")
-
-                projectDocRef.get()
-                    .addOnSuccessListener { documentSnapshot ->
-                        if (documentSnapshot.exists()) {
-                            val tags = documentSnapshot.get("TAGS") as List<HashMap<String, Any>>
-
-                            for (tagData in tags) {
-                                val tag = Tag(
-                                    tagData["tagText"].toString(),
-                                    tagData["bgColor"].toString(),
-                                    tagData["textColor"].toString(),
-                                    tagData["tagID"].toString()
-                                )
-                                TagListfromFireStore.add(tag)
-                            }
-
-                        } else {
-
-                        }
-//                    binding.progressbar.gone()
-//                    binding.chipGroup.visible()
-                        TagsList = (TagsList + TagListfromFireStore).distinct().toMutableList()
-                    }
-                    .addOnFailureListener { e ->
                     }
             }
             else{
@@ -145,6 +117,7 @@ class CreateTagsBottomSheet (private var TagsList: MutableList<Tag>): BottomShee
     private fun setBottomSheetConfig() {
         this.isCancelable = false
     }
+
 
 }
 

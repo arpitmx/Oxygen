@@ -24,9 +24,14 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.CreateTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.datafaker.Faker
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -42,7 +47,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
 
     private val selectedTags = mutableListOf<Tag>()
-
+    private var showsheet=false
 
 
     private val binding: ActivityCreateTaskBinding by lazy {
@@ -132,40 +137,14 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             userListBottomSheet.show(supportFragmentManager, "OList")
 
         }
+
         binding.addtags.setOnClickThrottleBounceListener {
-            val firestore = FirebaseFirestore.getInstance()
-            val projectDocRef = firestore.collection("Projects").document("Versa") // Replace with actual project name
-
-            projectDocRef.get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot.exists()) {
-                        val tags = documentSnapshot.get("TAGS") as List<HashMap<String, Any>>
-
-                        for (tagData in tags) {
-                            val tag = Tag(
-                                tagData["tagText"].toString(),
-                                tagData["bgColor"].toString(),
-                                tagData["textColor"].toString(),
-                                tagData["tagID"].toString()
-                            )
-                            TagListfromFireStore.add(tag)
-                        }
-
-                        // Now, TagListfromFireStore contains the data
-                    } else {
-                        // Document doesn't exist
-                    }
-//                    binding.progressbar.gone()
-//                    binding.chipGroup.visible()
-                    TagList = (TagList + TagListfromFireStore).distinct().toMutableList()
-                    val addTagsBottomSheet = AddTagsBottomSheet(TagList, this)
-                    addTagsBottomSheet.show(supportFragmentManager, "OList")
-                }
-                .addOnFailureListener { e ->
-                    // Handle the failure
-                }
-
-
+            val addTagsBottomSheet = AddTagsBottomSheet(TagList, this@CreateTaskActivity,selectedTags)
+            addTagsBottomSheet.show(supportFragmentManager, "OList")
+        }
+        if (showsheet){
+            val addTagsBottomSheet = AddTagsBottomSheet(TagList, this@CreateTaskActivity,selectedTags)
+            addTagsBottomSheet.show(supportFragmentManager, "OList")
         }
 
         setUpViews()
@@ -233,6 +212,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private fun updateChipGroup() {
         val chipGroup = binding.chipGroup
         chipGroup.removeAllViews()
+        Log.d("select",selectedTags.toString())
         for (tag in selectedTags) {
             val chip = Chip(this)
             chip.text = tag.tagText
@@ -241,15 +221,19 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             chip.setTextColor(ColorStateList.valueOf(Color.parseColor(tag.textColor)))
             chip.setOnCloseIconClickListener {
                 selectedTags.remove(tag)
-                val index=TagList.indexOf(tag)
-                TagList[index].isChecked=false
+                if (TagList.contains(tag)){
+                    val index=TagList.indexOf(tag)
+                    TagList[index].isChecked=false
+                }
                 updateChipGroup()
             }
             chipGroup.addView(chip)
             chip.setOnClickListener {
                 selectedTags.remove(tag)
-                val index=TagList.indexOf(tag)
-                TagList[index].isChecked=false
+                if (TagList.contains(tag)){
+                    val index=TagList.indexOf(tag)
+                    TagList[index].isChecked=false
+                }
                 updateChipGroup()
 
             }
@@ -354,6 +338,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         TagList.clear()
         TagList=tagList
     }
+
 
 
 }
