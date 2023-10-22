@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.compose.ui.unit.DpSize
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavHostController
@@ -32,6 +33,7 @@ import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -106,6 +108,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         binding.gioActionbar.notifications.setOnClickThrottleBounceListener {
                 navigator.startSingleTopActivity(NotificationsActivity::class.java)
                 this.overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_left)
+        }
+        val add_button: AppCompatButton = drawerLayout.findViewById(R.id.add_project_btn)
+        add_button.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            val project = AddProjectBottomSheet()
+            project.show(supportFragmentManager, " Add Project ")
+
         }
 
     }

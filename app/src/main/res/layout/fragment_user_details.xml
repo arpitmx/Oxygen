@@ -59,7 +59,7 @@
 
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_email"
+            android:id="@+id/et_name"
             style="@style/EditTextStyle"
             android:layout_below="@id/login_welcome_msg"
             android:layout_marginTop="@dimen/layout_in_between_margins"
@@ -68,7 +68,7 @@
             android:inputType="textEmailAddress" />
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_pass"
+            android:id="@+id/et_designation"
             style="@style/EditTextStyle"
             android:layout_below="@id/login_welcome_msg"
             android:layout_marginTop="@dimen/layout_in_between_margins"
@@ -77,7 +77,7 @@
             android:inputType="textEmailAddress" />
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_confirmation_pass"
+            android:id="@+id/et_bio"
             style="@style/EditTextStyle"
             android:layout_below="@id/et_pass"
             android:layout_marginTop="@dimen/layout_in_between_margins"

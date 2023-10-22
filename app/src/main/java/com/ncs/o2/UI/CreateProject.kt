@@ -6,17 +6,25 @@ import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.text.toLowerCase
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateProjectBinding
+import java.util.Random
 
 class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback {
     private var OList: MutableList<User> = mutableListOf()
@@ -34,7 +42,6 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val title=binding.projectTitle.text
         val desc=binding.projectDesc.text
         val image=binding.image
         binding.cardView.setOnClickListener {
@@ -55,6 +62,33 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         binding.addModeratorsBtn.setOnClickThrottleBounceListener{
             val userListBottomSheet = UserlistBottomSheet(OList,this)
             userListBottomSheet.show(supportFragmentManager, "OList")
+        }
+
+        binding.gioActionbar.btnNext.setOnClickThrottleBounceListener {
+            val title=binding.projectTitle.text.toString()
+            val projectData = hashMapOf(
+                "PROJECT_NAME" to title,
+                "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12)}",
+                "PROJECT_LINK" to "${title.toLowerCase()}.ncs.in",
+                "PROJECT_DESC" to desc.toString(),
+            )
+            if (title.isNotEmpty()) {
+                binding.progressBar.visible()
+                FirebaseFirestore.getInstance().collection("Projects").document(title)
+                    .set(projectData)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Project Created", Toast.LENGTH_SHORT).show()
+                        binding.projectTitle.setText("")
+                        binding.projectDesc.setText("")
+                        binding.progressBar.gone()
+                    }
+                    .addOnFailureListener { e ->
+
+                    }
+            }
+            else{
+                Toast.makeText(this, "Project Title can't be empty", Toast.LENGTH_SHORT).show()
+            }
         }
         setUpViews()
 

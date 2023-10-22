@@ -51,7 +51,6 @@
                 android:onClick="login"
                 android:textColor="@color/colorAccent"
                 android:text="@string/login_btn_label"
-
                 android:background="@drawable/card_view_background_green_outline"
                 android:textSize="14sp" />
 
