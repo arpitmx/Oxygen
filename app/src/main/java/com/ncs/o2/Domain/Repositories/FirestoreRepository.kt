@@ -1,14 +1,18 @@
 package com.ncs.o2.Domain.Repositories
 
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
@@ -16,7 +20,6 @@ import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
-import java.lang.Exception
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -47,6 +50,9 @@ class FirestoreRepository @Inject constructor(
 
     private val TAG: String = FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback : ServerErrorCallback
+//    private val editor : SharedPreferences.Editor by lazy {
+//        pref.edit()
+//    }
 
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
@@ -59,7 +65,50 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    fun sendNotification(){
+    fun getNotificationsRef(toUser: String): CollectionReference {
+        return firestore.collection(Endpoints.USERS).document(toUser).collection(Endpoints.Notifications.NOTIFICATIONS)
+        //Endpoints.USERS+"/${notification.fromUser}"+"/${Endpoints.Notifications.NOTIFICATIONS}"
+    }
+
+    fun getNotificationTimeStampPath():String{
+//        return Endpoints.USERS +
+//                "/${FirebaseAuth.getInstance().currentUser!!.email}"
+
+        return Endpoints.USERS +
+                "/userid1"
+
+    }
+    override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit) {
+
+        val currentTimeStamp = HashMap<String,Any>()
+        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_TIME_STAMP] = FieldValue.serverTimestamp()
+
+        return try {
+            serverResult(ServerResult.Progress)
+            firestore.document(getNotificationTimeStampPath()).update(currentTimeStamp).await()
+            serverResult(ServerResult.Success(200))
+        } catch (e:Exception){
+            serverResult(ServerResult.Failure(e))
+        }
+    }
+
+    override suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun addNotification(
+        notification: Notification,
+        serverResult: (ServerResult<Int>) -> Unit
+    ) {
+
+        return try {
+            serverResult(ServerResult.Progress)
+            getNotificationsRef(notification.toUser).add(notification).await()
+            serverResult(ServerResult.Success(200))
+
+        }catch (e : Exception){
+            serverResult(ServerResult.Failure(e))
+        }
 
     }
 
@@ -78,7 +127,6 @@ class FirestoreRepository @Inject constructor(
             IDType.TaskID -> return "#T$randomNumber"
             IDType.SegmentID -> return "#S$randomNumber"
         }
-
     }
 
 
@@ -232,7 +280,6 @@ class FirestoreRepository @Inject constructor(
     }
 
     override fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit) {
-
 
     }
 
