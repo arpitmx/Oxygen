@@ -23,6 +23,7 @@ import com.ncs.o2.UI.CreateProject
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
 import com.ncs.o2.databinding.ProjectAddBottomSheetBinding
+import com.ncs.versa.Constants.Endpoints
 import org.json.JSONArray
 import org.json.JSONException
 
@@ -79,11 +80,10 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
 
                             for (document in documents) {
                                 val project = document.data
-                                projectData= project.get("PROJECT_ID").toString()
-                                Log.d("project",project.toString())
+                                projectData= project.get("PROJECT_NAME").toString()
                             }
                             FirebaseFirestore.getInstance().collection("Users")
-                                .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                                .document(Endpoints.TESTUSERID)
                                 .update("PROJECTS", FieldValue.arrayUnion(projectData))
                                 .addOnSuccessListener {
                                     try {

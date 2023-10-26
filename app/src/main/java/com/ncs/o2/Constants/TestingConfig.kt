@@ -22,13 +22,14 @@ Tasks FUTURE ADDITION :
 */
 object TestingConfig {
 
-    val isTesting:Boolean = true
+    val isTesting:Boolean = false
     val testingMode:TestModes= TestModes.ADD_NOTIFICATIONS
     val activity  = TestingActivity::class.java
 
 
     enum class TestModes{
-        ADD_NOTIFICATIONS
+        ADD_NOTIFICATIONS,
+        ADD_TASKS,
     }
 
 }
