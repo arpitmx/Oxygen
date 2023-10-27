@@ -3,21 +3,18 @@ package com.ncs.o2.UI
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Layout
+import android.preference.PreferenceManager
 import android.view.MenuItem
-import android.view.View
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.unit.DpSize
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
-import androidx.navigation.NavHostController
+import androidx.lifecycle.MutableLiveData
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
@@ -26,22 +23,30 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.Navigator
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
+import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
+import com.ncs.o2.UI.Tasks.TasksHolderViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.FieldPosition
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback {
-
+class MainActivity : AppCompatActivity(), ProjectCallback,SegmentSelectionBottomSheet.SegmentSelectionListener{
+    private val viewmodel: TaskSectionViewModel by viewModels()
     private val viewModel: MainActivityViewModel by viewModels()
     private lateinit var search:LinearLayout
+    val segmentText = MutableLiveData<String>()
+
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
@@ -75,7 +80,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
 
 
     private fun setUpActionBar() {
-
+        PrefManager.initialize(this)
         search=binding.gioActionbar.searchCont
         binding.gioActionbar.tabLayout.height
 
@@ -88,11 +93,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
         binding.gioActionbar.titleTv.animFadein(this, 500)
+        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
             val segment = SegmentSelectionBottomSheet()
+            segment.segmentSelectionListener = this
             segment.show(supportFragmentManager, "Segment Selection")
             binding.gioActionbar.switchSegmentButton.rotate180(this)
         }
@@ -106,6 +112,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         binding.gioActionbar.notifications.setOnClickThrottleBounceListener {
                 navigator.startSingleTopActivity(NotificationsActivity::class.java)
                 this.overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_left)
+        }
+        val add_button: AppCompatButton = drawerLayout.findViewById(R.id.add_project_btn)
+        add_button.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            val project = AddProjectBottomSheet()
+            project.show(supportFragmentManager, " Add Project ")
+
         }
 
     }
@@ -129,7 +142,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
                 binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
             } else {
                 binding.lottieProgressInclude.progressLayout.progressGone(this, 400)
-
             }
         }
 
@@ -144,9 +156,23 @@ class MainActivity : AppCompatActivity(), ProjectCallback {
         }
     }
 
-    override fun onClick(projectID: String) {
+    override fun onClick(projectID: String,position: Int) {
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
+        PrefManager.initialize(this)
+        PrefManager.setcurrentProject(projectID)
+        PrefManager.setRadioButton(position)
+        PrefManager.selectedPosition.value = position
+        val drawerLayout = binding.drawer
+        drawerLayout.closeDrawer(GravityCompat.START)
     }
 
+    private fun refreshActivity() {
+        finish()
+        startActivity(intent)
+    }
+    override fun onSegmentSelected(segmentName: String) {
+        binding.gioActionbar.titleTv.text=segmentName
+        segmentText.value=segmentName
+    }
 
 }

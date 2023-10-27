@@ -31,10 +31,10 @@ class TaskSectionViewPagerAdapter(fragmentActivity: Fragment, private var totalC
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> TaskSectionFragment()
-            1 -> TaskSectionFragment()
-            2 -> TaskSectionFragment()
-            else -> TaskSectionFragment()
+            0 -> TaskSectionFragment("Ongoing")
+            1 -> TaskSectionFragment("Ready")
+            2 -> TaskSectionFragment("Testing")
+            else -> TaskSectionFragment("Completed")
         }
 
     }

@@ -8,7 +8,10 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.window.SplashScreen
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Constants.TestingConfig
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadeOut
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.bounce
@@ -57,8 +60,45 @@ class StartScreen : AppCompatActivity(){
 
             if (FirebaseAuth.getInstance().currentUser != null) {
 
-                startActivity(Intent(this, MainActivity::class.java))
-                finishAffinity()
+//                startActivity(Intent(this, MainActivity::class.java))
+//                finishAffinity()
+                FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                    .get()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val document = task.result
+                            if (document != null && document.exists()) {
+                                val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
+                                val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
+
+                                if (isDetailsAdded==true && isPhotoAdded==true) {
+                                    startActivity(
+                                        Intent(
+                                            this,
+                                            MainActivity::class.java
+                                        )
+                                    )
+                                    finishAffinity()
+                                } else if (isDetailsAdded == false) {
+                                    val intent = Intent(this, AuthScreenActivity::class.java)
+                                    intent.putExtra("isDetailsAdded", "false")
+                                    intent.putExtra("showchooser", "false")
+                                    startActivity(intent)
+                                    finishAffinity()
+                                }
+                                else if (isPhotoAdded==false){
+                                    val intent = Intent(this, AuthScreenActivity::class.java)
+                                    intent.putExtra("isPhotoAdded", "false")
+                                    intent.putExtra("showchooser", "false")
+                                    startActivity(intent)
+                                    finishAffinity()
+                                }
+                            }
+                        } else {
+                            val exception = task.exception
+                            exception?.printStackTrace()
+                        }
+                    }
 
 //                Handler(Looper.myLooper()!!).postDelayed({
 //                    o2logo.animation.cancel()
@@ -71,7 +111,11 @@ class StartScreen : AppCompatActivity(){
 
             }else {
                 Handler(Looper.myLooper()!!).postDelayed({
-                    startActivity(Intent(this, AuthScreenActivity::class.java))
+                    val intent = Intent(this, AuthScreenActivity::class.java)
+                    intent.putExtra("isDetailsAdded", "false")
+                    intent.putExtra("isPhotoAdded", "false")
+                    intent.putExtra("showchooser", "true")
+                    startActivity(intent)
                     finishAffinity()
                 }, DELAY)
 

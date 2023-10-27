@@ -13,7 +13,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -127,9 +129,25 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                 Timber.tag(TAG).d(
                     "Registration success : ${result.data.uid}"
                 )
+                val userData = hashMapOf(
+                    "EMAIL" to binding.etEmail.text.toString(),
+                    "DETAILS_ADDED" to false,
+                    "PHOTO_ADDED" to false,
 
-                requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-                requireActivity().finish()
+                    )
+                FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                    .set(userData)
+                    .addOnSuccessListener {
+                        findNavController().navigate(R.id.action_signUpScreenFragment_to_userDetailsFragment)
+
+                    }
+                    .addOnFailureListener { e ->
+
+                    }
+
+
+//                requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+//                requireActivity().finish()
 
             }
 

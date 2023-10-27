@@ -12,6 +12,7 @@ import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
 import com.ncs.o2.databinding.SegmetSelectionBottomSheetBinding
@@ -49,6 +50,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewSegments
     }
+    var segmentSelectionListener: SegmentSelectionListener? = null
 
     private val faker: Faker by lazy { Faker() }
 
@@ -75,17 +77,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         setActionbar()
 
         CoroutineScope(Dispatchers.IO).launch {
-            val segList = mutableListOf<Segment>()
-            repeat(4) {
-                val segment = Segment(
-                    SEGMENT_ID = faker.idNumber().toString(),
-                    SEGMENT_NAME = faker.clashOfClans().defensiveBuilding().toString()
-                )
-                synchronized(segList) {
-                    segList.add(segment)
-                }
-            }
-
+            val segList = listOf(Segment(SEGMENT_NAME = "Development"),Segment(SEGMENT_NAME = "Design")).toMutableList()
            withContext(Dispatchers.Main){
                setRecyclerView(segList)
            }
@@ -127,6 +119,13 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
 
     override fun onClick(segment: Segment, position: Int) {
         Toast.makeText(requireContext(), segment.SEGMENT_NAME, Toast.LENGTH_SHORT).show()
+        PrefManager.initialize(requireContext())
+        PrefManager.setcurrentsegment(segment.SEGMENT_NAME)
+        segmentSelectionListener?.onSegmentSelected(segment.SEGMENT_NAME)
+
         dismiss()
+    }
+    interface SegmentSelectionListener {
+        fun onSegmentSelected(segmentName: String)
     }
 }
