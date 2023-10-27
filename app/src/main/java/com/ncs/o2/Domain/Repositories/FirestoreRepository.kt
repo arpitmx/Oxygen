@@ -21,6 +21,7 @@ import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.log
 import kotlin.random.Random
 
 /*
@@ -65,7 +66,7 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    fun getNotificationsRef(toUser: String): CollectionReference {
+    fun getNotificationsRef(toUser:  String): CollectionReference {
         return firestore.collection(Endpoints.USERS).document(toUser).collection(Endpoints.Notifications.NOTIFICATIONS)
         //Endpoints.USERS+"/${notification.fromUser}"+"/${Endpoints.Notifications.NOTIFICATIONS}"
     }
@@ -214,11 +215,14 @@ class FirestoreRepository @Inject constructor(
 
     override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
 
+
+
         val appendTaskID = hashMapOf<String, Any>("TASKS.${task.ID}" to "${task.SEGMENT}.${task.SECTION}")
 
         return try {
 
         serverResult(ServerResult.Progress)
+
         firestore.document(getTaskPath(task)).set(task).await()
         getSegmentRef(task).apply { update(appendTaskID).await() }
         getProjectRef(task.PROJECT_ID).apply { update(appendTaskID).await() }

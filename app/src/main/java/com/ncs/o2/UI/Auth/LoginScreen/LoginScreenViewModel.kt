@@ -69,7 +69,6 @@ class LoginScreenViewModel @Inject constructor(
             validationEventChannel.send(ValidationEvent.Success)
             loginUser(email, password = password)
         }
-
     }
 
     suspend fun loginUser(email: String, password: String) {

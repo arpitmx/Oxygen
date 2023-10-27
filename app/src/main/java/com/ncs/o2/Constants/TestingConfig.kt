@@ -1,5 +1,6 @@
 package com.ncs.o2.Constants
 
+import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Testing.TestingActivity
 
@@ -22,7 +23,7 @@ Tasks FUTURE ADDITION :
 */
 object TestingConfig {
 
-    val isTesting:Boolean = true
+    val isTesting:Boolean = false
     val testingMode:TestModes= TestModes.ADD_NOTIFICATIONS
     val activity  = TestingActivity::class.java
 

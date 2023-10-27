@@ -175,8 +175,6 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                 password = pass)
         }
 
-
-
     }
 
     private fun setUpVisibilities() {

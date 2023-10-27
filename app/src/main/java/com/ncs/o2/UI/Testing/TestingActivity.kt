@@ -70,7 +70,6 @@ class TestingActivity: AppCompatActivity() {
 
         for (task in 1..quantity){
 
-
             val notification  = Notification(
                 notificationType = NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.toString(),
                 taskID = Faker().number().randomDigit().toString(),
