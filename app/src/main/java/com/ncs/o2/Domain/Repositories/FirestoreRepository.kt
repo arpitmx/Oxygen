@@ -1,6 +1,5 @@
 package com.ncs.o2.Domain.Repositories
 
-import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import com.google.firebase.firestore.CollectionReference
@@ -21,7 +20,6 @@ import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.math.log
 import kotlin.random.Random
 
 /*
@@ -57,16 +55,16 @@ class FirestoreRepository @Inject constructor(
 
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
-                "/${task.PROJECT_ID}" +
+                "/${task.project_ID}" +
                 "/${Endpoints.Project.SEGMENT}" +
-                "/${task.SEGMENT}" +
-                "/${task.SECTION}"+
-                "/${task.ID}" +
+                "/${task.segment}" +
+                "/${task.section}"+
+                "/${task.id}" +
                 "/"
 
     }
 
-    fun getNotificationsRef(toUser:  String): CollectionReference {
+    fun getNotificationsRef(toUser: String): CollectionReference {
         return firestore.collection(Endpoints.USERS).document(toUser).collection(Endpoints.Notifications.NOTIFICATIONS)
         //Endpoints.USERS+"/${notification.fromUser}"+"/${Endpoints.Notifications.NOTIFICATIONS}"
     }
@@ -156,6 +154,8 @@ class FirestoreRepository @Inject constructor(
     }
 
 
+
+
    fun uniqueIDfromList(idType: IDType, list: List<String>):String{
        var uniqueID : String
 
@@ -207,25 +207,22 @@ class FirestoreRepository @Inject constructor(
 
     private fun getSegmentRef(task: Task):DocumentReference{
         return firestore.collection(Endpoints.PROJECTS)
-            .document(task.PROJECT_ID)
+            .document(task.project_ID)
             .collection(Endpoints.Project.SEGMENT)
-            .document(task.SEGMENT)
+            .document(task.segment)
 
     }
 
     override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
 
-
-
-        val appendTaskID = hashMapOf<String, Any>("TASKS.${task.ID}" to "${task.SEGMENT}.${task.SECTION}")
+        val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.${task.section}")
 
         return try {
 
         serverResult(ServerResult.Progress)
-
         firestore.document(getTaskPath(task)).set(task).await()
         getSegmentRef(task).apply { update(appendTaskID).await() }
-        getProjectRef(task.PROJECT_ID).apply { update(appendTaskID).await() }
+        getProjectRef(task.project_ID).apply { update(appendTaskID).await() }
         serverResult(ServerResult.Success(200))
         }
         catch (exception:Exception) {
@@ -333,5 +330,23 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    fun getTasks(
+        projectName: String,
+        segmentName: String,
+        sectionName: String,
+        result: (ServerResult<List<Task>>) -> Unit
+    ) {
+
+        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName).collection("SEGMENTS").document(segmentName).collection(sectionName).get().addOnSuccessListener { querySnapshot ->
+            val sectionList = mutableListOf<Task>()
+            for (document in querySnapshot.documents) {
+                val sectionData = document.toObject(Task::class.java)
+                sectionData?.let { sectionList.add(it) }
+            }
+            result(ServerResult.Success(sectionList))
+        }.addOnFailureListener { exception ->
+            result(ServerResult.Failure(exception))
+        }
+    }
 
 }

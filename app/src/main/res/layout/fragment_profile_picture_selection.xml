@@ -47,35 +47,50 @@
             android:layout_width="250dp"
             android:layout_height="250dp"
             android:layout_marginTop="50dp"
+            android:id="@+id/pic_preview"
+            android:scaleType="centerCrop"
             android:layout_marginBottom="50dp"
             android:layout_gravity="center"
             android:src="@drawable/profile_pic_placeholder" />
 
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_reselect"
-            style="@style/SolidButtonStyle"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_below="@id/forgot_password"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/solid_bg_white"
-            android:text="Set photo"
-            android:textAllCaps="false"
-            android:textColor="@color/darkbg_main"
-            android:textSize="22dp" />
+            android:orientation="vertical"
+            android:id="@+id/layout"
+            android:visibility="visible"
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_reselect"
+                style="@style/SolidButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@id/forgot_password"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/solid_bg_white"
+                android:text="Set photo"
+                android:textAllCaps="false"
+                android:textColor="@color/darkbg_main"
+                android:textSize="22dp" />
 
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_login"
-            style="@style/SolidButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_below="@id/forgot_password"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/solid_bg_orange"
-            android:text="Next"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="22dp" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/next"
+                style="@style/SolidButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@id/forgot_password"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/solid_bg_orange"
+                android:text="Next"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="22dp" />
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:id="@+id/progress_bar"
+                android:indeterminateTint="@color/colorAccent"/>
+
+        </LinearLayout>
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

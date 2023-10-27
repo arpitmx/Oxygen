@@ -6,32 +6,24 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.chip.Chip
-import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.Colors
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.CreateTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.datafaker.Faker
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -111,7 +103,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         val testTask = Task(
             Faker().animal().scientificName().toString(),
             Faker().code().asin(),
-            ID = "",
+            id = "",
             1,
             emptyList(),
             1,
@@ -119,10 +111,10 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             emptyList(),
             "userid1",
             "01/04/2023",
-            DURATION = "3Hr+",
-            PROJECT_ID = "Versa",
-            SEGMENT = "Development",
-            SECTION = "TaskSection4",
+            duration = "3Hr+",
+            project_ID = "Versa",
+            segment = "Development",
+            section = "TaskSection4",
         )
 
         // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db

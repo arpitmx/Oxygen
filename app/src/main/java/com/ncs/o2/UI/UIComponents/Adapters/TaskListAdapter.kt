@@ -27,7 +27,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
 
         fun bind(task: Task) {
             Glide.with(binding.root)
-                .load(task.ASSIGNEE_DP_URL)
+                .load(task.assignee_DP_URL)
                 .listener(object : RequestListener<Drawable> {
 
                     override fun onLoadFailed(
@@ -60,14 +60,14 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
                 .error(R.drawable.profile_pic_placeholder)
                 .into(binding.asigneeDp)
 
-            if (task.isCompleted){
+            if (task.completed!!){
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.taskTitle.paintFlags=binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
 
-            binding.taskDuration.text = "about ${task.DURATION} hours ago"
-            binding.taskId.text = task.ID
-            binding.taskTitle.text = task.TITLE
+            binding.taskDuration.text = "about ${task.duration} hours ago"
+            binding.taskId.text = task.id
+            binding.taskTitle.text = task.title
             binding.difficulty.text = task.getDifficultyString()
             binding.difficulty.setBackgroundColor(task.getDifficultyColor())
         }
@@ -121,7 +121,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldTask = oldList[oldItemPosition]
             val newTask = newList[newItemPosition]
-            return oldTask.ID == newTask.ID
+            return oldTask.id == newTask.id
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -130,4 +130,5 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
             return oldTask == newTask
         }
     }
+
 }

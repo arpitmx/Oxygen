@@ -29,7 +29,8 @@ object TestingConfig {
 
 
     enum class TestModes{
-        ADD_NOTIFICATIONS
+        ADD_NOTIFICATIONS,
+        ADD_TASKS,
     }
 
 }

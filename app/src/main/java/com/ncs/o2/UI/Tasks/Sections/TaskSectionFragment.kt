@@ -3,48 +3,45 @@ package com.ncs.o2.UI.Tasks.Sections
 import TaskListAdapter
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.text.Layout
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.FieldValue
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGoneSlide
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
-import com.ncs.o2.R
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
-import com.ncs.o2.UI.Tasks.TasksHolderViewModel
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
-import com.ncs.o2.databinding.FragmentTasksHolderBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
-class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
+@AndroidEntryPoint
+class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter.OnClickListener {
 
 
 
-    private val viewModel: TaskSectionViewModel by viewModels()
+    private lateinit var viewModel: TaskSectionViewModel
     private lateinit var binding: FragmentTaskSectionBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter : TaskListAdapter
     private lateinit var taskList: ArrayList<Task>
     private lateinit var taskList2: ArrayList<Task>
+    private lateinit var projectName:String
+    private lateinit var segmentName:String
+
+
     val state = arrayOf(1)
-
-
 
 
     override fun onCreateView(
@@ -58,13 +55,24 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
         (requireActivity() as MainActivity).binding
     }
 
+
+
     private val searchCont by lazy {
         activityBinding.gioActionbar.searchCont
+    }
+    private val segmentText by lazy {
+        activityBinding.gioActionbar.titleTv
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this).get(TaskSectionViewModel::class.java)
+        PrefManager.initialize(requireContext())
+        projectName = PrefManager.getcurrentProject()
+        segmentName=PrefManager.getcurrentsegment()
+        
         setupViews()
+
     }
 
     private fun setupViews() {
@@ -72,37 +80,76 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
     }
 
     private fun setupRecyclerView() {
-
-
+        taskList= ArrayList<Task>()
         val task1 = Task("Appbar not working in the new implementation Appbar not working in the new implementation",
-            "Have to implement that.","#1234",2, listOf("link1,link2"),3,1, ASSIGNEE = listOf("mod1"),
-            "Assigner1","31/2/23", DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/200", isCompleted = true
+            "Have to implement that.","#1234",2, listOf("link1,link2"),3,1, assignee = listOf("mod1"),
+            "Assigner1","31/2/23", duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/200", completed = true
         )
 
         val task2 = Task("Window navigation not working in Versa 2.0",
             "Have to implement that.","#1364",1, listOf("link1,link2"),2,3, listOf("mod1"),
-            "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300"
+            "Assigner1","31/2/22",
+            duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300"
         )
         val task3 = Task("Window navigation not working in Versa 2.0",
             "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
-            "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300"
+            "Assigner1","31/2/22",
+            duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300"
         )
-        taskList = arrayListOf(task1,task2,task3,task2,task1,task2,task1,task2,task1)
-        taskList.add(task1)
-        taskList.add(task2)
+//        taskList = arrayListOf(task1,task2,task3,task2,task1,task2,task1,task2,task1)
+//        taskList.add(task1)
+        viewModel.getTasksForSegment(projectName, segmentName, sectionName) { result ->
+            when (result) {
+                is ServerResult.Success -> {
+                    val task = result.data
+                    for (i in 0 until task.size){
+                        taskList.add(task[i])
+                    }
+                    recyclerView = binding.recyclerView
+                    taskListAdapter = TaskListAdapter()
+                    taskListAdapter.setTaskList(taskList)
+                    taskListAdapter.notifyDataSetChanged()
 
-        recyclerView = binding.recyclerView
-        taskListAdapter = TaskListAdapter()
-        taskListAdapter.setTaskList(taskList)
-        taskListAdapter.setOnClickListener(this)
+                    taskListAdapter.setOnClickListener(this)
+                    val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                    layoutManager.reverseLayout = false
+                    with(recyclerView){
+                        this.layoutManager = layoutManager
+                        adapter = taskListAdapter
+                        edgeEffectFactory = BounceEdgeEffectFactory()
+                    }
+                    recyclerView.addOnScrollListener(object :RecyclerView.OnScrollListener(){
+                        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                            super.onScrollStateChanged(recyclerView, newState)
+                            state[0]=newState
+                        }
 
-        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        layoutManager.reverseLayout = true
-        with(recyclerView){
-            this.layoutManager = layoutManager
-            adapter = taskListAdapter
-            edgeEffectFactory = BounceEdgeEffectFactory()
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+                            if(dy>0&&(state[0]==0 || state[0]==2 )){
+                                hideSearch()
+                            }else if(dy<-10){
+                                showSearch()
+                            }
+                        }
+                    })
+                    binding.lottieProgressInclude.progressLayout.gone()
+
+                }
+                is ServerResult.Failure -> {
+                    val errorMessage = result.exception.message
+                    binding.lottieProgressInclude.progressLayout.gone()
+                }
+                is ServerResult.Progress->{
+                    binding.lottieProgressInclude.progressLayout.visible()
+                }
+
+            }
         }
+
+
+
+
 
 
 //        Handler(Looper.getMainLooper()).postDelayed(Runnable {
@@ -137,12 +184,13 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 
             val update=Task("New Task Updated for id #1364",
                 "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
-                "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300", isCompleted = false
+                "Assigner1","31/2/22",
+                duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300", completed = false
             )
 
-            val id=update.ID
+            val id=update.id
             for(i in taskList.indices){
-                if(taskList[i].ID==id){
+                if(taskList[i].id==id){
                     taskList[i]=update
                 }
             }
@@ -168,21 +216,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 //
 //        })
 
-        recyclerView.addOnScrollListener(object :RecyclerView.OnScrollListener(){
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                state[0]=newState
-            }
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if(dy>0&&(state[0]==0 || state[0]==2 )){
-                    hideSearch()
-                }else if(dy<-10){
-                    showSearch()
-                }
-            }
-        })
     }
 
     private fun showSearch() {
@@ -196,7 +230,5 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
     override fun onCLick(position: Int, task: Task) {
         startActivity(Intent(requireContext(), TaskDetailActivity::class.java))
     }
-
-
 
 }
