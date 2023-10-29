@@ -40,6 +40,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/placeholder"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:src="@drawable/tasks_palceholder"/>
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

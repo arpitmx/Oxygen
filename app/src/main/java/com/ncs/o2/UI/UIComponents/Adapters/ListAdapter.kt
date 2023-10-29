@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.TextView
 import com.ncs.o2.HelperClasses.PrefManager
@@ -77,6 +78,16 @@ interface ProjectCallback{
 
         vh.label.text = sList[position]
         vh.radioButton.isChecked = position == selectedPosition
+        vh.layout.setOnClickListener {
+            selectedPosition = position
+            notifyDataSetChanged()
+            callback.onClick(sList[position], position)
+        }
+        vh.radioButton.setOnClickListener {
+            selectedPosition = position
+            notifyDataSetChanged()
+            callback.onClick(sList[position], position)
+        }
 
         vh.label.setOnClickListener{
             selectedPosition = position
@@ -90,11 +101,13 @@ interface ProjectCallback{
 
 private class ListRowHolder(row: View?) {
      var label: TextView
-     lateinit var radioButton:RadioButton
+     var radioButton:RadioButton
+     var layout:LinearLayout
 
     init {
         this.label = row?.findViewById(R.id.project_title) as TextView
         this.radioButton= row.findViewById(R.id.radioButton) as RadioButton
+        this.layout=row.findViewById(R.id.layout) as LinearLayout
     }
 
 
