@@ -41,7 +41,7 @@ class FCMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         Timber.tag("SellerFirebaseService ").i("Message :: %s", message.data["body"])
-        val notif = FCNotification(NotificationType.TASK_REQUEST_RECIEVED_NOTIFICATION,"Work Request from armax","#ID12345 has a work request from Armax")
+        val notif = FCNotification(NotificationType.TASK_REQUEST_RECIEVED_NOTIFICATION, message.data.get("title").toString(), message.data.get("body").toString())
         showNotification(notification = notif, context = applicationContext)
 
     }

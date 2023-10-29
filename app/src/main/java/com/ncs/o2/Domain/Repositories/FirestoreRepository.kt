@@ -95,7 +95,7 @@ class FirestoreRepository @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun addNotification(
+    override suspend fun postNotification(
         notification: Notification,
         serverResult: (ServerResult<Int>) -> Unit
     ) {
@@ -337,7 +337,7 @@ class FirestoreRepository @Inject constructor(
         result: (ServerResult<List<Task>>) -> Unit
     ) {
 
-        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName).collection("SEGMENTS").document(segmentName).collection(sectionName).get().addOnSuccessListener { querySnapshot ->
+        firestore.collection(Endpoints.PROJECTS).document(projectName).collection("SEGMENTS").document(segmentName).collection(sectionName).get().addOnSuccessListener { querySnapshot ->
             val sectionList = mutableListOf<Task>()
             for (document in querySnapshot.documents) {
                 val sectionData = document.toObject(Task::class.java)

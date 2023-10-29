@@ -184,6 +184,7 @@
 <!--            android:elevation="5dp"-->
 <!--            />-->
         <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_weight="9"
             android:layout_height="match_parent"

@@ -39,6 +39,7 @@ class NotificationsViewModel @Inject constructor
     private val _serverResultLiveData = MutableLiveData<ServerResult<Int>>()
     val serverResultLiveData: LiveData<ServerResult<Int>> get() = _serverResultLiveData
 
+
     fun updateNotificationViewTimeStamp(){
         CoroutineScope(Dispatchers.IO).launch{
             repository.updateNotificationTimeStampPath { result->

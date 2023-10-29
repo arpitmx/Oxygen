@@ -33,7 +33,7 @@ object Endpoints {
     }
 
     object Notifications{
-        const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_STAMP"
+        const val NOTIFICATION_TIME_STAMP = "NOTIF_LAST_SEEN"
         const val NOTIFICATIONS = "NOTIFICATIONS"
 
     }

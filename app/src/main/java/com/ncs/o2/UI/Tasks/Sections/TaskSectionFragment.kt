@@ -17,6 +17,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
 import com.ncs.o2.databinding.ActivityMainBinding
@@ -24,6 +25,7 @@ import com.ncs.o2.databinding.FragmentTaskSectionBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import me.shouheng.utils.app.ActivityUtils.overridePendingTransition
 
 
 @AndroidEntryPoint
@@ -229,6 +231,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
     override fun onCLick(position: Int, task: Task) {
         startActivity(Intent(requireContext(), TaskDetailActivity::class.java))
+        requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
 }

@@ -2,16 +2,26 @@ package com.ncs.o2.UI.Tasks.TaskDetails
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.firebase.auth.FirebaseUser
 import com.google.gson.JsonObject
+import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.Notification
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Services.NotificationApiService
 import com.ncs.o2.Domain.Workers.FCMWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import net.datafaker.Faker
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -34,17 +44,45 @@ Tasks FUTURE ADDITION :
 */
 
 @HiltViewModel
-class TaskDetailViewModel @Inject constructor(val notificationApiService: NotificationApiService, val app: Application
+class TaskDetailViewModel @Inject
+constructor(val notificationApiService: NotificationApiService,
+            @FirebaseRepository val repository: Repository, val app: Application
 ) : AndroidViewModel(app) {
 
-    private val test_fcmtokenMI =
-        "cQiVebLLTPutKWl2t_13mY:APA91bH-fGRZ06pGDDMx70JwOqB3DI_n-CDbmEzcXGMGSOXrubXSTMx63T11TYFe5WnHT3Tc-wNTcpA7hIY4moZUNzglEjL8pe5Bm21WUh_u5-TaY_mkTxm5BIVlDHfOdTCPz4hL-45F"
-    private val test_fcmtokenEmulator =
-        "es4CBA66TeCyvGXjAwNnOi:APA91bFMqBwGPNp-g__CEw3EHSAQabLrVwnTBJnU-zYL1_5t_qnIZX06t96xkoXtBm7m1ZZzyqHzsOlv2-WgMEhnYHLCCJM5x7n8cnoAJb9Em3m5HCWd8t-ueocKX1cpfUopmmL1TVan"
+    companion object{
+        val TAG = "TaskDetailViewModel"
+    }
 
+    private val _notificationStatusLiveData = MutableLiveData<ServerResult<Int>>()
+    val notificationStatusLiveData: LiveData<ServerResult<Int>> = _notificationStatusLiveData
 
-    fun sendNotification(){
-        val payloadJsonObject = buildNotificationPayload(test_fcmtokenMI)
+    suspend fun sendNotificationToReceiverFirebase(notification: Notification, fcmToken: String){
+
+        repository.postNotification(notification){ result ->
+            when(result){
+                is ServerResult.Failure -> {
+                    Timber.tag(TAG).d("Failure : ${result.exception.printStackTrace()}")
+                    _notificationStatusLiveData.postValue(result)
+                }
+                ServerResult.Progress -> {
+                    Timber.tag(TAG).d("In progress")
+                    _notificationStatusLiveData.postValue(result)
+                }
+                is ServerResult.Success -> {
+
+                    Timber.tag(TAG).d("Saving to firebase success : ${result.data}")
+                    sendFCMNotification(fcmToken)
+
+                    Timber.tag(TAG).d("Sending FCM Notification")
+                    _notificationStatusLiveData.postValue(result)
+
+                }
+            }
+        }
+    }
+
+    fun sendFCMNotification(fcmToken : String){
+        val payloadJsonObject = buildNotificationPayload(fcmToken)
 
         val payloadInputData = Data.Builder()
             .putString(FCMWorker.PAYLOAD_DATA,payloadJsonObject.toString())
@@ -70,7 +108,7 @@ class TaskDetailViewModel @Inject constructor(val notificationApiService: Notifi
         payload.addProperty("to", token)
         val data = JsonObject()
         data.addProperty("title", "Work request")
-        data.addProperty("body", "Armax wants to work on #1234")
+        data.addProperty("body", Faker().bigBangTheory().quote().toString())
         payload.add("data", data)
         return payload
     }

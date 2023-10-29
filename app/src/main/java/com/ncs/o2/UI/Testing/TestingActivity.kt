@@ -82,9 +82,9 @@ class TestingActivity: AppCompatActivity() {
                 status = Random(System.currentTimeMillis()).nextInt(0,3),
                 assigner = Faker().funnyName().name().toString(),
                 deadline = "${Random(System.currentTimeMillis()).nextInt(1,5)} days",
-                project_ID = "Versa",
+                project_ID = "PinchOff",
                 segment = "Development", //change segments here //like Design
-                section = "Ongoing",  //Testing // Completed //Ready //Ongoing
+                section = "Testing",  //Testing // Completed //Ready //Ongoing
                 assignee_DP_URL = "https://picsum.photos/200",
                 completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),
@@ -98,17 +98,17 @@ class TestingActivity: AppCompatActivity() {
 
                         is ServerResult.Failure -> {
                             binding.progress.gone()
-                            binding.logs.text = binding.logs.text.toString().plus("\n> Error on task ${task}: ${result.exception.message}")
+                            binding.logs.text = binding.logs.text.toString().plus("\n> Error on task ${i}: ${result.exception.message}")
                         }
 
                         ServerResult.Progress -> {
                             binding.progress.visible()
-                            binding.logs.text = binding.logs.text.toString().plus("\n> Running task ${task}")
+                            binding.logs.text = binding.logs.text.toString().plus("\n> Running task ${i}")
                         }
 
                         is ServerResult.Success -> {
                             binding.progress.gone()
-                            binding.logs.text = binding.logs.text.toString().plus("\n> Task ${task} is success.")
+                            binding.logs.text = binding.logs.text.toString().plus("\n> Task ${i} is success.")
                         }
 
                     }
@@ -134,7 +134,7 @@ class TestingActivity: AppCompatActivity() {
 
             CoroutineScope(Dispatchers.Main).launch {
 
-                repository.addNotification(notification) { result ->
+                repository.postNotification(notification) { result ->
 
                     when (result) {
 

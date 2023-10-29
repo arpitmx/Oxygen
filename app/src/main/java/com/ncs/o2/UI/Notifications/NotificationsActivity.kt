@@ -40,17 +40,20 @@ class NotificationsActivity : AppCompatActivity() {
 
     private fun updateNotificationLastSeen() {
         viewModel.updateNotificationViewTimeStamp()
-        handleUpdateNotification()
+        handleUpdateNotification_TimeStamp()
     }
 
-    private fun handleUpdateNotification() {
+    private fun handleUpdateNotification_TimeStamp() {
         viewModel.serverResultLiveData.observe(this){ result ->
 
             when(result){
                 is ServerResult.Failure -> {
                     binding.progress.gone()
-                    utils.dialog("Failure","${result.exception}\n Retry?",{
-                        handleUpdateNotification()
+                    utils.dialog("Failure","${result.exception}\n Retry?",
+                        getString(R.string.retry),
+                        getString(R.string.cancel),
+                        {
+                        handleUpdateNotification_TimeStamp()
                     },{
                         finish()
                     })

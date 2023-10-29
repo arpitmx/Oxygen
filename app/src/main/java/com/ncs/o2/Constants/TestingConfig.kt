@@ -24,7 +24,7 @@ Tasks FUTURE ADDITION :
 object TestingConfig {
 
     val isTesting:Boolean = false
-    val testingMode:TestModes= TestModes.ADD_NOTIFICATIONS
+    val testingMode:TestModes= TestModes.ADD_TASKS
     val activity  = TestingActivity::class.java
 
 

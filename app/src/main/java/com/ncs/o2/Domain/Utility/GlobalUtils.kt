@@ -2,25 +2,29 @@ package com.ncs.o2.Domain.Utility
 
 import android.app.ProgressDialog
 import android.content.Context
+import android.graphics.Color
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
+import com.ncs.o2.R
 import timber.log.Timber
 import java.util.TimeZone
+
 
 object GlobalUtils {
 
 
     class EasyElements(val context: Context) {
-        fun dialog(title: String, msg: String, positive: () -> Unit, negative: () -> Unit) {
+        fun dialog(title: String, msg: String, postiveText : String, negativeText : String ,positive: () -> Unit, negative: () -> Unit) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
             builder.setMessage(msg)
-            builder.setPositiveButton("OK") { dialog, which ->
+            builder.setPositiveButton(postiveText) { dialog, which ->
                 positive()
             }
-            builder.setNegativeButton("Cancel") { dialog, which ->
+            builder.setNegativeButton(negativeText) { dialog, which ->
                 negative()
             }
             val dialog = builder.create()
@@ -39,12 +43,23 @@ object GlobalUtils {
             dialog.show()
         }
 
-        fun showSnackbar(rootView: View, msg: String, duration: Int, action: () -> Unit) {
+        fun showActionSnackbar(rootView: View, msg: String, duration: Int,actionText : String, action: () -> Unit) {
             Snackbar.make(rootView, msg, duration)
-                .setAction("Retry") {
+                .setAction(actionText) {
                     action()
                 }
                 .show()
+        }
+
+        fun showSnackbar(rootView: View, msg: String, duration: Int) {
+
+
+            val snackbar = Snackbar.make(rootView, msg, duration)
+            snackbar.setTextColor(Color.BLACK)
+            snackbar.setBackgroundTint(Color.WHITE)
+            snackbar.show()
+
+
 
         }
 

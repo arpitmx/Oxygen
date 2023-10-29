@@ -29,7 +29,7 @@ object PrefManager {
     val selectedPosition = MutableLiveData<Int>()
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor : SharedPreferences.Editor
-    fun initialize(context: Context){
+    fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(Endpoints.SharedPref.SHAREDPREFERENCES, Context.MODE_PRIVATE)
         editor= sharedPreferences.edit()
     }
@@ -47,6 +47,11 @@ object PrefManager {
     fun clearTimestamp() {
         sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_TIME_STAMP).apply()
     }
+
+
+
+    // Project related
+
     fun setcurrentProject(project: String?) {
         val existingProject = sharedPreferences.getString("project", null)
         if (existingProject != null) {

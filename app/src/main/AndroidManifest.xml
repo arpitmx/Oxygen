@@ -41,6 +41,9 @@
             android:name=".UI.CreateTask.CreateTaskActivity"
             android:exported="false" />
         <activity
+            android:name=".UI.CreateProject"
+            android:exported="false" />
+        <activity
             android:name=".UI.Notifications.Requests.RequestActivity"
             android:exported="false" />
         <activity

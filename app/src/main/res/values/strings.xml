@@ -65,6 +65,8 @@
     <string name="hold_on">Hold on...</string>
     <string name="register">Register</string>
     <string name="login">Login</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>

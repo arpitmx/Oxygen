@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.preference.PreferenceManager
 import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -41,50 +42,68 @@ import java.text.FieldPosition
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback,SegmentSelectionBottomSheet.SegmentSelectionListener{
+class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener {
+
+    // ViewModels
     private val viewmodel: TaskSectionViewModel by viewModels()
     private val viewModel: MainActivityViewModel by viewModels()
-    private lateinit var search:LinearLayout
+
+    // Views and data
+    private lateinit var search: LinearLayout
     val segmentText = MutableLiveData<String>()
 
+    // Utils
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+
+    // Navigation drawer toggle
     private lateinit var toggle: ActionBarDrawerToggle
+
+    // Data binding
     val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    // Dependency Injection
     @Inject
     lateinit var navigator: Navigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Hide keyboard at startup
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+
         setContentView(binding.root)
         setUpViews()
     }
 
-    @Later("1. Select a default segment if no segment was selected , or select the previously chosed one")
     private fun setUpViews() {
 
+        // Set up various views and components
         setUpProjects()
         setUpActionBar()
         setUpViewsOnClicks()
     }
 
     private fun setUpViewsOnClicks() {
+
+        // Set up click listeners for specific UI elements
         binding.gioActionbar.createTaskButton.setOnClickThrottleBounceListener {
             navigator.startSingleTopActivity(CreateTaskActivity::class.java)
         }
+
     }
 
-
     private fun setUpActionBar() {
+
+        // Set up the action bar, navigation drawer, and other UI components
         PrefManager.initialize(this)
-        search=binding.gioActionbar.searchCont
-        binding.gioActionbar.tabLayout.height
 
+        search = binding.gioActionbar.searchCont
 
+        // Rotate animation for CreateTaskButton
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
         }, 1000)
@@ -93,37 +112,47 @@ class MainActivity : AppCompatActivity(), ProjectCallback,SegmentSelectionBottom
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+
         binding.gioActionbar.titleTv.animFadein(this, 500)
-        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
+        binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
+
+            // Show a segment selection bottom sheet
             val segment = SegmentSelectionBottomSheet()
             segment.segmentSelectionListener = this
             segment.show(supportFragmentManager, "Segment Selection")
             binding.gioActionbar.switchSegmentButton.rotate180(this)
+
         }
 
         binding.gioActionbar.btnHam.setOnClickThrottleBounceListener {
-            if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.openDrawer(GravityCompat.START)
-            } else drawerLayout.closeDrawer(GravityCompat.END)
+
+            // Toggle the navigation drawer
+            val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
+            drawerLayout.openDrawer(gravity)
+
         }
 
         binding.gioActionbar.notifications.setOnClickThrottleBounceListener {
-                navigator.startSingleTopActivity(NotificationsActivity::class.java)
-                this.overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_left)
+
+            // Start the notifications activity with a slide animation
+            navigator.startSingleTopActivity(NotificationsActivity::class.java)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+
         }
+
+        // Add project button click listener
         val add_button: AppCompatButton = drawerLayout.findViewById(R.id.add_project_btn)
         add_button.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             val project = AddProjectBottomSheet()
-            project.show(supportFragmentManager, " Add Project ")
-
+            project.show(supportFragmentManager, "Add Project")
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle options item clicks, including navigation drawer toggle
         if (toggle.onOptionsItemSelected(item)) {
             return true
         }
@@ -132,6 +161,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,SegmentSelectionBottom
 
     private fun setUpProjects() {
 
+        // Set up the list of projects and related UI components
         binding.lottieProgressInclude.progressbarStrip.visible()
         binding.lottieProgressInclude.progressbarBlock.gone()
 
@@ -146,17 +176,20 @@ class MainActivity : AppCompatActivity(), ProjectCallback,SegmentSelectionBottom
         }
 
         viewModel.showDialogLD.observe(this) { data ->
-            easyElements.dialog(data[0], data[1], {}, {})
+            easyElements.singleBtnDialog(data[0], data[1],"OK",{})
         }
 
         viewModel.projectListLiveData.observe(this) { projectList ->
 
+            // Update the project list view
             val projectListAdapter = ListAdapter(this, projectList!!)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }
     }
 
-    override fun onClick(projectID: String,position: Int) {
+    override fun onClick(projectID: String, position: Int) {
+
+        // Handle click on a project in the list
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.initialize(this)
         PrefManager.setcurrentProject(projectID)
@@ -164,15 +197,22 @@ class MainActivity : AppCompatActivity(), ProjectCallback,SegmentSelectionBottom
         PrefManager.selectedPosition.value = position
         val drawerLayout = binding.drawer
         drawerLayout.closeDrawer(GravityCompat.START)
+
     }
 
     private fun refreshActivity() {
-        finish()
+
+        // Refresh the activity by recreating it
         startActivity(intent)
-    }
-    override fun onSegmentSelected(segmentName: String) {
-        binding.gioActionbar.titleTv.text=segmentName
-        segmentText.value=segmentName
+        finish()
+
     }
 
+    override fun onSegmentSelected(segmentName: String) {
+
+        // Handle segment selection
+        binding.gioActionbar.titleTv.text = segmentName
+        segmentText.value = segmentName
+
+    }
 }

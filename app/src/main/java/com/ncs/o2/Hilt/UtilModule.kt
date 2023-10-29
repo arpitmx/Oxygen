@@ -46,7 +46,7 @@ Tasks FUTURE ADDITION :
 object UtilModule {
 
     @Provides
-    fun providesEasyElements(context : Context):
+    fun providesEasyElements(@ApplicationContext context : Context):
             GlobalUtils.EasyElements{
         return GlobalUtils.EasyElements(context)
     }
@@ -56,6 +56,7 @@ object UtilModule {
     fun provideNavigator(context:Activity): Navigator {
         return Navigator(context)
     }
+
 
     @Provides
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
