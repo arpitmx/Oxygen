@@ -58,7 +58,7 @@ class FirestoreRepository @Inject constructor(
                 "/${task.project_ID}" +
                 "/${Endpoints.Project.SEGMENT}" +
                 "/${task.segment}" +
-                "/${task.section}"+
+                "/${Endpoints.Project.TASKS}"+
                 "/${task.id}" +
                 "/"
 
@@ -215,7 +215,7 @@ class FirestoreRepository @Inject constructor(
 
     override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
 
-        val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.${task.section}")
+        val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
 
         return try {
 
@@ -337,16 +337,24 @@ class FirestoreRepository @Inject constructor(
         result: (ServerResult<List<Task>>) -> Unit
     ) {
 
-        firestore.collection(Endpoints.PROJECTS).document(projectName).collection("SEGMENTS").document(segmentName).collection(sectionName).get().addOnSuccessListener { querySnapshot ->
-            val sectionList = mutableListOf<Task>()
-            for (document in querySnapshot.documents) {
-                val sectionData = document.toObject(Task::class.java)
-                sectionData?.let { sectionList.add(it) }
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection("SEGMENTS")
+            .document(segmentName)
+            .collection("TASKS")
+            .whereEqualTo("section", sectionName)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val sectionList = mutableListOf<Task>()
+                for (document in querySnapshot.documents) {
+                    val sectionData = document.toObject(Task::class.java)
+                    sectionData?.let { sectionList.add(it) }
+                }
+                result(ServerResult.Success(sectionList))
             }
-            result(ServerResult.Success(sectionList))
-        }.addOnFailureListener { exception ->
-            result(ServerResult.Failure(exception))
-        }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
     }
 
 }

@@ -136,7 +136,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                         }
                     })
                     binding.lottieProgressInclude.progressLayout.gone()
-
+                    if (taskList.isEmpty()){
+                        binding.recyclerView.gone()
+                        binding.placeholder.visible()
+                    }
                 }
                 is ServerResult.Failure -> {
                     val errorMessage = result.exception.message
