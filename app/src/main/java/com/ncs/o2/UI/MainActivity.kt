@@ -1,5 +1,6 @@
 package com.ncs.o2.UI
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -14,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
@@ -42,7 +45,9 @@ import java.text.FieldPosition
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener {
+class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener  {
+    private lateinit var projectListAdapter: ListAdapter
+    private var projects: MutableList<String> = mutableListOf()
 
     // ViewModels
     private val viewmodel: TaskSectionViewModel by viewModels()
@@ -74,7 +79,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-
+        PrefManager.initialize(this)
         setContentView(binding.root)
         setUpViews()
     }
@@ -147,6 +152,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         add_button.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             val project = AddProjectBottomSheet()
+            project.projectAddedListener = this
             project.show(supportFragmentManager, "Add Project")
         }
     }
@@ -166,7 +172,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.lottieProgressInclude.progressbarBlock.gone()
 
         viewModel.fetchUserProjectsFromRepository()
-
+        val user=PrefManager.getcurrentUserdetails()
+        binding.drawerheaderfile.username.text=user.USERNAME
+        binding.drawerheaderfile.designation.text=user.DESIGNATION
+        binding.drawerheaderfile.email.text=user.EMAIL
         viewModel.showprogressLD.observe(this) { show ->
             if (show) {
                 binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
@@ -181,8 +190,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         viewModel.projectListLiveData.observe(this) { projectList ->
 
-            // Update the project list view
-            val projectListAdapter = ListAdapter(this, projectList!!)
+            projects=projectList!!.toMutableList()
+            projectListAdapter = ListAdapter(this, projects)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }
     }
@@ -215,4 +224,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         segmentText.value = segmentName
 
     }
+    override fun onProjectAdded(userProjects: ArrayList<String>) {
+        projects.clear()
+        projects.addAll(userProjects)
+        projectListAdapter.notifyDataSetChanged()
+    }
+
+
 }

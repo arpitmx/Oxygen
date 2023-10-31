@@ -73,7 +73,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
         }
     }
 
-    fun setTaskList(newTaskList: ArrayList<Task>) {
+    fun setTaskList(newTaskList: List<Task>) {
         val diffCallback = TaskDiffCallback(taskList, newTaskList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         taskList.clear()

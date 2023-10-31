@@ -2,10 +2,13 @@ package com.ncs.o2.Domain.Repositories
 
 import android.os.Handler
 import android.os.Looper
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -236,7 +239,7 @@ class FirestoreRepository @Inject constructor(
         Handler(Looper.getMainLooper()).postDelayed({
             var currentUser: CurrentUser?
             firestore.collection(Endpoints.USERS)
-                .document(Endpoints.TESTUSERID)
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .get(Source.SERVER)
                 .addOnSuccessListener { snap ->
                     if (snap.exists()) {
@@ -356,5 +359,9 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
+
+
+
+
 
 }
