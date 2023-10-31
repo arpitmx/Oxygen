@@ -20,5 +20,8 @@ Tasks FUTURE ADDITION :
 data class CurrentUser (
             val EMAIL: String = "",
             val USERNAME: String = "",
-            val PROJECTS: List<String> = listOf()
-        )
+            val PROJECTS: List<String> = listOf(),
+            val BIO:String="",
+            val DESIGNATION:String="",
+            val ROLE:Int=1,
+)
