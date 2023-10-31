@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.MutableLiveData
+import com.ncs.o2.BuildConfig
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
@@ -109,12 +110,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }, 1000)
 
         val drawerLayout = binding.drawer
+
+        //Setting version code
+        binding.drawerheaderfile.versionCode.setText("v${BuildConfig.VERSION_NAME}")
+
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
         binding.gioActionbar.titleTv.animFadein(this, 500)
         binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
+
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
 
@@ -144,6 +150,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         // Add project button click listener
         val add_button: AppCompatButton = drawerLayout.findViewById(R.id.add_project_btn)
+
         add_button.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             val project = AddProjectBottomSheet()
