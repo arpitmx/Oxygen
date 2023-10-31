@@ -29,13 +29,16 @@ import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentProfilePictureSelectionBinding
 import com.ncs.o2.databinding.FragmentUserDetailsBinding
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
+@AndroidEntryPoint
 class ProfilePictureSelectionFragment : Fragment() {
 
     companion object {
@@ -77,10 +80,20 @@ class ProfilePictureSelectionFragment : Fragment() {
 //            }
             val userData = mapOf(
                 "PHOTO_ADDED" to true,
+                "PROJECTS" to listOf("NCSOxygen")
             )
             FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
+                    viewModel.user.observe(viewLifecycleOwner) { user ->
+                        if (user != null) {
+                            PrefManager.initialize(requireContext())
+                            PrefManager.setcurrentUserdetails(user)
+                        } else {
+                        }
+                    }
+
+                    viewModel.fetchUserInfo()
                     requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
                 }
@@ -98,7 +111,7 @@ class ProfilePictureSelectionFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ProfilePictureSelectionViewModel::class.java)
-        // TODO: Use the ViewModel
+
     }
     private fun pickImage() {
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")

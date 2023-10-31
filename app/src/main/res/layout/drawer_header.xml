@@ -25,7 +25,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:layout_margin="15dp"
-                android:src="@drawable/sampledp"
+                android:src="@drawable/default_pp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +43,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/username"
                 android:fontFamily="@font/outfitsemibold"
                 android:layout_marginTop="10dp"
                 android:text="Alok Ranjan"
@@ -53,6 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:id="@+id/designation"
                     android:fontFamily="@font/outfitregular"
                     android:text="Android Developer"
                     android:textColor="@color/green"
@@ -63,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/outfitregular"
                     android:text="sudoarmax@gmail.com"
+                    android:id="@+id/email"
                     android:textColor="#97CDCDCD"
                     android:textSize="14dp" />
 

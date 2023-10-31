@@ -1,8 +1,8 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,12 +13,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import com.google.gson.Gson
-import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.CreateProject
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
@@ -30,16 +28,15 @@ import org.json.JSONException
 class AddProjectBottomSheet : BottomSheetDialogFragment(){
 
     lateinit var binding:ProjectAddBottomSheetBinding
-    private lateinit var sharedPref: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
+    var projectAddedListener: ProjectAddedListener? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = ProjectAddBottomSheetBinding.inflate(inflater, container, false)
-        sharedPref = requireContext().getSharedPreferences("userDetails", AppCompatActivity.MODE_PRIVATE)
-        editor = sharedPref.edit()
+
         return binding.root
     }
 
@@ -57,6 +54,7 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
     }
 
     private fun setActionbar() {
+        PrefManager.initialize(requireContext())
         binding.closeBtn.setOnClickThrottleBounceListener{
             dismiss()
         }
@@ -66,55 +64,84 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
             dismiss()
         }
         binding.submitLink.setOnClickThrottleBounceListener {
-            val link=binding.projectLink.text.toString()
-            if (link.isNotEmpty()){
+            val link = binding.projectLink.text.toString()
+
+            if (link.isNotEmpty()) {
                 binding.submitLink.gone()
                 binding.progressBar.visible()
 
-                FirebaseFirestore.getInstance().collection("Projects").whereEqualTo("PROJECT_LINK", link)
+                val userDocument = FirebaseFirestore.getInstance().collection("Users")
+                    .document(FirebaseAuth.getInstance().currentUser?.email!!)
+
+                var projectData: String? = null
+
+                FirebaseFirestore.getInstance().collection("Projects")
+                    .whereEqualTo("PROJECT_LINK", link)
                     .get()
                     .addOnSuccessListener { documents ->
                         if (!documents.isEmpty) {
-                            var projectData=""
-                            val sharedPrefData = sharedPref.getString("PROJECTS", "[]")
-
                             for (document in documents) {
                                 val project = document.data
-                                projectData= project.get("PROJECT_NAME").toString()
+                                projectData = project.get("PROJECT_NAME").toString()
                             }
-                            FirebaseFirestore.getInstance().collection("Users")
-                                .document(Endpoints.TESTUSERID)
-                                .update("PROJECTS", FieldValue.arrayUnion(projectData))
-                                .addOnSuccessListener {
-                                    try {
-                                        val projectsArray = JSONArray(sharedPrefData)
-                                        projectsArray.put(projectData)
-                                        val editor = sharedPref.edit()
-                                        editor.putString("PROJECTS", projectsArray.toString())
-                                        editor.apply()
-                                    } catch (e: JSONException) {
-                                        e.printStackTrace()
+
+                            if (projectData != null) {
+                                userDocument.get()
+                                    .addOnSuccessListener { userSnapshot ->
+                                        val userProjects = userSnapshot.get("PROJECTS") as ArrayList<String>?
+
+
+                                        if (userProjects != null && userProjects.contains(projectData)) {
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Project already added in your account",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            dismiss()
+                                        } else {
+                                            userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData))
+                                                .addOnSuccessListener {
+                                                    PrefManager.lastaddedproject(projectData!!)
+                                                    userProjects?.add(projectData!!)
+                                                    sendcallBack(userProjects!!)
+                                                    Toast.makeText(
+                                                        requireContext(),
+                                                        "Project Added Successfully",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    projectAddedListener?.onProjectAdded(userProjects!!)
+                                                    dismiss()
+                                                }
+                                                .addOnFailureListener { e ->
+                                                }
+                                        }
                                     }
-                                    Toast.makeText(requireContext(), "Project Added Successfully", Toast.LENGTH_SHORT).show()
-                                    dismiss()
-                                }
-                                .addOnFailureListener { e ->
-                                }
+                                    .addOnFailureListener { e ->
+                                    }
+                            } else {
+                                Toast.makeText(requireContext(), "Project not found, please check the link", Toast.LENGTH_SHORT).show()
+                            }
                         } else {
                             Toast.makeText(requireContext(), "Project not found, please check the link", Toast.LENGTH_SHORT).show()
                         }
                     }
                     .addOnFailureListener { e ->
                     }
-            }
-            else{
-                Toast.makeText(requireContext(),"Project Link can't be empty",Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Project Link can't be empty", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
 
     private fun setBottomSheetConfig() {
         this.isCancelable = true
+    }
+    interface ProjectAddedListener {
+        fun onProjectAdded(userProjects:ArrayList<String>)
+    }
+    fun sendcallBack(userProjects: ArrayList<String>){
+        projectAddedListener?.onProjectAdded(userProjects)
     }
 
 }
