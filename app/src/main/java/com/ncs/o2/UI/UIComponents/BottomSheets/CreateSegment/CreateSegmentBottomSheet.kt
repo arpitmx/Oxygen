@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.showKeyboard
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.o2.R
 import com.ncs.o2.databinding.CreateSegmentBottomSheetBinding
@@ -50,12 +52,14 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
        savedInstanceState: Bundle?
     ): View {
         binding = CreateSegmentBottomSheetBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
     override fun onViewCreated( view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        PrefManager.initialize(requireContext())
+        val current_project=PrefManager.getcurrentProject()
         setUpViews()
 
         binding.doneButton.setOnClickThrottleBounceListener{
@@ -66,10 +70,13 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
             val desc = binding.segmentDescriptionTv.text.toString().trim()
             if (title.isNotEmpty() and (desc.isNotEmpty()) and(title.length<=15) ){
                 val segment = Segment(
-                    SEGMENT_NAME = title,
-                    DESCRIPTION = desc,
-                    SEGMENT_ID = "",
-                    PROJECT_ID = "Versa",
+                    segment_NAME = title.toLowerCase().capitalize(),
+                    description = desc,
+                    segment_ID = "${title.toLowerCase()}_${System.currentTimeMillis().toString().substring(8,12)}",
+                    project_ID = current_project,
+                    creation_DATETIME = Timestamp.now(),
+                    segment_CREATOR = PrefManager.getcurrentUserdetails().USERNAME,
+                    segment_CREATOR_ID = FirebaseAuth.getInstance().currentUser?.uid!!
                 )
 
                 viewModel.createSegment(segment = segment)
@@ -98,6 +105,16 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
             }
         }
 
+        viewModel.segmentcreationLiveData.observe(this){ state->
+            binding.validationsTxt.visible()
+            when(state){
+                ServerExceptions.segement_created.exceptionDescription->{
+                    binding.validationsTxt.text="Segment created"
+                    this.dismiss()
+                    this.toast("Segment Created")
+                }
+            }
+        }
 
         viewModel.segmentValidityLiveData.observe(this){ state ->
 
@@ -113,6 +130,7 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
                 Codes.Status.VALID_INPUT -> {
                     binding.validationsTxt.text = getString(R.string.creating_your_segment)
                 }
+
                 else -> {
                     binding.validationsTxt.text = "*"+state
                 }
@@ -121,4 +139,6 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
 
             }
         }
+
     }
+

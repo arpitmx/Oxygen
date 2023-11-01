@@ -33,7 +33,7 @@ class CreateSegmentUseCase @Inject constructor(
     fun doCheckAndCreateSegment(segment: Segment, callback: (ServerResult<Int>) -> Unit) {
 
         repository.checkIfSegmentNameExists(
-            fieldName = segment.SEGMENT_NAME, projectID = segment.PROJECT_ID
+            fieldName = segment.segment_NAME, projectID = segment.project_ID
         ) { result ->
 
             when (result) {
