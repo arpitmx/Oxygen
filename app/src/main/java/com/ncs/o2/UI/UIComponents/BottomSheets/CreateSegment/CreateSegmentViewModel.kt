@@ -5,10 +5,14 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.UseCases.CreateSegmentUseCase
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.ServerExceptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -34,13 +38,18 @@ Tasks FUTURE ADDITION :
 
 @HiltViewModel
 class CreateSegmentViewModel @Inject constructor(
-    val usecase : CreateSegmentUseCase
+    val usecase : CreateSegmentUseCase,
+    @FirebaseRepository val repository: Repository,
     ):
     ViewModel(){
 
 
     private val _segmentValidityLiveData = MutableLiveData<String>()
     val segmentValidityLiveData : LiveData<String> get() = _segmentValidityLiveData
+
+
+    private val _segmencreationLiveData = MutableLiveData<String>()
+    val segmentcreationLiveData : LiveData<String> get() = _segmencreationLiveData
 
     private val _showprogressLD = MutableLiveData<Boolean>()
     val showprogressLD: LiveData<Boolean> get() = _showprogressLD
@@ -79,6 +88,22 @@ class CreateSegmentViewModel @Inject constructor(
 
                             //Valid
                             if (callback.data == 200){
+                                repository.createSegment(segment){result->
+                                    when (result) {
+
+                                        is ServerResult.Failure -> {
+                                        }
+
+                                        ServerResult.Progress -> {
+                                        }
+
+                                        is ServerResult.Success -> {
+                                            _segmencreationLiveData.postValue(ServerExceptions.segement_created.exceptionDescription)
+                                        }
+
+                                    }
+
+                                }
                                _showprogressLD.postValue(false)
                                 _segmentValidityLiveData.postValue(Codes.Status.VALID_INPUT)
                             }
