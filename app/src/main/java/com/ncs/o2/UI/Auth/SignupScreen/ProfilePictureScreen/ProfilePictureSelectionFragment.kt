@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -82,20 +83,31 @@ class ProfilePictureSelectionFragment : Fragment() {
                 "PHOTO_ADDED" to true,
                 "PROJECTS" to listOf("NCSOxygen")
             )
+
             FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
-                    viewModel.user.observe(viewLifecycleOwner) { user ->
-                        if (user != null) {
-                            PrefManager.initialize(requireContext())
-                            PrefManager.setcurrentUserdetails(user)
-                        } else {
+                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                        .get()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val document = task.result
+                                if (document != null && document.exists()) {
+                                    val bio=document.getString("BIO")
+                                    val designation=document.getString("DESIGNATION")
+                                    val email=document.getString("EMAIL")
+                                    val username=document.getString("USERNAME")
+                                    val role=document.get("ROLE")
+                                    PrefManager.initialize(requireContext())
+                                    PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toInt()))
+                                    requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+                                    requireActivity().finish()
+                                }
+                            } else {
+                                val exception = task.exception
+                                exception?.printStackTrace()
+                            }
                         }
-                    }
-
-                    viewModel.fetchUserInfo()
-                    requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-                    requireActivity().finish()
                 }
                 .addOnFailureListener { e ->
 
