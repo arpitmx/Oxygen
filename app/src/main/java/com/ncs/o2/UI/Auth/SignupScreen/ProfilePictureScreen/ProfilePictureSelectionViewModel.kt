@@ -7,6 +7,7 @@ import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.HelperClasses.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -16,6 +17,7 @@ class ProfilePictureSelectionViewModel  @Inject constructor(
 ) : ViewModel() {
     private val _user = MutableLiveData<CurrentUser?>()
     val user = _user
+
 
     fun fetchUserInfo() {
         repository.getUserInfo { result ->

@@ -82,6 +82,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                 "PHOTO_ADDED" to true,
                 "PROJECTS" to listOf("NCSOxygen")
             )
+
             FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
@@ -137,6 +138,7 @@ class ProfilePictureSelectionFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_IMAGE_CAPTURE -> {
@@ -169,7 +171,7 @@ class ProfilePictureSelectionFragment : Fragment() {
         val imageFileName = "${FirebaseAuth.getInstance().currentUser?.email}+_profilepic"
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos)
         val data = baos.toByteArray()
         val uploadTask = imageRef.putBytes(data)
         uploadTask.addOnSuccessListener { taskSnapshot ->

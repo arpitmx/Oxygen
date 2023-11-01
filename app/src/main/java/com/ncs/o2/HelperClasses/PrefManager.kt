@@ -37,6 +37,7 @@ object PrefManager {
 
 
     //Notification View Timestamp
+
     fun saveTimestamp(timestamp: Timestamp) {
         sharedPreferences.edit().putString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, timestamp.toString()).apply()
     }
@@ -48,6 +49,9 @@ object PrefManager {
     fun clearTimestamp() {
         sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_TIME_STAMP).apply()
     }
+
+
+
 
 
 

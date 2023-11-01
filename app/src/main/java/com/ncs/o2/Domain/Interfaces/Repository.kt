@@ -1,5 +1,6 @@
 package com.ncs.o2.Domain.Interfaces
 
+import android.graphics.Bitmap
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
