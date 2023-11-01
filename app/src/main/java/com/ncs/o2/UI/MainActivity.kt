@@ -201,6 +201,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Handle click on a project in the list
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.initialize(this)
+        PrefManager.setcurrentsegment("Select Segment")
+        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
         PrefManager.selectedPosition.value = position
@@ -224,6 +226,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         segmentText.value = segmentName
 
     }
+
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
         projects.addAll(userProjects)

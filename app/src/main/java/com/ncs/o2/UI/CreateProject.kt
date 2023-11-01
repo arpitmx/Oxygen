@@ -67,12 +67,13 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 
         binding.gioActionbar.btnNext.setOnClickThrottleBounceListener {
             val _title=binding.projectTitle.text.toString()
-            val title = _title.replace(" ", "")
+            val __title = _title.replace(" ", "")
+            val title = __title.toLowerCase().capitalize()
             val projectData = hashMapOf(
-                "PROJECT_NAME" to title,
-                "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12)}",
-                "PROJECT_LINK" to "${title.toLowerCase()}.ncs.in",
-                "PROJECT_DESC" to desc.toString(),
+                "PROJECT_NAME" to title.trim(),
+                "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12).trim()}",
+                "PROJECT_LINK" to "${title.toLowerCase().trim()}.ncs.in",
+                "PROJECT_DESC" to desc.toString().trim(),
             )
             if (title.isNotEmpty()) {
                 binding.progressBar.visible()

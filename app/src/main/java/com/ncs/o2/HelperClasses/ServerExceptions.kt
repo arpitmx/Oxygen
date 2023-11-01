@@ -29,5 +29,8 @@ object ServerExceptions : Exception(){
         val exceptionDescription: String = "Project Does not exists"
         val exceptionCode : Int = 1200
     }
-
+    object segement_created : Exception(){
+        val exceptionDescription: String = "Segment created successfully"
+        val exceptionCode : Int = 1400
+    }
 }

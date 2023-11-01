@@ -2,13 +2,12 @@ package com.ncs.o2.Domain.Repositories
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -18,7 +17,6 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -211,21 +209,15 @@ class FirestoreRepository @Inject constructor(
     private fun getSegmentRef(task: Task):DocumentReference{
         return firestore.collection(Endpoints.PROJECTS)
             .document(task.project_ID)
-            .collection(Endpoints.Project.SEGMENT)
-            .document(task.segment)
-
     }
 
     override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
 
-        val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
-
         return try {
 
         serverResult(ServerResult.Progress)
-        firestore.document(getTaskPath(task)).set(task).await()
-        getSegmentRef(task).apply { update(appendTaskID).await() }
-        getProjectRef(task.project_ID).apply { update(appendTaskID).await() }
+//        firestore.document(getTaskPath(task)).set(task).await()
+        getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task).await()
         serverResult(ServerResult.Success(200))
         }
         catch (exception:Exception) {
@@ -284,7 +276,16 @@ class FirestoreRepository @Inject constructor(
     }
 
     override fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit) {
+        return try {
 
+            serverResult(ServerResult.Progress)
+            firestore.collection(Endpoints.PROJECTS)
+                .document(segment.project_ID).collection(Endpoints.Project.SEGMENT).document(segment.segment_NAME).set(segment)
+            serverResult(ServerResult.Success(200))
+        }
+        catch (exception:Exception) {
+            serverResult(ServerResult.Failure(exception))
+        }
     }
 
 
@@ -296,36 +297,16 @@ class FirestoreRepository @Inject constructor(
 
         result(ServerResult.Progress)
 
-        getProjectRef(projectID).get(Source.SERVER)
+        getProjectRef(projectID).collection(Endpoints.Project.SEGMENT).get(Source.SERVER)
             .addOnSuccessListener { snapshot ->
-
-
-                if (!snapshot.exists() or (snapshot == null)) {
-                    Timber.tag(TAG)
-                        .d("Exception : ${ServerExceptions.projectDoesNotExists.exceptionDescription}")
-                    result(ServerResult.Failure(ServerExceptions.projectDoesNotExists))
-                    return@addOnSuccessListener
-                }
-
-                val segmentsMap: Map<String, String> =
-                    snapshot.get(Endpoints.Project.ALL_SEGMENT) as Map<String, String>
-
-                if (segmentsMap.isEmpty()) {
-                    result(ServerResult.Success(false))
-                    Timber.tag(TAG).d("Map is empty")
-
-                } else {
-                    val containsValue = segmentsMap.containsValue(fieldName)
-                    if (containsValue) {
-                        Timber.tag(TAG)
-                            .d("Segment name present : ${ServerExceptions.duplicateNameException.exceptionDescription}")
+                for (document in snapshot.documents) {
+                    val fieldValue = document.getString("segment_NAME")
+                    if (fieldValue == fieldName) {
                         result(ServerResult.Success(true))
-                    } else {
-                        Timber.tag(TAG).d("Segment name original")
-                        result(ServerResult.Success(false))
+                        return@addOnSuccessListener
                     }
                 }
-
+                result(ServerResult.Success(false))
             }
             .addOnFailureListener {
                 Timber.tag(TAG).d("Firestore Exception : ${it}")
@@ -342,10 +323,9 @@ class FirestoreRepository @Inject constructor(
 
         firestore.collection(Endpoints.PROJECTS)
             .document(projectName)
-            .collection("SEGMENTS")
-            .document(segmentName)
-            .collection("TASKS")
+            .collection(Endpoints.Project.TASKS)
             .whereEqualTo("section", sectionName)
+            .whereEqualTo("segment",segmentName)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<Task>()
@@ -359,9 +339,21 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
-
-
-
-
-
+    fun getSegments(projectName: String,result: (ServerResult<List<Segment>>) -> Unit
+    ){
+      firestore.collection(Endpoints.PROJECTS).document(projectName).collection(Endpoints.Project.SEGMENT)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+              val segment_list = mutableListOf<Segment>()
+              for (document in querySnapshot.documents) {
+                  val segments = document.toObject(Segment::class.java)
+                  segment_list.add(segments!!)
+              }
+              Log.d("segements",segment_list.toString())
+              result(ServerResult.Success(segment_list))
+          }
+          .addOnFailureListener { exception ->
+              result(ServerResult.Failure(exception))
+          }
+    }
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.text.toLowerCase
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -73,10 +74,11 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                 val userDocument = FirebaseFirestore.getInstance().collection("Users")
                     .document(FirebaseAuth.getInstance().currentUser?.email!!)
 
+                var _projectData: String? = null
                 var projectData: String? = null
 
                 FirebaseFirestore.getInstance().collection("Projects")
-                    .whereEqualTo("PROJECT_LINK", link)
+                    .whereEqualTo("PROJECT_LINK", link.toLowerCase())
                     .get()
                     .addOnSuccessListener { documents ->
                         if (!documents.isEmpty) {
@@ -102,7 +104,7 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                                             userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData))
                                                 .addOnSuccessListener {
                                                     PrefManager.lastaddedproject(projectData!!)
-                                                    userProjects?.add(projectData!!)
+                                                    userProjects?.add(projectData!!.trim())
                                                     sendcallBack(userProjects!!)
                                                     Toast.makeText(
                                                         requireContext(),
