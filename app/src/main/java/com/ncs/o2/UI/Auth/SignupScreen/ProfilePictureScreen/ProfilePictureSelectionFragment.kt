@@ -120,6 +120,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ProfilePictureSelectionViewModel::class.java)
@@ -146,6 +147,7 @@ class ProfilePictureSelectionFragment : Fragment() {
         }
         builder.show()
     }
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -165,6 +167,7 @@ class ProfilePictureSelectionFragment : Fragment() {
             }
         }
     }
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

@@ -1,8 +1,10 @@
 package com.ncs.o2.Domain.Models
 
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FieldValue
-import com.ncs.o2.Constants.NotificationType
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.ncs.versa.Constants.Endpoints
+import java.util.Date
 
 /*
 File : ReceiveNotification -> com.ncs.o2.Domain.Models
@@ -23,12 +25,30 @@ Tasks FUTURE ADDITION :
 
 */
 
+@Entity(tableName = Endpoints.ROOM.NOTIFICATIONS.NOTIFICATIONS_TABLE)
 data class Notification(
+    @PrimaryKey
+    @ColumnInfo(name = "notificationID")
+    val notificationID: String,
+
+    @ColumnInfo(name = "notificationType")
     val notificationType: String,
-    val taskID : String ,
-    val title: String ,
+
+    @ColumnInfo(name = "taskID")
+    val taskID: String,
+
+    @ColumnInfo(name = "title")
+    val title: String,
+
+    @ColumnInfo(name = "message")
     val message: String,
-    val timeStamp : FieldValue,
-    val fromUser : String ,
-    val toUser : String
+
+    @ColumnInfo(name = "fromUser")
+    val fromUser: String,
+
+    @ColumnInfo(name = "toUser")
+    val toUser: String,
+
+    @ColumnInfo(name = "timeStamp")
+    val timeStamp: Long
 )

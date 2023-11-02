@@ -46,6 +46,8 @@ object PrefManager {
         return sharedPreferences.getString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, "NONE")!!
     }
 
+
+
     fun clearTimestamp() {
         sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_TIME_STAMP).apply()
     }
@@ -110,6 +112,11 @@ object PrefManager {
         val role = sharedPreferences.getInt(Endpoints.User.ROLE, 0)
         return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!)
     }
+
+    fun getCurrentUserEmail():String{
+        return getcurrentUserdetails().EMAIL
+    }
+
     fun lastaddedproject(project:String){
         val lastproject = sharedPreferences.getString("last_project", null)
         if (lastproject != null) {

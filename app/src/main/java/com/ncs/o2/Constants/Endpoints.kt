@@ -52,4 +52,14 @@ object Endpoints {
         const val STATUS = "STATUS"
         const val TITLE = "TITLE"
     }
+
+    object ROOM{
+
+        object NOTIFICATIONS{
+            const val NOTIFICATIONS_TABLE = "notifications"
+            const val NOTIFICATIONS_DATABASE = "NOTIFICATION-DB"
+        }
+
+
+    }
 }

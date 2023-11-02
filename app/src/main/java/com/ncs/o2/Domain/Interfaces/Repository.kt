@@ -47,6 +47,7 @@ interface Repository {
     suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit)
     suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit)
 
+
     suspend fun postNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
 
     fun checkIfSegmentNameExists(fieldName : String, projectID : String, result: (ServerResult<Boolean>) -> Unit)
