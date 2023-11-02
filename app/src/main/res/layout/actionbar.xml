@@ -233,6 +233,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
+        android:id="@+id/line"
         android:background="@color/border_grey"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 

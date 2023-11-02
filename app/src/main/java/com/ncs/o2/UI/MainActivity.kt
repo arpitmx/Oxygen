@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         PrefManager.initialize(this)
         setContentView(binding.root)
+
         setUpViews()
     }
 
@@ -203,6 +204,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         PrefManager.initialize(this)
         PrefManager.setcurrentsegment("Select Segment")
         binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
+
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
         PrefManager.selectedPosition.value = position
