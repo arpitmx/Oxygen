@@ -10,6 +10,27 @@
     tools:context=".UI.Tasks.TasksHolderFragment"
     >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAlignment="center"
+        android:padding="10dp"
+        android:visibility="gone"
+        android:id="@+id/placeholder_text"
+        android:text="Select a segment\n to continue"
+        android:fontFamily="@font/outfitbold"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="35dp"
+        android:textColor="@color/edit_text_hint"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -38,6 +59,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/placeholder"
