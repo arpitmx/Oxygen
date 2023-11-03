@@ -133,6 +133,7 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                     "EMAIL" to binding.etEmail.text.toString(),
                     "DETAILS_ADDED" to false,
                     "PHOTO_ADDED" to false,
+                    "DP_URL" to "",
 
                     )
                 FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
@@ -146,8 +147,6 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                     }
 
 
-//                requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-//                requireActivity().finish()
 
             }
 

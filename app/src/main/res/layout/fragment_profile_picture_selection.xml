@@ -86,7 +86,7 @@
             <ProgressBar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:visibility="invisible"
                 android:id="@+id/progress_bar"
                 android:indeterminateTint="@color/colorAccent"/>
 
@@ -94,6 +94,7 @@
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
 
 
 </RelativeLayout>

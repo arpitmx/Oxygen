@@ -2,6 +2,7 @@ package com.ncs.o2.HelperClasses
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.ncs.versa.Constants.Endpoints
@@ -49,6 +50,18 @@ object PrefManager {
     }
 
 
+    //DP related
+
+    fun setDpUrl(url:String){
+        if (url != null){
+            editor.putString("DpUrl", url)
+        }
+        editor.apply()
+    }
+
+    fun getDpUrl(): String? {
+        return sharedPreferences.getString("Dpurl", null)
+    }
 
     // Project related
 
