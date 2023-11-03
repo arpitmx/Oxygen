@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,8 +25,10 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
+import com.ncs.o2.databinding.FragmentTasksHolderBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,6 +37,8 @@ import me.shouheng.utils.app.ActivityUtils.overridePendingTransition
 
 @AndroidEntryPoint
 class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter.OnClickListener {
+
+
 
     private lateinit var viewModel: TaskSectionViewModel
     private lateinit var binding: FragmentTaskSectionBinding
@@ -45,10 +49,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     private lateinit var projectName:String
     private lateinit var segmentName:String
 
+
     val state = arrayOf(1)
 
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,6 +64,9 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     private val activityBinding: ActivityMainBinding by lazy {
         (requireActivity() as MainActivity).binding
     }
+
+
+
 
     private val searchCont by lazy {
         activityBinding.gioActionbar.searchCont
@@ -74,7 +81,6 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         PrefManager.initialize(requireContext())
         projectName = PrefManager.getcurrentProject()
         segmentName=PrefManager.getcurrentsegment()
-        
         setupViews()
 
     }
@@ -100,6 +106,23 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
     private fun setupRecyclerView() {
         taskList= ArrayList<Task>()
+        val task1 = Task("Appbar not working in the new implementation Appbar not working in the new implementation",
+            "Have to implement that.","#1234",2, listOf("link1,link2"),3,1, assignee = listOf("mod1"),
+            "Assigner1","31/2/23", duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/200", completed = true
+        )
+
+        val task2 = Task("Window navigation not working in Versa 2.0",
+            "Have to implement that.","#1364",1, listOf("link1,link2"),2,3, listOf("mod1"),
+            "Assigner1","31/2/22",
+            duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300"
+        )
+        val task3 = Task("Window navigation not working in Versa 2.0",
+            "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
+            "Assigner1","31/2/22",
+            duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300"
+        )
+//        taskList = arrayListOf(task1,task2,task3,task2,task1,task2,task1,task2,task1)
+//        taskList.add(task1)
         viewModel.getTasksForSegment(projectName, segmentName, sectionName) { result ->
             when (result) {
                 is ServerResult.Success -> {
@@ -113,7 +136,6 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     taskListAdapter.notifyDataSetChanged()
 
                     taskListAdapter.setOnClickListener(this)
-
                     val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                     layoutManager.reverseLayout = false
                     with(recyclerView){
@@ -136,14 +158,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                             }
                         }
                     })
-
                     binding.lottieProgressInclude.progressLayout.gone()
                     if (taskList.isEmpty()){
-                        binding.layout.gone()
+                        binding.recyclerView.gone()
                         binding.placeholder.visible()
-                    }else {
-                        binding.layout.visible()
-                        binding.placeholder.gone()
                     }
                 }
                 is ServerResult.Failure -> {
@@ -157,6 +175,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
             }
 
         }
+
+
+
+
 
 
 //        Handler(Looper.getMainLooper()).postDelayed(Runnable {
@@ -178,27 +200,52 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 //        },4000)
 
         activityBinding.gioActionbar.filterBtn.setOnClickListener {
+//            val newTask=Task("New Task Added",
+//                "Have to implement that.","#0987",3, listOf("link1,link2"),2,3, listOf("mod1"),
+//                "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300", isCompleted = false
+//            )
 
-            val update =Task("New Task Updated for id #1364",
-                "Have to implement that.","#T11416",3, listOf("link1,link2"),2,3, listOf("mod1"),
+//            taskList.add(newTask)
+//            Toast.makeText(requireContext(),"New Task Added",Toast.LENGTH_SHORT).show()
+
+//            taskList.remove(task2)
+//            Toast.makeText(requireContext(),"task2 removed",Toast.LENGTH_SHORT).show()
+
+            val update=Task("New Task Updated for id #1364",
+                "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
                 "Assigner1","31/2/22",
                 duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300", completed = false
             )
-            updateTask(update = update)
-        }
 
-    }
-
-    private fun updateTask(update: Task){
-        val id=update.id
-        for(i in taskList.indices){
-            if(taskList[i].id==id){
-                taskList[i]=update
+            val id=update.id
+            for(i in taskList.indices){
+                if(taskList[i].id==id){
+                    taskList[i]=update
+                }
             }
+
+            Toast.makeText(requireContext(),"task updated",Toast.LENGTH_SHORT).show()
+            taskListAdapter.setTaskList(taskList)
+
         }
 
-        Toast.makeText(requireContext(),"task updated",Toast.LENGTH_SHORT).show()
-        taskListAdapter.setTaskList(taskList)
+//        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+//                if (dy > 100 && searchCont.visibility == View.VISIBLE) {
+//                   Handler(Looper.getMainLooper()).postDelayed({
+//                       searchCont.progressGoneSlide(requireContext(),200)
+//                   },200)
+//                } else if (dy < -20 && searchCont.visibility  != View.VISIBLE) {
+//
+//                    Handler(Looper.getMainLooper()).postDelayed({
+//                        searchCont.progressVisible(requireContext(),200)
+//                    },200)
+//                }
+//            }
+//
+//        })
+
+
     }
 
     private fun showSearch() {

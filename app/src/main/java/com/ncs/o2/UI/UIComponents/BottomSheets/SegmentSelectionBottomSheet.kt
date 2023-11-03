@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -16,8 +17,10 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.UI.Tasks.TasksHolderViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentViewModel
 import com.ncs.o2.databinding.SegmetSelectionBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -55,8 +58,10 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         binding.recyclerViewSegments
     }
     var segmentSelectionListener: SegmentSelectionListener? = null
-
+    var sectionSelectionListener:sendSectionsListListner?=null
+    lateinit var sectionList:MutableList<String>
     private val faker: Faker by lazy { Faker() }
+    private lateinit var segmentName:String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,6 +76,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sectionList = mutableListOf()
 
         setViews()
 
@@ -95,7 +101,8 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
             dismiss()
             val createSegmentBottomSheet = CreateSegmentBottomSheet()
             createSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
-
+//            val createSectionsBottomSheet = CreateSectionsBottomSheet()
+//            createSectionsBottomSheet.show(requireActivity().supportFragmentManager,"this")
 
         }
     }
@@ -121,11 +128,18 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
         PrefManager.initialize(requireContext())
         PrefManager.setcurrentsegment(segment.segment_NAME)
+        segmentName=segment.segment_NAME
+        sendsectionList(PrefManager.getcurrentProject())
         segmentSelectionListener?.onSegmentSelected(segment.segment_NAME)
+        sectionSelectionListener?.sendSectionsList(sectionList)
         dismiss()
     }
     interface SegmentSelectionListener {
         fun onSegmentSelected(segmentName: String)
+    }
+    interface sendSectionsListListner{
+        fun sendSectionsList(list:MutableList<String>)
+
     }
 
     private fun fetchSegments(projectName: String) {
@@ -152,5 +166,36 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
             }
         }
     }
+    private fun sendsectionList(projectName: String) {
+        firestoreRepository.getSegments(projectName) { serverResult ->
+            when (serverResult) {
+                is ServerResult.Success -> {
+                    binding.progressbar.gone()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val segList = serverResult.data
+                        if (segList.isNotEmpty()) {
+                            for (i in 0 until segList.size){
+                                if (segList[i].segment_NAME == segmentName){
+                                    sectionList = segList[i].sections
+                                }
+                            }
+                            PrefManager.putsectionsList(sectionList)
+                            withContext(Dispatchers.Main) {
+                                PrefManager.list.value = sectionList
+                            }
+                        }
+                    }
+                }
+                is ServerResult.Failure -> {
+                    val exception = serverResult.exception
+                    // Handle the failure here
+                }
+                is ServerResult.Progress -> {
+                    binding.progressbar.visible()
+                }
+            }
+        }
+    }
+
 
 }

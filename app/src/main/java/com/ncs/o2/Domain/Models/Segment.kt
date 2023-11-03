@@ -22,12 +22,13 @@ Tasks FUTURE ADDITION :
 
 */
 data class Segment (
-        val segment_NAME : String="",
-        val segment_ID : String="",
-        val description : String="",
-        val contributers : MutableList<String> = mutableListOf(),
-        val segment_CREATOR : String="",
-        val segment_CREATOR_ID : String="",
-        val project_ID: String="",
-        val creation_DATETIME : Timestamp?=null,
+    val segment_NAME : String="",
+    val segment_ID : String="",
+    val description : String="",
+    val contributers : MutableList<String> = mutableListOf(),
+    val segment_CREATOR : String="",
+    val segment_CREATOR_ID : String="",
+    val project_ID: String="",
+    var creation_DATETIME : Timestamp?=null,
+    var sections: MutableList<String> = mutableListOf()
         )
