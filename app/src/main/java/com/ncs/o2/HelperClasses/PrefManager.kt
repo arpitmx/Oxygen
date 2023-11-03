@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.Domain.Models.Segment
 import com.ncs.versa.Constants.Endpoints
 
 /*
@@ -30,6 +33,7 @@ object PrefManager {
     val selectedPosition = MutableLiveData<Int>()
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor : SharedPreferences.Editor
+    val list=MutableLiveData<List<String>>()
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(Endpoints.SharedPref.SHAREDPREFERENCES, Context.MODE_PRIVATE)
         editor= sharedPreferences.edit()
@@ -119,6 +123,48 @@ object PrefManager {
         return sharedPreferences.getString("last_project","NCSOxygen")!!
     }
 
+    fun setSegmentdetails(segment: Segment){
+        val gson = Gson()
+        val contributersJson = gson.toJson(segment.contributers)
+        editor.putString(Endpoints.SEGMENT.SEGMENT_NAME,segment.segment_NAME)
+        editor.putString(Endpoints.SEGMENT.SEGMENT_ID,segment.segment_ID)
+        editor.putString(Endpoints.SEGMENT.DESCRIPTION,segment.description)
+        editor.putString(Endpoints.SEGMENT.CONTRIBUTERS, contributersJson)
+        editor.putString(Endpoints.SEGMENT.CREATOR,segment.segment_CREATOR)
+        editor.putString(Endpoints.SEGMENT.CREATOR_ID,segment.segment_CREATOR_ID)
+        editor.putString(Endpoints.SEGMENT.PROJECT_ID,segment.project_ID)
+        editor.apply()
+    }
+    fun getSegmentDetails():Segment{
 
+        val segment_name = sharedPreferences.getString(Endpoints.SEGMENT.SEGMENT_NAME, "")
+        val segment_id = sharedPreferences.getString(Endpoints.SEGMENT.SEGMENT_ID, "")
+        val desc = sharedPreferences.getString(Endpoints.SEGMENT.DESCRIPTION, "")
+        val contributorsJson = sharedPreferences.getString(Endpoints.SEGMENT.CONTRIBUTERS, null)
+        val gson = Gson()
+        val type = object : TypeToken<List<String>>() {}.type
+        val creator = sharedPreferences.getString(Endpoints.SEGMENT.CREATOR, "")
+        val creator_id = sharedPreferences.getString(Endpoints.SEGMENT.CREATOR_ID, "")
+        val project_id = sharedPreferences.getString(Endpoints.SEGMENT.PROJECT_ID, "")
 
+        return Segment(segment_NAME = segment_name!!, segment_ID = segment_id!!, description = desc!!, contributers = gson.fromJson(contributorsJson, type), segment_CREATOR = creator!!, segment_CREATOR_ID = creator_id!!, project_ID = project_id!!)
+    }
+    fun putsectionsList(sections:List<String>){
+        val gson = Gson()
+        val sectionsJson = gson.toJson(sections)
+        editor.putString("sections", sectionsJson)
+        editor.apply()
+    }
+    fun getsectionsList():List<String>{
+        val sectionsJson = sharedPreferences.getString("sections",
+           null
+        )
+        if (sectionsJson != null) {
+            val gson = Gson()
+            val type = object : TypeToken<List<String>>() {}.type
+            return gson.fromJson(sectionsJson, type)
+        }else{
+            return listOf("Ongoing Progress", "Ready for Test", "Testing", "Completed")
+        }
+    }
 }

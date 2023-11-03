@@ -43,13 +43,22 @@ object Endpoints {
 
 
     object SEGMENT{
-        const val CONTRIBUTERS = "CONTRIBUTERS"
         const val TASKS = "TASKS"
         const val ASSIGNEE = "ASSIGNEE"
         const val ASSIGNER = "ASSIGNER"
         const val DEADLINE = "DEADLINE"
-        const val DESCRIPTION = "DESC"
         const val STATUS = "STATUS"
         const val TITLE = "TITLE"
+
+
+        const val SEGMENT_NAME="segment_name"
+        const val SEGMENT_ID="segment_id"
+        const val DESCRIPTION = "DESC"
+        const val CONTRIBUTERS = "contributors"
+        const val CREATOR="creator"
+        const val CREATOR_ID="creator_id"
+        const val PROJECT_ID="project_id"
+        const val CREATION_DATETIME="creation_datetime"
+
     }
 }

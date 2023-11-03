@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,8 +25,10 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
+import com.ncs.o2.databinding.FragmentTasksHolderBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -64,6 +67,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
 
 
+
     private val searchCont by lazy {
         activityBinding.gioActionbar.searchCont
     }
@@ -77,7 +81,6 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         PrefManager.initialize(requireContext())
         projectName = PrefManager.getcurrentProject()
         segmentName=PrefManager.getcurrentsegment()
-        
         setupViews()
 
     }
