@@ -12,6 +12,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -26,16 +27,20 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentProfilePictureSelectionBinding
 import com.ncs.o2.databinding.FragmentUserDetailsBinding
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
+@AndroidEntryPoint
 class ProfilePictureSelectionFragment : Fragment() {
 
     companion object {
@@ -44,15 +49,26 @@ class ProfilePictureSelectionFragment : Fragment() {
     lateinit var binding: FragmentProfilePictureSelectionBinding
 
     private lateinit var viewModel: ProfilePictureSelectionViewModel
+
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
     private val CAMERA_PERMISSION_REQUEST = 100
     private val storageReference = FirebaseStorage.getInstance().reference
 
     private var bitmap:Bitmap?=null
+    private lateinit var userDPRef : StorageReference
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(this).get(ProfilePictureSelectionViewModel::class.java)
+
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+
+
         binding = FragmentProfilePictureSelectionBinding.inflate(inflater, container, false)
 
         binding.btnReselect.setOnClickThrottleBounceListener{
@@ -67,27 +83,15 @@ class ProfilePictureSelectionFragment : Fragment() {
             }
         }
         binding.next.setOnClickThrottleBounceListener {
-//            binding.layout.gone()
-//            binding.progressBar.visible()
-//            if (bitmap!=null) {
-//                uploadImageToFirebaseStorage(bitmap!!)
-//            }
-//            else{
-//                Toast.makeText(requireContext(),"Profile Pic can't be empty",Toast.LENGTH_LONG).show()
-//            }
-            val userData = mapOf(
-                "PHOTO_ADDED" to true,
-            )
-            FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .update(userData)
-                .addOnSuccessListener {
-                    requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-                    requireActivity().finish()
-                }
-                .addOnFailureListener { e ->
-
-                }
-
+            binding.layout.gone()
+            binding.progressBar.visible()
+            if (bitmap!=null) {
+                Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
+                uploadImageToFirebaseStorage(bitmap!!)
+            }
+            else{
+                Toast.makeText(requireContext(),"Profile Pic can't be empty",Toast.LENGTH_LONG).show()
+            }
 
         }
 
@@ -97,7 +101,6 @@ class ProfilePictureSelectionFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ProfilePictureSelectionViewModel::class.java)
         // TODO: Use the ViewModel
     }
     private fun pickImage() {
@@ -134,6 +137,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                 REQUEST_IMAGE_PICK -> {
                     val selectedImage = data?.data
                     bitmap=uriToBitmap(requireContext().contentResolver,selectedImage!!)
+                    val imageSize = bitmap?.byteCount
                     binding.picPreview?.setImageURI(selectedImage)
                 }
             }
@@ -153,37 +157,35 @@ class ProfilePictureSelectionFragment : Fragment() {
         }
     }
     private fun uploadImageToFirebaseStorage(bitmap: Bitmap) {
-        val imageFileName = "${FirebaseAuth.getInstance().currentUser?.email}+_profilepic"
-        val imageRef = storageReference.child(imageFileName)
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val data = baos.toByteArray()
-        val uploadTask = imageRef.putBytes(data)
-        uploadTask.addOnSuccessListener { taskSnapshot ->
-            getImageDownloadUrl(imageRef)
-        }.addOnFailureListener { exception ->
-            Toast.makeText(requireContext(), "Image upload failed", Toast.LENGTH_SHORT).show()
+
+        viewModel.uploadDPthroughRepository(bitmap).observe(viewLifecycleOwner) { data ->
+            Log.d("userDpIMageCheck", data.toString())
+            userDPRef = data
+            Log.d("userDpIMageCheck", userDPRef.toString())
+
+            getImageDownloadUrl(userDPRef)
+
+            requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+            requireActivity().finish()
         }
     }
     private fun getImageDownloadUrl(imageRef: StorageReference) {
-        imageRef.downloadUrl.addOnSuccessListener { uri ->
-            val imageUrl = uri.toString()
-            addImageUrlToFirestore(imageUrl)
-        }.addOnFailureListener { exception ->
-            Toast.makeText(requireContext(), "Failed to get image download URL", Toast.LENGTH_SHORT).show()
+        viewModel.getDPUrlTHroughRepository(imageRef).observe(viewLifecycleOwner) { data ->
+            PrefManager.setDpUrl(data)
+            addImageUrlToFirestore(data)
         }
     }
     private fun addImageUrlToFirestore(imageUrl: String) {
-        FirebaseFirestore.getInstance().collection("User").document(FirebaseAuth.getInstance().currentUser?.email!!)
-            .update("profilePicUrl", imageUrl)
-            .addOnSuccessListener {
+
+        viewModel.storeDPUrlToFirestore(imageUrl).observe(viewLifecycleOwner) { data ->
+            if (data) {
                 Toast.makeText(requireContext(), "Successfully Saved", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { exception ->
-                // Handle failed Firestore update
+            } else {
                 Toast.makeText(requireContext(), "Failed to add Image", Toast.LENGTH_SHORT).show()
             }
+        }
     }
+
     fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
         var bitmap: Bitmap? = null
         try {

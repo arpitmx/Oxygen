@@ -7,7 +7,7 @@ object Endpoints {
 
     const val USERS = "Users"
     const val PROJECTS = "Projects"
-    const val TESTUSERID = "userid1"
+    const val USERID = "userid1"
 
 
     object SharedPref{
@@ -18,6 +18,9 @@ object Endpoints {
         const val PROJECTS = "PROJECTS"
         const val EMAIL = "email"
         const val USERNAME = "username"
+        const val BIO = "bio"
+        const val DESIGNATION = "designation"
+        const val ROLE = "role"
 
     }
 
@@ -48,5 +51,15 @@ object Endpoints {
         const val DESCRIPTION = "DESC"
         const val STATUS = "STATUS"
         const val TITLE = "TITLE"
+    }
+
+    object ROOM{
+
+        object NOTIFICATIONS{
+            const val NOTIFICATIONS_TABLE = "notifications"
+            const val NOTIFICATIONS_DATABASE = "NOTIFICATION-DB"
+        }
+
+
     }
 }

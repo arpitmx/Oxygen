@@ -2,8 +2,10 @@ package com.ncs.o2.HelperClasses
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.versa.Constants.Endpoints
 
 /*
@@ -36,6 +38,7 @@ object PrefManager {
 
 
     //Notification View Timestamp
+
     fun saveTimestamp(timestamp: Timestamp) {
         sharedPreferences.edit().putString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, timestamp.toString()).apply()
     }
@@ -44,9 +47,26 @@ object PrefManager {
         return sharedPreferences.getString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, "NONE")!!
     }
 
+
+
     fun clearTimestamp() {
         sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_TIME_STAMP).apply()
     }
+
+
+    //DP related
+
+    fun setDpUrl(url:String){
+        if (url != null){
+            editor.putString("DpUrl", url)
+        }
+        editor.apply()
+    }
+
+    fun getDpUrl(): String? {
+        return sharedPreferences.getString("Dpurl", null)
+    }
+
 
 
 
@@ -74,7 +94,7 @@ object PrefManager {
         return sharedPreferences.getInt("position",0)
     }
     fun getcurrentProject():String {
-        return sharedPreferences.getString("project","Versa")!!
+        return sharedPreferences.getString("project","NCSOxygen")!!
     }
     fun setcurrentsegment(segment: String?) {
         val existingSegment = sharedPreferences.getString("segment", null)
@@ -87,6 +107,40 @@ object PrefManager {
     }
     fun getcurrentsegment():String {
         return sharedPreferences.getString("segment","Development")!!
+    }
+    fun setcurrentUserdetails(user:CurrentUser){
+        editor.putString(Endpoints.User.USERNAME,user.USERNAME)
+        editor.putString(Endpoints.User.EMAIL,user.EMAIL)
+        editor.putString(Endpoints.User.BIO,user.BIO)
+        editor.putString(Endpoints.User.DESIGNATION,user.DESIGNATION)
+        editor.putInt(Endpoints.User.ROLE,user.ROLE)
+        editor.apply()
+    }
+    fun getcurrentUserdetails():CurrentUser{
+
+        val username = sharedPreferences.getString(Endpoints.User.USERNAME, "")
+        val email = sharedPreferences.getString(Endpoints.User.EMAIL, "")
+        val bio = sharedPreferences.getString(Endpoints.User.BIO, "")
+        val designation = sharedPreferences.getString(Endpoints.User.DESIGNATION, "")
+        val role = sharedPreferences.getInt(Endpoints.User.ROLE, 0)
+        return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!)
+    }
+
+    fun getCurrentUserEmail():String{
+        return getcurrentUserdetails().EMAIL
+    }
+
+    fun lastaddedproject(project:String){
+        val lastproject = sharedPreferences.getString("last_project", null)
+        if (lastproject != null) {
+            editor.putString("last_project", project)
+        } else {
+            editor.putString("last_project", project)
+        }
+        editor.apply()
+    }
+    fun getlastaddedproject():String {
+        return sharedPreferences.getString("last_project","NCSOxygen")!!
     }
 
 

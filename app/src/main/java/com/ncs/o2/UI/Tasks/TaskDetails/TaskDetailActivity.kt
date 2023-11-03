@@ -22,6 +22,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.databinding.ActivityTaskDetailBinding
@@ -30,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.datafaker.Faker
+import java.sql.Timestamp
 import javax.inject.Inject
 
 
@@ -54,6 +56,7 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
@@ -140,11 +143,12 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     private fun createRequestNotification(): Notification {
         return Notification(
+            notificationID = RandomIDGenerator.generateRandomId(),
             notificationType = NotificationType.TASK_REQUEST_RECIEVED_NOTIFICATION.toString(),
             taskID = Faker().number().randomDigit().toString(),
             title = "Armax wants to work on 12345",
             message = Faker().backToTheFuture().quote().toString(),
-            timeStamp = FieldValue.serverTimestamp(),
+            timeStamp = com.google.firebase.Timestamp.now().seconds,
             fromUser = Faker().funnyName().name().toString(),
             toUser = "userid1"
         )

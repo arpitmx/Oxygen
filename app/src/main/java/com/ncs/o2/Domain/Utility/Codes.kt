@@ -1,5 +1,6 @@
 package com.ncs.o2.Domain.Utility
 
+import com.google.firebase.storage.StorageReference
 import kotlin.String
 
 object Codes {
@@ -7,6 +8,7 @@ object Codes {
 
     object STRINGS {
 
+        var NAME: StorageReference = TODO()
         const val TIME_ZONE_INDIA = "Asia/Kolkata"
         const val INTENT_ERROR_CODE = "errorCode"
     }

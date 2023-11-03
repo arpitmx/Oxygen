@@ -26,8 +26,6 @@ class UserDetailsFragment : Fragment() {
         fun newInstance() = UserDetailsFragment()
     }
     lateinit var binding: FragmentUserDetailsBinding
-    private lateinit var sharedPref: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
     private lateinit var viewModel: UserDetailsViewModel
 
     override fun onCreateView(
@@ -35,8 +33,7 @@ class UserDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentUserDetailsBinding.inflate(inflater, container, false)
-        sharedPref = requireContext().getSharedPreferences("userDetails", AppCompatActivity.MODE_PRIVATE)
-        editor = sharedPref.edit()
+
         binding.btnLogin.setOnClickThrottleBounceListener{
             val name=binding.etName.text.toString()
             val designation=binding.etDesignation.text.toString()
@@ -50,13 +47,7 @@ class UserDetailsFragment : Fragment() {
                 "DETAILS_ADDED" to true,
                 "PHOTO_ADDED" to false,
                 )
-            editor.putString("USERNAME", name)
-            editor.putString("DESIGNATION", designation)
-            editor.putString("BIO", bio)
-            editor.putString("EMAIL", FirebaseAuth.getInstance().currentUser?.email!!)
-            editor.putInt("ROLE", 1)
-            editor.apply()
-            editor.commit()
+
             FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {

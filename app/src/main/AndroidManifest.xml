@@ -28,7 +28,7 @@
             android:name=".UI.Auth.AuthScreenActivity"
             android:exported="true" />
         <activity
-            android:name=".UI.UIComponents.StartScreen"
+            android:name=".UI.StartScreen.StartScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
             <intent-filter>

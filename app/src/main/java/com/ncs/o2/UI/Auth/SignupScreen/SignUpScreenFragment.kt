@@ -20,6 +20,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentSignUpBinding
@@ -133,6 +134,7 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                     "EMAIL" to binding.etEmail.text.toString(),
                     "DETAILS_ADDED" to false,
                     "PHOTO_ADDED" to false,
+                    "DP_URL" to "",
 
                     )
                 FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
@@ -146,8 +148,6 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                     }
 
 
-//                requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-//                requireActivity().finish()
 
             }
 
