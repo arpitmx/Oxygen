@@ -431,7 +431,7 @@ class FirestoreRepository @Inject constructor(
                   val segments = document.toObject(Segment::class.java)
                   segment_list.add(segments!!)
               }
-              Log.d("segements",segment_list.toString())
+                  Timber.d("segements",segment_list.toString())
               result(ServerResult.Success(segment_list))
           }
           .addOnFailureListener { exception ->

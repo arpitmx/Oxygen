@@ -32,8 +32,22 @@ object GlobalUtils {
         }
 
 
+
         fun singleBtnDialog(title: String, msg: String, btnText: String, positive: () -> Unit) {
             val builder = android.app.AlertDialog.Builder(context)
+            builder.setIcon(R.drawable.logogradhd)
+            builder.setTitle(title)
+            builder.setMessage(msg)
+            builder.setPositiveButton(btnText) { dialog, which ->
+                positive()
+            }
+            val dialog = builder.create()
+            dialog.show()
+        }
+
+        fun singleBtnDialog_ErrorConnection(title: String, msg: String, btnText: String, positive: () -> Unit) {
+            val builder = android.app.AlertDialog.Builder(context)
+            builder.setIcon(R.drawable.baseline_signal_wifi_connected_no_internet_4_24)
             builder.setTitle(title)
             builder.setMessage(msg)
             builder.setPositiveButton(btnText) { dialog, which ->
