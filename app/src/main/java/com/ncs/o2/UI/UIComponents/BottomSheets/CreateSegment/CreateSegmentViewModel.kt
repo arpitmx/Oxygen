@@ -87,23 +87,23 @@ class CreateSegmentViewModel @Inject constructor(
                             },400)
 
                             //Valid
-                            if (callback.data == 200){
-                                repository.createSegment(segment){result->
-                                    when (result) {
-
-                                        is ServerResult.Failure -> {
-                                        }
-
-                                        ServerResult.Progress -> {
-                                        }
-
-                                        is ServerResult.Success -> {
-                                            _segmencreationLiveData.postValue(ServerExceptions.segement_created.exceptionDescription)
-                                        }
-
-                                    }
-
-                                }
+//                            if (callback.data == 200){
+//                                repository.createSegment(segment){result->
+//                                    when (result) {
+//
+//                                        is ServerResult.Failure -> {
+//                                        }
+//
+//                                        ServerResult.Progress -> {
+//                                        }
+//
+//                                        is ServerResult.Success -> {
+//                                            _segmencreationLiveData.postValue(ServerExceptions.segement_created.exceptionDescription)
+//                                        }
+//
+//                                    }
+//
+//                                }
                                _showprogressLD.postValue(false)
                                 _segmentValidityLiveData.postValue(Codes.Status.VALID_INPUT)
                             }
@@ -111,6 +111,6 @@ class CreateSegmentViewModel @Inject constructor(
                         }
                     }
             }
-    }
+
 
 }
