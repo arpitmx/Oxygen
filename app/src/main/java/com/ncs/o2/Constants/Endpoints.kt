@@ -61,4 +61,14 @@ object Endpoints {
         const val CREATION_DATETIME="creation_datetime"
 
     }
+
+    object ROOM{
+
+        object NOTIFICATIONS{
+            const val NOTIFICATIONS_TABLE = "notifications"
+            const val NOTIFICATIONS_DATABASE = "NOTIFICATION-DB"
+        }
+
+
+    }
 }

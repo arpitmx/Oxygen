@@ -2,6 +2,7 @@ package com.ncs.o2.HelperClasses
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
@@ -41,6 +42,7 @@ object PrefManager {
 
 
     //Notification View Timestamp
+
     fun saveTimestamp(timestamp: Timestamp) {
         sharedPreferences.edit().putString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, timestamp.toString()).apply()
     }
@@ -49,9 +51,26 @@ object PrefManager {
         return sharedPreferences.getString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, "NONE")!!
     }
 
+
+
     fun clearTimestamp() {
         sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_TIME_STAMP).apply()
     }
+
+
+    //DP related
+
+    fun setDpUrl(url:String){
+        if (url != null){
+            editor.putString("DpUrl", url)
+        }
+        editor.apply()
+    }
+
+    fun getDpUrl(): String? {
+        return sharedPreferences.getString("Dpurl", null)
+    }
+
 
 
 
@@ -110,6 +129,11 @@ object PrefManager {
         val role = sharedPreferences.getInt(Endpoints.User.ROLE, 0)
         return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!)
     }
+
+    fun getCurrentUserEmail():String{
+        return getcurrentUserdetails().EMAIL
+    }
+
     fun lastaddedproject(project:String){
         val lastproject = sharedPreferences.getString("last_project", null)
         if (lastproject != null) {

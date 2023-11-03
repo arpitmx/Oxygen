@@ -10,7 +10,6 @@
     tools:context=".UI.Tasks.TasksHolderFragment"
     >
 
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,12 +23,14 @@
         android:gravity="center"
         android:textSize="35dp"
         android:textColor="@color/edit_text_hint"/>
-    <LinearLayout
-        android:layout_width="match_parent"
+
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="visible"
-        android:layout_height="match_parent">
+        >
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -38,8 +39,8 @@
         android:layoutAnimation="@anim/layout_animation_popscale"
         android:nestedScrollingEnabled="false"
         android:paddingBottom="40dp"
-        android:elevation="2dp"
         android:visibility="visible"
+        android:elevation="2dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <include
@@ -48,6 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="10dp"
+        android:visibility="visible"
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/progressBar"
@@ -57,14 +59,52 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         />
-    <ImageView
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/placeholder"
+        android:orientation="vertical"
         android:layout_gravity="center"
         android:visibility="gone"
-        android:src="@drawable/tasks_palceholder"/>
-    </LinearLayout>
+        android:translationY="-25dp"
+        android:background="@color/darkbg_main"
+        android:gravity="center"
+        android:paddingBottom="@dimen/progress_offset"
+        >
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:layout_gravity="center"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:src="@drawable/tasks_placeholder_grey"
+       />
+
+    <TextView
+        android:id="@+id/title_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:text="@string/no_current_tasks_here"
+        android:textColor="@color/account"
+        android:textSize="16dp"
+        android:translationY="-30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/btnBack"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
 

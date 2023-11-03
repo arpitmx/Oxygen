@@ -277,6 +277,12 @@ object ExtensionsUtil {
         this.startAnimation(animation)
     }
 
+    fun View.blink(context: Context) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context,R.anim.blink)
+        this.startAnimation(animation)
+    }
+
     fun View.rotateInfinityReverse(context: Context) = run {
         this.clearAnimation()
         val animation = AnimationUtils.loadAnimation(context, R.anim.rotateinfirev)
