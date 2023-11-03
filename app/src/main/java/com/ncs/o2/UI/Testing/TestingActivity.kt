@@ -84,7 +84,7 @@ class TestingActivity: AppCompatActivity() {
                 deadline = "${Random(System.currentTimeMillis()).nextInt(1,5)} days",
                 project_ID = "Versa",
                 segment = "Development", //change segments here //like Design
-                section = "Completed",  //Testing // Completed //Ready //Ongoing
+                section = "Ready",  //Testing // Completed //Ready //Ongoing
                 assignee_DP_URL = "https://picsum.photos/200",
                 completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),

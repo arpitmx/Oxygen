@@ -60,7 +60,7 @@ class FirestoreRepository @Inject constructor(
 
     private val storageReference = FirebaseStorage.getInstance().reference
     private val TAG: String = FirestoreRepository::class.java.simpleName
-    lateinit var serverErrorCallback: ServerErrorCallback
+    lateinit var serverErrorCallback : ServerErrorCallback
 //    private val editor : SharedPreferences.Editor by lazy {
 //        pref.edit()
 //    }
@@ -70,19 +70,18 @@ class FirestoreRepository @Inject constructor(
                 "/${task.project_ID}" +
                 "/${Endpoints.Project.SEGMENT}" +
                 "/${task.segment}" +
-                "/${Endpoints.Project.TASKS}" +
+                "/${Endpoints.Project.TASKS}"+
                 "/${task.id}" +
                 "/"
 
     }
 
     fun getNotificationsRef(toUser: String): CollectionReference {
-        return firestore.collection(Endpoints.USERS).document(toUser)
-            .collection(Endpoints.Notifications.NOTIFICATIONS)
+        return firestore.collection(Endpoints.USERS).document(toUser).collection(Endpoints.Notifications.NOTIFICATIONS)
         //Endpoints.USERS+"/${notification.fromUser}"+"/${Endpoints.Notifications.NOTIFICATIONS}"
     }
 
-    fun getNotificationTimeStampPath(): String {
+    fun getNotificationTimeStampPath():String{
 //        return Endpoints.USERS +
 //                "/${FirebaseAuth.getInstance().currentUser!!.email}"
 
@@ -90,18 +89,16 @@ class FirestoreRepository @Inject constructor(
                 "/userid1"
 
     }
-
     override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit) {
 
-        val currentTimeStamp = HashMap<String, Any>()
-        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_TIME_STAMP] =
-            FieldValue.serverTimestamp()
+        val currentTimeStamp = HashMap<String,Any>()
+        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_TIME_STAMP] = FieldValue.serverTimestamp()
 
         return try {
             serverResult(ServerResult.Progress)
             firestore.document(getNotificationTimeStampPath()).update(currentTimeStamp).await()
             serverResult(ServerResult.Success(200))
-        } catch (e: Exception) {
+        } catch (e:Exception){
             serverResult(ServerResult.Failure(e))
         }
     }
@@ -120,7 +117,7 @@ class FirestoreRepository @Inject constructor(
             getNotificationsRef(notification.toUser).add(notification).await()
             serverResult(ServerResult.Success(200))
 
-        } catch (e: Exception) {
+        }catch (e : Exception){
             serverResult(ServerResult.Failure(e))
         }
 
@@ -193,15 +190,15 @@ class FirestoreRepository @Inject constructor(
 
     fun getProjectRef(projectID: String): DocumentReference {
         return firestore.collection(Endpoints.PROJECTS).document(projectID)
-        // return Endpoints.PROJECTS + "/${projectID}"
+    // return Endpoints.PROJECTS + "/${projectID}"
     }
 
-    fun generateRandomID(id: IDType): String {
+    fun generateRandomID(id:IDType): String {
 
         val random = Random(System.currentTimeMillis())
         val randomNumber = random.nextInt(10000, 99999)
 
-        when (id) {
+        when(id){
             IDType.UserID -> return "#U$randomNumber"
             IDType.TaskID -> return "#T$randomNumber"
             IDType.SegmentID -> return "#S$randomNumber"
@@ -209,63 +206,63 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    fun getProjectPath(projectID: String): String {
+    fun getProjectPath(projectID: String):String{
         return Endpoints.PROJECTS + "/${projectID}" + "/"
     }
 
-    fun getTasksRepository(projectPath: String, isDuplicate: (List<String>) -> Unit) {
-        firestore.document(projectPath)
-            .get(Source.SERVER)
-            .addOnSuccessListener { snap ->
-                if (snap.exists()) {
-                    val taskMap = snap.get(Endpoints.Project.TASKS) as Map<String, String>
-                    val taskArrayList = taskMap.keys.toList()
-                    isDuplicate(taskArrayList)
+    fun getTasksRepository(projectPath: String, isDuplicate : (List<String>)->Unit){
+            firestore.document(projectPath)
+                .get(Source.SERVER)
+                .addOnSuccessListener { snap->
+                    if (snap.exists()){
+                        val taskMap = snap.get(Endpoints.Project.TASKS) as Map<String, String>
+                        val taskArrayList = taskMap.keys.toList()
+                        isDuplicate(taskArrayList)
 
-                } else {
-                    Timber.tag(tag = TAG).d("No tasks exists")
-                    isDuplicate(listOf())
+                    }else{
+                        Timber.tag(tag = TAG).d("No tasks exists")
+                       isDuplicate(listOf())
+                    }
                 }
-            }
-            .addOnFailureListener {
-                serverErrorCallback.handleServerException(it.message!!)
-            }
+                .addOnFailureListener{
+                    serverErrorCallback.handleServerException(it.message!!)
+                }
 
     }
 
 
-    fun uniqueIDfromList(idType: IDType, list: List<String>): String {
-        var uniqueID: String
-
-        when (idType) {
-            IDType.UserID -> {
-                do {
-                    uniqueID = generateRandomID(idType)
-                } while (list.contains(uniqueID))
-            }
-
-            IDType.TaskID -> {
-                uniqueID = generateRandomID(idType)
-
-            }
-
-            IDType.SegmentID -> {
-                uniqueID = generateRandomID(idType)
-
-            }
-        }
-
-        return uniqueID
-    }
 
 
-    override fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit) {
+   fun uniqueIDfromList(idType: IDType, list: List<String>):String{
+       var uniqueID : String
+
+       when(idType){
+           IDType.UserID -> {
+               do {
+                   uniqueID = generateRandomID(idType)
+               } while (list.contains(uniqueID))
+           }
+           IDType.TaskID ->{
+               uniqueID = generateRandomID(idType)
+
+           }
+           IDType.SegmentID -> {
+               uniqueID = generateRandomID(idType)
+
+           }
+       }
+
+       return uniqueID
+   }
+
+
+    override fun createUniqueID(idType: IDType, projectID: String, generatedID:(String)->Unit){
 
         val projectPath = getProjectPath(projectID)
-        when (idType) {
-            IDType.TaskID -> {
-                getTasksRepository(projectPath) { tasksArray ->
-                    generatedID(uniqueIDfromList(idType, tasksArray))
+        when(idType){
+            IDType.TaskID ->{
+                    getTasksRepository(projectPath) { tasksArray->
+                            generatedID(uniqueIDfromList(idType,tasksArray))
                 }
             }
 
@@ -285,7 +282,7 @@ class FirestoreRepository @Inject constructor(
         this.serverErrorCallback = callback
     }
 
-    private fun getSegmentRef(task: Task): DocumentReference {
+    private fun getSegmentRef(task: Task):DocumentReference{
         return firestore.collection(Endpoints.PROJECTS)
             .document(task.project_ID)
             .collection(Endpoints.Project.SEGMENT)
@@ -293,18 +290,18 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit) {
+    override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
 
         val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
 
         return try {
 
-            serverResult(ServerResult.Progress)
-            firestore.document(getTaskPath(task)).set(task).await()
-            getSegmentRef(task).apply { update(appendTaskID).await() }
-            getProjectRef(task.project_ID).apply { update(appendTaskID).await() }
-            serverResult(ServerResult.Success(200))
-        } catch (exception: Exception) {
+        serverResult(ServerResult.Progress)
+//        firestore.document(getTaskPath(task)).set(task).await()
+        getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task).await()
+        serverResult(ServerResult.Success(200))
+        }
+        catch (exception:Exception) {
             serverResult(ServerResult.Failure(exception))
         }
 
@@ -315,7 +312,7 @@ class FirestoreRepository @Inject constructor(
         Handler(Looper.getMainLooper()).postDelayed({
             var currentUser: CurrentUser?
             firestore.collection(Endpoints.USERS)
-                .document(Endpoints.TESTUSERID)
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .get(Source.SERVER)
                 .addOnSuccessListener { snap ->
                     if (snap.exists()) {
@@ -360,7 +357,16 @@ class FirestoreRepository @Inject constructor(
     }
 
     override fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit) {
+        return try {
 
+            serverResult(ServerResult.Progress)
+            firestore.collection(Endpoints.PROJECTS)
+                .document(segment.project_ID).collection(Endpoints.Project.SEGMENT).document(segment.segment_NAME).set(segment)
+            serverResult(ServerResult.Success(200))
+        }
+        catch (exception:Exception) {
+            serverResult(ServerResult.Failure(exception))
+        }
     }
 
 
@@ -372,36 +378,16 @@ class FirestoreRepository @Inject constructor(
 
         result(ServerResult.Progress)
 
-        getProjectRef(projectID).get(Source.SERVER)
+        getProjectRef(projectID).collection(Endpoints.Project.SEGMENT).get(Source.SERVER)
             .addOnSuccessListener { snapshot ->
-
-
-                if (!snapshot.exists() or (snapshot == null)) {
-                    Timber.tag(TAG)
-                        .d("Exception : ${ServerExceptions.projectDoesNotExists.exceptionDescription}")
-                    result(ServerResult.Failure(ServerExceptions.projectDoesNotExists))
-                    return@addOnSuccessListener
-                }
-
-                val segmentsMap: Map<String, String> =
-                    snapshot.get(Endpoints.Project.ALL_SEGMENT) as Map<String, String>
-
-                if (segmentsMap.isEmpty()) {
-                    result(ServerResult.Success(false))
-                    Timber.tag(TAG).d("Map is empty")
-
-                } else {
-                    val containsValue = segmentsMap.containsValue(fieldName)
-                    if (containsValue) {
-                        Timber.tag(TAG)
-                            .d("Segment name present : ${ServerExceptions.duplicateNameException.exceptionDescription}")
+                for (document in snapshot.documents) {
+                    val fieldValue = document.getString("segment_NAME")
+                    if (fieldValue == fieldName) {
                         result(ServerResult.Success(true))
-                    } else {
-                        Timber.tag(TAG).d("Segment name original")
-                        result(ServerResult.Success(false))
+                        return@addOnSuccessListener
                     }
                 }
-
+                result(ServerResult.Success(false))
             }
             .addOnFailureListener {
                 Timber.tag(TAG).d("Firestore Exception : ${it}")
@@ -409,47 +395,18 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
-//    fun uploadUserDP(
-//        bitmap: Bitmap,
-//        result: (ServerResult<Int>) -> Unit
-//    ){
-//        val imageFileName = "${FirebaseAuth.getInstance().currentUser?.email}/DP/dp.JPEG"
-//        val imageRef = storageReference.child(imageFileName)
-//        val baos = ByteArrayOutputStream()
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
-//        val data = baos.toByteArray()
-//        val uploadTask = imageRef.putBytes(data)
-//        uploadTask.addOnSuccessListener { taskSnapshot ->
-//            //getImageDownloadUrl(imageRef)
-//            val userData = mapOf(
-//                "PHOTO_ADDED" to true,
-//            )
-//            FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
-//                .update(userData)
-//                .addOnSuccessListener {
-//                    result(ServerResult.Success())
-//                }
-//                .addOnFailureListener { e ->
-//                    result(ServerResult.Failure())
-//                }
-//
-//        }.addOnFailureListener { exception ->
-//            //Toast.makeText(requireContext(), "Image upload failed", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-
     fun getTasks(
         projectName: String,
         segmentName: String,
         sectionName: String,
         result: (ServerResult<List<Task>>) -> Unit
     ) {
+
         firestore.collection(Endpoints.PROJECTS)
             .document(projectName)
-            .collection("SEGMENTS")
-            .document(segmentName)
-            .collection("TASKS")
+            .collection(Endpoints.Project.TASKS)
             .whereEqualTo("section", sectionName)
+            .whereEqualTo("segment",segmentName)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<Task>()
@@ -463,5 +420,21 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
-
+    fun getSegments(projectName: String,result: (ServerResult<List<Segment>>) -> Unit
+    ){
+      firestore.collection(Endpoints.PROJECTS).document(projectName).collection(Endpoints.Project.SEGMENT)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+              val segment_list = mutableListOf<Segment>()
+              for (document in querySnapshot.documents) {
+                  val segments = document.toObject(Segment::class.java)
+                  segment_list.add(segments!!)
+              }
+              Log.d("segements",segment_list.toString())
+              result(ServerResult.Success(segment_list))
+          }
+          .addOnFailureListener { exception ->
+              result(ServerResult.Failure(exception))
+          }
+    }
 }

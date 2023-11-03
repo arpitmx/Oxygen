@@ -3,6 +3,7 @@ package com.ncs.o2.UI.Tasks.Sections
 import TaskListAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +13,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
@@ -45,6 +49,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
     val state = arrayOf(1)
 
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,7 +83,22 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     }
 
     private fun setupViews() {
-        setupRecyclerView()
+
+        if (segmentName=="Select Segment"){
+            binding.placeholderText.visible()
+            binding.layout.gone()
+            activityBinding.gioActionbar.tabLayout.gone()
+            activityBinding.gioActionbar.searchCont.gone()
+            activityBinding.gioActionbar.line.gone()
+        }
+        else {
+            binding.placeholderText.gone()
+            binding.layout.visible()
+            activityBinding.gioActionbar.tabLayout.visible()
+            activityBinding.gioActionbar.searchCont.visible()
+            activityBinding.gioActionbar.line.visible()
+            setupRecyclerView()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -150,6 +170,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                 }
 
             }
+
         }
 
 
@@ -236,5 +257,6 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         startActivity(Intent(requireContext(), TaskDetailActivity::class.java))
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
+
 
 }
