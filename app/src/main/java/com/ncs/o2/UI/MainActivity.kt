@@ -246,6 +246,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
         projects.addAll(userProjects)
+        PrefManager.putProjectsList(userProjects)
         projectListAdapter.notifyDataSetChanged()
     }
 
