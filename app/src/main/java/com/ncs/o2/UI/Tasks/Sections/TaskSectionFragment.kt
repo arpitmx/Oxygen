@@ -160,8 +160,11 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     })
                     binding.lottieProgressInclude.progressLayout.gone()
                     if (taskList.isEmpty()){
-                        binding.recyclerView.gone()
+                        binding.layout.gone()
                         binding.placeholder.visible()
+                    }else{
+                        binding.layout.visible()
+                        binding.placeholder.gone()
                     }
                 }
                 is ServerResult.Failure -> {

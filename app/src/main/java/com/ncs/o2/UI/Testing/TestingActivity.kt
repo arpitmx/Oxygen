@@ -2,7 +2,6 @@ package com.ncs.o2.UI.Testing
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.room.Room
 import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.TestingConfig
@@ -21,7 +20,6 @@ import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.databinding.ActivityTestingBinding
-import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,9 +103,9 @@ class TestingActivity: AppCompatActivity() {
                 status = Random(System.currentTimeMillis()).nextInt(0,3),
                 assigner = Faker().funnyName().name().toString(),
                 deadline = "${Random(System.currentTimeMillis()).nextInt(1,5)} days",
-                project_ID = "Versa",
+                project_ID = "Odin",
                 segment = "Development", //change segments here //like Design
-                section = "Ready",  //Testing // Completed //Ready //Ongoing
+                section = "Ongoing",  //Testing // Completed //Ready for Test //Ongoing
                 assignee_DP_URL = "https://picsum.photos/200",
                 completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),

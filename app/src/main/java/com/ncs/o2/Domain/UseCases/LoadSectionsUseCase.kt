@@ -5,7 +5,6 @@ import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.Later
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 /*

@@ -2,12 +2,6 @@ package com.ncs.versa.Hilt
 
 import android.content.Context
 import androidx.room.Room
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.ncs.o2.Domain.Interfaces.AuthRepository
-import com.ncs.o2.Domain.Interfaces.Repository
-import com.ncs.o2.Domain.Repositories.FirebaseAuthRepository
-import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Room.NotificationRepository.NotificationDatabase
 import com.ncs.versa.Constants.Endpoints
 import dagger.Module
@@ -15,7 +9,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import dagger.hilt.internal.aggregatedroot.codegen._com_ncs_o2_O2Application
 import javax.inject.Singleton
 
 /*

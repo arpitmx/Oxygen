@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Domain.Models.CurrentUser
@@ -37,6 +38,7 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentProfilePictureSelectionBinding
 import com.ncs.o2.databinding.FragmentUserDetailsBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -66,11 +68,25 @@ class ProfilePictureSelectionFragment : Fragment() {
 
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-
-
+                              savedInstanceState: Bundle?): View {
 
         binding = FragmentProfilePictureSelectionBinding.inflate(inflater, container, false)
+        setupViews()
+        return binding.root
+
+    }
+
+    private fun setupViews() {
+
+
+        setUpOnclickListeners()
+
+
+    }
+
+    private fun setUpOnclickListeners() {
+
+        // For taking permissions
 
         binding.btnReselect.setOnClickThrottleBounceListener{
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -83,24 +99,22 @@ class ProfilePictureSelectionFragment : Fragment() {
                 pickImage()
             }
         }
+
+        // For getting the bitmap from local storage
+
         binding.next.setOnClickThrottleBounceListener {
             binding.layout.gone()
             binding.progressBar.visible()
-            if (bitmap!=null) {
-                Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
-                uploadImageToFirebaseStorage(bitmap!!)
-            }
-            else{
+
+            if (bitmap==null) {
                 Toast.makeText(requireContext(),"Profile Pic can't be empty",Toast.LENGTH_LONG).show()
+                return@setOnClickThrottleBounceListener
             }
-//            binding.layout.gone()
-//            binding.progressBar.visible()
-//            if (bitmap!=null) {
-//                uploadImageToFirebaseStorage(bitmap!!)
-//            }
-//            else{
-//                Toast.makeText(requireContext(),"Profile Pic can't be empty",Toast.LENGTH_LONG).show()
-//            }
+
+            Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
+            uploadImageToFirebaseStorage(bitmap!!)
+
+
             val userData = mapOf(
                 "PHOTO_ADDED" to true,
                 "PROJECTS" to listOf("NCSOxygen")
@@ -110,18 +124,21 @@ class ProfilePictureSelectionFragment : Fragment() {
                 .update(userData)
                 .addOnSuccessListener {
                     FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
-                        .get()
+                        .get(Source.SERVER)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 val document = task.result
                                 if (document != null && document.exists()) {
-                                    val bio=document.getString("BIO")
-                                    val designation=document.getString("DESIGNATION")
-                                    val email=document.getString("EMAIL")
-                                    val username=document.getString("USERNAME")
-                                    val role=document.get("ROLE")
+
+                                    val bio= Endpoints.User.BIO
+                                    val designation= Endpoints.User.DESIGNATION
+                                    val email= Endpoints.User.EMAIL
+                                    val username= Endpoints.User.USERNAME
+                                    val role= Endpoints.User.ROLE
+
                                     PrefManager.initialize(requireContext())
                                     PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toInt()))
+
                                     requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                     requireActivity().finish()
                                 }
@@ -135,11 +152,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                 }
 
-
         }
-
-
-        return binding.root
 
     }
 

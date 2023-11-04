@@ -13,7 +13,7 @@ import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelect
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
-Description : This is the repository interface for extending them to the different Repositories 
+Description : This is the repository interface for extending them to the different Repositories
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
