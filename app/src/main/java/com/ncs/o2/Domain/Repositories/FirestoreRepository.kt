@@ -1,8 +1,10 @@
 package com.ncs.o2.Domain.Repositories
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +23,9 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.HelperClasses.ServerExceptions
+import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
+import com.ncs.o2.UI.MainActivity
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -30,7 +35,7 @@ import kotlin.random.Random
 
 /*
 File : FirestoreRepository.kt -> com.ncs.o2.UI
-Description : This is the class for firestore repository
+Description : This is the class for firestore repository 
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
@@ -277,11 +282,9 @@ class FirestoreRepository @Inject constructor(
         this.serverErrorCallback = callback
     }
 
-    private fun getSegmentRef(task: Task):CollectionReference{
+    private fun getSegmentRef(task: Task):DocumentReference{
         return firestore.collection(Endpoints.PROJECTS)
             .document(task.project_ID)
-            .collection(Endpoints.Project.TASKS)
-
 
     }
 
@@ -294,7 +297,7 @@ class FirestoreRepository @Inject constructor(
 
         serverResult(ServerResult.Progress)
 //        firestore.document(getTaskPath(task)).set(task).await()
-        getSegmentRef(task).document(task.id).set(task).await()
+        getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task).await()
         serverResult(ServerResult.Success(200))
         }
         catch (exception:Exception) {

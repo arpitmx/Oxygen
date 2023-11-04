@@ -127,8 +127,16 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
             when (result) {
                 is ServerResult.Success -> {
                     val task = result.data
+                    taskList.clear()
                     for (i in 0 until task.size){
                         taskList.add(task[i])
+                    }
+                    if (taskList.isEmpty()) {
+                        binding.layout.gone()
+                        binding.placeholder.visible()
+                    } else {
+                        binding.layout.visible()
+                        binding.placeholder.gone()
                     }
                     recyclerView = binding.recyclerView
                     taskListAdapter = TaskListAdapter()
@@ -158,14 +166,8 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                             }
                         }
                     })
+
                     binding.lottieProgressInclude.progressLayout.gone()
-                    if (taskList.isEmpty()){
-                        binding.layout.gone()
-                        binding.placeholder.visible()
-                    }else{
-                        binding.layout.visible()
-                        binding.placeholder.gone()
-                    }
                 }
                 is ServerResult.Failure -> {
                     val errorMessage = result.exception.message

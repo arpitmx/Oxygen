@@ -59,28 +59,28 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         super.onViewCreated(view, savedInstanceState)
         PrefManager.initialize(requireContext())
         segmentName=PrefManager.getcurrentsegment()
-        if (sectionsList!=null) {
-            val sectionsList = PrefManager.getsectionsList().toMutableList()
 
-            PrefManager.list.observe(viewLifecycleOwner,Observer{newList->
-                setUpViewPager(newList.toMutableList())
-            })
+        val sectionsList = PrefManager.getsectionsList().toMutableList()
 
-            PrefManager.selectedPosition.observe(viewLifecycleOwner, Observer { newPosition ->
-                setUpViewPager(sectionsList)
-            })
-            mainActivity.segmentText.observe(viewLifecycleOwner, Observer { newSegmentText ->
-                segmentName = newSegmentText
-                setUpViewPager(sectionsList)
-            })
+        PrefManager.list.observe(viewLifecycleOwner,Observer{newList->
+            setUpViewPager(newList.toMutableList())
+        })
+
+        PrefManager.selectedPosition.observe(viewLifecycleOwner, Observer { newPosition ->
             setUpViewPager(sectionsList)
-        }
+        })
+        mainActivity.segmentText.observe(viewLifecycleOwner, Observer { newSegmentText ->
+            segmentName = newSegmentText
+            setUpViewPager(sectionsList)
+        })
+        setUpViewPager(sectionsList)
+
     }
 
     private fun setUpViewPager(list:MutableList<String>) {
 
         PrefManager.initialize(requireContext())
-        val adapter = TaskSectionViewPagerAdapter(this, list.size)
+        val adapter = TaskSectionViewPagerAdapter(this, list.size,list)
         binding.viewPager2.adapter = adapter
         setUpTabsLayout(list)
     }
