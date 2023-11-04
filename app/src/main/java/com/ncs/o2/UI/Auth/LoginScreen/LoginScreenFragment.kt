@@ -141,7 +141,6 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                                                 PrefManager.initialize(requireContext())
                                                 PrefManager.putProjectsList(document.get("PROJECTS") as List<String>)
                                                 PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toInt()))
-
                                                 startActivity(
                                                     Intent(
                                                         requireContext(),
