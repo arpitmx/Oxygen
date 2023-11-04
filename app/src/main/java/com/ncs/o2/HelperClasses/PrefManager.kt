@@ -62,16 +62,15 @@ object PrefManager {
 
     fun setDpUrl(url:String){
         if (url != null){
-            editor.putString("DpUrl", url)
+            editor.putString(Endpoints.User.DP_URL, url)
         }
+
         editor.apply()
     }
 
     fun getDpUrl(): String? {
-        return sharedPreferences.getString("Dpurl", null)
+        return sharedPreferences.getString(Endpoints.User.DP_URL, null)
     }
-
-
 
 
     // Project related
@@ -117,7 +116,7 @@ object PrefManager {
         editor.putString(Endpoints.User.EMAIL,user.EMAIL)
         editor.putString(Endpoints.User.BIO,user.BIO)
         editor.putString(Endpoints.User.DESIGNATION,user.DESIGNATION)
-        editor.putInt(Endpoints.User.ROLE,user.ROLE)
+        editor.putLong(Endpoints.User.ROLE,user.ROLE)
         editor.apply()
     }
     fun getcurrentUserdetails():CurrentUser{
@@ -126,8 +125,8 @@ object PrefManager {
         val email = sharedPreferences.getString(Endpoints.User.EMAIL, "")
         val bio = sharedPreferences.getString(Endpoints.User.BIO, "")
         val designation = sharedPreferences.getString(Endpoints.User.DESIGNATION, "")
-        val role = sharedPreferences.getInt(Endpoints.User.ROLE, 0)
-        return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!)
+        val role = sharedPreferences.getLong(Endpoints.User.ROLE, 0)
+        return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role)
     }
 
     fun getCurrentUserEmail():String{

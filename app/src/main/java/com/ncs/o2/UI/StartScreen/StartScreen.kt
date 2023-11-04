@@ -13,6 +13,11 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.fadeIn
+import androidx.core.content.ContextCompat
+import androidx.core.os.postDelayed
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -22,6 +27,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.MainActivity
@@ -42,7 +48,7 @@ class StartScreen : AppCompatActivity() {
     }
 
     companion object {
-        val DELAY = 500L
+        val DELAY = 200L
         val DELAY_ACTIVITY_START = 0L
     }
 
@@ -63,7 +69,7 @@ class StartScreen : AppCompatActivity() {
 
         ball = binding.ball
         ball.rotateInfinity(this)
-        val maxsize = 12f
+        val maxsize = 1000f
         val change = 3f
 
         ball.setOnClickThrottleBounceListener{
@@ -126,11 +132,22 @@ class StartScreen : AppCompatActivity() {
     private fun setBallAnimator() {
 
         ball = binding.ball
-        ball.rotateInfinity(this)
-        val maxsize = 15f
+        PrefManager.initialize(this)
 
-        valueAnimator = ValueAnimator.ofFloat(1f, maxsize)
-        valueAnimator.setDuration(400L)
+//        if (PrefManager.getDpUrl()!=null){
+//        Glide.with(this)
+//            .load(PrefManager.getDpUrl())
+//            .placeholder(R.drawable.profile_pic_placeholder)
+//            .error(R.drawable.logogradhd)
+//            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+//            .into(ball)
+//        }
+
+        ball.rotateInfinity(this)
+        val maxsize = 12f
+
+        valueAnimator = ValueAnimator.ofFloat(2f, maxsize)
+        valueAnimator.setDuration(300L)
 
         valueAnimator.addUpdateListener {
 
@@ -180,58 +197,7 @@ class StartScreen : AppCompatActivity() {
 
             if (FirebaseAuth.getInstance().currentUser != null) {
 
-
-                FirebaseFirestore.getInstance().collection("Users")
-                    .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                    .get(Source.SERVER)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val document = task.result
-                            if (document != null && document.exists()) {
-                                val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
-                                val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
-
-                                if (isDetailsAdded == true && isPhotoAdded == true) {
-                                    Handler(Looper.getMainLooper()).postDelayed(
-                                        {
-                                            ball.animation.cancel()
-                                            ball.post {
-                                                valueAnimator.start()
-                                            }
-                                        }, DELAY
-                                    )
-
-
-                                } else if (isDetailsAdded == false) {
-                                    val intent = Intent(this, AuthScreenActivity::class.java)
-                                    intent.putExtra("isDetailsAdded", "false")
-                                    intent.putExtra("showchooser", "false")
-                                    startActivity(intent)
-                                    finishAffinity()
-                                } else if (isPhotoAdded == false) {
-                                    val intent = Intent(this, AuthScreenActivity::class.java)
-                                    intent.putExtra("isPhotoAdded", "false")
-                                    intent.putExtra("showchooser", "false")
-                                    startActivity(intent)
-                                    finishAffinity()
-                                }
-                            }
-                        } else {
-
-                            val exception = task.exception
-                            exception?.printStackTrace()
-                            Toast.makeText(this, "Error in loading", Toast.LENGTH_SHORT).show()
-
-                            util.singleBtnDialog_ErrorConnection(
-                                "Failure in loading",
-                                "Check your internet connection and try again. ",
-                                "Okay"
-                            ) {
-                                finishAffinity()
-                            }
-                        }
-                    }
-
+                preloadData()
 
             } else {
                 Handler(Looper.myLooper()!!).postDelayed({
@@ -248,4 +214,64 @@ class StartScreen : AppCompatActivity() {
 
 
     }
+
+    private fun preloadData(){
+        FirebaseFirestore.getInstance().collection("Users")
+            .document(FirebaseAuth.getInstance().currentUser?.email!!)
+            .get(Source.SERVER)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val document = task.result
+                    if (document != null && document.exists()) {
+                        val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
+                        val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
+
+                        if (isDetailsAdded == true && isPhotoAdded == true) {
+                            Handler(Looper.getMainLooper()).postDelayed(
+                                {
+                                    ball.animation.cancel()
+                                    ball.post {
+                                        valueAnimator.start()
+                                    }
+                                }, DELAY
+                            )
+
+
+                        } else if (isDetailsAdded == false) {
+                            val intent = Intent(this, AuthScreenActivity::class.java)
+                            intent.putExtra("isDetailsAdded", "false")
+                            intent.putExtra("showchooser", "false")
+                            startActivity(intent)
+                            finishAffinity()
+                        } else if (isPhotoAdded == false) {
+                            val intent = Intent(this, AuthScreenActivity::class.java)
+                            intent.putExtra("isPhotoAdded", "false")
+                            intent.putExtra("showchooser", "false")
+                            startActivity(intent)
+                            finishAffinity()
+                        }
+                    }
+                } else {
+
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        val tintColor = ContextCompat.getColor(this, R.color.redx)
+                        binding.ball.setColorFilter(tintColor)
+
+                        val exception = task.exception
+                        exception?.printStackTrace()
+                        // Toast.makeText(this, "Error in loading", Toast.LENGTH_SHORT).show()
+
+                        util.showActionSnackbar(binding.root,"Check connection and try again",150000,"Retry") {
+                            val tintColor = ContextCompat.getColor(this, R.color.pureblack)
+                            binding.ball.setColorFilter(tintColor)
+                            preloadData()
+                        }
+                    },2000)
+
+                }
+            }
+    }
+
+
 }

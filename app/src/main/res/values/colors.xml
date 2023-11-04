@@ -13,6 +13,7 @@
     <color name="green">@color/s1bg</color>
     <color name="yello">@color/s3bg</color>
     <color name="red">@color/secondaryPink</color>
+    <color name="redx">#FF5252</color>
 
 
     <color name="s1bg">#A7FFA5</color>

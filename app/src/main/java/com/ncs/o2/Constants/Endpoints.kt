@@ -14,13 +14,22 @@ object Endpoints {
         const val SHAREDPREFERENCES = "O2PREF"
     }
 
+
+    object Storage{
+        const val DP_PATH = "/DP/dp"
+    }
+
+
     object User {
+        val DP_URL = "DP_URL"
         const val PROJECTS = "PROJECTS"
-        const val EMAIL = "email"
-        const val USERNAME = "username"
-        const val BIO = "bio"
-        const val DESIGNATION = "designation"
-        const val ROLE = "role"
+        const val EMAIL = "EMAIL"
+        const val USERNAME = "USERNAME"
+        const val BIO = "BIO"
+        const val DESIGNATION = "DESIGNATION"
+        const val ROLE = "ROLE"
+        const val PHOTO_ADDED = "PHOTO_ADDED"
+        const val DETAILS_ADDED = "DETAILS_ADDED"
 
     }
 

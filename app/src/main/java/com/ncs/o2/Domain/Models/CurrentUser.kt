@@ -23,5 +23,5 @@ data class CurrentUser (
             val PROJECTS: List<String> = listOf(),
             val BIO:String="",
             val DESIGNATION:String="",
-            val ROLE:Int=1,
+            val ROLE:Long=1,
 )
