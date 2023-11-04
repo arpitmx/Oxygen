@@ -190,8 +190,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
         viewModel.projectListLiveData.observe(this) { projectList ->
-
-            projects=projectList!!.toMutableList()
+            projects=PrefManager.getProjectsList().toMutableList()
             projectListAdapter = ListAdapter(this, projects)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }

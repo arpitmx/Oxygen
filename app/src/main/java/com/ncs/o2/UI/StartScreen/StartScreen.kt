@@ -22,6 +22,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.MainActivity
@@ -51,7 +52,7 @@ class StartScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        PrefManager.initialize(this)
         setBallAnimator()
         setUpViews(TestingConfig.isTesting)
 
@@ -190,7 +191,8 @@ class StartScreen : AppCompatActivity() {
                             if (document != null && document.exists()) {
                                 val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
                                 val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
-
+                                val projectsList=document.get("PROJECTS") as List<String>
+                                PrefManager.putProjectsList(projectsList)
                                 if (isDetailsAdded == true && isPhotoAdded == true) {
                                     Handler(Looper.getMainLooper()).postDelayed(
                                         {
@@ -231,8 +233,6 @@ class StartScreen : AppCompatActivity() {
                             }
                         }
                     }
-
-
             } else {
                 Handler(Looper.myLooper()!!).postDelayed({
                     val intent = Intent(this, AuthScreenActivity::class.java)

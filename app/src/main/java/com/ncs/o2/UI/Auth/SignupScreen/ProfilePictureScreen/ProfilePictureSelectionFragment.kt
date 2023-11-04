@@ -121,6 +121,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                     val username=document.getString("USERNAME")
                                     val role=document.get("ROLE")
                                     PrefManager.initialize(requireContext())
+                                    PrefManager.putProjectsList(listOf("NCSOxygen"))
                                     PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toInt()))
                                     requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                     requireActivity().finish()
