@@ -9,13 +9,13 @@
     <dimen name="splash_btn_width">130dp</dimen>
     <dimen name="divider_height">2dp</dimen>
     <dimen name="ic_nav_padding_start">16dp</dimen>
-    <dimen name="layout_in_between_margins">18dp</dimen>
+    <dimen name="layout_in_between_margins">15dp</dimen>
     <dimen name="divider_start_and_end_margins">8dp</dimen>
     <dimen name="divider_top_and_bottom_margins">8dp</dimen>
     <dimen name="_5dp">5dp</dimen>
     <dimen name="margin_top">5dp</dimen>
     <dimen name="margin_top_30dp">30dp</dimen>
-    <dimen name="padding_bottom_offset">4dp</dimen>
+    <dimen name="padding_bottom_offset">3dp</dimen>
     <dimen name="action_bar_title">20dp</dimen>
     <dimen name="progress_offset">40dp</dimen>
 </resources>

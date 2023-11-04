@@ -3,7 +3,15 @@
 
         <alpha
             android:fromAlpha="1.0"
-            android:toAlpha="0.0"
+            android:toAlpha="0.1"
+            android:duration="1000"
+            android:repeatCount="-1"
+
+            />
+
+        <alpha
+            android:fromAlpha="0.1"
+            android:toAlpha="1.0"
             android:duration="1000"
             android:repeatCount="-1"
 

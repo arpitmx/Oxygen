@@ -67,7 +67,7 @@ class CreateSectionViewModel @Inject constructor(
 
                     //Valid
                     if (callback.data == 200){
-                        repository.createSegment(segment){result->
+                        repository.createSegment(segment){ result->
                             when (result) {
 
                                 is ServerResult.Failure -> {

@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 /*
 File : FirebaseAuthRepository.kt -> com.ncs.o2.Domain.Repositories
-Description : Repository for Firebase Auth 
+Description : Repository for Firebase Auth
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx

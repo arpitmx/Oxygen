@@ -10,8 +10,6 @@ import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.UseCases.CreateSegmentUseCase
 import com.ncs.o2.Domain.Utility.Codes
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.ServerExceptions
 import dagger.hilt.android.lifecycle.HiltViewModel

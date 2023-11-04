@@ -5,7 +5,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 
 /*
 File : AuthRepository.kt -> com.ncs.o2.Domain.Interfaces
-Description : Auth repository interface  
+Description : Auth repository interface
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx

@@ -24,6 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
+            android:paddingTop="@dimen/padding_bottom_offset"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/create_task_button"
             app:layout_constraintHorizontal_bias="0.0"
@@ -69,6 +70,7 @@
                 android:layout_height="match_parent"
                 android:background="@null"
                 android:layout_marginStart="8dp"
+
                 app:srcCompat="@android:drawable/arrow_down_float"
                 app:tint="@color/primary" />
 
@@ -92,7 +94,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:src="@drawable/ham"
-            android:paddingBottom="2dp"
+            android:paddingTop="@dimen/padding_bottom_offset"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -152,22 +154,23 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         style="@style/CustomTabLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        app:tabGravity="center"
         android:background="@color/darkbg_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-        app:tabIndicatorColor="@color/better_white"
-        app:tabMode="scrollable"
+        app:tabIndicatorColor="@color/divider_or"
+        app:tabMode="auto"
         android:layoutAnimation="@anim/layout_animation_fadein"
         app:tabIndicatorAnimationMode="fade"
         app:tabRippleColor="@color/item_bg_glow"
         app:tabSelectedTextColor="@color/primary"
+
         app:tabTextColor="@color/account" />
 
 
@@ -177,12 +180,12 @@
         android:orientation="horizontal"
         android:layout_height="55dp">
 
-<!--        <include-->
-<!--            layout="@layout/task_item_legend"-->
-<!--            android:layout_height="55dp"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:elevation="5dp"-->
-<!--            />-->
+        <!--        <include-->
+        <!--            layout="@layout/task_item_legend"-->
+        <!--            android:layout_height="55dp"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:elevation="5dp"-->
+        <!--            />-->
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/search_bar"
             android:layout_width="0dp"
@@ -190,7 +193,7 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="7dp"
             android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="7dp"
             android:background="@drawable/item_bg_curve"
             android:drawableStart="@drawable/ic_searchico"
@@ -214,10 +217,12 @@
 
         <ImageView
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.2"
             android:layout_gravity="center"
             android:layout_marginEnd="15dp"
             android:layout_marginTop="7dp"
+            android:background="@drawable/item_bg_curve"
+
             android:scaleX="0.8"
             android:scaleY="0.8"
             android:layout_marginBottom="7dp"
@@ -228,6 +233,7 @@
 
 
     </LinearLayout>
+
 
 
     <View

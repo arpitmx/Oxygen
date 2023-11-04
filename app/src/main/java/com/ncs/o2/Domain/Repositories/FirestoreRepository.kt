@@ -125,49 +125,55 @@ class FirestoreRepository @Inject constructor(
 
 
     ////////////////////////////// FIREBASE USER DP FUNCTIONALITY //////////////////////////
-    override fun uploadUserDP(bitmap: Bitmap): LiveData<StorageReference> {
+    override fun uploadUserDP(bitmap: Bitmap):  LiveData<ServerResult<StorageReference>> {
 //        serverResult(ServerResult.Progress)
-        val liveData = MutableLiveData<StorageReference>()
 
-        val imageFileName = "${FirebaseAuth.getInstance().currentUser?.email}/DP/dp.JPEG"
+        val liveData = MutableLiveData<ServerResult<StorageReference>>()
+
+        val imageFileName = "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
         val data = baos.toByteArray()
         val uploadTask = imageRef.putBytes(data)
-        uploadTask.addOnSuccessListener { taskSnapshot ->
-            //getImageDownloadUrl(imageRef)
+        uploadTask.addOnSuccessListener {
             val userData = mapOf(
                 "PHOTO_ADDED" to true,
             )
             FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
-                    liveData.postValue(imageRef)
+                    liveData.postValue(ServerResult.Success(imageRef))
 //                    serverResult(ServerResult.Success(imageRef))
                 }
                 .addOnFailureListener { e ->
+                    liveData.postValue(ServerResult.Failure(e))
+
 //                    serverResult(ServerResult.Failure(e))
                 }
 
         }.addOnFailureListener { exception ->
+            liveData.postValue(ServerResult.Failure(exception))
+
 //            serverResult(ServerResult.Failure(exception))
         }
 
         return liveData
     }
 
-    override fun getUserDPUrl(reference: StorageReference): LiveData<String> {
+    override fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>> {
 
-        val liveData = MutableLiveData<String>()
+        val liveData = MutableLiveData<ServerResult<String>>()
 
+        liveData.postValue(ServerResult.Progress)
         reference.downloadUrl
             .addOnSuccessListener { uri ->
                 val imageUrl = uri.toString()
-                liveData.postValue(imageUrl)
-        }
+                liveData.postValue(ServerResult.Success(imageUrl))
+            }
             .addOnFailureListener { exception ->
-        }
+                liveData.postValue(ServerResult.Failure(exception))
+             }
         return liveData
     }
     override fun addImageUrlToFirestore(DPUrl: String): LiveData<Boolean> {
@@ -176,12 +182,10 @@ class FirestoreRepository @Inject constructor(
             .update("DP_URL", DPUrl)
             .addOnSuccessListener {
                 liveData.postValue(true)
-//                Toast.makeText(requireContext(), "Successfully Saved", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { exception ->
                 // Handle failed Firestore update
                 liveData.postValue(false)
-//                Toast.makeText(requireContext(), "Failed to add Image", Toast.LENGTH_SHORT).show()
             }
         return liveData
     }
@@ -335,19 +339,19 @@ class FirestoreRepository @Inject constructor(
         getUserInfo { result ->
 
             when (result) {
-                is ServerResult.Success -> {
-                    projectListCallback(ServerResult.Success(result.data!!.PROJECTS))
-                }
 
-                is ServerResult.Progress -> {
-                    projectListCallback(ServerResult.Progress)
 
-                }
 
                 is ServerResult.Failure -> {
                     projectListCallback(ServerResult.Failure(result.exception))
                 }
+                ServerResult.Progress -> {
+                    projectListCallback(ServerResult.Progress)
 
+                }
+                is ServerResult.Success -> {
+                    projectListCallback(ServerResult.Success(result.data!!.PROJECTS))
+                }
             }
 
         }

@@ -277,6 +277,14 @@ object ExtensionsUtil {
         this.startAnimation(animation)
     }
 
+
+    fun View.popInfinity(context: Context) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context,R.anim.popinfi)
+        this.startAnimation(animation)
+    }
+
+
     fun View.blink(context: Context) = run {
         this.clearAnimation()
         val animation = AnimationUtils.loadAnimation(context,R.anim.blink)

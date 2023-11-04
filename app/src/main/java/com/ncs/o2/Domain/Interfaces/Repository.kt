@@ -2,6 +2,7 @@ package com.ncs.o2.Domain.Interfaces
 
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Models.ServerResult
@@ -13,7 +14,7 @@ import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelect
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
-Description : This is the repository interface for extending them to the different Repositories 
+Description : This is the repository interface for extending them to the different Repositories
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
@@ -52,8 +53,8 @@ interface Repository {
     suspend fun postNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
 
     // User DP Related
-    fun getUserDPUrl(reference: StorageReference): LiveData<String>
-    fun uploadUserDP(bitmap: Bitmap): LiveData<StorageReference>
+    fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>>
+    fun uploadUserDP(bitmap: Bitmap): LiveData<ServerResult<StorageReference>>
     fun addImageUrlToFirestore(DPUrl:String): LiveData<Boolean>
 
     fun checkIfSegmentNameExists(fieldName : String, projectID : String, result: (ServerResult<Boolean>) -> Unit)

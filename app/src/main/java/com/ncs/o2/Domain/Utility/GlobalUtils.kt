@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
 import com.ncs.o2.R
 import timber.log.Timber
+import java.time.Duration
 import java.util.TimeZone
 
 
@@ -34,6 +35,18 @@ object GlobalUtils {
 
 
         fun singleBtnDialog(title: String, msg: String, btnText: String, positive: () -> Unit) {
+            val builder = android.app.AlertDialog.Builder(context)
+            builder.setIcon(R.drawable.logogradhd)
+            builder.setTitle(title)
+            builder.setMessage(msg)
+            builder.setPositiveButton(btnText) { dialog, which ->
+                positive()
+            }
+            val dialog = builder.create()
+            dialog.show()
+        }
+
+        fun singleBtnDialog_InputError(title: String, msg: String, btnText: String, positive: () -> Unit) {
             val builder = android.app.AlertDialog.Builder(context)
             builder.setIcon(R.drawable.logogradhd)
             builder.setTitle(title)
