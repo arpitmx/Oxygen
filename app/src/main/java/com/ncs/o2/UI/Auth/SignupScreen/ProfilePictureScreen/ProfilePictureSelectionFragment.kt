@@ -18,6 +18,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,9 +31,14 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.blink
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.popInfinity
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
@@ -42,10 +48,13 @@ import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfilePictureSelectionFragment : Fragment() {
 
+    @Inject
+    lateinit var util : GlobalUtils.EasyElements
     companion object {
         fun newInstance() = ProfilePictureSelectionFragment()
     }
@@ -78,15 +87,36 @@ class ProfilePictureSelectionFragment : Fragment() {
 
     private fun setupViews() {
 
-
+        setUpBackPress()
         setUpOnclickListeners()
 
 
     }
 
+    private fun setUpBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner){
+            requireActivity().toast("Cannot go back")
+        }
+    }
+
+
+    fun setUpLoader( set : Boolean){
+       if (set) {
+           binding.loginWelcomeMsg.text = "Setting up your profile..."
+           binding.layout.gone()
+           binding.progressBar.visible()
+           binding.picPreview.popInfinity(requireContext())
+       }else {
+           binding.loginWelcomeMsg.text = "Select profile picture"
+           binding.layout.visible()
+           binding.progressBar.gone()
+           binding.picPreview.animation.cancel()
+       }
+    }
+
     private fun setUpOnclickListeners() {
 
-        // For taking permissions
+        // For taking permissions (SET PHOTO BUTTON)
 
         binding.btnReselect.setOnClickThrottleBounceListener{
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -100,57 +130,58 @@ class ProfilePictureSelectionFragment : Fragment() {
             }
         }
 
-        // For getting the bitmap from local storage
+        // For getting the bitmap from local storage (NEXT BUTTON)
 
         binding.next.setOnClickThrottleBounceListener {
-            binding.layout.gone()
-            binding.progressBar.visible()
+
+            setUpLoader(true)
 
             if (bitmap==null) {
                 Toast.makeText(requireContext(),"Profile Pic can't be empty",Toast.LENGTH_LONG).show()
+                util.singleBtnDialog("Select a photo", "Profile Picture cannot be kept empty", "Okay",{})
                 return@setOnClickThrottleBounceListener
             }
 
             Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
-            uploadImageToFirebaseStorage(bitmap!!)
 
-
-            val userData = mapOf(
-                "PHOTO_ADDED" to true,
-                "PROJECTS" to listOf("NCSOxygen")
-            )
-
-            FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .update(userData)
-                .addOnSuccessListener {
-                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
-                        .get(Source.SERVER)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val document = task.result
-                                if (document != null && document.exists()) {
-
-                                    val bio= Endpoints.User.BIO
-                                    val designation= Endpoints.User.DESIGNATION
-                                    val email= Endpoints.User.EMAIL
-                                    val username= Endpoints.User.USERNAME
-                                    val role= Endpoints.User.ROLE
-
-                                    PrefManager.initialize(requireContext())
-                                    PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toInt()))
-
-                                    requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-                                    requireActivity().finish()
-                                }
-                            } else {
-                                val exception = task.exception
-                                exception?.printStackTrace()
-                            }
-                        }
-                }
-                .addOnFailureListener { e ->
-
-                }
+//            uploadImageToFirebaseStorage(bitmap!!)
+//
+//            val userData = mapOf(
+//                "PHOTO_ADDED" to true,
+//                "PROJECTS" to listOf("NCSOxygen")
+//            )
+//
+//            FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+//                .update(userData)
+//                .addOnSuccessListener {
+//                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+//                        .get(Source.SERVER)
+//                        .addOnCompleteListener { task ->
+//                            if (task.isSuccessful) {
+//                                val document = task.result
+//                                if (document != null && document.exists()) {
+//
+//                                    val bio= Endpoints.User.BIO
+//                                    val designation= Endpoints.User.DESIGNATION
+//                                    val email= Endpoints.User.EMAIL
+//                                    val username= Endpoints.User.USERNAME
+//                                    val role= Endpoints.User.ROLE
+//
+//                                    PrefManager.initialize(requireContext())
+//                                    PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toInt()))
+//
+//                                    requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+//                                    requireActivity().finish()
+//                                }
+//                            } else {
+//                                val exception = task.exception
+//                                exception?.printStackTrace()
+//                            }
+//                        }
+//                }
+//                .addOnFailureListener { e ->
+//
+//                }
 
         }
 
@@ -161,6 +192,7 @@ class ProfilePictureSelectionFragment : Fragment() {
         // TODO: Use the ViewModel
     }
     private fun pickImage() {
+
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Choose an option")

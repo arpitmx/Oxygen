@@ -124,6 +124,7 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                             Timber.tag(SignUpScreenFragment.TAG).d(
                                 "Login success : ${result.data.uid}"
                             )
+
                             FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                                 .get()
                                 .addOnCompleteListener { task ->
