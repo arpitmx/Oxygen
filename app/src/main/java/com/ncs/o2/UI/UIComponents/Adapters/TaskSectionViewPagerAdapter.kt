@@ -22,7 +22,7 @@ Tasks FUTURE ADDITION :
 
 
 */
-class TaskSectionViewPagerAdapter(fragmentActivity: Fragment, private var totalCount: Int) :
+class TaskSectionViewPagerAdapter(fragmentActivity: Fragment, private var totalCount: Int,private var sectionsList:MutableList<String>) :
     FragmentStateAdapter(fragmentActivity) {
 
     override fun getItemCount(): Int {
@@ -30,12 +30,9 @@ class TaskSectionViewPagerAdapter(fragmentActivity: Fragment, private var totalC
     }
 
     override fun createFragment(position: Int): Fragment {
-        return when (position) {
-            0 -> TaskSectionFragment("Ongoing")
-            1 -> TaskSectionFragment("Ready")
-            2 -> TaskSectionFragment("Testing")
-            else -> TaskSectionFragment("Completed")
+        if (position < sectionsList.size) {
+            return TaskSectionFragment(sectionsList[position])
         }
-
+        return TaskSectionFragment("")
     }
 }
