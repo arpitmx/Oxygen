@@ -105,9 +105,9 @@ class TestingActivity: AppCompatActivity() {
                 status = Random(System.currentTimeMillis()).nextInt(0,3),
                 assigner = Faker().funnyName().name().toString(),
                 deadline = "${Random(System.currentTimeMillis()).nextInt(1,5)} days",
-                project_ID = "Versa",
-                segment = "Development", //change segments here //like Design
-                section = "Ready",  //Testing // Completed //Ready //Ongoing
+                project_ID = "NCSOxygen",
+                segment = "Version 1.0", //change segments here //like Design
+                section = "Section 2",  //Testing // Completed //Ready //Ongoing
                 assignee_DP_URL = "https://picsum.photos/200",
                 completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),

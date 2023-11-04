@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 
 class TasksHolderViewModel : ViewModel() {
     // TODO: Implement the ViewModel
+    val sectionList = MutableLiveData<List<String>>()
 
 
 

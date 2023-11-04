@@ -124,6 +124,7 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                             Timber.tag(SignUpScreenFragment.TAG).d(
                                 "Login success : ${result.data.uid}"
                             )
+
                             FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                                 .get()
                                 .addOnCompleteListener { task ->
@@ -136,10 +137,11 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                                             val designation=document.getString("DESIGNATION")
                                             val email=document.getString("EMAIL")
                                             val username=document.getString("USERNAME")
-                                            val role=document.get("ROLE")
+                                            val role=document.getLong("ROLE")
                                             if (isDetailsAdded==true && isPhotoAdded==true) {
+
                                                 PrefManager.initialize(requireContext())
-                                                PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toInt()))
+                                                PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!))
 
                                                 startActivity(
                                                     Intent(

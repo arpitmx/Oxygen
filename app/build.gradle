@@ -72,6 +72,12 @@ android {
 
 dependencies {
 
+
+    //Cloudnary
+    implementation 'com.cloudinary:kotlin-url-gen:1.6.0'
+
+
+
     // Room
     def room_version = "2.6.0"
 

@@ -10,12 +10,10 @@ import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.firebase.auth.FirebaseUser
 import com.google.gson.JsonObject
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Services.NotificationApiService
 import com.ncs.o2.Domain.Workers.FCMWorker

@@ -12,10 +12,8 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseAuthorizationRepository
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.Issue
-import com.ncs.o2.UI.Auth.SignupScreen.SignUpViewModel
 import com.ncs.o2.UI.Auth.usecases.ValidationEmail
 import com.ncs.o2.UI.Auth.usecases.ValidationPassword
-import com.ncs.o2.UI.Auth.usecases.ValidationRepeatedPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow

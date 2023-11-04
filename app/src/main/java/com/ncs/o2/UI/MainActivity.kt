@@ -16,6 +16,10 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -177,6 +181,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.drawerheaderfile.username.text=user.USERNAME
         binding.drawerheaderfile.designation.text=user.DESIGNATION
         binding.drawerheaderfile.email.text=user.EMAIL
+
+        Glide.with(this)
+            .load(PrefManager.getDpUrl())
+            .placeholder(R.drawable.profile_pic_placeholder)
+            .error(R.drawable.logogradhd)
+            .override(200,200)
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+            .into(binding.drawerheaderfile.userDp)
+
         viewModel.showprogressLD.observe(this) { show ->
             if (show) {
                 binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
@@ -228,6 +241,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         segmentText.value = segmentName
 
     }
+
+
 
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
