@@ -285,8 +285,6 @@ class FirestoreRepository @Inject constructor(
     private fun getSegmentRef(task: Task):DocumentReference{
         return firestore.collection(Endpoints.PROJECTS)
             .document(task.project_ID)
-            .collection(Endpoints.Project.SEGMENT)
-            .document(task.segment)
 
     }
 
