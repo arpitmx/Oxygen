@@ -157,6 +157,10 @@ class EditProfileActivity : AppCompatActivity() {
                     else -> {}
                 }
             }
+        }else{
+            Toast.makeText(this, "Updated", Toast.LENGTH_SHORT)
+                .show()
+            onBackPressed()
         }
     }
 
