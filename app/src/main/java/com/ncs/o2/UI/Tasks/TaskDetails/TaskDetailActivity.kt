@@ -207,8 +207,8 @@ class TaskDetailActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     override fun onProfileClick(user: User, position: Int) {
-        val bottomSheet = ProfileBottomSheet(user.profileDPUrl)
-        bottomSheet.show(supportFragmentManager, "bottomsheet")
+        val bottomSheet = user.profileDPUrl?.let { ProfileBottomSheet(it) }
+        bottomSheet?.show(supportFragmentManager, "bottomsheet")
     }
 
     override fun removeClick(user: User, position: Int) {

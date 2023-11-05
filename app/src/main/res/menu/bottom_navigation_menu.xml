@@ -14,10 +14,10 @@
         android:title="@string/bottom_nav_item_assigned" />
 
     <item
-        android:id="@+id/done_item"
+        android:id="@+id/project_stats_item"
         android:enabled="true"
-        android:icon="@drawable/baseline_done_24"
-        android:title="@string/bottom_nav_item_done" />
+        android:icon="@drawable/baseline_project_stats_24"
+        android:title="@string/bottom_nav_item_project_stats" />
 
 
 </menu>
