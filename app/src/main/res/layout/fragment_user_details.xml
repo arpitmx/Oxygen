@@ -73,6 +73,9 @@
             android:layout_below="@id/login_welcome_msg"
             android:layout_marginTop="@dimen/layout_in_between_margins"
             android:hint="@string/designation"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:focusedByDefault="false"
             android:textColor="@color/primary"
             android:inputType="textEmailAddress" />
 

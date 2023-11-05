@@ -10,6 +10,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
 
 /*
@@ -41,6 +42,8 @@ interface Repository {
 
     //User related
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
+    fun getUserInfo1(serverResult: (ServerResult<UserInfo?>) -> Unit)
+    fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)
 
     //Project related
     fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit)

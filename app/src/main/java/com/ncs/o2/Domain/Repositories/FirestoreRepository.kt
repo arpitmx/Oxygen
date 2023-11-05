@@ -23,6 +23,7 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
 import com.ncs.o2.UI.MainActivity
@@ -327,6 +328,48 @@ class FirestoreRepository @Inject constructor(
 
                         serverResult(ServerResult.Success(currentUser))
                     }
+                }
+                .addOnFailureListener { error ->
+                    Timber.tag(TAG).d("failed %s", error.stackTrace)
+                    serverResult(ServerResult.Failure(error))
+                }
+        }, 1000)
+    }
+
+    override fun getUserInfo1(serverResult: (ServerResult<UserInfo?>) -> Unit) {
+        serverResult(ServerResult.Progress)
+        Handler(Looper.getMainLooper()).postDelayed({
+            var userInfo: UserInfo?
+            firestore.collection(Endpoints.USERS)
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                .get(Source.SERVER)
+                .addOnSuccessListener { snap ->
+                    if (snap.exists()) {
+                        userInfo = snap.toObject(UserInfo::class.java)
+
+                        Timber.tag(TAG).d(userInfo?.username)
+                        Timber.tag(TAG).d(userInfo?.designation)
+                        Timber.tag(TAG).d(userInfo?.bio)
+                        Timber.tag(TAG).d(userInfo?.profileDPUrl)
+
+                        serverResult(ServerResult.Success(userInfo))
+                    }
+                }
+                .addOnFailureListener { error ->
+                    Timber.tag(TAG).d("failed %s", error.stackTrace)
+                    serverResult(ServerResult.Failure(error))
+                }
+        }, 1000)
+    }
+
+    override fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit) {
+        serverResult(ServerResult.Progress)
+        Handler(Looper.getMainLooper()).postDelayed({
+            firestore.collection(Endpoints.USERS)
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                .set(userInfo)
+                .addOnSuccessListener { snap ->
+                    serverResult(ServerResult.Success(userInfo))
                 }
                 .addOnFailureListener { error ->
                     Timber.tag(TAG).d("failed %s", error.stackTrace)

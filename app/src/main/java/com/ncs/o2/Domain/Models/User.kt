@@ -23,8 +23,8 @@ Tasks FUTURE ADDITION :
 @Later("Add name")
 data class User (
         val firebaseID : String ,
-        val profileDPUrl : String = "",
-        val username : String="",
+        val profileDPUrl : String? = "",
+        val username : String?="",
         val post: String= "",
         val profileIDUrl : String="",
         @Exclude var isChecked : Boolean = false,

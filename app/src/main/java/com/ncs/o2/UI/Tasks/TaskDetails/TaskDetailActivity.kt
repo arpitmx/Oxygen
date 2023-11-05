@@ -50,5 +50,63 @@ class TaskDetailActivity : AppCompatActivity() {
         fragmentTransaction.commit()
     }
 
+
+    private fun setContributors() {
+
+        val contriRecyclerView = binding.contributorsRecyclerView
+        val layoutManager = FlexboxLayoutManager(this)
+        layoutManager.flexDirection = FlexDirection.ROW
+        layoutManager.flexWrap = FlexWrap.WRAP
+        contriRecyclerView.layoutManager = layoutManager
+
+
+        val dataList = listOf(
+            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj"),
+            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"),
+            User("https://picsum.photos/200"),
+            User("https://picsum.photos/300"),
+            User("https://picsum.photos/350"),
+            User("https://picsum.photos/450"),
+            User("https://picsum.photos/230"),
+            User("https://picsum.photos/231"),
+            User("https://picsum.photos/202"),
+            User("https://picsum.photos/234")
+        )
+
+        val adapter = ContributorAdapter(dataList as MutableList<User>, this,false)
+        contriRecyclerView.adapter = adapter
+    }
+
+    private fun setTagsView() {
+
+        val tagsRecyclerView = binding.tagRecyclerView
+        val layoutManager = FlexboxLayoutManager(this)
+        layoutManager.flexDirection = FlexDirection.ROW
+        layoutManager.flexWrap = FlexWrap.WRAP
+        tagsRecyclerView.layoutManager = layoutManager
+
+        val dataList = listOf(
+            Tag("Critical", Colors.WHITE, Colors.BLACK,""),
+            Tag("Bug", Colors.RED, Colors.WHITE,""),
+            Tag("Feature", Colors.BLUE, Colors.WHITE,""),
+            Tag("New", Colors.GREEN, Colors.BLACK,""),
+            Tag("Critical", Colors.WHITE, Colors.BLACK,""),
+
+            )
+        val adapter = TagAdapter(dataList)
+        tagsRecyclerView.adapter = adapter
+    }
+
+    override fun onProfileClick(user: User, position: Int) {
+        val bottomSheet = user.profileDPUrl?.let { ProfileBottomSheet(it) }
+        bottomSheet?.show(supportFragmentManager, "bottomsheet")
+    }
+
+    override fun removeClick(user: User, position: Int) {
+        TODO("Not yet implemented")
+    }
+
+
+
 }
 
