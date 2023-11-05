@@ -1,5 +1,6 @@
 package com.ncs.o2.UI
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
@@ -43,6 +44,8 @@ import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
+import com.ncs.o2.UI.UIComponents.EditProfile.EditProfileActivity
+import com.ncs.o2.UI.UIComponents.EditProfile.EditProfileFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.FieldPosition
@@ -159,6 +162,16 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             val project = AddProjectBottomSheet()
             project.projectAddedListener = this
             project.show(supportFragmentManager, "Add Project")
+        }
+
+        // setting up Edit Profile
+        binding.drawerheaderfile.ibEditProfile.setOnClickListener {
+
+            val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            drawerLayout.closeDrawer(GravityCompat.START)
+
         }
     }
 
