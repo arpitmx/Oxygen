@@ -3,10 +3,15 @@ package com.ncs.o2.Hilt
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.navigation.NavInflater
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.O2Application
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.versa.Constants.Endpoints
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,7 +46,7 @@ Tasks FUTURE ADDITION :
 object UtilModule {
 
     @Provides
-    fun providesEasyElements(context : Context):
+    fun providesEasyElements(@ApplicationContext context : Context):
             GlobalUtils.EasyElements{
         return GlobalUtils.EasyElements(context)
     }
@@ -50,6 +55,12 @@ object UtilModule {
     @Provides
     fun provideNavigator(context:Activity): Navigator {
         return Navigator(context)
+    }
+
+
+    @Provides
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences(Endpoints.SharedPref.SHAREDPREFERENCES, Context.MODE_PRIVATE)
     }
 
 }

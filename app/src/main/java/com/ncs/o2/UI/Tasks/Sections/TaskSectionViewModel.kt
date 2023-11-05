@@ -1,6 +1,13 @@
 package com.ncs.o2.UI.Tasks.Sections
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 /*
 File : TaskSectionViewModel.kt -> com.ncs.o2.UI.Tasks.Sections
@@ -22,5 +29,15 @@ Tasks FUTURE ADDITION :
 
 
 */
-class TaskSectionViewModel : ViewModel(){
+@HiltViewModel
+class TaskSectionViewModel @Inject constructor(private val firestoreRepository: FirestoreRepository) : ViewModel(){
+
+    fun getTasksForSegment(
+        projectName: String,
+        segmentName: String,
+        sectionName: String,
+        resultCallback: (ServerResult<List<Task>>) -> Unit
+    ) {
+        firestoreRepository.getTasks(projectName, segmentName, sectionName, resultCallback)
+    }
 }

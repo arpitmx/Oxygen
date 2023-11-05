@@ -1,27 +1,34 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.UI.Tasks.TasksHolderViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentViewModel
 import com.ncs.o2.databinding.SegmetSelectionBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.internal.lifecycle.HiltViewModelMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.datafaker.Faker
+import javax.inject.Inject
 
 /*
 File : SegmentSelectionBottomSheet.kt -> com.ncs.o2.UI.UIComponents.BottomSheets
@@ -44,13 +51,17 @@ Tasks FUTURE ADDITION :
 @AndroidEntryPoint
 class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
     SegmentListAdapter.OnClickCallback {
-
+    @Inject lateinit var firestoreRepository:FirestoreRepository
+    private var segments:List<Segment> = emptyList()
     lateinit var binding: SegmetSelectionBottomSheetBinding
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewSegments
     }
-
+    var segmentSelectionListener: SegmentSelectionListener? = null
+    var sectionSelectionListener:sendSectionsListListner?=null
+    lateinit var sectionList:MutableList<String>
     private val faker: Faker by lazy { Faker() }
+    private lateinit var segmentName:String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,11 +69,14 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         savedInstanceState: Bundle?
     ): View {
         binding = SegmetSelectionBottomSheetBinding.inflate(inflater, container, false)
+        PrefManager.initialize(requireContext())
+        fetchSegments(PrefManager.getcurrentProject())
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sectionList = mutableListOf()
 
         setViews()
 
@@ -74,23 +88,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         setBottomSheetConfig()
         setActionbar()
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val segList = mutableListOf<Segment>()
-            repeat(4) {
-                val segment = Segment(
-                    SEGMENT_ID = faker.idNumber().toString(),
-                    SEGMENT_NAME = faker.clashOfClans().defensiveBuilding().toString()
-                )
-                synchronized(segList) {
-                    segList.add(segment)
-                }
-            }
 
-           withContext(Dispatchers.Main){
-               setRecyclerView(segList)
-           }
-
-        }
     }
 
     private fun setActionbar() {
@@ -103,7 +101,8 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
             dismiss()
             val createSegmentBottomSheet = CreateSegmentBottomSheet()
             createSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
-
+//            val createSectionsBottomSheet = CreateSectionsBottomSheet()
+//            createSectionsBottomSheet.show(requireActivity().supportFragmentManager,"this")
 
         }
     }
@@ -112,7 +111,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         this.isCancelable = true
     }
 
-    private fun setRecyclerView(segments: MutableList<Segment>) {
+    private fun setRecyclerView(segments: List<Segment>) {
 
         val adapter = SegmentListAdapter(segments, this@SegmentSelectionBottomSheet)
         val linearLayoutManager = LinearLayoutManager(requireContext())
@@ -126,7 +125,77 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
     }
 
     override fun onClick(segment: Segment, position: Int) {
-        Toast.makeText(requireContext(), segment.SEGMENT_NAME, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
+        PrefManager.initialize(requireContext())
+        PrefManager.setcurrentsegment(segment.segment_NAME)
+        segmentName=segment.segment_NAME
+        sendsectionList(PrefManager.getcurrentProject())
+        segmentSelectionListener?.onSegmentSelected(segment.segment_NAME)
+        sectionSelectionListener?.sendSectionsList(sectionList)
         dismiss()
     }
+    interface SegmentSelectionListener {
+        fun onSegmentSelected(segmentName: String)
+    }
+    interface sendSectionsListListner{
+        fun sendSectionsList(list:MutableList<String>)
+
+    }
+
+    private fun fetchSegments(projectName: String) {
+        firestoreRepository.getSegments(projectName) { serverResult ->
+            when (serverResult) {
+                is ServerResult.Success -> {
+                    binding.progressbar.gone()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val segList = serverResult.data
+                        if (segList.isNotEmpty()) {
+                            withContext(Dispatchers.Main) {
+                                setRecyclerView(segList)
+                            }
+                        }
+
+                    }
+                }
+                is ServerResult.Failure -> {
+                    val exception = serverResult.exception
+                }
+                is ServerResult.Progress -> {
+                    binding.progressbar.visible()
+                }
+            }
+        }
+    }
+    private fun sendsectionList(projectName: String) {
+        firestoreRepository.getSegments(projectName) { serverResult ->
+            when (serverResult) {
+                is ServerResult.Success -> {
+                    binding.progressbar.gone()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val segList = serverResult.data
+                        if (segList.isNotEmpty()) {
+                            for (i in 0 until segList.size){
+                                if (segList[i].segment_NAME == segmentName){
+                                    sectionList = segList[i].sections
+                                }
+                            }
+                            PrefManager.putsectionsList(sectionList)
+                            withContext(Dispatchers.Main) {
+                                PrefManager.list.value = sectionList
+                            }
+                        }
+                    }
+                }
+                is ServerResult.Failure -> {
+                    val exception = serverResult.exception
+                    // Handle the failure here
+                }
+                is ServerResult.Progress -> {
+                    binding.progressbar.visible()
+                }
+            }
+        }
+    }
+
+
 }

@@ -52,6 +52,7 @@ object FirebaseModule {
     fun provideFirestoreRepository(firestore: FirebaseFirestore): Repository = FirestoreRepository(firestore)
 
 
+
     @Singleton
     @Provides
     fun provideFirebaseAuthRepository(firebaseAuth: FirebaseAuth): AuthRepository = FirebaseAuthRepository(firebaseAuth)

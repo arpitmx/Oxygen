@@ -9,7 +9,6 @@
     android:orientation="vertical"
     >
 
-
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
@@ -253,7 +252,7 @@
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="20dp"
             android:layout_marginTop="10dp"
-            android:text="Done"
+            android:text="Next"
             android:gravity="center"
             android:textColor="@color/better_white"
             android:textAllCaps="false"

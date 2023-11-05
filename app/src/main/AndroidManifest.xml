@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <application
         android:name=".O2Application"
         android:allowBackup="true"
@@ -17,24 +19,29 @@
         android:supportsRtl="true"
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
+
+        <activity
+            android:name=".UI.Testing.TestingActivity"
+            android:exported="false" />
+
         <activity
             android:name=".UI.Auth.AuthScreenActivity"
-            android:exported="true" >
-
+            android:exported="true" />
+        <activity
+            android:name=".UI.StartScreen.StartScreen"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
-        <activity
-            android:name=".UI.UIComponents.SplashScreen"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true" />
         <activity
             android:name=".UI.CreateTask.CreateTaskActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.CreateProject"
             android:exported="false" />
         <activity
             android:name=".UI.Notifications.Requests.RequestActivity"
@@ -47,8 +54,9 @@
             android:exported="false" />
         <activity
             android:name=".UI.MainActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
+
+
 
         <service
             android:name=".Services.FCMessagingService"

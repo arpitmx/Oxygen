@@ -20,7 +20,7 @@ Tasks FUTURE ADDITION :
 
 */
 
-data class O2Notification constructor(
+data class FCNotification constructor(
     val notificationType: NotificationType,
     val title: String = "",
     val message: String = "",

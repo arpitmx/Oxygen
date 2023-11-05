@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/layout"
     android:background="@color/secondary_bg_black"
     android:orientation="horizontal"
     android:weightSum="10"
@@ -38,7 +39,6 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:layout_weight="1.5"
-
         android:buttonTint="@color/green"
          />
 

@@ -16,13 +16,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.showKeyboard
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.showKeyboardB
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpViewModel
@@ -121,8 +125,41 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                                 "Login success : ${result.data.uid}"
                             )
 
-                            requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-                            requireActivity().finish()
+                            FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                                .get()
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        val document = task.result
+                                        if (document != null && document.exists()) {
+                                            val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
+                                            val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
+                                            val bio=document.getString("BIO")
+                                            val designation=document.getString("DESIGNATION")
+                                            val email=document.getString("EMAIL")
+                                            val username=document.getString("USERNAME")
+                                            val role=document.getLong("ROLE")
+                                            if (isDetailsAdded==true && isPhotoAdded==true) {
+                                                PrefManager.initialize(requireContext())
+                                                PrefManager.putProjectsList(document.get("PROJECTS") as List<String>)
+                                                PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toLong()))
+                                                startActivity(
+                                                    Intent(
+                                                        requireContext(),
+                                                        MainActivity::class.java
+                                                    )
+                                                )
+                                            } else if (isDetailsAdded == false) {
+                                                findNavController().navigate(R.id.action_loginScreenFragment_to_userDetailsFragment)
+                                            }
+                                            else if (isPhotoAdded==false){
+                                                findNavController().navigate(R.id.action_loginScreenFragment_to_profilePictureSelectionFragment)
+                                            }
+                                        }
+                                    } else {
+                                        val exception = task.exception
+                                        exception?.printStackTrace()
+                                    }
+                                }
 
                         }
                         null -> {
@@ -174,8 +211,6 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                 email = email,
                 password = pass)
         }
-
-
 
     }
 

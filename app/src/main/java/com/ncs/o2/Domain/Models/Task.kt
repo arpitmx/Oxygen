@@ -1,6 +1,7 @@
 package com.ncs.o2.Domain.Models
 
 import android.graphics.Color
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.FieldValue
 
@@ -22,30 +23,30 @@ Tasks FUTURE ADDITION :
 
 */
 data class Task(
-    val TITLE: String = "",
-    val DESCRIPTION: String = "",
-    var ID: String,
-    val DIFFICULTY: Int = 0,
-    val LINKS: List<String> = emptyList(),
-    val PRIORITY: Int = 0,
-    val STATUS: Int = -1,
-    val ASSIGNEE: List<String> = emptyList(),
-    val ASSIGNER: String = "",
-    val DEADLINE: String = "",
-    var TIME_STAMP: FieldValue = FieldValue.serverTimestamp(),
-    val DURATION: String = "",
-
-    val TAGS: List<Tag> = listOf(),
-    val PROJECT_ID: String = "",
-    val SEGMENT: String = "",
-    val SECTION: String = "",
-    val ASSIGNEE_DP_URL : String = "",
-    val isCompleted:Boolean=false
+    val title: String = "",
+    val description: String = "",
+    var id: String="",
+    val difficulty: Int = 0,
+    val links: List<String> = emptyList(),
+    val priority: Int = 0,
+    val status: Int = -1,
+    val assignee: List<String> = emptyList(),
+    val assigner: String = "",
+    val deadline: String = "",
+    var time_STAMP: Timestamp? =null,
+//    val timestamp: FieldValue= FieldValue.serverTimestamp(),
+    val duration: String = "",
+    val tags: List<Tag> = listOf(),
+    val project_ID: String = "",
+    val segment: String = "",
+    val section: String = "",
+    val assignee_DP_URL: String = "",
+    val completed:Boolean=false
     ) {
 
     @Exclude
     fun getPriorityColor(): Int {
-        when (PRIORITY) {
+        when (priority) {
             1 -> return Color.GREEN
             2 -> return Color.YELLOW
             3 -> return Color.RED
@@ -55,7 +56,7 @@ data class Task(
 
     @Exclude
     fun getDifficultyColor(): Int {
-        when (DIFFICULTY) {
+        when (difficulty) {
             1 -> return Color.GREEN
             2 -> return Color.YELLOW
             3 -> return Color.RED
@@ -65,7 +66,7 @@ data class Task(
 
     @Exclude
     fun getDifficultyString(): String {
-        when (DIFFICULTY) {
+        when (difficulty) {
             1 -> return "E"
             2 -> return "M"
             3 -> return "H"
@@ -75,7 +76,7 @@ data class Task(
 
     @Exclude
     fun getStatusString(): String {
-        when (STATUS) {
+        when (status) {
             0 -> return "Unassigned"
             1 -> return "Assigned"
             2 -> return "In Progress"

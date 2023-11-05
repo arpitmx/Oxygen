@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<RelativeLayout android:layout_width="match_parent"
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@color/darkbg_main">
@@ -19,17 +20,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:layout_marginStart="@dimen/container_layout_margin"
-        android:layout_marginTop="@dimen/container_layout_margin"
-        android:layout_marginEnd="@dimen/container_layout_margin"
-        android:layout_marginBottom="@dimen/container_layout_margin"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        android:paddingBottom="10dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/login_title"
             style="@style/LabelStyle"
-            android:layout_marginTop="0dp"
             android:layout_gravity="center"
+            android:layout_marginTop="0dp"
             android:fontFamily="@font/sf_pro_display_medium"
             android:text="Profile Picture"
             android:textColor="@color/orange" />
@@ -43,42 +46,80 @@
             android:text="Select profile picture" />
 
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="50dp"
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/pic_preview"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="40dp"
+                android:elevation="5dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile_pic_placeholder"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
+        <LinearLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_reselect"
+                style="@style/SolidButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@id/forgot_password"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/solid_bg_white"
+                android:text="Set photo"
+                android:textAllCaps="false"
+                android:textColor="@color/darkbg_main"
+                android:textSize="22dp" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/next"
+                style="@style/SolidButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@id/forgot_password"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/solid_bg_orange"
+                android:text="Next"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="22dp" />
+
+
+        </LinearLayout>
+
+
+
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:indeterminateTint="@color/colorAccent"
+            android:visibility="gone"
             android:layout_gravity="center"
-            android:src="@drawable/profile_pic_placeholder" />
+            app:layout_constraintBottom_toBottomOf="@+id/pic_preview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_reselect"
-            style="@style/SolidButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_below="@id/forgot_password"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/solid_bg_white"
-            android:text="Set photo"
-            android:textAllCaps="false"
-            android:textColor="@color/darkbg_main"
-            android:textSize="22dp" />
-
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_login"
-            style="@style/SolidButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_below="@id/forgot_password"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/solid_bg_orange"
-            android:text="Next"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="22dp" />
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
 
 
 </RelativeLayout>

@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.ncs.o2.Domain.Interfaces.AuthRepository
+import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseAuthorizationRepository
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.Issue
-import com.ncs.o2.UI.Auth.SignupScreen.SignUpViewModel
 import com.ncs.o2.UI.Auth.usecases.ValidationEmail
 import com.ncs.o2.UI.Auth.usecases.ValidationPassword
-import com.ncs.o2.UI.Auth.usecases.ValidationRepeatedPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -24,9 +25,11 @@ import javax.inject.Inject
 class LoginScreenViewModel @Inject constructor(
     val emailValidator : ValidationEmail,
     val passwordValidator : ValidationPassword,
+    @FirebaseRepository val repository: Repository,
     @FirebaseAuthorizationRepository val authRepository: AuthRepository
 ) : ViewModel() {
-
+    private val _user = MutableLiveData<CurrentUser?>()
+    val user = _user
     private val _emailError = MutableLiveData<String?>(null)
     val emailError: LiveData<String?> get() = _emailError
 
@@ -69,7 +72,6 @@ class LoginScreenViewModel @Inject constructor(
             validationEventChannel.send(ValidationEvent.Success)
             loginUser(email, password = password)
         }
-
     }
 
     suspend fun loginUser(email: String, password: String) {
@@ -77,6 +79,17 @@ class LoginScreenViewModel @Inject constructor(
         val result = authRepository.login(email, password)
         _loginLiveData.postValue(result)
 
+    }
+    fun fetchUserInfo() {
+        repository.getUserInfo { result ->
+            when (result) {
+                is ServerResult.Success -> {
+                    _user.value = result.data
+                }
+                else -> {
+                }
+            }
+        }
     }
 
 

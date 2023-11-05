@@ -1,20 +1,21 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
 }
 
 android {
     namespace 'com.ncs.o2'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.ncs.o2"
         minSdk 26
-        targetSdk 33
+        targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.4"
         multiDexEnabled true
 
 
@@ -57,7 +58,8 @@ android {
         jvmTarget = '17'
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0'
+
+        kotlinCompilerExtensionVersion '1.5.3'
     }
 
     packagingOptions {
@@ -71,6 +73,20 @@ android {
 dependencies {
 
 
+    //Cloudnary
+    implementation 'com.cloudinary:kotlin-url-gen:1.6.0'
+
+
+
+    // Room
+    def room_version = "2.6.0"
+
+    implementation "androidx.room:room-ktx:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-paging:$room_version"
+
+
     //  Add these line in your project
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
@@ -78,14 +94,19 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
     //ViewModel
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+
+    //Transition button
+    implementation 'com.github.roynx98:transition-button-android:c1bf882dc3'
 
     //Dagger Hilt
-    implementation 'com.google.dagger:hilt-android:2.44'
-    implementation 'androidx.hilt:hilt-common:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-    implementation 'androidx.activity:activity-compose:1.5.1'
+    implementation 'com.google.dagger:hilt-android:2.48.1'
+    kapt "com.google.dagger:hilt-android-compiler:2.48.1"
+
+    implementation 'androidx.hilt:hilt-common:1.1.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+    implementation 'androidx.activity:activity-compose:1.8.0'
     implementation platform('androidx.compose:compose-bom:2022.10.00')
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
@@ -95,7 +116,7 @@ dependencies {
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
-    kapt "com.google.dagger:hilt-android-compiler:2.44.2"
+
 
 
     //Timber
@@ -108,7 +129,6 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
 
-
     //Circle image view
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
@@ -120,7 +140,7 @@ dependencies {
 
 
     //bottomsheet
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
 
     // Qr library:
     implementation("io.github.g00fy2.quickie:quickie-bundled:1.6.0")
@@ -150,7 +170,7 @@ dependencies {
     //Firestore Database
     implementation 'com.google.firebase:firebase-firestore'
     //Firebase Storage
-    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-storage:20.3.0'
     //Firebase messaging
     implementation 'com.google.firebase:firebase-messaging-ktx'
 
@@ -184,6 +204,10 @@ dependencies {
     //Faker data TODO "Remove in production"
     implementation 'net.datafaker:datafaker:1.9.0'
 
+    //color picker
+    implementation 'com.github.Dhaval2404:ColorPicker:2.3'
+
+
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -192,6 +216,10 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+kapt {
+    correctErrorTypes true
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.textfield.TextInputLayout style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+    android:layout_width="match_parent"
+    android:layout_weight="7"
+    android:layout_height="wrap_content"
+    app:hintEnabled="false"
+    android:layout_marginStart="15dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginEnd="15dp"
+    app:boxBackgroundColor="@color/better_white"
+    app:endIconMode="clear_text"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/segmet_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Set Title here..."
+            android:lines="1"
+            android:singleLine="true"
+            android:textColorHint="@color/darkbg_main_a80"
+
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
