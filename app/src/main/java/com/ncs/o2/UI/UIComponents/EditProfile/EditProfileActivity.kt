@@ -64,9 +64,16 @@ class EditProfileActivity : AppCompatActivity() {
 
         binding.btnEdit.setOnClickListener {
 
-            val newUsername= binding.etName.text?.filter { it.isDigit() }.toString() ?: null
+            var newUsername: String?= null
+            binding.etName.text?.trim()?.let {
+                newUsername= binding.etName.toString()
+            }
+
             val newDesignation= binding.etDesignation.text.toString() ?: null
-            val newBio= binding.etBio.text?.filter { it.isLetterOrDigit() }.toString() ?: null
+            var newBio: String?= null
+            binding.etBio.text?.trim()?.let {
+                newBio= binding.etBio.toString()
+            }
             val newImageUrl= "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/quiz0.jpg?alt=media&token=d16f5af1-f85e-4ffb-9c7d-7e8acebd97b9"
 
             newUserInfo= UserInfo(
