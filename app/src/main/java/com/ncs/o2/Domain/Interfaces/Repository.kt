@@ -2,7 +2,6 @@ package com.ncs.o2.Domain.Interfaces
 
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Models.ServerResult
@@ -11,7 +10,6 @@ import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.UserInfo
-import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
@@ -42,7 +40,7 @@ interface Repository {
 
     //User related
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
-    fun getUserInfo1(serverResult: (ServerResult<UserInfo?>) -> Unit)
+    fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit)
     fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)
 
     //Project related

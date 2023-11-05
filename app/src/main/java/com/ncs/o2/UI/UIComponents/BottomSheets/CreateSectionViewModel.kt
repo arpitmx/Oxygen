@@ -6,11 +6,11 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.UseCases.CreateSegmentUseCase
-import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.ServerExceptions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -84,7 +84,7 @@ class CreateSectionViewModel @Inject constructor(
 
                         }
                         _showprogressLD.postValue(false)
-                        _segmentValidityLiveData.postValue(Codes.Status.VALID_INPUT)
+                        _segmentValidityLiveData.postValue(Errors.Status.VALID_INPUT)
                     }
 
                 }

@@ -56,7 +56,7 @@ class MainActivityViewModel @Inject constructor(
                 is ServerResult.Failure -> {
 
                     _showprogressLD.value = false
-                    _showdialogLD.value = listOf("Error", result.exception.message.toString())
+                    _showdialogLD.value = listOf("Errors", result.exception.message.toString())
 
                 }
             }

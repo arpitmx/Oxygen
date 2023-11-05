@@ -24,4 +24,5 @@ data class CurrentUser (
             val BIO:String="",
             val DESIGNATION:String="",
             val ROLE:Long=1,
+            val DP_URL:String?=null,
 )

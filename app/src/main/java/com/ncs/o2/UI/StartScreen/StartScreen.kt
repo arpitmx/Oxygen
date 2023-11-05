@@ -1,6 +1,5 @@
 package com.ncs.o2.UI.StartScreen
 
-import android.R.attr.duration
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Intent
@@ -10,19 +9,18 @@ import android.os.Looper
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.fadeIn
 import androidx.core.content.ContextCompat
-import androidx.core.os.postDelayed
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.FirebaseException
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.TestingConfig
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.blink
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -32,7 +30,9 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -43,13 +43,17 @@ class StartScreen : AppCompatActivity() {
         GlobalUtils.EasyElements(this@StartScreen)
     }
 
+    private val viewModel: LogCatViewModel by viewModels()
+
+
     private val binding: ActivitySplashScreenBinding by lazy {
         ActivitySplashScreenBinding.inflate(layoutInflater)
     }
 
     companion object {
-        val DELAY = 200L
+        val DELAY = 0L
         val DELAY_ACTIVITY_START = 0L
+        val TAG = "StartScreen"
     }
 
     private lateinit var ball: ImageView
@@ -63,16 +67,18 @@ class StartScreen : AppCompatActivity() {
 
     }
 
-    lateinit var scaleAnimation:ScaleAnimation
+    lateinit var scaleAnimation: ScaleAnimation
 
     private fun setBallTouchAnimator() {
 
         ball = binding.ball
         ball.rotateInfinity(this)
-        val maxsize = 1000f
+        val maxsize = 12f
         val change = 3f
 
-        ball.setOnClickThrottleBounceListener{
+
+
+        ball.setOnClickThrottleBounceListener {
 
             this.performHapticFeedback()
             val scale = ball.scaleX
@@ -85,8 +91,8 @@ class StartScreen : AppCompatActivity() {
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f
             )
-            ball.scaleX = scale+change
-            ball.scaleY = scale+change
+            ball.scaleX = scale + change
+            ball.scaleY = scale + change
 
             scaleAnimation.duration = 200
             scaleAnimation.fillAfter = true
@@ -180,9 +186,23 @@ class StartScreen : AppCompatActivity() {
             R.anim.fadein,
             R.anim.fadeout
         )
-
         finishAffinity()
     }
+
+    private fun showBallError(error: Errors) {
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            val tintColor = ContextCompat.getColor(this, R.color.redx)
+            binding.ball.setColorFilter(tintColor)
+
+            util.showActionSnackbar(binding.root, error.description, 150000, error.actionText) {
+                val tintColor = ContextCompat.getColor(this, R.color.pureblack)
+                binding.ball.setColorFilter(tintColor)
+                preloadData()
+            }
+        }, 500)
+    }
+
 
     private fun setUpViews(isTesting: Boolean) {
 
@@ -191,12 +211,9 @@ class StartScreen : AppCompatActivity() {
             startActivity(Intent(this, TestingConfig.activity))
             finishAffinity()
 
-
         } else {
 
-
             if (FirebaseAuth.getInstance().currentUser != null) {
-
                 preloadData()
 
             } else {
@@ -215,62 +232,83 @@ class StartScreen : AppCompatActivity() {
 
     }
 
-    private fun preloadData(){
-        FirebaseFirestore.getInstance().collection("Users")
-            .document(FirebaseAuth.getInstance().currentUser?.email!!)
-            .get(Source.SERVER)
+    private fun preloadData() {
+
+        FirebaseFirestore.getInstance().collection(Endpoints.USERS)
+            .document(FirebaseAuth.getInstance().currentUser?.email!!).get(Source.SERVER)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val document = task.result
-                    if (document != null && document.exists()) {
-                        val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
-                        val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
 
-                        if (isDetailsAdded == true && isPhotoAdded == true) {
-                            Handler(Looper.getMainLooper()).postDelayed(
-                                {
-                                    ball.animation.cancel()
-                                    ball.post {
-                                        valueAnimator.start()
-                                    }
-                                }, DELAY
-                            )
+                if (!task.isSuccessful || task.isNull) {
 
-
-                        } else if (isDetailsAdded == false) {
-                            val intent = Intent(this, AuthScreenActivity::class.java)
-                            intent.putExtra("isDetailsAdded", "false")
-                            intent.putExtra("showchooser", "false")
-                            startActivity(intent)
-                            finishAffinity()
-                        } else if (isPhotoAdded == false) {
-                            val intent = Intent(this, AuthScreenActivity::class.java)
-                            intent.putExtra("isPhotoAdded", "false")
-                            intent.putExtra("showchooser", "false")
-                            startActivity(intent)
-                            finishAffinity()
-                        }
-                    }
-                } else {
-
-
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        val tintColor = ContextCompat.getColor(this, R.color.redx)
-                        binding.ball.setColorFilter(tintColor)
-
+                        showBallError(Errors.NetworkErrors.NO_CONNECTION_ERR)
                         val exception = task.exception
                         exception?.printStackTrace()
-                        // Toast.makeText(this, "Error in loading", Toast.LENGTH_SHORT).show()
-
-                        util.showActionSnackbar(binding.root,"Check connection and try again",150000,"Retry") {
-                            val tintColor = ContextCompat.getColor(this, R.color.pureblack)
-                            binding.ball.setColorFilter(tintColor)
-                            preloadData()
-                        }
-                    },2000)
-
+                    return@addOnCompleteListener
                 }
+
+
+                val document = task.result
+
+                if (!document.exists()) {
+                    showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL)
+                    return@addOnCompleteListener
+                }
+
+                val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
+                val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
+
+                if (isDetailsAdded == null) {
+                    showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL)
+                    return@addOnCompleteListener
+                }
+
+                val projectsList = document.get("PROJECTS") as List<String>
+                PrefManager.putProjectsList(projectsList)
+
+                if (isDetailsAdded == true && isPhotoAdded == true) {
+                    Handler(Looper.getMainLooper()).postDelayed(
+
+                        {
+                            ball.animation.cancel()
+                            ball.post {
+                                valueAnimator.start()
+                            }
+                        }, DELAY
+                    )
+
+                } else if (isDetailsAdded == false) {
+
+                    val intent = Intent(this, AuthScreenActivity::class.java)
+                    intent.putExtra("isDetailsAdded", "false")
+                    intent.putExtra("showchooser", "false")
+                    startActivity(intent)
+                    finishAffinity()
+
+                } else {
+                    val intent = Intent(this, AuthScreenActivity::class.java)
+                    intent.putExtra("isPhotoAdded", "false")
+                    intent.putExtra("showchooser", "false")
+                    startActivity(intent)
+                    finishAffinity()
+                }
+
             }
+            .addOnFailureListener {exception ->
+
+                when (exception){
+                    is FirebaseNetworkException ->{
+                        showBallError(Errors.NetworkErrors.NO_CONNECTION_ERR)
+                    }
+
+                    is FirebaseAuthException ->{
+                        showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL)
+                    }
+                }
+
+                Timber.tag(TAG).d(exception.stackTraceToString())
+            }
+
+
     }
 
 

@@ -205,7 +205,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
             when(result){
                 is ServerResult.Failure -> {
-                    util.singleBtnDialog_InputError("Upload Error",
+                    util.singleBtnDialog_InputError("Upload Errors",
                         "There was an issue in uploading the profile picture, ${result.exception.message} \n\nplease retry",
                         "Retry"
                     ) {
@@ -233,7 +233,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
             when(result){
                 is ServerResult.Failure -> {
-                    util.singleBtnDialog_InputError("Upload Error",
+                    util.singleBtnDialog_InputError("Upload Errors",
                         "There was an issue in uploading the profile picture, ${result.exception.message},\n\nplease retry",
                         "Retry"
                     ) {
@@ -286,9 +286,8 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
-
+                                        PrefManager.putProjectsList(listOf("NCSOxygen"))
                                         PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!))
-
                                         requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                         requireActivity().finish()
                                     }
@@ -297,7 +296,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                     val exception = task.exception
                                     exception?.printStackTrace()
 
-                                    util.singleBtnDialog_InputError("Error",
+                                    util.singleBtnDialog_InputError("Errors",
                                         "There was an error : ${exception?.message} \nPlease retry",
                                         "Retry"
                                     ) {
@@ -308,7 +307,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                             }
                     }
                     .addOnFailureListener { e ->
-                        util.singleBtnDialog_InputError("Error",
+                        util.singleBtnDialog_InputError("Errors",
                             "There was an error : ${e.message} \nPlease retry",
                             "Retry"
                         ) {
@@ -322,7 +321,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
             } else {
 
-                    util.singleBtnDialog_InputError("Upload Error",
+                    util.singleBtnDialog_InputError("Upload Errors",
                         "There was an issue in uploading the profile picture,\n\nplease retry",
                         "Retry"
                     ) {

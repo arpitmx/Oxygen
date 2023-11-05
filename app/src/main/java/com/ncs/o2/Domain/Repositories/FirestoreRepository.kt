@@ -1,10 +1,8 @@
 package com.ncs.o2.Domain.Repositories
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -24,9 +22,6 @@ import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.UserInfo
-import com.ncs.o2.HelperClasses.ServerExceptions
-import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
-import com.ncs.o2.UI.MainActivity
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -61,7 +56,7 @@ class FirestoreRepository @Inject constructor(
 
     private val storageReference = FirebaseStorage.getInstance().reference
     private val TAG: String = FirestoreRepository::class.java.simpleName
-    lateinit var serverErrorCallback : ServerErrorCallback
+    lateinit var serverErrorCallback: ServerErrorCallback
 //    private val editor : SharedPreferences.Editor by lazy {
 //        pref.edit()
 //    }
@@ -71,18 +66,19 @@ class FirestoreRepository @Inject constructor(
                 "/${task.project_ID}" +
                 "/${Endpoints.Project.SEGMENT}" +
                 "/${task.segment}" +
-                "/${Endpoints.Project.TASKS}"+
+                "/${Endpoints.Project.TASKS}" +
                 "/${task.id}" +
                 "/"
 
     }
 
     fun getNotificationsRef(toUser: String): CollectionReference {
-        return firestore.collection(Endpoints.USERS).document(toUser).collection(Endpoints.Notifications.NOTIFICATIONS)
+        return firestore.collection(Endpoints.USERS).document(toUser)
+            .collection(Endpoints.Notifications.NOTIFICATIONS)
         //Endpoints.USERS+"/${notification.fromUser}"+"/${Endpoints.Notifications.NOTIFICATIONS}"
     }
 
-    fun getNotificationTimeStampPath():String{
+    fun getNotificationTimeStampPath(): String {
 //        return Endpoints.USERS +
 //                "/${FirebaseAuth.getInstance().currentUser!!.email}"
 
@@ -90,16 +86,18 @@ class FirestoreRepository @Inject constructor(
                 "/userid1"
 
     }
+
     override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit) {
 
-        val currentTimeStamp = HashMap<String,Any>()
-        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_TIME_STAMP] = FieldValue.serverTimestamp()
+        val currentTimeStamp = HashMap<String, Any>()
+        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_TIME_STAMP] =
+            FieldValue.serverTimestamp()
 
         return try {
             serverResult(ServerResult.Progress)
             firestore.document(getNotificationTimeStampPath()).update(currentTimeStamp).await()
             serverResult(ServerResult.Success(200))
-        } catch (e:Exception){
+        } catch (e: Exception) {
             serverResult(ServerResult.Failure(e))
         }
     }
@@ -118,7 +116,7 @@ class FirestoreRepository @Inject constructor(
             getNotificationsRef(notification.toUser).add(notification).await()
             serverResult(ServerResult.Success(200))
 
-        }catch (e : Exception){
+        } catch (e: Exception) {
             serverResult(ServerResult.Failure(e))
         }
 
@@ -126,12 +124,13 @@ class FirestoreRepository @Inject constructor(
 
 
     ////////////////////////////// FIREBASE USER DP FUNCTIONALITY //////////////////////////
-    override fun uploadUserDP(bitmap: Bitmap):  LiveData<ServerResult<StorageReference>> {
+    override fun uploadUserDP(bitmap: Bitmap): LiveData<ServerResult<StorageReference>> {
 //        serverResult(ServerResult.Progress)
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
 
-        val imageFileName = "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
+        val imageFileName =
+            "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
@@ -141,7 +140,8 @@ class FirestoreRepository @Inject constructor(
             val userData = mapOf(
                 "PHOTO_ADDED" to true,
             )
-            FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+            FirebaseFirestore.getInstance().collection("Users")
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
                     liveData.postValue(ServerResult.Success(imageRef))
@@ -174,12 +174,14 @@ class FirestoreRepository @Inject constructor(
             }
             .addOnFailureListener { exception ->
                 liveData.postValue(ServerResult.Failure(exception))
-             }
+            }
         return liveData
     }
+
     override fun addImageUrlToFirestore(DPUrl: String): LiveData<Boolean> {
         val liveData = MutableLiveData<Boolean>()
-        FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+        FirebaseFirestore.getInstance().collection("Users")
+            .document(FirebaseAuth.getInstance().currentUser?.email!!)
             .update("DP_URL", DPUrl)
             .addOnSuccessListener {
                 liveData.postValue(true)
@@ -195,15 +197,15 @@ class FirestoreRepository @Inject constructor(
 
     fun getProjectRef(projectID: String): DocumentReference {
         return firestore.collection(Endpoints.PROJECTS).document(projectID)
-    // return Endpoints.PROJECTS + "/${projectID}"
+        // return Endpoints.PROJECTS + "/${projectID}"
     }
 
-    fun generateRandomID(id:IDType): String {
+    fun generateRandomID(id: IDType): String {
 
         val random = Random(System.currentTimeMillis())
         val randomNumber = random.nextInt(10000, 99999)
 
-        when(id){
+        when (id) {
             IDType.UserID -> return "#U$randomNumber"
             IDType.TaskID -> return "#T$randomNumber"
             IDType.SegmentID -> return "#S$randomNumber"
@@ -211,63 +213,64 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    fun getProjectPath(projectID: String):String{
+    fun getProjectPath(projectID: String): String {
         return Endpoints.PROJECTS + "/${projectID}" + "/"
     }
 
-    fun getTasksRepository(projectPath: String, isDuplicate : (List<String>)->Unit){
-            firestore.document(projectPath)
-                .get(Source.SERVER)
-                .addOnSuccessListener { snap->
-                    if (snap.exists()){
-                        val taskMap = snap.get(Endpoints.Project.TASKS) as Map<String, String>
-                        val taskArrayList = taskMap.keys.toList()
-                        isDuplicate(taskArrayList)
+    fun getTasksRepository(projectPath: String, isDuplicate: (List<String>) -> Unit) {
+        firestore.document(projectPath)
+            .get(Source.SERVER)
+            .addOnSuccessListener { snap ->
 
-                    }else{
-                        Timber.tag(tag = TAG).d("No tasks exists")
-                       isDuplicate(listOf())
-                    }
+                if (snap.exists()) {
+                    val taskMap = snap.get(Endpoints.Project.TASKS) as Map<String, String>
+                    val taskArrayList = taskMap.keys.toList()
+                    isDuplicate(taskArrayList)
+
+                } else {
+                    Timber.tag(tag = TAG).d("No tasks exists")
+                    isDuplicate(listOf())
                 }
-                .addOnFailureListener{
-                    serverErrorCallback.handleServerException(it.message!!)
-                }
+            }
+            .addOnFailureListener {
+                serverErrorCallback.handleServerException(it.message!!)
+            }
 
     }
 
 
+    fun uniqueIDfromList(idType: IDType, list: List<String>): String {
+        var uniqueID: String
+
+        when (idType) {
+            IDType.UserID -> {
+                do {
+                    uniqueID = generateRandomID(idType)
+                } while (list.contains(uniqueID))
+            }
+
+            IDType.TaskID -> {
+                uniqueID = generateRandomID(idType)
+
+            }
+
+            IDType.SegmentID -> {
+                uniqueID = generateRandomID(idType)
+
+            }
+        }
+
+        return uniqueID
+    }
 
 
-   fun uniqueIDfromList(idType: IDType, list: List<String>):String{
-       var uniqueID : String
-
-       when(idType){
-           IDType.UserID -> {
-               do {
-                   uniqueID = generateRandomID(idType)
-               } while (list.contains(uniqueID))
-           }
-           IDType.TaskID ->{
-               uniqueID = generateRandomID(idType)
-
-           }
-           IDType.SegmentID -> {
-               uniqueID = generateRandomID(idType)
-
-           }
-       }
-
-       return uniqueID
-   }
-
-
-    override fun createUniqueID(idType: IDType, projectID: String, generatedID:(String)->Unit){
+    override fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit) {
 
         val projectPath = getProjectPath(projectID)
-        when(idType){
-            IDType.TaskID ->{
-                    getTasksRepository(projectPath) { tasksArray->
-                            generatedID(uniqueIDfromList(idType,tasksArray))
+        when (idType) {
+            IDType.TaskID -> {
+                getTasksRepository(projectPath) { tasksArray ->
+                    generatedID(uniqueIDfromList(idType, tasksArray))
                 }
             }
 
@@ -287,25 +290,27 @@ class FirestoreRepository @Inject constructor(
         this.serverErrorCallback = callback
     }
 
-    private fun getSegmentRef(task: Task):DocumentReference{
+    private fun getSegmentRef(task: Task): DocumentReference {
         return firestore.collection(Endpoints.PROJECTS)
             .document(task.project_ID)
 
     }
 
 
-    override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit){
+    override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit) {
 
         val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
 
         return try {
 
-        serverResult(ServerResult.Progress)
-//        firestore.document(getTaskPath(task)).set(task).await()
-        getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task).await()
-        serverResult(ServerResult.Success(200))
-        }
-        catch (exception:Exception) {
+            serverResult(ServerResult.Progress)
+
+           //firestore.document(getTaskPath(task)).set(task).await()
+            getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task).await()
+
+            serverResult(ServerResult.Success(200))
+
+        } catch (exception: Exception) {
             serverResult(ServerResult.Failure(exception))
         }
 
@@ -336,47 +341,52 @@ class FirestoreRepository @Inject constructor(
         }, 1000)
     }
 
-    override fun getUserInfo1(serverResult: (ServerResult<UserInfo?>) -> Unit) {
+    override fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit) {
+
         serverResult(ServerResult.Progress)
-        Handler(Looper.getMainLooper()).postDelayed({
-            var userInfo: UserInfo?
-            firestore.collection(Endpoints.USERS)
-                .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .get(Source.SERVER)
-                .addOnSuccessListener { snap ->
-                    if (snap.exists()) {
-                        userInfo = snap.toObject(UserInfo::class.java)
 
-                        Timber.tag(TAG).d(userInfo?.username)
-                        Timber.tag(TAG).d(userInfo?.designation)
-                        Timber.tag(TAG).d(userInfo?.bio)
-                        Timber.tag(TAG).d(userInfo?.profileDPUrl)
+        //  Handler(Looper.getMainLooper()).postDelayed({
+        var userInfo: UserInfo?
+        firestore.collection(Endpoints.USERS)
+            .document(FirebaseAuth.getInstance().currentUser?.email!!)
+            .get(Source.SERVER)
+            .addOnSuccessListener { snap ->
 
-                        serverResult(ServerResult.Success(userInfo))
-                    }
+                if (snap.exists()) {
+                    userInfo = snap.toObject(UserInfo::class.java)
+
+                    Timber.tag(TAG).d(userInfo?.USERNAME)
+                    Timber.tag(TAG).d(userInfo?.DESIGNATION)
+                    Timber.tag(TAG).d(userInfo?.BIO)
+                    Timber.tag(TAG).d(userInfo?.DP_URL)
+
+                    serverResult(ServerResult.Success(userInfo))
                 }
-                .addOnFailureListener { error ->
-                    Timber.tag(TAG).d("failed %s", error.stackTrace)
-                    serverResult(ServerResult.Failure(error))
-                }
-        }, 1000)
+            }
+            .addOnFailureListener { error ->
+                Timber.tag(TAG).d("failed %s", error.stackTrace)
+                serverResult(ServerResult.Failure(error))
+            }
+        //    }, 1000)
     }
 
     override fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit) {
+
         serverResult(ServerResult.Progress)
-        Handler(Looper.getMainLooper()).postDelayed({
-            firestore.collection(Endpoints.USERS)
-                .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .set(userInfo)
-                .addOnSuccessListener { snap ->
-                    serverResult(ServerResult.Success(userInfo))
-                }
-                .addOnFailureListener { error ->
-                    Timber.tag(TAG).d("failed %s", error.stackTrace)
-                    serverResult(ServerResult.Failure(error))
-                }
-        }, 1000)
+
+        firestore.collection(Endpoints.USERS)
+            .document(FirebaseAuth.getInstance().currentUser?.email!!)
+            .set(userInfo)
+            .addOnSuccessListener { snap ->
+                serverResult(ServerResult.Success(userInfo))
+            }
+            .addOnFailureListener { error ->
+                Timber.tag(TAG).d("failed %s", error.stackTrace)
+                serverResult(ServerResult.Failure(error))
+            }
+
     }
+
 
     override fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit) {
         getUserInfo { result ->
@@ -384,14 +394,15 @@ class FirestoreRepository @Inject constructor(
             when (result) {
 
 
-
                 is ServerResult.Failure -> {
                     projectListCallback(ServerResult.Failure(result.exception))
                 }
+
                 ServerResult.Progress -> {
                     projectListCallback(ServerResult.Progress)
 
                 }
+
                 is ServerResult.Success -> {
                     projectListCallback(ServerResult.Success(result.data!!.PROJECTS))
                 }
@@ -407,10 +418,10 @@ class FirestoreRepository @Inject constructor(
 
             serverResult(ServerResult.Progress)
             firestore.collection(Endpoints.PROJECTS)
-                .document(segment.project_ID).collection(Endpoints.Project.SEGMENT).document(segment.segment_NAME).set(segment)
+                .document(segment.project_ID).collection(Endpoints.Project.SEGMENT)
+                .document(segment.segment_NAME).set(segment)
             serverResult(ServerResult.Success(200))
-        }
-        catch (exception:Exception) {
+        } catch (exception: Exception) {
             serverResult(ServerResult.Failure(exception))
         }
     }
@@ -452,7 +463,7 @@ class FirestoreRepository @Inject constructor(
             .document(projectName)
             .collection(Endpoints.Project.TASKS)
             .whereEqualTo("section", sectionName)
-            .whereEqualTo("segment",segmentName)
+            .whereEqualTo("segment", segmentName)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<Task>()
@@ -466,22 +477,25 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
-    fun getSegments(projectName: String,result: (ServerResult<List<Segment>>) -> Unit
-    ){
-      firestore.collection(Endpoints.PROJECTS).document(projectName).collection(Endpoints.Project.SEGMENT)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-              val segment_list = mutableListOf<Segment>()
-              for (document in querySnapshot.documents) {
-                  val segments = document.toObject(Segment::class.java)
-                  segment_list.add(segments!!)
-              }
-                  Timber.d("segements",segment_list.toString())
-              result(ServerResult.Success(segment_list))
-          }
-          .addOnFailureListener { exception ->
-              result(ServerResult.Failure(exception))
-          }
+
+    fun getSegments(
+        projectName: String, result: (ServerResult<List<Segment>>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.SEGMENT)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val segment_list = mutableListOf<Segment>()
+                for (document in querySnapshot.documents) {
+                    val segments = document.toObject(Segment::class.java)
+                    segment_list.add(segments!!)
+                }
+                Timber.d("segements", segment_list.toString())
+                result(ServerResult.Success(segment_list))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
     }
 
 

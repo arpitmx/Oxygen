@@ -1,4 +1,4 @@
-package com.ncs.o2.UI.UIComponents.EditProfile
+package com.ncs.o2.UI.EditProfile
 
 import android.os.Bundle
 import android.view.View
@@ -33,6 +33,7 @@ class EditProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setUpView()
+
         viewModel.getUserDetails()
         viewModel._getUserDetails.observe(this) { serverResult ->
 
@@ -44,7 +45,7 @@ class EditProfileActivity : AppCompatActivity() {
                         newUserInfo= userInfo
                         setOldUserDetails(response)
                         hideProgressBar()
-                        Toast.makeText(this, response.username.toString(), Toast.LENGTH_SHORT)
+                        Toast.makeText(this, response.USERNAME.toString(), Toast.LENGTH_SHORT)
                             .show()
 
                         binding.btnEdit.isEnabled = true
@@ -74,13 +75,14 @@ class EditProfileActivity : AppCompatActivity() {
             binding.etBio.text?.trim()?.let {
                 newBio= binding.etBio.toString()
             }
+
             val newImageUrl= "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/quiz0.jpg?alt=media&token=d16f5af1-f85e-4ffb-9c7d-7e8acebd97b9"
 
             newUserInfo= UserInfo(
-                newUsername ?: userInfo.username,
-                newDesignation ?: userInfo.designation,
-                newBio ?: userInfo.bio,
-                newImageUrl ?: userInfo.profileDPUrl
+                newUsername ?: userInfo.USERNAME,
+                newDesignation ?: userInfo.DESIGNATION,
+                newBio ?: userInfo.BIO,
+                newImageUrl ?: userInfo.DP_URL
             )
 
             editUserDetails(newUserInfo)
@@ -88,27 +90,28 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun setOldUserDetails(userInfo: UserInfo){
-        userInfo.username?.let {
+
+        userInfo.USERNAME?.let {
             binding.etName.setText(it)
         }
-        userInfo.designation?.let {
+        userInfo.DESIGNATION?.let {
             binding.etDesignation.setText(it)
         }
-        userInfo.bio?.let {
+        userInfo.BIO?.let {
             binding.etBio.setText(it)
         }
-        userInfo.profileDPUrl?.let {url ->
+        userInfo.DP_URL?.let {url ->
             try {
 
                 Glide.with(this)
                     .load(url)
                     .fitCenter()
                     .placeholder(R.drawable.profile_pic_placeholder)
-                    .error(R.drawable.ab)
+                    .error(R.drawable.ncs)
                     .into(binding.ivPicPreview)
 
             }catch (e: Exception){
-                Timber.tag(TAG).e("An Error occurred: %s", e)
+                Timber.tag(TAG).e("An Errors occurred: %s", e)
             }
         }
     }
@@ -142,7 +145,7 @@ class EditProfileActivity : AppCompatActivity() {
                             binding.btnEdit.isEnabled = false
                             binding.btnEdit.isClickable = false
                             binding.btnEdit.setText(R.string.edit)
-                            Toast.makeText(this, "Error" , Toast.LENGTH_SHORT)
+                            Toast.makeText(this, "Errors" , Toast.LENGTH_SHORT)
                                 .show()
                         }
                     }
@@ -212,10 +215,17 @@ class EditProfileActivity : AppCompatActivity() {
 
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+        finish()
+    }
+
     private fun setUpView() {
         val backBtn = binding.toolbar.btnBackEditProfile
         backBtn.setOnClickThrottleBounceListener {
             onBackPressed()
+
         }
     }
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/task_detail_nav"
+    app:startDestination="@id/tasksDetailsHolderFragment"
+    >
+
+    <fragment
+        android:id="@+id/tasksDetailsHolderFragment"
+        android:name="com.ncs.o2.UI.Tasks.TaskDetails.TasksDetailsHolderFragment"
+        android:label="fragment_tasks_details_holder"
+        tools:layout="@layout/fragment_tasks_details_holder" />
+</navigation>
