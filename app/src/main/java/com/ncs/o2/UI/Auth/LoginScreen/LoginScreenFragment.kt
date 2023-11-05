@@ -139,10 +139,9 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                                             val username=document.getString("USERNAME")
                                             val role=document.getLong("ROLE")
                                             if (isDetailsAdded==true && isPhotoAdded==true) {
-
                                                 PrefManager.initialize(requireContext())
-                                                PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!))
-
+                                                PrefManager.putProjectsList(document.get("PROJECTS") as List<String>)
+                                                PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role.toString().toLong()))
                                                 startActivity(
                                                     Intent(
                                                         requireContext(),

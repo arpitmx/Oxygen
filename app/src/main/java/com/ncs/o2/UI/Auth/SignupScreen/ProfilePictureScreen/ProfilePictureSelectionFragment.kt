@@ -286,9 +286,8 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
-
+                                        PrefManager.putProjectsList(listOf("NCSOxygen"))
                                         PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!))
-
                                         requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                         requireActivity().finish()
                                     }

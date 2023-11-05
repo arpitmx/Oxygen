@@ -216,8 +216,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
         viewModel.projectListLiveData.observe(this) { projectList ->
-
-            projects=projectList!!.toMutableList()
+            projects=PrefManager.getProjectsList().toMutableList()
             projectListAdapter = ListAdapter(this, projects)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }
@@ -260,6 +259,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
         projects.addAll(userProjects)
+        PrefManager.putProjectsList(userProjects)
         projectListAdapter.notifyDataSetChanged()
     }
 
