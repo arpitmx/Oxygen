@@ -18,4 +18,5 @@
     <dimen name="padding_bottom_offset">3dp</dimen>
     <dimen name="action_bar_title">20dp</dimen>
     <dimen name="progress_offset">40dp</dimen>
+    <dimen name="padding_left_offset">20dp</dimen>
 </resources>

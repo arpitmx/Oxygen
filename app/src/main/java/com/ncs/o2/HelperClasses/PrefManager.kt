@@ -115,6 +115,8 @@ object PrefManager {
         editor.putString(Endpoints.User.USERNAME,user.USERNAME)
         editor.putString(Endpoints.User.EMAIL,user.EMAIL)
         editor.putString(Endpoints.User.BIO,user.BIO)
+        editor.putString(Endpoints.User.DP_URL,user.DP_URL)
+
         editor.putString(Endpoints.User.DESIGNATION,user.DESIGNATION)
         editor.putLong(Endpoints.User.ROLE,user.ROLE)
         editor.apply()

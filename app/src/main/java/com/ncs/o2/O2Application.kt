@@ -13,6 +13,7 @@ import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import com.ncs.o2.Services.NotificationApiService
 import com.ncs.o2.Domain.Workers.FCMWorker
+import me.shouheng.utils.UtilsApp
 import javax.inject.Inject
 
 /*
@@ -43,6 +44,7 @@ class O2Application : Application(), Configuration.Provider{
 
     override fun onCreate() {
         super.onCreate()
+
 
         if (BuildConfig.DEBUG)  {
             Timber.plant(Timber.DebugTree())

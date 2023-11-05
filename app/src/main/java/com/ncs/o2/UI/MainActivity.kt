@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.common.util.CrashUtils
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -45,6 +46,18 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import me.shouheng.utils.UtilsApp
+import me.shouheng.utils.app.ActivityUtils
+import me.shouheng.utils.app.IntentUtils
+import me.shouheng.utils.app.ResUtils
+import me.shouheng.utils.data.EncodeUtils
+import me.shouheng.utils.data.RegexUtils
+import me.shouheng.utils.data.StringUtils
+import me.shouheng.utils.stability.L
+import me.shouheng.utils.store.IOUtils
+import me.shouheng.utils.ui.ImageUtils
+import me.shouheng.utils.ui.ToastUtils
+import me.shouheng.utils.ui.ViewUtils
 import java.text.FieldPosition
 import javax.inject.Inject
 
@@ -172,6 +185,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     private fun setUpProjects() {
 
+
         // Set up the list of projects and related UI components
         binding.lottieProgressInclude.progressbarStrip.visible()
         binding.lottieProgressInclude.progressbarBlock.gone()
@@ -185,7 +199,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         Glide.with(this)
             .load(PrefManager.getDpUrl())
             .placeholder(R.drawable.profile_pic_placeholder)
-            .error(R.drawable.logogradhd)
+            .error(R.drawable.ncs)
             .override(200,200)
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
             .into(binding.drawerheaderfile.userDp)

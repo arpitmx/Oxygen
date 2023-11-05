@@ -11,10 +11,12 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.fadeIn
 import androidx.core.content.ContextCompat
 import androidx.core.os.postDelayed
+import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -43,12 +45,15 @@ class StartScreen : AppCompatActivity() {
         GlobalUtils.EasyElements(this@StartScreen)
     }
 
+    private val viewModel : LogCatViewModel by viewModels()
+
+
     private val binding: ActivitySplashScreenBinding by lazy {
         ActivitySplashScreenBinding.inflate(layoutInflater)
     }
 
     companion object {
-        val DELAY = 200L
+        val DELAY = 0L
         val DELAY_ACTIVITY_START = 0L
     }
 
@@ -58,8 +63,15 @@ class StartScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+
+
         setBallAnimator()
         setUpViews(TestingConfig.isTesting)
+
+
+//        viewModel.logCatOutput().observe(this, Observer{ logMessage ->
+//            binding.logs.append("$logMessage\n")
+//        })
 
     }
 
@@ -69,8 +81,10 @@ class StartScreen : AppCompatActivity() {
 
         ball = binding.ball
         ball.rotateInfinity(this)
-        val maxsize = 1000f
+        val maxsize = 12f
         val change = 3f
+
+
 
         ball.setOnClickThrottleBounceListener{
 

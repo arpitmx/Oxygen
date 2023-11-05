@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavOptions
@@ -32,10 +33,12 @@ import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpViewModel
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentLoginScreenBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import me.shouheng.utils.UtilsApp
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -114,13 +117,8 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
 
                         }
                         is ServerResult.Success -> {
-                            Toast.makeText(activity, "Authenticated", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(activity, "Power to you now", Toast.LENGTH_SHORT).show()
                             binding.progressbar.gone()
-                            Toast.makeText(
-                                activity,
-                                "Login success ",
-                                Toast.LENGTH_SHORT
-                            ).show()
                             Timber.tag(SignUpScreenFragment.TAG).d(
                                 "Login success : ${result.data.uid}"
                             )
@@ -131,17 +129,21 @@ class LoginScreenFragment @Inject constructor(): Fragment() {
                                     if (task.isSuccessful) {
                                         val document = task.result
                                         if (document != null && document.exists()) {
-                                            val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
-                                            val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
-                                            val bio=document.getString("BIO")
-                                            val designation=document.getString("DESIGNATION")
-                                            val email=document.getString("EMAIL")
-                                            val username=document.getString("USERNAME")
-                                            val role=document.getLong("ROLE")
+
+                                            val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
+                                            val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
+                                            val bio=document.getString(Endpoints.User.BIO)
+                                            val designation=document.getString(Endpoints.User.DESIGNATION)
+                                            val email=document.getString(Endpoints.User.EMAIL)
+                                            val username=document.getString(Endpoints.User.USERNAME)
+                                            val role=document.getLong(Endpoints.User.ROLE)
+                                            val dp : String?= document.getString(Endpoints.User.DP_URL)
+
                                             if (isDetailsAdded==true && isPhotoAdded==true) {
 
                                                 PrefManager.initialize(requireContext())
-                                                PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!))
+                                                PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!, DP_URL = dp))
+
 
                                                 startActivity(
                                                     Intent(
