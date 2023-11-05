@@ -67,21 +67,21 @@ class EditProfileActivity : AppCompatActivity() {
 
             var newUsername: String?= null
             binding.etName.text?.trim()?.let {
-                newUsername= binding.etName.toString()
+                newUsername= binding.etName.text.toString()
             }
 
             val newDesignation= binding.etDesignation.text.toString() ?: null
             var newBio: String?= null
             binding.etBio.text?.trim()?.let {
-                newBio= binding.etBio.toString()
+                newBio= binding.etBio.text.toString()
             }
 
             val newImageUrl= "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/quiz0.jpg?alt=media&token=d16f5af1-f85e-4ffb-9c7d-7e8acebd97b9"
 
             newUserInfo= UserInfo(
                 newUsername ?: userInfo.USERNAME,
-                newDesignation ?: userInfo.DESIGNATION,
                 newBio ?: userInfo.BIO,
+                newDesignation ?: userInfo.DESIGNATION,
                 newImageUrl ?: userInfo.DP_URL
             )
 

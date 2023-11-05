@@ -345,7 +345,6 @@ class FirestoreRepository @Inject constructor(
 
         serverResult(ServerResult.Progress)
 
-        //  Handler(Looper.getMainLooper()).postDelayed({
         var userInfo: UserInfo?
         firestore.collection(Endpoints.USERS)
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
@@ -367,16 +366,22 @@ class FirestoreRepository @Inject constructor(
                 Timber.tag(TAG).d("failed %s", error.stackTrace)
                 serverResult(ServerResult.Failure(error))
             }
-        //    }, 1000)
     }
 
     override fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit) {
 
         serverResult(ServerResult.Progress)
 
+        val userUpdate = mapOf(
+            "USERNAME" to userInfo.USERNAME,
+            "BIO" to userInfo.BIO,
+            "DESIGNATION" to userInfo.DESIGNATION,
+            "DP_URL" to userInfo.DP_URL
+        )
+
         firestore.collection(Endpoints.USERS)
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
-            .set(userInfo)
+            .update(userUpdate)
             .addOnSuccessListener { snap ->
                 serverResult(ServerResult.Success(userInfo))
             }

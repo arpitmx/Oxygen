@@ -35,7 +35,7 @@ import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
-import com.ncs.o2.UI.UIComponents.EditProfile.EditProfileActivity
+import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
