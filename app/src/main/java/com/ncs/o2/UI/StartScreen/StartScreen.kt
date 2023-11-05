@@ -239,7 +239,8 @@ class StartScreen : AppCompatActivity() {
                     if (document != null && document.exists()) {
                         val isDetailsAdded = document.getBoolean("DETAILS_ADDED")
                         val isPhotoAdded = document.getBoolean("PHOTO_ADDED")
-
+                        val projectsList=document.get("PROJECTS") as List<String>
+                        PrefManager.putProjectsList(projectsList)
                         if (isDetailsAdded == true && isPhotoAdded == true) {
                             Handler(Looper.getMainLooper()).postDelayed(
                                 {

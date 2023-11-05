@@ -192,4 +192,20 @@ object PrefManager {
             return listOf("Ongoing Progress", "Ready for Test", "Testing", "Completed")
         }
     }
+    fun putProjectsList(projects:List<String>){
+        val gson=Gson()
+        val projectsJson=gson.toJson(projects)
+        editor.putString("projects",projectsJson)
+        editor.apply()
+    }
+    fun getProjectsList():List<String>{
+        val projectsJson = sharedPreferences.getString("projects", null)
+        if (projectsJson != null) {
+            val gson = Gson()
+            val type = object : TypeToken<List<String>>() {}.type
+            return gson.fromJson(projectsJson, type)
+        }else{
+            return listOf("NCSOxygen")
+        }
+    }
 }

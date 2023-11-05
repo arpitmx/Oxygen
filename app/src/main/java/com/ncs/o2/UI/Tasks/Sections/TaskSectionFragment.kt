@@ -262,7 +262,9 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     }
 
     override fun onCLick(position: Int, task: Task) {
-        startActivity(Intent(requireContext(), TaskDetailActivity::class.java))
+        val intent = Intent(requireContext(), TaskDetailActivity::class.java)
+        intent.putExtra("task_id", task.id)
+        startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
