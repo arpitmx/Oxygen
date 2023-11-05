@@ -19,6 +19,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ChooseDesignationBottomSheetBinding
 import com.ncs.o2.databinding.FragmentUserDetailsBinding
+import com.ncs.versa.Constants.Endpoints
 
 @Suppress("DEPRECATION")
 class UserDetailsFragment : Fragment() {
@@ -42,15 +43,15 @@ class UserDetailsFragment : Fragment() {
             val bio=binding.etBio.text.toString()
 
             val userData = mapOf(
-                "username" to name,
-                "designation" to designation,
-                "bio" to bio,
-                "ROLE" to 1,
-                "DETAILS_ADDED" to true,
-                "PHOTO_ADDED" to false,
+                Endpoints.User.USERNAME to name,
+                Endpoints.User.DESIGNATION to designation,
+                Endpoints.User.BIO to bio,
+                Endpoints.User.ROLE to 1,
+                Endpoints.User.DETAILS_ADDED to true,
+                Endpoints.User.PHOTO_ADDED to false,
                 )
 
-            FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+            FirebaseFirestore.getInstance().collection(Endpoints.USERS).document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
                     findNavController().navigate(R.id.action_userDetailsFragment_to_profilePictureSelectionFragment)

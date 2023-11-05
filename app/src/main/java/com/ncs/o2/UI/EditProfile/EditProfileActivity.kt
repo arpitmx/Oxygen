@@ -1,51 +1,41 @@
-package com.ncs.o2.UI.UIComponents.EditProfile
+package com.ncs.o2.UI.EditProfile
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInfo
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.R
+import com.ncs.o2.databinding.ActivityEditProfileBinding
 import com.ncs.o2.databinding.ChooseDesignationBottomSheetBinding
-import com.ncs.o2.databinding.FragmentEditProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
-class EditProfileFragment : Fragment() {
+class EditProfileActivity : AppCompatActivity() {
 
-    private val TAG= "EditProfileFragment"
+    private val TAG= "EditProfileActivity"
 
     private val viewModel: EditProfileViewModel by viewModels()
-    private lateinit var binding: FragmentEditProfileBinding
+    private lateinit var binding: ActivityEditProfileBinding
     private lateinit var userInfo: UserInfo
     private lateinit var newUserInfo: UserInfo
-    private lateinit var bottomSheetBinding:ChooseDesignationBottomSheetBinding
+    private lateinit var bottomSheetBinding: ChooseDesignationBottomSheetBinding
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding= ActivityEditProfileBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        binding = FragmentEditProfileBinding.inflate(inflater,container,false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        setUpView()
 
         viewModel.getUserDetails()
-        viewModel._getUserDetails.observe(viewLifecycleOwner) { serverResult ->
+        viewModel._getUserDetails.observe(this) { serverResult ->
 
             when (serverResult) {
                 is ServerResult.Success -> {
@@ -55,7 +45,7 @@ class EditProfileFragment : Fragment() {
                         newUserInfo= userInfo
                         setOldUserDetails(response)
                         hideProgressBar()
-                        Toast.makeText(activity, response.username.toString(), Toast.LENGTH_SHORT)
+                        Toast.makeText(this, response.USERNAME.toString(), Toast.LENGTH_SHORT)
                             .show()
 
                         binding.btnEdit.isEnabled = true
@@ -75,45 +65,53 @@ class EditProfileFragment : Fragment() {
 
         binding.btnEdit.setOnClickListener {
 
-            val newUsername= binding.etName.text?.filter { it.isDigit() }.toString() ?: null
+            var newUsername: String?= null
+            binding.etName.text?.trim()?.let {
+                newUsername= binding.etName.toString()
+            }
+
             val newDesignation= binding.etDesignation.text.toString() ?: null
-            val newBio= binding.etBio.text?.filter { it.isLetterOrDigit() }.toString() ?: null
+            var newBio: String?= null
+            binding.etBio.text?.trim()?.let {
+                newBio= binding.etBio.toString()
+            }
+
             val newImageUrl= "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/quiz0.jpg?alt=media&token=d16f5af1-f85e-4ffb-9c7d-7e8acebd97b9"
 
             newUserInfo= UserInfo(
-                newUsername ?: userInfo.username,
-                newDesignation ?: userInfo.designation,
-                newBio ?: userInfo.bio,
-                newImageUrl ?: userInfo.profileDPUrl
+                newUsername ?: userInfo.USERNAME,
+                newDesignation ?: userInfo.DESIGNATION,
+                newBio ?: userInfo.BIO,
+                newImageUrl ?: userInfo.DP_URL
             )
 
             editUserDetails(newUserInfo)
         }
     }
 
-
     private fun setOldUserDetails(userInfo: UserInfo){
-        userInfo.username?.let {
+
+        userInfo.USERNAME?.let {
             binding.etName.setText(it)
         }
-        userInfo.designation?.let {
+        userInfo.DESIGNATION?.let {
             binding.etDesignation.setText(it)
         }
-        userInfo.bio?.let {
+        userInfo.BIO?.let {
             binding.etBio.setText(it)
         }
-        userInfo.profileDPUrl?.let {url ->
+        userInfo.DP_URL?.let {url ->
             try {
 
                 Glide.with(this)
                     .load(url)
                     .fitCenter()
                     .placeholder(R.drawable.profile_pic_placeholder)
-                    .error(R.drawable.purple)
+                    .error(R.drawable.ncs)
                     .into(binding.ivPicPreview)
 
             }catch (e: Exception){
-                Timber.tag(TAG).e("An Error occurred: %s", e)
+                Timber.tag(TAG).e("An Errors occurred: %s", e)
             }
         }
     }
@@ -122,7 +120,7 @@ class EditProfileFragment : Fragment() {
 
         if(userInfo!= newUserInfo){
             viewModel.editUserDetails(newUserInfo)
-            viewModel._editUserDetails.observe(viewLifecycleOwner) { serverResult ->
+            viewModel._editUserDetails.observe(this) { serverResult ->
 
                 when (serverResult) {
                     is ServerResult.Success -> {
@@ -133,10 +131,10 @@ class EditProfileFragment : Fragment() {
                             binding.btnEdit.isEnabled = true
                             binding.btnEdit.isClickable = true
                             binding.btnEdit.setText(R.string.edit)
-                            Toast.makeText(activity, "Updated", Toast.LENGTH_SHORT)
+                            Toast.makeText(this, "Updated", Toast.LENGTH_SHORT)
                                 .show()
 
-                            requireActivity().onBackPressed()
+                            onBackPressed()
 
                         }
                     }
@@ -147,7 +145,7 @@ class EditProfileFragment : Fragment() {
                             binding.btnEdit.isEnabled = false
                             binding.btnEdit.isClickable = false
                             binding.btnEdit.setText(R.string.edit)
-                            Toast.makeText(activity, "Error" , Toast.LENGTH_SHORT)
+                            Toast.makeText(this, "Errors" , Toast.LENGTH_SHORT)
                                 .show()
                         }
                     }
@@ -175,7 +173,7 @@ class EditProfileFragment : Fragment() {
 
     private fun setUpBottomDialog(){
         bottomSheetBinding = ChooseDesignationBottomSheetBinding.inflate(layoutInflater)
-        val dialog = BottomSheetDialog(requireContext())
+        val dialog = BottomSheetDialog(this)
 
 
         bottomSheetBinding.tvDesigner.setOnClickListener {
@@ -213,5 +211,17 @@ class EditProfileFragment : Fragment() {
 
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+        finish()
+    }
 
+    private fun setUpView() {
+        val backBtn = binding.toolbar.btnBackEditProfile
+        backBtn.setOnClickThrottleBounceListener {
+            onBackPressed()
+
+        }
+    }
 }

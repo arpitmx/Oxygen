@@ -1,6 +1,5 @@
-package com.ncs.o2.UI.UIComponents.EditProfile
+package com.ncs.o2.UI.EditProfile
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,7 +27,7 @@ class EditProfileViewModel @Inject constructor(
 
         try {
             if (hasInternetConnection()){
-                repository.getUserInfo1(){ result ->
+                repository.getUserInfoEditProfile(){ result ->
                     when (result) {
                         is ServerResult.Success -> {
                             // Handle success

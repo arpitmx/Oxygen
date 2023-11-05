@@ -203,7 +203,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
     override fun onProfileClick(user: User, position: Int) {
-        val bottomSheet = ProfileBottomSheet(user.profileDPUrl)
+        val bottomSheet = ProfileBottomSheet(user.profileDPUrl!!)
         bottomSheet.show(childFragmentManager, "bottomsheet")
     }
 

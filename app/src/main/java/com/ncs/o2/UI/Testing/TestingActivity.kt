@@ -122,7 +122,7 @@ class TestingActivity: AppCompatActivity() {
 
                         is ServerResult.Failure -> {
                             binding.progress.gone()
-                            binding.logs.text = binding.logs.text.toString().plus("\n> Error on task ${i}: ${result.exception.message}")
+                            binding.logs.text = binding.logs.text.toString().plus("\n> Errors on task ${i}: ${result.exception.message}")
                         }
 
                         ServerResult.Progress -> {
@@ -201,7 +201,7 @@ class TestingActivity: AppCompatActivity() {
 
                         is ServerResult.Failure -> {
                             binding.progress.gone()
-                            binding.logs.text = binding.logs.text.toString().plus("\n> Error on task ${task}: ${result.exception.message}")
+                            binding.logs.text = binding.logs.text.toString().plus("\n> Errors on task ${task}: ${result.exception.message}")
                         }
 
                         ServerResult.Progress -> {

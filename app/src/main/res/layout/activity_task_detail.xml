@@ -46,8 +46,13 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:layout_height="match_parent"
-        android:id="@+id/fragment"
-        android:layout_width="match_parent"/>
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:id="@+id/task_holder_fragment_container"
+        android:layout_width="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/task_detail_nav"
+
+        />
 
 
 </LinearLayout>

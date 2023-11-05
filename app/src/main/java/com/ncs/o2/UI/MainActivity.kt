@@ -1,11 +1,9 @@
 package com.ncs.o2.UI
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -16,13 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.gms.common.util.CrashUtils
-import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
@@ -31,41 +25,25 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
-import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
+import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
-import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
-import com.ncs.o2.UI.Tasks.TasksHolderFragment
-import com.ncs.o2.UI.Tasks.TasksHolderViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
-import com.ncs.o2.UI.UIComponents.EditProfile.EditProfileActivity
-import com.ncs.o2.UI.UIComponents.EditProfile.EditProfileFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import me.shouheng.utils.UtilsApp
-import me.shouheng.utils.app.ActivityUtils
-import me.shouheng.utils.app.IntentUtils
-import me.shouheng.utils.app.ResUtils
-import me.shouheng.utils.data.EncodeUtils
-import me.shouheng.utils.data.RegexUtils
-import me.shouheng.utils.data.StringUtils
-import me.shouheng.utils.stability.L
-import me.shouheng.utils.store.IOUtils
-import me.shouheng.utils.ui.ImageUtils
-import me.shouheng.utils.ui.ToastUtils
-import me.shouheng.utils.ui.ViewUtils
-import java.text.FieldPosition
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener  {
+class MainActivity : AppCompatActivity(), ProjectCallback,
+    SegmentSelectionBottomSheet.SegmentSelectionListener,
+    AddProjectBottomSheet.ProjectAddedListener {
     private lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
 
@@ -155,7 +133,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.btnHam.setOnClickThrottleBounceListener {
 
             // Toggle the navigation drawer
-            val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
+            val gravity =
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
 
         }
@@ -182,7 +161,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
             val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
             startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
             drawerLayout.closeDrawer(GravityCompat.START)
 
         }
@@ -204,16 +183,16 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.lottieProgressInclude.progressbarBlock.gone()
 
         viewModel.fetchUserProjectsFromRepository()
-        val user=PrefManager.getcurrentUserdetails()
-        binding.drawerheaderfile.username.text=user.USERNAME
-        binding.drawerheaderfile.designation.text=user.DESIGNATION
-        binding.drawerheaderfile.email.text=user.EMAIL
+        val user = PrefManager.getcurrentUserdetails()
+        binding.drawerheaderfile.username.text = user.USERNAME
+        binding.drawerheaderfile.designation.text = user.DESIGNATION
+        binding.drawerheaderfile.email.text = user.EMAIL
 
         Glide.with(this)
             .load(PrefManager.getDpUrl())
             .placeholder(R.drawable.profile_pic_placeholder)
             .error(R.drawable.ncs)
-            .override(200,200)
+            .override(200, 200)
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
             .into(binding.drawerheaderfile.userDp)
 
@@ -226,11 +205,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
         viewModel.showDialogLD.observe(this) { data ->
-            easyElements.singleBtnDialog(data[0], data[1],"OK",{})
+            easyElements.singleBtnDialog(data[0], data[1], "OK", {})
         }
 
         viewModel.projectListLiveData.observe(this) { projectList ->
-            projects=PrefManager.getProjectsList().toMutableList()
+            projects = PrefManager.getProjectsList().toMutableList()
             projectListAdapter = ListAdapter(this, projects)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }
@@ -242,7 +221,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.initialize(this)
         PrefManager.setcurrentsegment("Select Segment")
-        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
+        binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
 
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
@@ -267,7 +246,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         segmentText.value = segmentName
 
     }
-
 
 
     override fun onProjectAdded(userProjects: ArrayList<String>) {

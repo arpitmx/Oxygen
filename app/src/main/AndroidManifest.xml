@@ -20,7 +20,7 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
-            android:name=".UI.UIComponents.EditProfile.EditProfileActivity"
+            android:name=".UI.EditProfile.EditProfileActivity"
             android:exported="false" />
         <activity
             android:name=".UI.Testing.TestingActivity"
