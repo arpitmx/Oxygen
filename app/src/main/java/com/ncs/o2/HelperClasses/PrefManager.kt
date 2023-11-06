@@ -60,7 +60,7 @@ object PrefManager {
 
     //DP related
 
-    fun setDpUrl(url:String){
+    fun setDpUrl(url:String?){
         if (url != null){
             editor.putString(Endpoints.User.DP_URL, url)
         }

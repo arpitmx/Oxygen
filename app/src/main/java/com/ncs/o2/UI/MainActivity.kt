@@ -38,6 +38,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,6 +55,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
     // Views and data
     private lateinit var search: LinearLayout
     val segmentText = MutableLiveData<String>()
+
+    companion object{
+        val TAG = "MainActivity"
+    }
 
     // Utils
     private val easyElements: GlobalUtils.EasyElements by lazy {
@@ -86,6 +91,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
     private fun setUpViews() {
 
         // Set up various views and components
+        binding.lottieProgressInclude.progressbarBlock.gone()
+
         setUpProjects()
         setUpActionBar()
         setUpViewsOnClicks()
@@ -180,7 +187,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
 
         // Set up the list of projects and related UI components
         binding.lottieProgressInclude.progressbarStrip.visible()
-        binding.lottieProgressInclude.progressbarBlock.gone()
 
         viewModel.fetchUserProjectsFromRepository()
         val user = PrefManager.getcurrentUserdetails()
@@ -188,12 +194,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
         binding.drawerheaderfile.designation.text = user.DESIGNATION
         binding.drawerheaderfile.email.text = user.EMAIL
 
+        Timber.tag(TAG).d("DP URL : ${PrefManager.getDpUrl()}")
+
         Glide.with(this)
             .load(PrefManager.getDpUrl())
             .placeholder(R.drawable.profile_pic_placeholder)
             .error(R.drawable.ncs)
             .override(200, 200)
-            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
             .into(binding.drawerheaderfile.userDp)
 
         viewModel.showprogressLD.observe(this) { show ->

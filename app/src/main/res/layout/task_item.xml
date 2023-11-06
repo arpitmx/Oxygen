@@ -107,7 +107,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:fontFamily="@font/sf_pro_display_medium"
-        android:maxLines="2"
+        android:maxLines="20"
         android:ellipsize="end"
         android:minLines="1"
         android:text="Appbar integration on to be redesigned"
