@@ -16,10 +16,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ChooseDesignationBottomSheetBinding
 import com.ncs.o2.databinding.FragmentUserDetailsBinding
 import com.ncs.versa.Constants.Endpoints
+import javax.inject.Inject
 
 @Suppress("DEPRECATION")
 class UserDetailsFragment : Fragment() {
@@ -27,6 +29,9 @@ class UserDetailsFragment : Fragment() {
     companion object {
         fun newInstance() = UserDetailsFragment()
     }
+
+    @Inject
+    lateinit var util : GlobalUtils.EasyElements
     lateinit var binding: FragmentUserDetailsBinding
     private lateinit var viewModel: UserDetailsViewModel
     private lateinit var bottomSheetBinding: ChooseDesignationBottomSheetBinding
@@ -34,9 +39,13 @@ class UserDetailsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentUserDetailsBinding.inflate(inflater, container, false)
+        setUpViews()
+        return binding.root
+    }
 
+    private fun setUpViews(){
         binding.btnLogin.setOnClickThrottleBounceListener{
             val name=binding.etName.text.toString()
             val designation=binding.etDesignation.text.toString()
@@ -49,7 +58,7 @@ class UserDetailsFragment : Fragment() {
                 Endpoints.User.ROLE to 1,
                 Endpoints.User.DETAILS_ADDED to true,
                 Endpoints.User.PHOTO_ADDED to false,
-                )
+            )
 
             FirebaseFirestore.getInstance().collection(Endpoints.USERS).document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
@@ -57,10 +66,12 @@ class UserDetailsFragment : Fragment() {
                     findNavController().navigate(R.id.action_userDetailsFragment_to_profilePictureSelectionFragment)
                 }
                 .addOnFailureListener { e ->
-
+                    util.showSnackbar(binding.root,
+                        "Failure is pushing data, try again",
+                        15000
+                    )
                 }
         }
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -135,6 +135,15 @@ object PrefManager {
         return getcurrentUserdetails().EMAIL
     }
 
+    fun getUserFCMToken(): String {
+        return getcurrentUserdetails().FCM_TOKEN
+    }
+
+    fun setUserFCMToken(token : String){
+        editor.putString(Endpoints.User.FCM_TOKEN,token)
+        editor.apply()
+    }
+
     fun lastaddedproject(project:String){
         val lastproject = sharedPreferences.getString("last_project", null)
         if (lastproject != null) {

@@ -21,6 +21,7 @@ object Endpoints {
 
 
     object User {
+        val FCM_TOKEN= "FCM_TOKEN"
         val DP_URL = "DP_URL"
         const val PROJECTS = "PROJECTS"
         const val EMAIL = "EMAIL"

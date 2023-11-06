@@ -20,31 +20,43 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.TestingConfig
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.O2Application
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
+import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.O2Bot.O2Bot
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Exception
 import java.lang.RuntimeException
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class StartScreen : AppCompatActivity() {
+class StartScreen @Inject constructor(): AppCompatActivity() {
 
+    @Inject
+    @FirebaseRepository
+    lateinit var repository: Repository
 
     private val util: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this@StartScreen)
@@ -299,6 +311,7 @@ class StartScreen : AppCompatActivity() {
                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
 
+
                 if (PrefManager.getDpUrl()==null){
                     val dp_url = document.getString(Endpoints.User.DP_URL)
                     PrefManager.setDpUrl(dp_url)
@@ -309,7 +322,13 @@ class StartScreen : AppCompatActivity() {
                     return@addOnCompleteListener
                 }
 
+
                 val projectsList = document.get("PROJECTS") as List<String>
+                val fcmToken = document.getString(Endpoints.User.FCM_TOKEN)
+
+
+                updateTokenIfRequired(fcmToken?:"")
+
                 PrefManager.putProjectsList(projectsList)
 
                 if (isDetailsAdded == true && isPhotoAdded == true) {
@@ -355,6 +374,44 @@ class StartScreen : AppCompatActivity() {
                 Timber.tag(TAG).d(exception.stackTraceToString())
             }
 
+
+    }
+
+
+    private fun updateTokenIfRequired(serverFCMToken : String) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Timber.tag(SignUpScreenFragment.TAG)
+                    .w(task.exception, "Fetching FCM registration token failed")
+                return@addOnCompleteListener
+            }
+
+            val actualFCM = task.result
+            if (serverFCMToken != actualFCM){
+                PrefManager.setUserFCMToken(actualFCM)
+                updateFCMToken(actualFCM)
+            }
+
+        }
+
+    }
+
+    private fun updateFCMToken(actualFCM: String?) {
+            CoroutineScope(Dispatchers.Main).launch {
+                repository.setFCMToken(actualFCM!!){ result->
+                    when(result){
+                        is ServerResult.Failure -> {
+                            showBallError(Errors.FCMTokenErrors.FCM_TOKEN_UPDATE_FAILED,result.exception)
+                        }
+                        ServerResult.Progress -> {
+
+                        }
+                        is ServerResult.Success -> {
+                            util.showSnackbar(binding.root,"FCM token updated",5000)
+                        }
+                    }
+                }
+            }
 
     }
 

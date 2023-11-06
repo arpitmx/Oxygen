@@ -3,7 +3,6 @@ package com.ncs.o2.Domain.Repositories
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +23,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.UserInfo
+import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -86,7 +86,6 @@ class FirestoreRepository @Inject constructor(
 
         return Endpoints.USERS +
                 "/userid1"
-
     }
 
     override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit) {
@@ -127,10 +126,8 @@ class FirestoreRepository @Inject constructor(
 
     ////////////////////////////// FIREBASE USER DP FUNCTIONALITY //////////////////////////
     override fun uploadUserDP(bitmap: Bitmap): LiveData<ServerResult<StorageReference>> {
-//        serverResult(ServerResult.Progress)
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
-
         val imageFileName =
             "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
         val imageRef = storageReference.child(imageFileName)
@@ -138,27 +135,26 @@ class FirestoreRepository @Inject constructor(
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
         val data = baos.toByteArray()
         val uploadTask = imageRef.putBytes(data)
+
+
         uploadTask.addOnSuccessListener {
             val userData = mapOf(
                 "PHOTO_ADDED" to true,
             )
-            FirebaseFirestore.getInstance().collection("Users")
+
+            firestore.collection("Users")
                 .document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
                     liveData.postValue(ServerResult.Success(imageRef))
-//                    serverResult(ServerResult.Success(imageRef))
                 }
                 .addOnFailureListener { e ->
                     liveData.postValue(ServerResult.Failure(e))
-
-//                    serverResult(ServerResult.Failure(e))
                 }
 
         }.addOnFailureListener { exception ->
             liveData.postValue(ServerResult.Failure(exception))
 
-//            serverResult(ServerResult.Failure(exception))
         }
 
         return liveData
@@ -181,8 +177,9 @@ class FirestoreRepository @Inject constructor(
     }
 
     override fun addImageUrlToFirestore(DPUrl: String): LiveData<Boolean> {
+
         val liveData = MutableLiveData<Boolean>()
-        FirebaseFirestore.getInstance().collection("Users")
+        firestore.collection("Users")
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
             .update("DP_URL", DPUrl)
             .addOnSuccessListener {
@@ -266,6 +263,27 @@ class FirestoreRepository @Inject constructor(
     }
 
 
+    override suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit) {
+
+        val userData = mapOf(
+            Endpoints.User.FCM_TOKEN to token,
+        )
+
+        return try {
+
+            serverResult(ServerResult.Progress)
+          firestore.collection(Endpoints.USERS)
+              .document(FirebaseAuth.getInstance().currentUser?.email!!)
+              .update(userData).awaitt()
+          serverResult(ServerResult.Success(200))
+
+       }catch (e : Exception){
+           serverResult(ServerResult.Failure(e))
+       }
+
+    }
+
+
     override fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit) {
 
         val projectPath = getProjectPath(projectID)
@@ -306,9 +324,9 @@ class FirestoreRepository @Inject constructor(
         return try {
 
             serverResult(ServerResult.Progress)
-
-           //firestore.document(getTaskPath(task)).set(task).await()
-            getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task).await()
+            //firestore.document(getTaskPath(task)).set(task).await()
+            getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task)
+                .await()
 
             serverResult(ServerResult.Success(200))
 
@@ -499,12 +517,14 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
-    fun getTasksItem(
+
+   fun getTasksItem(
         projectName: String,
         segmentName: String,
         sectionName: String,
         result: (ServerResult<List<TaskItem>>) -> Unit
     ) {
+
         firestore.collection(Endpoints.PROJECTS)
             .document(projectName)
             .collection(Endpoints.Project.TASKS)
@@ -514,23 +534,44 @@ class FirestoreRepository @Inject constructor(
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<TaskItem>()
                 for (document in querySnapshot.documents) {
+
                     val title = document.getString("title")
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
                     val duration = document.getString("duration")
-                    val completed = document.get("completed")
-                    val assignee_DP_URL=document.getString("assignee_DP_URL")
-                    val taskItem = TaskItem(title = title!!,id=id!!,difficulty=difficulty.toString().toInt(),duration=duration!!, completed = completed.toString().toBoolean(),assignee_DP_URL=assignee_DP_URL!!)
+                    val completed = document.getBoolean("completed")
+                    val assignerID = document.getString("assigner")
+
+
+                    val assignee_DP_URL = document.getString("assignee_DP_URL")
+
+//                       val assigneeDPUrl = firestore
+//                           .collection(Endpoints.USERS).
+//                           document(assignerID!!)
+//                           .get().await()
+
+
+                    val taskItem = TaskItem(
+                        title = title!!,
+                        id = id!!,
+                        difficulty = difficulty.toString().toInt(),
+                        duration = duration!!,
+                        completed = completed.toString().toBoolean(),
+                        assignee_DP_URL = assignee_DP_URL!!
+                    )
                     sectionList.add(taskItem)
+                    result(ServerResult.Success(sectionList))
+
+
                 }
-                result(ServerResult.Success(sectionList))
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
     }
+
     fun getTasksbyId(
-        id:String,
+        id: String,
         projectName: String,
         result: (ServerResult<Task>) -> Unit
     ) {

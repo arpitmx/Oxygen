@@ -66,13 +66,6 @@ class O2Application : Application(), Configuration.Provider{
             Timber.plant(Timber.DebugTree())
         }
 
-        Thread.setDefaultUncaughtExceptionHandler { thread, e ->
-            handleUncaughtException(
-                thread,
-                e
-            )
-        }
-
         fcmToken()
     }
 

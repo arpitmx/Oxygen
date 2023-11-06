@@ -53,6 +53,9 @@ interface Repository {
     suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit)
     suspend fun postNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
 
+    suspend fun setFCMToken(token : String , serverResult: (ServerResult<Int>) -> Unit)
+
+
     // User DP Related
     fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>>
     fun uploadUserDP(bitmap: Bitmap): LiveData<ServerResult<StorageReference>>

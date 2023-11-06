@@ -31,4 +31,8 @@ class LogCatViewModel() : ViewModel(){
             .useLines { lines -> lines.forEach { line -> emit(line) }
             }
     }
+
+    fun updateFCMToken() {
+
+    }
 }
