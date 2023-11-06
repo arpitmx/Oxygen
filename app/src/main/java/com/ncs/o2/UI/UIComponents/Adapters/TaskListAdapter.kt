@@ -12,6 +12,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
@@ -20,12 +21,12 @@ import com.ncs.o2.databinding.TaskItemBinding
 class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
-    private var taskList: ArrayList<Task> = ArrayList()
+    private var taskList: ArrayList<TaskItem> = ArrayList()
 
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(task: Task) {
+        fun bind(task: TaskItem) {
             Glide.with(binding.root)
                 .load(task.assignee_DP_URL)
                 .listener(object : RequestListener<Drawable> {
@@ -73,7 +74,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
         }
     }
 
-    fun setTaskList(newTaskList: List<Task>) {
+    fun setTaskList(newTaskList: List<TaskItem>) {
         val diffCallback = TaskDiffCallback(taskList, newTaskList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         taskList.clear()
@@ -105,10 +106,10 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
     }
 
     interface OnClickListener {
-        fun onCLick(position: Int, task: Task)
+        fun onCLick(position: Int, task: TaskItem)
     }
 
-    private class TaskDiffCallback(private val oldList: List<Task>, private val newList: List<Task>) : DiffUtil.Callback() {
+    private class TaskDiffCallback(private val oldList: List<TaskItem>, private val newList: List<TaskItem>) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int {
             return oldList.size
