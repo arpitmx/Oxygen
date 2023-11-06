@@ -1,11 +1,14 @@
 package com.ncs.o2.UI.Tasks.TaskDetails.Details
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -24,6 +27,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailViewModel
@@ -31,10 +35,12 @@ import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
+import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.datafaker.Faker
 import javax.inject.Inject
 
@@ -61,6 +67,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpViews()
+        Log.d("id",activityBinding.taskId)
+        setdetails(activityBinding.taskId)
     }
 
 
@@ -209,5 +217,31 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     override fun removeClick(user: User, position: Int) {
         TODO("Not yet implemented")
+    }
+    fun setdetails(id:String){
+        viewModel.getTasksbyId(id,PrefManager.getcurrentProject()) { result ->
+            when (result) {
+                is ServerResult.Success -> {
+                    binding.progressBar.gone()
+                    binding.scrollView2.visible()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val task = result.data
+                        binding.titleTv.text=task.title
+                        binding.descriptionTv.text=task.description
+                    }
+                }
+                is ServerResult.Failure -> {
+                    val errorMessage = result.exception.message
+                    binding.progressBar.gone()
+                }
+                is ServerResult.Progress->{
+                    binding.progressBar.visible()
+                }
+
+            }
+
+        }
+
+
     }
 }

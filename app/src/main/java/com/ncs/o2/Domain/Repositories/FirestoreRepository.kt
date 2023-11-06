@@ -3,6 +3,7 @@ package com.ncs.o2.Domain.Repositories
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,7 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
@@ -492,6 +494,60 @@ class FirestoreRepository @Inject constructor(
                 }
                 Timber.d("segements", segment_list.toString())
                 result(ServerResult.Success(segment_list))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+    fun getTasksItem(
+        projectName: String,
+        segmentName: String,
+        sectionName: String,
+        result: (ServerResult<List<TaskItem>>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+            .whereEqualTo("section", sectionName)
+            .whereEqualTo("segment", segmentName)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val sectionList = mutableListOf<TaskItem>()
+                for (document in querySnapshot.documents) {
+                    val title = document.getString("title")
+                    val id = document.getString("id")
+                    val difficulty = document.get("difficulty")!!
+                    val duration = document.getString("duration")
+                    val completed = document.get("completed")
+                    val assignee_DP_URL=document.getString("assignee_DP_URL")
+                    val taskItem = TaskItem(title = title!!,id=id!!,difficulty=difficulty.toString().toInt(),duration=duration!!, completed = completed.toString().toBoolean(),assignee_DP_URL=assignee_DP_URL!!)
+                    sectionList.add(taskItem)
+                }
+                result(ServerResult.Success(sectionList))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+    fun getTasksbyId(
+        id:String,
+        projectName: String,
+        result: (ServerResult<Task>) -> Unit
+    ) {
+
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+            .whereEqualTo("id", id)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    val taskData = document.toObject(Task::class.java)
+                    taskData?.let { result(ServerResult.Success(it)) }
+                } else {
+                    result(ServerResult.Failure(Exception("Document not found for title: $id")))
+                }
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))

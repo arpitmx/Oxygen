@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -44,7 +45,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     private lateinit var binding: FragmentTaskSectionBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter : TaskListAdapter
-    private lateinit var taskList: ArrayList<Task>
+    private lateinit var taskList: ArrayList<TaskItem>
     private lateinit var taskList2: ArrayList<Task>
     private lateinit var projectName:String
     private lateinit var segmentName:String
@@ -105,7 +106,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     }
 
     private fun setupRecyclerView() {
-        taskList= ArrayList<Task>()
+        taskList= ArrayList<TaskItem>()
         val task1 = Task("Appbar not working in the new implementation Appbar not working in the new implementation",
             "Have to implement that.","#1234",2, listOf("link1,link2"),3,1, assignee = listOf("mod1"),
             "Assigner1","31/2/23", duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/200", completed = true
@@ -123,7 +124,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         )
 //        taskList = arrayListOf(task1,task2,task3,task2,task1,task2,task1,task2,task1)
 //        taskList.add(task1)
-        viewModel.getTasksForSegment(projectName, segmentName, sectionName) { result ->
+        viewModel.getTasksItemsForSegment(projectName, segmentName, sectionName) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     val task = result.data
@@ -216,21 +217,21 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 //            taskList.remove(task2)
 //            Toast.makeText(requireContext(),"task2 removed",Toast.LENGTH_SHORT).show()
 
-            val update=Task("New Task Updated for id #1364",
-                "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
-                "Assigner1","31/2/22",
-                duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300", completed = false
-            )
+//            val update=Task("New Task Updated for id #1364",
+//                "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
+//                "Assigner1","31/2/22",
+//                duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300", completed = false
+//            )
 
-            val id=update.id
-            for(i in taskList.indices){
-                if(taskList[i].id==id){
-                    taskList[i]=update
-                }
-            }
+//            val id=update.id
+//            for(i in taskList.indices){
+//                if(taskList[i].id==id){
+//                    taskList[i]=update
+//                }
+//            }
 
-            Toast.makeText(requireContext(),"task updated",Toast.LENGTH_SHORT).show()
-            taskListAdapter.setTaskList(taskList)
+//            Toast.makeText(requireContext(),"task updated",Toast.LENGTH_SHORT).show()
+//            taskListAdapter.setTaskList(taskList)
 
         }
 
@@ -261,7 +262,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         searchCont.gone()
     }
 
-    override fun onCLick(position: Int, task: Task) {
+    override fun onCLick(position: Int, task: TaskItem) {
         val intent = Intent(requireContext(), TaskDetailActivity::class.java)
         intent.putExtra("task_id", task.id)
         startActivity(intent)
