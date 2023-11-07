@@ -13,12 +13,14 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
 import com.ncs.o2.databinding.TaskItemBinding
+import java.util.Date
 
-class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
+class TaskListAdapter() : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
     private var taskList: ArrayList<TaskItem> = ArrayList()
@@ -26,7 +28,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(task: TaskItem) {
+        fun bind(task: TaskItem,) {
             Glide.with(binding.root)
                 .load(task.assignee_DP_URL)
                 .listener(object : RequestListener<Drawable> {
@@ -65,8 +67,15 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.taskTitle.paintFlags=binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
-
-            binding.taskDuration.text = "about ${task.duration} hours ago"
+            val timeDifference = Date().time - task.timestamp!!.toDate().time
+            val hours = (timeDifference / (1000 * 60 * 60)).toInt()
+            val days = (hours / 24).toInt()
+            val timeAgo: String = if (hours >= 24) {
+                "$days days ago"
+            } else {
+                "$hours hours ago"
+            }
+            binding.taskDuration.text = "about $timeAgo"
             binding.taskId.text = task.id
             binding.taskTitle.text = task.title
             binding.difficulty.text = task.getDifficultyString()

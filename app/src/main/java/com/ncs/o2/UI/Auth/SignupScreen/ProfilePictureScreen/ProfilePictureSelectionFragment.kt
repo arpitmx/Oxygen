@@ -21,6 +21,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -264,7 +265,8 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                 val userData = mapOf(
                     "PHOTO_ADDED" to true,
-                    "PROJECTS" to listOf("NCSOxygen")
+                    "PROJECTS" to listOf("NCSOxygen"),
+                    "TIMESTAMP" to Timestamp.now()
                 )
 
                 FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)

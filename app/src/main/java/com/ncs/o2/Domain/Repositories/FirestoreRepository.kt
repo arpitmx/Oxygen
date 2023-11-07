@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -23,6 +24,7 @@ import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.HelperClasses.ServerExceptions
@@ -30,6 +32,7 @@ import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelect
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.versa.Constants.Endpoints
@@ -357,7 +360,6 @@ class FirestoreRepository @Inject constructor(
     override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit) {
 
         val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
-
         return try {
 
             serverResult(ServerResult.Progress)
@@ -469,7 +471,49 @@ class FirestoreRepository @Inject constructor(
 
 
     }
+     override fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit) {
 
+        firestore.collection(Endpoints.USERS)
+            .whereEqualTo("EMAIL", id)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    val firebaseID = document.getString("EMAIL")
+                    val profileDPUrl = document.getString("DP_URL")
+                    val name = document.getString("USERNAME")!!
+                    val time=document.get("TIMESTAMP") as Timestamp
+                    val designation=document.getString("DESIGNATION")
+                    val user = User(
+                        firebaseID = firebaseID!!,profileDPUrl = profileDPUrl, username = name, timestamp = time, designation = designation!!
+                    )
+                    serverResult(ServerResult.Success(user))
+                } else {
+                    serverResult(ServerResult.Failure(Exception("Document not found for title: $id")))
+                }
+            }
+            .addOnFailureListener { exception ->
+                serverResult(ServerResult.Failure(exception))
+            }
+    }
+
+    override suspend fun postTags(tag: Tag,projectName: String, serverResult: (ServerResult<Int>) -> Unit) {
+
+
+        return try {
+
+            serverResult(ServerResult.Progress)
+            firestore.collection(Endpoints.PROJECTS)
+                .document(projectName).collection(Endpoints.Project.TAGS).document(tag.tagID!!).set(tag)
+                .await()
+
+            serverResult(ServerResult.Success(200))
+
+        } catch (exception: Exception) {
+            serverResult(ServerResult.Failure(exception))
+        }
+
+    }
     override fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit) {
         return try {
 
@@ -570,16 +614,20 @@ class FirestoreRepository @Inject constructor(
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<TaskItem>()
+                var assignerID:String
                 for (document in querySnapshot.documents) {
 
                     val title = document.getString("title")
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
-                    val duration = document.getString("duration")
+                    val time = document.get("time_STAMP") as Timestamp
                     val completed = document.getBoolean("completed")
-                    val assignerID = document.getString("assigner")
-
-
+                    if (document.getString("assigner_email")!=null) {
+                        assignerID = document.getString("assigner_email")!!
+                    }
+                    else{
+                        assignerID="mohit@mail.com"
+                    }
                     val assignee_DP_URL = document.getString("assignee_DP_URL")
 
 //                       val assigneeDPUrl = firestore
@@ -592,9 +640,9 @@ class FirestoreRepository @Inject constructor(
                         title = title!!,
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
-                        duration = duration!!,
+                        timestamp = time,
                         completed = completed.toString().toBoolean(),
-                        assignee_DP_URL = assignee_DP_URL!!
+                        assignee_id = assignerID
                     )
                     sectionList.add(taskItem)
                     result(ServerResult.Success(sectionList))
@@ -606,7 +654,40 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
+    fun getTagbyId(
+        id: String,
+        projectName: String,
+        result: (ServerResult<Tag>) -> Unit
+    ) {
 
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TAGS)
+            .whereEqualTo("tagID", id)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+
+                        val tagText = document.getString("tagText")
+                        val tagID = document.getString("tagID")
+                        val textColor = document.getString("textColor")!!
+                        val bgColor = document.getString("bgColor")
+                        val tag = Tag(
+                            tagText = tagText!!,
+                            tagID = tagID,
+                            textColor = textColor,
+                            bgColor = bgColor!!,
+                        )
+                    result(ServerResult.Success(tag))
+                } else {
+                    result(ServerResult.Failure(Exception("Document not found for title: $id")))
+                }
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
     fun getTasksbyId(
         id: String,
         projectName: String,
@@ -631,6 +712,22 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
+    override suspend fun fetchProjectTags(projectName: String,result: (ServerResult<List<Tag>>) -> Unit) {
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.TAGS)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val tags_list = mutableListOf<Tag>()
+                for (document in querySnapshot.documents) {
+                    val tag = document.toObject(Tag::class.java)
+                    tags_list.add(tag!!)
+                }
+                result(ServerResult.Success(tags_list))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
 
+    }
 
 }

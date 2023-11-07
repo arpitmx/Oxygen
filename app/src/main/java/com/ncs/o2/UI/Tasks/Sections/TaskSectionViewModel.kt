@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -40,6 +41,12 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
         resultCallback: (ServerResult<List<TaskItem>>) -> Unit
     ) {
         firestoreRepository.getTasksItem(projectName, segmentName, sectionName, resultCallback)
+    }
+    fun getUserbyId(
+        id:String,
+        resultCallback: (ServerResult<User?>) -> Unit
+    ) {
+        firestoreRepository.getUserInfobyId(id,resultCallback)
     }
 
 }
