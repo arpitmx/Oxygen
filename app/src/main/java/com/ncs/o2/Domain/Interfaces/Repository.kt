@@ -9,6 +9,8 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
+import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.o2.Domain.Models.UserInfo
 
 /*
@@ -55,6 +57,9 @@ interface Repository {
 
     suspend fun setFCMToken(token : String , serverResult: (ServerResult<Int>) -> Unit)
 
+
+
+    fun maintenanceCheck(): LiveData<maintainceCheck>
 
     // User DP Related
     fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>>

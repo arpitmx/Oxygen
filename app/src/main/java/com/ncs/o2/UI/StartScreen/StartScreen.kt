@@ -7,6 +7,7 @@ import android.graphics.ColorSpace.Model
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
@@ -26,6 +27,8 @@ import com.ncs.o2.Constants.TestingConfig
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.blink
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -38,6 +41,7 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailViewModel
 import com.ncs.o2.UI.O2Bot.O2Bot
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
@@ -57,14 +61,18 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
+    private lateinit var MaintainceCheck: maintainceCheck
+
 
     private val util: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this@StartScreen)
     }
 
-    private val viewModel: LogCatViewModel by viewModels()
+//    private val viewModel: LogCatViewModel by viewModels()
     private val o2Bot: O2Bot by viewModels()
 
+
+    private val viewModel: StartScreenViewModel by viewModels()
 
     private val binding: ActivitySplashScreenBinding by lazy {
         ActivitySplashScreenBinding.inflate(layoutInflater)
@@ -83,6 +91,8 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         setContentView(binding.root)
 
         PrefManager.initialize(this)
+
+
         setBallAnimator()
         setUpViews(TestingConfig.isTesting)
 
@@ -201,13 +211,26 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     }
 
     private fun startMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        overridePendingTransition(
-            R.anim.fadein,
-            R.anim.fadeout
-        )
-        finishAffinity()
+
+        viewModel.checkMaintenanceThroughRepository().observe(this) {
+            if(Codes.STRINGS.isMaintaining != null){
+                if (Codes.STRINGS.isMaintaining == "true"){
+                    Log.d("maintainenceCheck", "maintaining")
+                    val intent = Intent(this, maintainingScreen::class.java)
+                    startActivity(intent)
+                    finishAffinity()
+                }
+                else{
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.fadein,
+                        R.anim.fadeout
+                    )
+                    finishAffinity()
+                }
+            }
+        }
     }
 
 
