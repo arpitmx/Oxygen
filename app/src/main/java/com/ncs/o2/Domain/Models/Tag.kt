@@ -1,6 +1,5 @@
 package com.ncs.o2.Domain.Models
 
-import android.graphics.Color
 import com.ncs.o2.Domain.Utility.Later
 
 /*
@@ -27,5 +26,5 @@ data class Tag(
     val bgColor : String,
     val textColor : String,
     val tagID:String?="",
-    var isChecked: Boolean = false
+    var checked: Boolean = false
 )

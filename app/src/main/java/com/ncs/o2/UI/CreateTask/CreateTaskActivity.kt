@@ -215,7 +215,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 selectedTags.remove(tag)
                 if (TagList.contains(tag)){
                     val index=TagList.indexOf(tag)
-                    TagList[index].isChecked=false
+                    TagList[index].checked=false
                 }
                 updateChipGroup()
             }
@@ -224,7 +224,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 selectedTags.remove(tag)
                 if (TagList.contains(tag)){
                     val index=TagList.indexOf(tag)
-                    TagList[index].isChecked=false
+                    TagList[index].checked=false
                 }
                 updateChipGroup()
 
