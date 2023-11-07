@@ -201,8 +201,8 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
             override fun onAnimationRepeat(animator: Animator) {
             }
-        })
-    }
+        })}
+
 
     private fun startMainActivity() {
 
@@ -440,6 +440,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
             }
 
     }
+
 
 
 }
