@@ -1,8 +1,11 @@
 package com.ncs.o2.Domain.Repositories
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
@@ -23,12 +26,18 @@ import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.HelperClasses.ServerExceptions
+import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
+import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.tasks.await
+import net.datafaker.providers.base.Bool
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
@@ -59,6 +68,7 @@ class FirestoreRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : Repository {
 
+    private var db = FirebaseFirestore.getInstance()
     private val storageReference = FirebaseStorage.getInstance().reference
     private val TAG: String = FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback: ServerErrorCallback
@@ -124,6 +134,33 @@ class FirestoreRepository @Inject constructor(
             serverResult(ServerResult.Failure(e))
         }
 
+    }
+
+    override fun maintenanceCheck(): LiveData<maintainceCheck> {
+        val liveData = MutableLiveData<maintainceCheck>()
+
+        db.collection("AppConfig")
+            .document("maintenance")
+            .get()
+            .addOnSuccessListener { data->
+                if(data.exists()){
+                    val maintanenceChecks = data.data?.get("isMaintaining").toString()
+                    val maintainceDesc = data.data?.get("Description").toString()
+
+                    Codes.STRINGS.isMaintaining = maintanenceChecks
+                    Codes.STRINGS.maintaninDesc = maintainceDesc
+
+
+                    val checks = data.toObject(maintainceCheck::class.java)
+                    liveData.postValue(checks!!)
+
+                }
+            }
+            .addOnFailureListener {
+                Log.d("checks","failed")
+            }
+
+        return liveData
     }
 
 
