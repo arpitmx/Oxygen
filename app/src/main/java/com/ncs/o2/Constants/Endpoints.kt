@@ -1,7 +1,7 @@
 package com.ncs.versa.Constants
 
-import com.google.firebase.auth.FirebaseAuth
-import com.ncs.o2.Domain.Repositories.FirebaseAuthRepository_Factory
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 
 object Endpoints {
 
@@ -21,6 +21,7 @@ object Endpoints {
 
 
     object User {
+
         val FCM_TOKEN= "FCM_TOKEN"
         val DP_URL = "DP_URL"
         const val PROJECTS = "PROJECTS"
@@ -31,6 +32,7 @@ object Endpoints {
         const val ROLE = "ROLE"
         const val PHOTO_ADDED = "PHOTO_ADDED"
         const val DETAILS_ADDED = "DETAILS_ADDED"
+        const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_LAST_SEEN"
 
     }
 
@@ -46,8 +48,21 @@ object Endpoints {
     }
 
     object Notifications{
-        const val NOTIFICATION_TIME_STAMP = "NOTIF_LAST_SEEN"
+        const val NOTIFICATION_LAST_SEEN = "NOTIFICATION_LAST_SEEN"
         const val NOTIFICATIONS = "NOTIFICATIONS"
+        const val TIMESTAMP = "timeStamp"
+
+        const val notificationID: String = "notificationID"
+        const val notificationType: String = "notificationType"
+
+
+        const val taskID: String= "taskID"
+        const val title: String= "title"
+        const val message: String= "message"
+
+        const val fromUser: String="fromUser"
+        const val toUser: String = "toUser"
+        const val timeStamp: String = "timeStamp"
 
     }
 

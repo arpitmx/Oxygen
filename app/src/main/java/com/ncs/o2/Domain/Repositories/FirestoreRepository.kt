@@ -5,11 +5,13 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -25,7 +27,12 @@ import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.versa.Constants.Endpoints
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
@@ -81,30 +88,84 @@ class FirestoreRepository @Inject constructor(
     }
 
     fun getNotificationTimeStampPath(): String {
-//        return Endpoints.USERS +
-//                "/${FirebaseAuth.getInstance().currentUser!!.email}"
-
         return Endpoints.USERS +
-                "/userid1"
+                "/${FirebaseAuth.getInstance().currentUser!!.email}"
+
     }
 
-    override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit) {
+    override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Long>) -> Unit) {
 
         val currentTimeStamp = HashMap<String, Any>()
-        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_TIME_STAMP] =
-            FieldValue.serverTimestamp()
+        val currentTime = com.google.firebase.Timestamp.now().seconds
+        currentTimeStamp[Endpoints.Notifications.NOTIFICATION_LAST_SEEN] = currentTime
 
         return try {
             serverResult(ServerResult.Progress)
             firestore.document(getNotificationTimeStampPath()).update(currentTimeStamp).await()
-            serverResult(ServerResult.Success(200))
+            serverResult(ServerResult.Success(currentTime))
         } catch (e: Exception) {
             serverResult(ServerResult.Failure(e))
         }
     }
 
-    override suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit) {
-        TODO("Not yet implemented")
+
+    override suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit) {
+        return try {
+            serverResult(ServerResult.Progress)
+            val lastSeenTimeStamp = firestore.document(getNotificationTimeStampPath()).get().await().getLong(Endpoints.User.NOTIFICATION_TIME_STAMP)
+            serverResult(ServerResult.Success(lastSeenTimeStamp!!))
+
+        } catch (e: Exception) {
+            serverResult(ServerResult.Failure(e))
+        }
+    }
+
+    override suspend fun getNewNotifications(lastSeenTimeStamp: Long, serverResult: (ServerResult<List<Notification>>) -> Unit) {
+
+       return try {
+            serverResult(ServerResult.Progress)
+
+            val notificationsCollection = firestore.collection(Endpoints.USERS)
+                .document(FirebaseAuth.getInstance().currentUser!!.email!!)
+                .collection(Endpoints.Notifications.NOTIFICATIONS)
+
+            val query = notificationsCollection
+                .orderBy(Endpoints.Notifications.TIMESTAMP, Query.Direction.DESCENDING)
+                .whereGreaterThan(Endpoints.Notifications.TIMESTAMP , lastSeenTimeStamp)
+                .get()
+                .await()
+
+            val newNotifications =  CoroutineScope(Dispatchers.IO).async {
+                query.documents.map { documentSnapshot ->
+
+
+                    val notificationID: String = documentSnapshot.getString(Endpoints.Notifications.notificationID)!!
+                    val notificationType: String = documentSnapshot.getString(Endpoints.Notifications.notificationType)!!
+                    val taskID: String = documentSnapshot.getString(Endpoints.Notifications.taskID)!!
+                    val title: String = documentSnapshot.getString(Endpoints.Notifications.title)!!
+                    val message: String = documentSnapshot.getString(Endpoints.Notifications.message)!!
+                    val fromUser: String = documentSnapshot.getString(Endpoints.Notifications.fromUser)!!
+                    val toUser: String = documentSnapshot.getString(Endpoints.Notifications.toUser)!!
+                    val timeStamp: Long = documentSnapshot.getLong(Endpoints.Notifications.timeStamp)!!
+
+                    Notification(notificationID = notificationID,
+                        notificationType = notificationType,
+                        taskID = taskID,
+                        title = title,
+                        message = message,
+                        fromUser = fromUser,
+                        toUser = toUser,
+                        timeStamp = timeStamp
+                        )
+                }
+            }.await()
+
+            serverResult(ServerResult.Success(newNotifications))
+
+        } catch (e: Exception) {
+            serverResult(ServerResult.Failure(e))
+        }
+
     }
 
     override suspend fun postNotification(
@@ -272,16 +333,18 @@ class FirestoreRepository @Inject constructor(
         return try {
 
             serverResult(ServerResult.Progress)
-          firestore.collection(Endpoints.USERS)
-              .document(FirebaseAuth.getInstance().currentUser?.email!!)
-              .update(userData).awaitt()
-          serverResult(ServerResult.Success(200))
+            firestore.collection(Endpoints.USERS)
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                .update(userData).awaitt()
+            serverResult(ServerResult.Success(200))
 
-       }catch (e : Exception){
-           serverResult(ServerResult.Failure(e))
-       }
+        } catch (e: Exception) {
+            serverResult(ServerResult.Failure(e))
+        }
 
     }
+
+
 
 
     override fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit) {
@@ -457,14 +520,19 @@ class FirestoreRepository @Inject constructor(
 
         getProjectRef(projectID).collection(Endpoints.Project.SEGMENT).get(Source.SERVER)
             .addOnSuccessListener { snapshot ->
-                for (document in snapshot.documents) {
-                    val fieldValue = document.getString("segment_NAME")
-                    if (fieldValue == fieldName) {
-                        result(ServerResult.Success(true))
-                        return@addOnSuccessListener
-                    }
-                }
-                result(ServerResult.Success(false))
+
+               CoroutineScope(Dispatchers.IO).launch {
+                   for (document in snapshot.documents) {
+                       val fieldValue = document.getString("segment_NAME")
+                       if (fieldValue == fieldName) {
+                           result(ServerResult.Success(true))
+                           return@launch
+                       }
+                   }
+
+                   result(ServerResult.Success(false))
+               }
+
             }
             .addOnFailureListener {
                 Timber.tag(TAG).d("Firestore Exception : ${it}")
@@ -487,11 +555,16 @@ class FirestoreRepository @Inject constructor(
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<Task>()
-                for (document in querySnapshot.documents) {
-                    val sectionData = document.toObject(Task::class.java)
-                    sectionData?.let { sectionList.add(it) }
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    for (document in querySnapshot.documents) {
+                        val sectionData = document.toObject(Task::class.java)
+                        sectionData?.let { sectionList.add(it) }
+                    }
                 }
+
                 result(ServerResult.Success(sectionList))
+
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
@@ -506,19 +579,31 @@ class FirestoreRepository @Inject constructor(
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val segment_list = mutableListOf<Segment>()
-                for (document in querySnapshot.documents) {
-                    val segments = document.toObject(Segment::class.java)
-                    segment_list.add(segments!!)
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    for (document in querySnapshot.documents) {
+                        val segments = document.toObject(Segment::class.java)
+                        segment_list.add(segments!!)
+                    }
+
+                    withContext(Dispatchers.Main){
+                        Timber.d("segements", segment_list.toString())
+                        result(ServerResult.Success(segment_list))
+                    }
+
                 }
-                Timber.d("segements", segment_list.toString())
-                result(ServerResult.Success(segment_list))
+
+
+
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
     }
 
-   fun getTasksItem(
+
+    //TODO Get assigner dp from assigner's profile using assigner id not static url
+    fun getTasksItem(
         projectName: String,
         segmentName: String,
         sectionName: String,
@@ -533,37 +618,39 @@ class FirestoreRepository @Inject constructor(
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<TaskItem>()
-                for (document in querySnapshot.documents) {
 
-                    val title = document.getString("title")
-                    val id = document.getString("id")
-                    val difficulty = document.get("difficulty")!!
-                    val duration = document.getString("duration")
-                    val completed = document.getBoolean("completed")
-                    val assignerID = document.getString("assigner")
+                CoroutineScope(Dispatchers.IO).launch {
 
+                    for (document in querySnapshot.documents) {
 
-                    val assignee_DP_URL = document.getString("assignee_DP_URL")
+                        val title = document.getString("title")
+                        val id = document.getString("id")
+                        val difficulty = document.get("difficulty")!!
+                        val duration = document.getString("duration")
+                        val completed = document.getBoolean("completed")
+                        //   val assignerID = document.getString("assigner")
 
-//                       val assigneeDPUrl = firestore
-//                           .collection(Endpoints.USERS).
-//                           document(assignerID!!)
-//                           .get().await()
+                        val assignee_DP_URL = document.getString("assignee_DP_URL")
 
+                        val taskItem = TaskItem(
+                            title = title!!,
+                            id = id!!,
+                            difficulty = difficulty.toString().toInt(),
+                            duration = duration!!,
+                            completed = completed.toString().toBoolean(),
+                            assignee_DP_URL = assignee_DP_URL!!
+                        )
 
-                    val taskItem = TaskItem(
-                        title = title!!,
-                        id = id!!,
-                        difficulty = difficulty.toString().toInt(),
-                        duration = duration!!,
-                        completed = completed.toString().toBoolean(),
-                        assignee_DP_URL = assignee_DP_URL!!
-                    )
-                    sectionList.add(taskItem)
-                    result(ServerResult.Success(sectionList))
+                        sectionList.add(taskItem)
+                    }
 
+                    withContext(Dispatchers.Main){
+                        Timber.tag(TAG).d("Item task list fetch success : ${sectionList}")
+                        result(ServerResult.Success(sectionList))
+                    }
 
                 }
+
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))

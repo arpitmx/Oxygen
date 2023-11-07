@@ -49,11 +49,12 @@ interface Repository {
     fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit)
 
     //Notifications Related
-    suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit)
-    suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit)
+    suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Long>) -> Unit)
+    suspend fun getNewNotifications(lastSeenTimeStamp : Long, serverResult: (ServerResult<List<Notification>>) -> Unit)
     suspend fun postNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
 
     suspend fun setFCMToken(token : String , serverResult: (ServerResult<Int>) -> Unit)
+    suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
 
 
     // User DP Related

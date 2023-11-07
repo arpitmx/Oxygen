@@ -2,7 +2,6 @@ package com.ncs.o2.HelperClasses
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
@@ -44,17 +43,17 @@ object PrefManager {
     //Notification View Timestamp
 
     fun saveTimestamp(timestamp: Timestamp) {
-        sharedPreferences.edit().putString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, timestamp.toString()).apply()
+        sharedPreferences.edit().putString(Endpoints.Notifications.NOTIFICATION_LAST_SEEN, timestamp.toString()).apply()
     }
 
     fun getTimestamp(): String {
-        return sharedPreferences.getString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, "NONE")!!
+        return sharedPreferences.getString(Endpoints.Notifications.NOTIFICATION_LAST_SEEN, "NONE")!!
     }
 
 
 
     fun clearTimestamp() {
-        sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_TIME_STAMP).apply()
+        sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_LAST_SEEN).apply()
     }
 
 
