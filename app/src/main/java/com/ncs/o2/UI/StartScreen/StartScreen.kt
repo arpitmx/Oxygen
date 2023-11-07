@@ -68,7 +68,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         GlobalUtils.EasyElements(this@StartScreen)
     }
 
-    private val viewModel: LogCatViewModel by viewModels()
+//    private val viewModel: LogCatViewModel by viewModels()
     private val o2Bot: O2Bot by viewModels()
 
 
