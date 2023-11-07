@@ -2,7 +2,6 @@ package com.ncs.o2.Domain.Interfaces
 
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Models.ServerResult
@@ -12,6 +11,7 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
 import com.ncs.o2.UI.StartScreen.maintainceCheck
+import com.ncs.o2.Domain.Models.UserInfo
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
@@ -42,6 +42,8 @@ interface Repository {
 
     //User related
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
+    fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit)
+    fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)
 
     //Project related
     fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit)
@@ -52,6 +54,9 @@ interface Repository {
     suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit)
     suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit)
     suspend fun postNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
+
+    suspend fun setFCMToken(token : String , serverResult: (ServerResult<Int>) -> Unit)
+
 
 
     fun maintenanceCheck(): LiveData<maintainceCheck>

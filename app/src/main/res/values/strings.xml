@@ -9,6 +9,7 @@
 
     <string name="bottom_nav_item_assigned">Assigned</string>
     <string name="bottom_nav_item_done">Completed</string>
+    <string name="bottom_nav_item_project_stats">Project Stats</string>
     <string name="new_task">New Task</string>
     <string name="select_members">Select Members</string>
     <string name="select_segment">Select Segment</string>
@@ -68,6 +69,17 @@
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
     <string name="no_current_tasks_here">No tasks yet in this section...</string>
+
+    <!--    Choose designation bottomSheet and edit profile-->
+
+    <string name="backend_developer">Backend developer</string>
+    <string name="programmer">Programmer</string>
+    <string name="android_developer">Android developer</string>
+    <string name="designer">Designer</string>
+    <string name="web_developer">Web developer</string>
+    <string name="edit">Edit</string>
+    <string name="choose_designation">Choose Designation</string>
+    <string name="edit_profile">Edit Profile</string>
 
 
 </resources>

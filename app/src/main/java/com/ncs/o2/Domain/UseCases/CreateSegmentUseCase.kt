@@ -1,9 +1,9 @@
 package com.ncs.o2.Domain.UseCases
 
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.ServerExceptions
 import javax.inject.Inject
@@ -44,7 +44,7 @@ class CreateSegmentUseCase @Inject constructor(
                         callback(ServerResult.Failure(ServerExceptions.duplicateNameException))
                     } else {
                         //False : Not a duplicate, safe to create new segment
-                        callback(ServerResult.Success(Codes.Status.RESULT_OK))
+                        callback(ServerResult.Success(Errors.Status.RESULT_OK))
                     }
 
                 }

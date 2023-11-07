@@ -8,8 +8,8 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Domain.Models.Segment
-import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -19,7 +19,6 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ServerExceptions
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSectionsBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.CreateSegmentBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -128,7 +127,7 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
                 ServerExceptions.projectDoesNotExists.exceptionDescription -> {
                     binding.validationsTxt.text = getString(R.string.this_project_doesn_t_exist)
                 }
-                Codes.Status.VALID_INPUT -> {
+                Errors.Status.VALID_INPUT -> {
                     binding.validationsTxt.text = getString(R.string.creating_your_segment)
                     this.dismiss()
 

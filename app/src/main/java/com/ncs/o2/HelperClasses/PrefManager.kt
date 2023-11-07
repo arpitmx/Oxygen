@@ -60,7 +60,7 @@ object PrefManager {
 
     //DP related
 
-    fun setDpUrl(url:String){
+    fun setDpUrl(url:String?){
         if (url != null){
             editor.putString(Endpoints.User.DP_URL, url)
         }
@@ -115,6 +115,8 @@ object PrefManager {
         editor.putString(Endpoints.User.USERNAME,user.USERNAME)
         editor.putString(Endpoints.User.EMAIL,user.EMAIL)
         editor.putString(Endpoints.User.BIO,user.BIO)
+        editor.putString(Endpoints.User.DP_URL,user.DP_URL)
+
         editor.putString(Endpoints.User.DESIGNATION,user.DESIGNATION)
         editor.putLong(Endpoints.User.ROLE,user.ROLE)
         editor.apply()
@@ -131,6 +133,15 @@ object PrefManager {
 
     fun getCurrentUserEmail():String{
         return getcurrentUserdetails().EMAIL
+    }
+
+    fun getUserFCMToken(): String {
+        return getcurrentUserdetails().FCM_TOKEN
+    }
+
+    fun setUserFCMToken(token : String){
+        editor.putString(Endpoints.User.FCM_TOKEN,token)
+        editor.apply()
     }
 
     fun lastaddedproject(project:String){
@@ -188,6 +199,22 @@ object PrefManager {
             return gson.fromJson(sectionsJson, type)
         }else{
             return listOf("Ongoing Progress", "Ready for Test", "Testing", "Completed")
+        }
+    }
+    fun putProjectsList(projects:List<String>){
+        val gson=Gson()
+        val projectsJson=gson.toJson(projects)
+        editor.putString("projects",projectsJson)
+        editor.apply()
+    }
+    fun getProjectsList():List<String>{
+        val projectsJson = sharedPreferences.getString("projects", null)
+        if (projectsJson != null) {
+            val gson = Gson()
+            val type = object : TypeToken<List<String>>() {}.type
+            return gson.fromJson(projectsJson, type)
+        }else{
+            return listOf("NCSOxygen")
         }
     }
 }

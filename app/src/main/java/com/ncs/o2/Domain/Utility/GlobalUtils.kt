@@ -4,13 +4,12 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.graphics.Color
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.R
 import timber.log.Timber
-import java.time.Duration
 import java.util.TimeZone
 
 
@@ -33,6 +32,17 @@ object GlobalUtils {
         }
 
 
+        fun singleBtnDialog_ServerError(title: String="Failure", msg: String="Failed to get results, please try again", btnText: String="Okay", positive: () -> Unit) {
+            val builder = android.app.AlertDialog.Builder(context)
+            builder.setIcon(com.google.android.material.R.drawable.mtrl_ic_error)
+            builder.setTitle(title)
+            builder.setMessage(msg)
+            builder.setPositiveButton(btnText) { dialog, which ->
+                positive()
+            }
+            val dialog = builder.create()
+            dialog.show()
+        }
 
         fun singleBtnDialog(title: String, msg: String, btnText: String, positive: () -> Unit) {
             val builder = android.app.AlertDialog.Builder(context)
@@ -110,7 +120,7 @@ object GlobalUtils {
 
         fun checkTimeZoneValid(timeZone: TimeZone): Boolean {
             Timber.tag("GlobalUtils-Debug101").d(timeZone.displayName)
-            if (timeZone.displayName != Codes.STRINGS.TIME_ZONE_INDIA) {
+            if (timeZone.displayName != Errors.STRINGS.TIME_ZONE_INDIA) {
                 return false
             }
 

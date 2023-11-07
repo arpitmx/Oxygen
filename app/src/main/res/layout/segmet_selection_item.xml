@@ -4,15 +4,16 @@
     android:layout_height="50dp"
     android:background="@color/secondary_bg_black"
     android:orientation="vertical"
+    android:weightSum="10"
     >
 
     <TextView
         android:id="@+id/segment_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:fontFamily="@font/outfitmedium"
+        android:layout_height="0dp"
+        android:layout_weight="9.5"
+        android:paddingLeft="@dimen/padding_left_offset"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:text="Segment"
         android:gravity="center_vertical"
         android:layout_marginTop="10dp"
@@ -20,6 +21,13 @@
         android:textColor="@color/better_white"
         android:textSize="18dp" />
 
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:background="#753F4041"
+        />
 
 
 
