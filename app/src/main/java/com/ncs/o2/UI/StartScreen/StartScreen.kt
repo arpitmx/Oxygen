@@ -7,10 +7,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.fadeIn
 import androidx.core.content.ContextCompat
@@ -22,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.ncs.o2.Constants.TestingConfig
+import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.blink
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
@@ -31,6 +34,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailViewModel
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,10 +42,19 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class StartScreen : AppCompatActivity() {
 
+    private lateinit var MaintainceCheck: maintainceCheck
+
+//    private var checks = ""
+//    private var desc = ""
+//    private val MaintainceCheck : maintainceCheck by lazy {
+//        maintainceCheck(checks,desc)
+//    }
 
     private val util: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this@StartScreen)
     }
+
+    private val viewModel: StartScreenViewModel by viewModels()
 
     private val binding: ActivitySplashScreenBinding by lazy {
         ActivitySplashScreenBinding.inflate(layoutInflater)
@@ -57,6 +70,8 @@ class StartScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+
 
         setBallAnimator()
         setUpViews(TestingConfig.isTesting)
@@ -174,14 +189,26 @@ class StartScreen : AppCompatActivity() {
     }
 
     private fun startMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        overridePendingTransition(
-            R.anim.fadein,
-            R.anim.fadeout
-        )
 
-        finishAffinity()
+        viewModel.checkMaintenanceThroughRepository().observe(this) {
+            if(Codes.STRINGS.isMaintaining != null){
+                if (Codes.STRINGS.isMaintaining == "true"){
+                    Log.d("maintainenceCheck", "maintaining")
+                    val intent = Intent(this, maintainingScreen::class.java)
+                    startActivity(intent)
+                    finishAffinity()
+                }
+                else{
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.fadein,
+                        R.anim.fadeout
+                    )
+                    finishAffinity()
+                }
+            }
+        }
     }
 
     private fun setUpViews(isTesting: Boolean) {
@@ -191,8 +218,8 @@ class StartScreen : AppCompatActivity() {
             startActivity(Intent(this, TestingConfig.activity))
             finishAffinity()
 
-
-        } else {
+        }
+        else {
 
 
             if (FirebaseAuth.getInstance().currentUser != null) {

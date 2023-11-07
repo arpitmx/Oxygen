@@ -11,6 +11,7 @@ import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
+import com.ncs.o2.UI.StartScreen.maintainceCheck
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
@@ -51,6 +52,9 @@ interface Repository {
     suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Int>) -> Unit)
     suspend fun loadNewNotifications(serverResult: (ServerResult<List<Notification>>) -> Unit)
     suspend fun postNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
+
+
+    fun maintenanceCheck(): LiveData<maintainceCheck>
 
     // User DP Related
     fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>>

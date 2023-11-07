@@ -8,22 +8,28 @@
     tools:context=".UI.StartScreen.StartScreen"
     >
 
+    <FrameLayout
+        android:id="@+id/fragContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/ball"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:visibility="visible"
-        android:elevation="5dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/baseline_circle_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/darkbg_main" />
+        <ImageView
+            android:id="@+id/ball"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:visibility="visible"
+            android:elevation="5dp"
+            android:layout_gravity="center"
+            android:src="@drawable/baseline_circle_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/darkbg_main" />
+
+    </FrameLayout>
+
+
 
 
 
