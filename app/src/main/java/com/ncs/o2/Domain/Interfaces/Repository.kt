@@ -45,7 +45,21 @@ interface Repository {
     suspend fun postTags(tag: Tag,projectName: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun fetchProjectTags(projectName: String,projectListCallback: (ServerResult<List<Tag>>) -> Unit)
 
+
+
         //User related
+
+    fun getTagbyId(
+        id: String,
+        projectName: String,
+        result: (ServerResult<Tag>) -> Unit
+    )
+
+    fun getTasksbyId(
+        id: String,
+        projectName: String,
+        result: (ServerResult<Task>) -> Unit
+    )
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id:String,serverResult: (ServerResult<User?>) -> Unit)
 

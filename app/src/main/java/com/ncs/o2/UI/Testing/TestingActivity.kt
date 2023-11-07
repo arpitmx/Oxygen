@@ -201,8 +201,8 @@ class TestingActivity : AppCompatActivity() {
                 assigner = Faker().funnyName().name().toString(),
                 deadline = "${Random(System.currentTimeMillis()).nextInt(1, 5)} days",
                 project_ID = "NCSOxygen",
-                segment = "Version 1.0", //change segments here //like Design
-                section = "Section 2",  //Testing // Completed //Ready //Ongoing
+                segment = "Design", //change segments here //like Design
+                section = "UI tinkering",  //Testing // Completed //Ready //Ongoing
                 assignee_DP_URL = "https://picsum.photos/200",
                 completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1, 5).toString(),

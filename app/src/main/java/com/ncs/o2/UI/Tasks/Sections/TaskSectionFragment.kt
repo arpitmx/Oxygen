@@ -128,6 +128,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     } else {
                         binding.layout.visible()
                         binding.placeholder.gone()
+
                         recyclerView = binding.recyclerView
                         taskListAdapter = TaskListAdapter()
                         taskListAdapter.setTaskList(taskList)
