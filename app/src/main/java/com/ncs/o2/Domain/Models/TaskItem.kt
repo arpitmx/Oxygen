@@ -7,8 +7,9 @@ import com.google.firebase.firestore.Exclude
 data class TaskItem(
     val title: String = "",
     var id: String="",
+    val assignee_id:String="",
     val difficulty: Int = 0,
-    val duration: String = "",
+    val timestamp: Timestamp?=null,
     val completed:Boolean=false,
     val assignee_DP_URL: String = "",
 ) {

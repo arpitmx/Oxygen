@@ -3,6 +3,7 @@ package com.ncs.o2.UI.Tasks.Sections
 import TaskListAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -26,6 +28,12 @@ import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 
@@ -44,8 +52,6 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     private lateinit var taskList2: ArrayList<Task>
     private lateinit var projectName: String
     private lateinit var segmentName: String
-
-
     val state = arrayOf(1)
 
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
@@ -115,14 +121,13 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                         taskList.add(element)
                     }
 
-                    if (taskList.size == 0) {
+                    if (taskList.isEmpty()) {
                         binding.layout.gone()
                         binding.placeholder.visible()
 
                     } else {
                         binding.layout.visible()
                         binding.placeholder.gone()
-
                         recyclerView = binding.recyclerView
                         taskListAdapter = TaskListAdapter()
                         taskListAdapter.setTaskList(taskList)
@@ -173,7 +178,9 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                 }
 
                 is ServerResult.Progress -> {
-                    binding.lottieProgressInclude.progressbarBlock.visible()
+                    binding.lottieProgressInclude.progressbarBlock.gone()
+                    binding.layout.gone()
+                    binding.placeholder.visible()
                 }
 
             }

@@ -1,5 +1,7 @@
 package com.ncs.o2.Domain.Models
 
+import com.google.firebase.Timestamp
+
 /*
 File : User.kt -> com.ncs.o2.Models
 Description : User data class for Firestore user 
@@ -26,4 +28,5 @@ data class CurrentUser (
             val ROLE:Long=1,
             val DP_URL:String?=null,
             val FCM_TOKEN: String="",
+            val TIMESTAMP:Timestamp?=null
 )

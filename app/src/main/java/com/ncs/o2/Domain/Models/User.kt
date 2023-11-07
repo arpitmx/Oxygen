@@ -1,5 +1,6 @@
 package com.ncs.o2.Domain.Models
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 import com.ncs.o2.Domain.Utility.Later
 
@@ -27,5 +28,7 @@ data class User (
         val username : String?="",
         val post: String= "",
         val profileIDUrl : String="",
+        val timestamp:Timestamp?=null,
+        val designation:String="",
         @Exclude var isChecked : Boolean = false,
         )

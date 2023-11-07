@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.room.Room
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.TestingConfig
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -111,11 +112,11 @@ class TestingActivity: AppCompatActivity() {
                 assignee_DP_URL = "https://picsum.photos/200",
                 completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),
-                time_STAMP = Timestamp.now()
+                time_STAMP = Timestamp.now(),
+                assigner_email = FirebaseAuth.getInstance().currentUser?.email!!
             )
 
             CoroutineScope(Dispatchers.Main).launch {
-
                 repository.postTask(task) { result ->
 
                     when (result) {

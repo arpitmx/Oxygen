@@ -9,6 +9,8 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.Tag
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
 
 /*
@@ -38,8 +40,13 @@ interface Repository {
     //Task related
     suspend fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit)
 
-    //User related
+    suspend fun postTags(tag: Tag,projectName: String, serverResult: (ServerResult<Int>) -> Unit)
+    suspend fun fetchProjectTags(projectName: String,projectListCallback: (ServerResult<List<Tag>>) -> Unit)
+
+        //User related
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
+    fun getUserInfobyId(id:String,serverResult: (ServerResult<User?>) -> Unit)
+
     fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit)
     fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)
 
