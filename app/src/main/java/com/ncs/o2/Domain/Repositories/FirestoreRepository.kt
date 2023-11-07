@@ -3,6 +3,7 @@ package com.ncs.o2.Domain.Repositories
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.ColumnInfo
@@ -25,7 +26,9 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.UserInfo
+import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
+import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -118,6 +121,33 @@ class FirestoreRepository @Inject constructor(
         } catch (e: Exception) {
             serverResult(ServerResult.Failure(e))
         }
+    }
+
+    override fun maintenanceCheck(): LiveData<maintainceCheck> {
+        val liveData = MutableLiveData<maintainceCheck>()
+
+        firestore.collection("AppConfig")
+            .document("maintenance")
+            .get()
+            .addOnSuccessListener { data->
+                if(data.exists()){
+                    val maintanenceChecks = data.data?.get("isMaintaining").toString()
+                    val maintainceDesc = data.data?.get("Description").toString()
+
+                    Codes.STRINGS.isMaintaining = maintanenceChecks
+                    Codes.STRINGS.maintaninDesc = maintainceDesc
+
+
+                    val checks = data.toObject(maintainceCheck::class.java)
+                    liveData.postValue(checks!!)
+
+                }
+            }
+            .addOnFailureListener {
+                Log.d("checks","failed")
+            }
+
+        return liveData
     }
 
     override suspend fun getNewNotifications(lastSeenTimeStamp: Long, serverResult: (ServerResult<List<Notification>>) -> Unit) {
@@ -628,7 +658,7 @@ class FirestoreRepository @Inject constructor(
                         val difficulty = document.get("difficulty")!!
                         val duration = document.getString("duration")
                         val completed = document.getBoolean("completed")
-                        //   val assignerID = document.getString("assigner")
+                        val assignerID = document.getString("assigner")
 
                         val assignee_DP_URL = document.getString("assignee_DP_URL")
 
@@ -648,9 +678,7 @@ class FirestoreRepository @Inject constructor(
                         Timber.tag(TAG).d("Item task list fetch success : ${sectionList}")
                         result(ServerResult.Success(sectionList))
                     }
-
                 }
-
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))

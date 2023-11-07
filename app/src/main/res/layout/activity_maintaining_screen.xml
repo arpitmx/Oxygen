@@ -5,12 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_bg_black"
-    tools:context=".UI.StartScreen.maintainingScreen">
+    android:background="@color/better_white"
+    tools:context=".UI.StartScreen.MaintainingScreen">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,25 +22,38 @@
             android:id="@+id/maintainingImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/maintaining" />
+            android:src="@drawable/maintaining"
+            />
+
 
         <TextView
             android:id="@+id/tvMaintaining"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="20dp"
+            android:gravity="center"
+            android:fontFamily="@font/outfitregular"
             android:text="Maintaining..."
-            android:textSize="20dp"
-            android:fontFamily="@font/outfitmedium"
-            android:textColor="@color/colorAccent"/>
-        <TextView
+            android:textColor="@color/border_zero_alpha"
+            android:textSize="20dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/tvRetry"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Retry"
-            android:textSize="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/curvedbggraybg"
             android:fontFamily="@font/outfitmedium"
-            android:textColor="@color/colorAccent"/>
+            android:text="Retry"
+            android:textAllCaps="false"
+            android:textColor="@color/primary"
+            android:textSize="20dp" />
+
+
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

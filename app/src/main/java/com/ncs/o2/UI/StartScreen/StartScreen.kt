@@ -27,7 +27,6 @@ import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.blink
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -38,7 +37,6 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
-import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailViewModel
 import com.ncs.o2.UI.O2Bot.O2Bot
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
@@ -209,10 +207,11 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     private fun startMainActivity() {
 
         viewModel.checkMaintenanceThroughRepository().observe(this) {
+
             if(Codes.STRINGS.isMaintaining != null){
                 if (Codes.STRINGS.isMaintaining == "true"){
                     Log.d("maintainenceCheck", "maintaining")
-                    val intent = Intent(this, maintainingScreen::class.java)
+                    val intent = Intent(this, MaintainingScreen::class.java)
                     startActivity(intent)
                     finishAffinity()
                 }
