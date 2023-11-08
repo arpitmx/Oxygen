@@ -42,6 +42,14 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
     ) {
         firestoreRepository.getTasksItem(projectName, segmentName, sectionName, resultCallback)
     }
+    fun getTasksForSegment(
+        projectName: String,
+        segmentName: String,
+        sectionName: String,
+        resultCallback: (ServerResult<List<Task>>) -> Unit
+    ) {
+        firestoreRepository.getTasks(projectName, segmentName, sectionName, resultCallback)
+    }
     fun getUserbyId(
         id:String,
         resultCallback: (ServerResult<User?>) -> Unit
