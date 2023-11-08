@@ -494,7 +494,6 @@ class FirestoreRepository @Inject constructor(
 
         serverResult(ServerResult.Progress)
 
-        //  Handler(Looper.getMainLooper()).postDelayed({
         var userInfo: UserInfo?
         firestore.collection(Endpoints.USERS)
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
@@ -516,16 +515,22 @@ class FirestoreRepository @Inject constructor(
                 Timber.tag(TAG).d("failed %s", error.stackTrace)
                 serverResult(ServerResult.Failure(error))
             }
-        //    }, 1000)
     }
 
     override fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit) {
 
         serverResult(ServerResult.Progress)
 
+        val userUpdate = mapOf(
+            "USERNAME" to userInfo.USERNAME,
+            "BIO" to userInfo.BIO,
+            "DESIGNATION" to userInfo.DESIGNATION,
+            "DP_URL" to userInfo.DP_URL
+        )
+
         firestore.collection(Endpoints.USERS)
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
-            .set(userInfo)
+            .update(userUpdate)
             .addOnSuccessListener { snap ->
                 serverResult(ServerResult.Success(userInfo))
             }
@@ -606,36 +611,7 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
-    fun getTasks(
-        projectName: String,
-        segmentName: String,
-        sectionName: String,
-        result: (ServerResult<List<Task>>) -> Unit
-    ) {
 
-        firestore.collection(Endpoints.PROJECTS)
-            .document(projectName)
-            .collection(Endpoints.Project.TASKS)
-            .whereEqualTo("section", sectionName)
-            .whereEqualTo("segment", segmentName)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val sectionList = mutableListOf<Task>()
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    for (document in querySnapshot.documents) {
-                        val sectionData = document.toObject(Task::class.java)
-                        sectionData?.let { sectionList.add(it) }
-                    }
-                }
-
-                result(ServerResult.Success(sectionList))
-
-            }
-            .addOnFailureListener { exception ->
-                result(ServerResult.Failure(exception))
-            }
-    }
 
     fun getSegments(
         projectName: String, result: (ServerResult<List<Segment>>) -> Unit
@@ -667,7 +643,36 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    fun getTasks(
+        projectName: String,
+        segmentName: String,
+        sectionName: String,
+        result: (ServerResult<List<Task>>) -> Unit
+    ) {
 
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+            .whereEqualTo("section", sectionName)
+            .whereEqualTo("segment", segmentName)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val sectionList = mutableListOf<Task>()
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    for (document in querySnapshot.documents) {
+                        val sectionData = document.toObject(Task::class.java)
+                        sectionData?.let { sectionList.add(it) }
+                    }
+                }
+
+                result(ServerResult.Success(sectionList))
+
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
     fun getTasksItem(
         projectName: String,
         segmentName: String,
@@ -692,9 +697,6 @@ class FirestoreRepository @Inject constructor(
                     val duration = document.getString("duration")
                     val time = document.get("time_STAMP") as Timestamp
                     val completed = document.getBoolean("completed")
-                    var assignerID = document.getString("assigner")
-
-
                     if (document.getString("assigner_email")!=null) {
                         assignerID = document.getString("assigner_email")!!
                     }
@@ -714,10 +716,8 @@ class FirestoreRepository @Inject constructor(
                         assignee_id = assignerID,
                     )
                     sectionList.add(taskItem)
-                    result(ServerResult.Success(sectionList))
-
-
                 }
+                result(ServerResult.Success(sectionList))
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))

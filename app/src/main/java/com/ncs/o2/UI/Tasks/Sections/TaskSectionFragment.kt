@@ -88,13 +88,14 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
     private fun setupViews() {
 
-        if (segmentName == "Select Segment") {
+        if (segmentName=="Select Segment"){
             binding.placeholderText.visible()
             binding.layout.gone()
             activityBinding.gioActionbar.tabLayout.gone()
             activityBinding.gioActionbar.searchCont.gone()
             activityBinding.gioActionbar.line.gone()
-        } else {
+        }
+        else {
             binding.placeholderText.gone()
             binding.layout.visible()
             activityBinding.gioActionbar.tabLayout.visible()
@@ -130,7 +131,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                         binding.placeholder.gone()
 
                         recyclerView = binding.recyclerView
-                        taskListAdapter = TaskListAdapter()
+                        taskListAdapter = TaskListAdapter(firestoreRepository)
                         taskListAdapter.setTaskList(taskList)
                         taskListAdapter.notifyDataSetChanged()
 
@@ -252,6 +253,4 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
-
-
 }

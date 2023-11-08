@@ -1,5 +1,7 @@
 package com.ncs.o2.UI.Tasks.TaskDetails.Details
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -34,6 +36,8 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailViewModel
+import com.ncs.o2.UI.Tasks.TaskDetails.TasksDetailsHolderFragment
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.LinkAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
@@ -58,10 +62,14 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
+    private val tasksHolderBinding:TasksDetailsHolderFragment by lazy {
+        (requireParentFragment() as TasksDetailsHolderFragment)
+    }
     private val viewModel: TaskDetailViewModel by viewModels()
     lateinit var taskDetails:Task
     var tags:MutableList<Tag> = mutableListOf()
     var users:MutableList<User> = mutableListOf()
+    private val TextViewList = mutableListOf<TextView>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,8 +81,19 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpViews()
-        Log.d("id",activityBinding.taskId)
         setdetails(activityBinding.taskId)
+
+        CoroutineScope(Dispatchers.Main).launch{
+            withContext(Dispatchers.Main){
+                binding.activity.setOnClickThrottleBounceListener {
+                    val viewpager=tasksHolderBinding.binding.viewPager2
+                    val next=viewpager.currentItem+1
+                    if (next < 2) {
+                        viewpager.currentItem=next
+                    }
+                }
+            }
+        }
 
     }
 
@@ -191,17 +210,29 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         val num=list.size
         val parentLayout = binding.linksCont
         val inflater = LayoutInflater.from(requireContext())
+        TextViewList.clear()
         for (i in 0 until num) {
             val text = inflater.inflate(
                 R.layout.links_item,
                 parentLayout,
                 false
             ) as TextView
-
+            TextViewList.add(text)
             parentLayout.addView(text)
             text.text=list[i]
+        }
+        for (i in 0 until num) {
+            CoroutineScope(Dispatchers.IO).launch{
+                withContext(Dispatchers.Main){
+                    TextViewList[i] .setOnClickThrottleBounceListener{
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
+                        startActivity(intent)
+                    }
+                }
+            }
 
         }
+
     }
 
     override fun onProfileClick(user: User, position: Int) {
@@ -238,12 +269,15 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                                 3 -> binding.difficulty.text = "Difficult"
                             }
                             val timeDifference = Date().time - task.time_STAMP!!.toDate().time
-                            val hours = (timeDifference / (1000 * 60 * 60)).toInt()
-                            val days = (hours / 24).toInt()
-                            val timeAgo: String = if (hours >= 24) {
-                                "$days days ago"
-                            } else {
-                                "$hours hours ago"
+                            val minutes = (timeDifference / (1000 * 60)).toInt()
+                            val hours = minutes / 60
+                            val days = hours / 24
+
+                            val timeAgo: String = when {
+                                days > 0 -> "$days days ago"
+                                hours > 0 -> "$hours hours ago"
+                                minutes > 0 -> "$minutes minutes ago"
+                                else -> "just now"
                             }
                             binding.openedBy.text = "${task.assigner} created this task $timeAgo"
                             withContext(Dispatchers.Main) {
