@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
         PrefManager.initialize(this)
         setContentView(binding.root)
 
+        PrefManager.initialize(this)
         setUpViews()
     }
 
@@ -107,17 +108,25 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
 
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        setNotificationCountOnActionBar()
+    }
+
+
     private fun setUpActionBar() {
 
         // Set up the action bar, navigation drawer, and other UI components
-        PrefManager.initialize(this)
 
         search = binding.gioActionbar.searchCont
+        setNotificationCountOnActionBar()
 
         // Rotate animation for CreateTaskButton
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
         }, 1000)
+
 
         val drawerLayout = binding.drawer
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
@@ -171,6 +180,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
             drawerLayout.closeDrawer(GravityCompat.START)
 
+        }
+    }
+
+    private fun setNotificationCountOnActionBar() {
+        val notificationCount = PrefManager.getNotificationCount()
+        if (notificationCount>0){
+
+            binding.gioActionbar.notificationCountET.text = notificationCount.toString()
+            binding.gioActionbar.notificationCountET.visible()
+
+        }else {
+            binding.gioActionbar.notificationCountET.gone()
         }
     }
 

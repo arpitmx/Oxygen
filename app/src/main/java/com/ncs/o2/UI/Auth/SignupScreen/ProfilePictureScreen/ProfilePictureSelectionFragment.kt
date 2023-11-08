@@ -176,13 +176,13 @@ class ProfilePictureSelectionFragment : Fragment() {
                 REQUEST_IMAGE_CAPTURE -> {
                     val imageBitmap = data?.extras?.get("data") as Bitmap
                     bitmap=imageBitmap
-                    binding.picPreview?.setImageBitmap(imageBitmap)
+                    binding.picPreview.setImageBitmap(imageBitmap)
                 }
                 REQUEST_IMAGE_PICK -> {
                     val selectedImage = data?.data
                     bitmap=uriToBitmap(requireContext().contentResolver,selectedImage!!)
                     val imageSize = bitmap?.byteCount
-                    binding.picPreview?.setImageURI(selectedImage)
+                    binding.picPreview.setImageURI(selectedImage)
                 }
             }
         }
@@ -293,15 +293,24 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
-                                        PrefManager.putProjectsList(listOf("NCSOxygen"))
-                                        PrefManager.setcurrentUserdetails(CurrentUser(
-                                            EMAIL = email!!,
-                                            USERNAME = username!!,
-                                            BIO = bio!!,
-                                            DESIGNATION = designation!!,
-                                            ROLE = role!!,
-                                            FCM_TOKEN = fcm!!,
-                                        ))
+                                        with(PrefManager){
+
+                                            putProjectsList(listOf("NCSOxygen"))
+
+                                            setLastSeenTimeStamp(0)
+                                            setLatestNotificationTimeStamp(0)
+
+                                            setcurrentUserdetails(CurrentUser(
+                                                EMAIL = email!!,
+                                                USERNAME = username!!,
+                                                BIO = bio!!,
+                                                DESIGNATION = designation!!,
+                                                ROLE = role!!,
+                                                FCM_TOKEN = fcm,
+                                            ))
+
+                                        }
+
                                         requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                         requireActivity().finish()
                                     }

@@ -50,6 +50,8 @@ object Endpoints {
 
     object Notifications{
         const val NOTIFICATION_LAST_SEEN = "NOTIFICATION_LAST_SEEN"
+        const val NOTIFICATION_COUNT = "NOTIFICATION_COUNT"
+        const val LATEST_NOTIFICATION_TIME_STAMP = "LATEST_NOTIFICATION_TIME_STAMP"
         const val NOTIFICATIONS = "NOTIFICATIONS"
         const val TIMESTAMP = "timeStamp"
 

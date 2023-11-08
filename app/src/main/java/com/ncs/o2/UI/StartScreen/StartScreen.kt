@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -73,12 +74,12 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     }
 
     companion object {
-        val DELAY = 0L
+        val DELAY = 2000L
         val DELAY_ACTIVITY_START = 0L
         val TAG = "StartScreen"
     }
 
-    private lateinit var ball: ImageView
+    private lateinit var ball: FrameLayout
     private lateinit var valueAnimator: ValueAnimator
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +97,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
     private fun setBallTouchAnimator() {
 
-        ball = binding.ball
+        ball = binding.fragContainer
         ball.rotateInfinity(this)
         val maxsize = 12f
         val change = 3f
@@ -162,7 +163,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
     private fun setBallAnimator() {
 
-        ball = binding.ball
+        ball = binding.fragContainer
         PrefManager.initialize(this)
 
 //        if (PrefManager.getDpUrl()!=null){
@@ -238,19 +239,25 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
             util.showActionSnackbar(binding.root, error.description, 150000, error.actionText) {
 
+
+                val tintColor = ContextCompat.getColor(this, R.color.pureblack)
+
                 if (error.actionText.equals("Send report")) {
                     val title: String = error.description
                     val desc: String = "📍${error.code} \n\n${error.solution}" +
                             "\n${error.description}\n" +
                             "\nPosted on: \n1. API level 31" +
-                            "\n2. Android logs : \n${logs.toString()} "
+                            "\n2. Android logs : \n${logs.printStackTrace()} "
 
                     o2Bot.botPostBug(title, desc)
+
                     o2Bot.serverResultLiveData.observe(this) {
                         when (it) {
                             is ServerResult.Failure -> {
                                 Toast.makeText(this, "Failed to submit issue", Toast.LENGTH_SHORT)
                                     .show()
+                                binding.ball.setColorFilter(tintColor)
+                                setUpProcesses()
                             }
 
                             ServerResult.Progress -> {
@@ -259,15 +266,23 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                             is ServerResult.Success -> {
                                 Toast.makeText(this, "Issue submitted", Toast.LENGTH_SHORT).show()
+                                finishAffinity()
                             }
                         }
                     }
+                }
+
+                else if (error.code.contains("NOTIF")) {
+
+                    binding.ball.setColorFilter(tintColor)
+                    setUpNotifications()
+
                 }else {
 
-                    val tintColor = ContextCompat.getColor(this, R.color.pureblack)
                     binding.ball.setColorFilter(tintColor)
-                    setUpProcesses()
+                    setUpNotifications()
                 }
+
             }
         }, 500)
     }
@@ -358,20 +373,8 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                 setUpFCMTokenIfRequired(document = document)
                 setUpProjectsList(document = document)
+                setUpNotifications()
 
-
-                if (isDetailsAdded == true && isPhotoAdded == true) {
-                    Handler(Looper.getMainLooper()).postDelayed(
-
-                        {
-                            ball.animation.cancel()
-                            ball.post {
-                                valueAnimator.start()
-                            }
-                        }, DELAY
-                    )
-
-                }
 
 
             }
@@ -393,11 +396,65 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
     }
 
+    private fun stopAnimAndStartActivity(){
+        Handler(Looper.getMainLooper()).postDelayed(
+            {
+                ball.animation.cancel()
+                ball.post {
+                    valueAnimator.start()
+                }
+            }, DELAY
+        )
+    }
+
+    private fun setUpNotifications() {
+        viewModel.setUpNewNotifications()
+        viewModel.serverResultLiveData.observe(this){ result->
+
+            when(result){
+                is ServerResult.Failure -> {
+                    showBallError(Errors.NotificationErrors.NOTIFICATION_FETCH_FAILED,result.exception)
+                }
+                ServerResult.Progress -> {
+                    util.showSnackbar(binding.root,"Fetching Notifications", 500)
+                }
+                is ServerResult.Success -> {
+
+                    val newNotificationsList = result.data
+
+                    if (newNotificationsList.isNotEmpty()){
+
+                    viewModel.pushNewNotificationsToRoom(newNotificationsList){ pushResult ->
+
+                        when(pushResult){
+                            is ServerResult.Failure -> {
+                                showBallError(Errors.NotificationErrors.NOTIFICATION_SAVE_FAILED,pushResult.exception)
+                            }
+                            ServerResult.Progress -> {
+                            }
+                            is ServerResult.Success -> {
+                               // Toast.makeText(this, "You have ${pushResult.data} new notifications", Toast.LENGTH_SHORT).show()
+                                util.showSnackbar(binding.root,"O2 is ready",1000)
+                                stopAnimAndStartActivity()
+                            }
+
+                        }
+                    }
+
+                    }else {
+                        util.showSnackbar(binding.root,"O2 is ready",1000)
+                        stopAnimAndStartActivity()
+                    }
+
+                }
+            }
+
+        }
+    }
+
     private fun setUpProjectsList(document : DocumentSnapshot) {
         val projectsList = document.get("PROJECTS") as List<String>
         PrefManager.putProjectsList(projectsList)
-
-
     }
 
 

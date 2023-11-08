@@ -136,20 +136,25 @@
                 app:tint="@color/primary" />
 
             <TextView
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginEnd="4dp"
+                android:id="@+id/notificationCountET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@drawable/red_circle_bubble"
-                android:text="2"
-                android:paddingTop="1dp"
-                android:fontFamily="@font/outfitmedium"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:padding="2dp"
+                android:minWidth="18dp"
+                android:layout_marginTop="6dp"
+                android:text="150"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="11dp"
+                android:textSize="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.189" />
+                app:layout_constraintVertical_bias="0.0" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

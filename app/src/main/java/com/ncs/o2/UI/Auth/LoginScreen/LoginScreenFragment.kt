@@ -28,7 +28,7 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
-import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.StartScreen.StartScreen
 import com.ncs.o2.databinding.FragmentLoginScreenBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -82,6 +82,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                             }
                         }
                     }
+
                 }
             }
         }
@@ -129,8 +130,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                             val document = task.result
                             if (document != null && document.exists()) {
 
-                                val isDetailsAdded =
-                                    document.getBoolean(Endpoints.User.DETAILS_ADDED)
+                                val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
                                 val bio = document.getString(Endpoints.User.BIO)
                                 val designation = document.getString(Endpoints.User.DESIGNATION)
@@ -146,21 +146,31 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                     }
                                 }
 
-
                                 if (isDetailsAdded == true && isPhotoAdded == true) {
 
-                                    PrefManager.initialize(requireContext())
-                                    PrefManager.setcurrentUserdetails(
-                                        CurrentUser(
-                                            EMAIL = email!!,
-                                            USERNAME = username!!,
-                                            BIO = bio!!,
-                                            DESIGNATION = designation!!,
-                                            ROLE = role!!,
-                                            DP_URL = dp,
-                                            FCM_TOKEN = fcmToken!!
+
+
+                                    with(PrefManager){
+
+                                        initialize(requireContext())
+
+                                        setLastSeenTimeStamp(0)
+                                        setLatestNotificationTimeStamp(0)
+                                        setNotificationCount(0)
+
+                                        setcurrentUserdetails(
+                                            CurrentUser(
+                                                EMAIL = email!!,
+                                                USERNAME = username!!,
+                                                BIO = bio!!,
+                                                DESIGNATION = designation!!,
+                                                ROLE = role!!,
+                                                DP_URL = dp,
+                                                FCM_TOKEN = fcmToken!!
+                                            )
                                         )
-                                    )
+                                    }
+
 
 
                                     Toast.makeText(activity, "Power to you now", Toast.LENGTH_SHORT).show()
@@ -173,7 +183,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                     startActivity(
                                         Intent(
                                             requireContext(),
-                                            MainActivity::class.java
+                                            StartScreen::class.java
                                         )
                                     )
 
