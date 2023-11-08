@@ -1,8 +1,11 @@
 package com.ncs.o2.UI.EditProfile
 
+import android.graphics.Bitmap
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInfo
@@ -83,6 +86,16 @@ class EditProfileViewModel @Inject constructor(
                 is IOException -> _editUserDetails.postValue(ServerResult.Failure(t))
             }
         }
+    }
+
+    fun uploadDPthroughRepository(bitmap: Bitmap): LiveData<ServerResult<StorageReference>> {
+
+        return repository.uploadUserDP(bitmap)
+    }
+
+    fun getDPUrlThroughRepository(reference: StorageReference): LiveData<ServerResult<String>> {
+
+        return repository.getUserDPUrl(reference)
     }
 
     private fun hasInternetConnection(): Boolean{
