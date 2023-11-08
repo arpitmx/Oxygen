@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:elevation="5dp"
         android:background="@color/darkbg_main_a80"
-        android:visibility="gone"
+        android:visibility="visible"
         >
         <ProgressBar
             android:layout_width="match_parent"
@@ -41,6 +41,7 @@
         android:clipToPadding="false"
         android:elevation="2dp"
         android:paddingTop="10dp"
+        android:visibility="gone"
         android:paddingBottom="80dp"
         android:scrollbarThumbVertical="@color/s3bg"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -195,11 +196,6 @@
                 android:fontFamily="@font/outfitregular"
                 android:gravity="start"
                 android:padding="10dp"
-                android:text="In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available. It is also used to temporarily replace text in a process called greeking, which allows designers to consider the form of a webpage or publication, without the meaning of the text influencing the design.
-
-Lorem ipsum is typically a corrupted version of De finibus bonorum et malorum, a 1st-century BC text by the Roman statesman and philosopher Cicero, with words altered, added, and removed to make it nonsensical and improper Latin. The first two words themselves are a truncation of 'dolorem ipsum' ('pain itself').
-
-Versions of the Lorem ipsum text have been used in typesetting at least since the 1960s, when it was popularized by advertisements for Letraset transfer sheets.[1] Lorem ipsum was introduced to the digital world in the mid-1980s, when Aldus employed it in graphic and word-processing templates for its desktop publishing program PageMaker. Other popular word processors, including Pages and Microsoft Word, have since adopted Lorem ipsum,[2] as have many LaTeX packages,[3][4][5] web content managers such as Joomla! and WordPress, and CSS libraries such as Semantic UI.[6]"
                 android:textColor="#CEFFFFFF"
                 android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -287,23 +283,23 @@ Versions of the Lorem ipsum text have been used in typesetting at least since th
                     app:layout_constraintStart_toEndOf="@+id/btnBack"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0" />
-
-                <TextView
-                    android:id="@+id/links_tv"
+                <LinearLayout
                     android:layout_width="match_parent"
+                    android:orientation="vertical"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/outfitregular"
-                    android:gravity="start"
-                    android:padding="10dp"
-                    android:text="https://github.com/arpitmx/bitscuit"
-                    android:textColor="#0066FF"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    android:id="@+id/links_cont">
+
+                </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/linksRecyclerView"
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_animation_popscale"
+                    android:nestedScrollingEnabled="false" />
+
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>

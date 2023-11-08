@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -32,12 +34,19 @@ Tasks FUTURE ADDITION :
 @HiltViewModel
 class TaskSectionViewModel @Inject constructor(private val firestoreRepository: FirestoreRepository) : ViewModel(){
 
-    fun getTasksForSegment(
+    fun getTasksItemsForSegment(
         projectName: String,
         segmentName: String,
         sectionName: String,
-        resultCallback: (ServerResult<List<Task>>) -> Unit
+        resultCallback: (ServerResult<List<TaskItem>>) -> Unit
     ) {
-        firestoreRepository.getTasks(projectName, segmentName, sectionName, resultCallback)
+        firestoreRepository.getTasksItem(projectName, segmentName, sectionName, resultCallback)
     }
+    fun getUserbyId(
+        id:String,
+        resultCallback: (ServerResult<User?>) -> Unit
+    ) {
+        firestoreRepository.getUserInfobyId(id,resultCallback)
+    }
+
 }

@@ -32,6 +32,17 @@ object GlobalUtils {
         }
 
 
+        fun singleBtnDialog_ServerError(title: String="Failure", msg: String="Failed to get results, please try again", btnText: String="Okay", positive: () -> Unit) {
+            val builder = android.app.AlertDialog.Builder(context)
+            builder.setIcon(com.google.android.material.R.drawable.mtrl_ic_error)
+            builder.setTitle(title)
+            builder.setMessage(msg)
+            builder.setPositiveButton(btnText) { dialog, which ->
+                positive()
+            }
+            val dialog = builder.create()
+            dialog.show()
+        }
 
         fun singleBtnDialog(title: String, msg: String, btnText: String, positive: () -> Unit) {
             val builder = android.app.AlertDialog.Builder(context)

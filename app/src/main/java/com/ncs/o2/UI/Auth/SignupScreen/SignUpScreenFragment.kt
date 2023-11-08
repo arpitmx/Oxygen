@@ -16,14 +16,18 @@ import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.O2Application
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentSignUpBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,6 +42,9 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
         const val TAG = "SignUpScreenFragment"
         fun newInstance() = SignUpScreenFragment()
     }
+
+    @Inject
+    lateinit var utils : GlobalUtils.EasyElements
 
     private val viewModel: SignUpViewModel by viewModels()
     lateinit var binding: FragmentSignUpBinding
@@ -94,6 +101,7 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
 
     private fun handleAuthResult(result: ServerResult<FirebaseUser>?){
         when (result) {
+
             is ServerResult.Failure -> {
 
                 binding.progressbar.gone()
@@ -131,29 +139,59 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
                     "Registration success : ${result.data.uid}"
                 )
                 val userData = hashMapOf(
-                    "EMAIL" to binding.etEmail.text.toString(),
-                    "DETAILS_ADDED" to false,
-                    "PHOTO_ADDED" to false,
-                    "DP_URL" to "",
-
+                    Endpoints.User.EMAIL to binding.etEmail.text.toString(),
+                    Endpoints.User.DETAILS_ADDED to false,
+                    Endpoints.User.PHOTO_ADDED to false,
+                    Endpoints.User.DP_URL to "",
                     )
-                FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
-                    .set(userData)
-                    .addOnSuccessListener {
-                        findNavController().navigate(R.id.action_signUpScreenFragment_to_userDetailsFragment)
 
-                    }
-                    .addOnFailureListener { e ->
+                fcmToken { token->
+                    userData.set(Endpoints.User.FCM_TOKEN,token)
 
-                    }
+                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                        .set(userData)
+                        .addOnSuccessListener {
+                            findNavController().navigate(R.id.action_signUpScreenFragment_to_userDetailsFragment)
+                        }
+                        .addOnFailureListener { e ->
+
+                        }
+                }
+
+
 
 
 
             }
 
-
+//            null -> {
+//
+//                utils.singleBtnDialog("Fault",
+//                    "There was an unknown problem, please restart the registration procedue",
+//                    "Restart"
+//                ) {
+//                    findNavController().navigate(R.id.action_signUpScreenFragment_to_chooserFragment)
+//                }
+//
+//            }
             else -> {}
         }
+    }
+
+    private fun fcmToken(token: (String)->Unit) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Timber.tag(TAG).w(task.exception, "Fetching FCM registration token failed")
+
+                return@addOnCompleteListener
+            }
+
+            val tokenFCM = task.result
+            Timber.tag(TAG).d("FCM registration token: %s", token)
+            Timber.tag("FCM TOKEN").d("FCM registration %s", token)
+            token(tokenFCM)
+        }
+
     }
 
     private fun handleValidation() {

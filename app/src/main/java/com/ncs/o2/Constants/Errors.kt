@@ -59,6 +59,31 @@ sealed class Errors {
         }
 
 
+    sealed class FCMTokenErrors : Errors() {
+
+        object FCM_TOKEN_EXPIRED : FCMTokenErrors() {
+            override val code: String = "FCM-001"
+            override val description: String = "FCM token has expired."
+            override val solution: String = "Generate a new FCM token for the user."
+            override val actionText: String = "Refresh Token"
+        }
+
+        object FCM_TOKEN_MISSING : FCMTokenErrors() {
+            override val code: String = "FCM-002"
+            override val description: String = "FCM token is missing."
+            override val solution: String = "Generate and save an FCM token for the user."
+            override val actionText: String = "Generate Token"
+        }
+
+        object FCM_TOKEN_UPDATE_FAILED : FCMTokenErrors() {
+            override val code: String = "FCM-003"
+            override val description: String = "FCM token update to Firestore failed."
+            override val solution: String = "Check network connectivity and try again."
+            override val actionText: String = "Retry"
+        }
+    }
+
+
         sealed class AccountErrors: Errors(){
             object ACCOUNT_FIELDS_NULL : AccountErrors(){
                 override val code: String ="ACCNT-001"
@@ -77,6 +102,20 @@ sealed class Errors {
                 override val code: String = "NETWRK-001"
                 override val description: String = "Check internet connectivity, retry."
                 override val solution: String = "Check your internet connection and try again."
+                override val actionText: String = "Retry"
+            }
+
+            object SERVER_UNAVAILABLE : NetworkErrors() {
+                override val code: String = "CON-002"
+                override val description: String = "Server is currently unavailable."
+                override val solution: String = "Wait for server availability or contact support."
+                override val actionText: String = "Contact Support"
+            }
+
+            object TIMEOUT_ERROR : NetworkErrors() {
+                override val code: String = "CON-003"
+                override val description: String = "Request has timed out."
+                override val solution: String = "Check your internet connection and retry."
                 override val actionText: String = "Retry"
             }
         }

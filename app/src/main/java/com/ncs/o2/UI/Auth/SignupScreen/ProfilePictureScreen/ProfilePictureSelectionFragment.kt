@@ -21,6 +21,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -264,7 +265,8 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                 val userData = mapOf(
                     "PHOTO_ADDED" to true,
-                    "PROJECTS" to listOf("NCSOxygen")
+                    "PROJECTS" to listOf("NCSOxygen"),
+                    "TIMESTAMP" to Timestamp.now()
                 )
 
                 FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
@@ -283,11 +285,23 @@ class ProfilePictureSelectionFragment : Fragment() {
                                         val email=document.getString(Endpoints.User.EMAIL)
                                         val username=document.getString(Endpoints.User.USERNAME)
                                         val role= document.getLong(Endpoints.User.ROLE)
+                                        var fcm : String? = document.getString(Endpoints.User.FCM_TOKEN)
+
+                                        if (fcm==null){
+                                            fcm = ""
+                                        }
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
                                         PrefManager.putProjectsList(listOf("NCSOxygen"))
-                                        PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!))
+                                        PrefManager.setcurrentUserdetails(CurrentUser(
+                                            EMAIL = email!!,
+                                            USERNAME = username!!,
+                                            BIO = bio!!,
+                                            DESIGNATION = designation!!,
+                                            ROLE = role!!,
+                                            FCM_TOKEN = fcm!!,
+                                        ))
                                         requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                         requireActivity().finish()
                                     }

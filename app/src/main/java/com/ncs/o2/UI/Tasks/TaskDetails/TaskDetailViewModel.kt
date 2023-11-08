@@ -14,6 +14,10 @@ import com.google.gson.JsonObject
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
+import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Services.NotificationApiService
 import com.ncs.o2.Domain.Workers.FCMWorker
@@ -44,7 +48,7 @@ Tasks FUTURE ADDITION :
 @HiltViewModel
 class TaskDetailViewModel @Inject
 constructor(val notificationApiService: NotificationApiService,
-            @FirebaseRepository val repository: Repository, val app: Application
+            @FirebaseRepository val repository: Repository, val app: Application,private val firestoreRepository: FirestoreRepository
 ) : AndroidViewModel(app) {
 
     companion object{
@@ -112,7 +116,26 @@ constructor(val notificationApiService: NotificationApiService,
     }
 
 
-
+    fun getTasksbyId(
+        id:String,
+        projectName: String,
+        resultCallback: (ServerResult<Task>) -> Unit
+    ) {
+        firestoreRepository.getTasksbyId(id,projectName, resultCallback)
+    }
+    fun getTagsbyId(
+        id:String,
+        projectName: String,
+        resultCallback: (ServerResult<Tag>) -> Unit
+    ) {
+        firestoreRepository.getTagbyId(id,projectName, resultCallback)
+    }
+    fun getUserbyId(
+        id:String,
+        resultCallback: (ServerResult<User?>) -> Unit
+    ) {
+        firestoreRepository.getUserInfobyId(id,resultCallback)
+    }
 
 
 
