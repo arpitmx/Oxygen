@@ -148,7 +148,7 @@ class TestingActivity : AppCompatActivity() {
                             binding.logs.text.toString().plus("\n> Last time stamp : ${lastTimeStamp}")
 
                         CoroutineScope(Dispatchers.Main).launch {
-                            repository.getNewNotifications(lastSeenTimeStamp = 1699369837) { result ->
+                            repository.getNewNotifications(lastSeenTimeStamp = 1699385831) { result ->
 
                                 when(result){
                                     is ServerResult.Failure -> {

@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/tasksDetailsHolderFragment"
-        android:name="com.ncs.o2.UI.Tasks.TaskDetails.TasksDetailsHolderFragment"
+        android:name="com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment"
         android:label="fragment_tasks_details_holder"
         tools:layout="@layout/fragment_tasks_details_holder" />
 </navigation>

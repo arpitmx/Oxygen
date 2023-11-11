@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
-            android:fontFamily="@font/outfitbold"
+            android:fontFamily="@font/sf_pro_display_semibold"
             android:gravity="center"
             android:layout_marginStart="10dp"
             android:text="Title"
@@ -55,7 +55,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="15dp"
-            android:fontFamily="@font/outfitbold"
+            android:fontFamily="@font/sf_pro_display_semibold"
             android:gravity="center"
             android:text="Done"
             android:visibility="gone"
@@ -110,6 +110,7 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         style="@style/CustomTabLayout2"

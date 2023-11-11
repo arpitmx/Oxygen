@@ -1,4 +1,4 @@
-package com.ncs.o2.UI.Tasks.TaskDetails
+package com.ncs.o2.UI.Tasks.TaskPage
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -116,13 +116,11 @@ constructor(val notificationApiService: NotificationApiService,
     }
 
 
-    fun getTasksbyId(
-        id:String,
-        projectName: String,
-        resultCallback: (ServerResult<Task>) -> Unit
-    ) {
-        firestoreRepository.getTasksbyId(id,projectName, resultCallback)
+    suspend fun getTasksById(id: String, projectName: String): ServerResult<Task> {
+        return firestoreRepository.getTasksbyId(id, projectName = projectName)
     }
+
+
     fun getTagsbyId(
         id:String,
         projectName: String,

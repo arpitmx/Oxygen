@@ -16,6 +16,14 @@
         android:orientation="vertical"
         >
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/secondaryBlue"
+           android:layout_marginBottom="10dp"
+            />
+
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="100dp"
             android:layout_height="100dp">
@@ -52,10 +60,10 @@
             android:layout_height="wrap_content"
             android:baselineAligned="false"
             android:elevation="5dp"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:text="Armax"
-            android:textColor="@color/purple"
+            android:textColor="@color/primary"
             android:textSize="22sp" />
 
         <TextView
@@ -63,44 +71,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="5dp"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:text="sudoarmax@gmail.com"
-            android:textColor="#C1536DFE"
+            android:textColor="@color/better_white"
             android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:elevation="5dp"
-            android:fontFamily="@font/outfitmedium"
-            android:gravity="center"
-            android:text="Joined on 15th Oct,2022"
-            android:textColor="#C95E5E5E"
-            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/totalMembers_bs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:elevation="5dp"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:text="Android developer"
-            android:textColor="#DD5E5E5E"
+            android:textColor="@color/account"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:elevation="5dp"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:gravity="center"
+            android:text="Joined on 15th Oct,2022"
+            android:textColor="@color/better_white"
+            android:textSize="13sp" />
+
+
     </LinearLayout>
 
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/secondaryBlue"
-        />
 
 
 

@@ -120,6 +120,8 @@ object PrefManager {
         editor.putLong(Endpoints.User.ROLE,user.ROLE)
         editor.apply()
     }
+
+
     fun getcurrentUserdetails():CurrentUser{
 
         val username = sharedPreferences.getString(Endpoints.User.USERNAME, "")
@@ -129,6 +131,7 @@ object PrefManager {
         val role = sharedPreferences.getLong(Endpoints.User.ROLE, 0)
         return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role)
     }
+
 
     fun getCurrentUserEmail():String{
         return getcurrentUserdetails().EMAIL
@@ -142,6 +145,37 @@ object PrefManager {
         editor.putString(Endpoints.User.FCM_TOKEN,token)
         editor.apply()
     }
+
+    fun setLastSeenTimeStamp(timestamp: Long){
+        editor.putLong(Endpoints.Notifications.NOTIFICATION_LAST_SEEN,timestamp)
+        editor.apply()
+    }
+
+    fun getLastSeenTimeStamp():Long{
+        return sharedPreferences.getLong(Endpoints.Notifications.NOTIFICATION_LAST_SEEN,0)
+    }
+
+
+    fun setNotificationCount(count: Int){
+        editor.putInt(Endpoints.Notifications.NOTIFICATION_COUNT, count)
+        editor.apply()
+    }
+
+    fun getNotificationCount():Int{
+        return sharedPreferences.getInt(Endpoints.Notifications.NOTIFICATION_COUNT,0)
+    }
+
+
+    fun setLatestNotificationTimeStamp(timestamp: Long){
+        editor.putLong(Endpoints.Notifications.LATEST_NOTIFICATION_TIME_STAMP,timestamp)
+        editor.apply()
+    }
+
+    fun getLatestNotificationTimeStamp():Long{
+        return sharedPreferences.getLong(Endpoints.Notifications.LATEST_NOTIFICATION_TIME_STAMP,0)
+    }
+
+
 
     fun lastaddedproject(project:String){
         val lastproject = sharedPreferences.getString("last_project", null)

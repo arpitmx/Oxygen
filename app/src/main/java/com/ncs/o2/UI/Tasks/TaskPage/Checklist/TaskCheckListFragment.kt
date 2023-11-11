@@ -1,18 +1,17 @@
-package com.ncs.o2.UI.Tasks.TaskDetails.Chat
+package com.ncs.o2.UI.Tasks.TaskPage.Checklist
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ncs.o2.R
 import com.ncs.o2.databinding.FragmentTaskChatBinding
-import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
+import com.ncs.o2.databinding.FragmentTaskChecklistBinding
 
 
-class TaskChatFragment : Fragment() {
+class TaskCheckListFragment : Fragment() {
 
-    lateinit var binding: FragmentTaskChatBinding
+    lateinit var binding: FragmentTaskChecklistBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,8 +21,8 @@ class TaskChatFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentTaskChatBinding.inflate(inflater, container, false)
+    ): View {
+        binding = FragmentTaskChecklistBinding.inflate(inflater, container, false)
         return binding.root
     }
 

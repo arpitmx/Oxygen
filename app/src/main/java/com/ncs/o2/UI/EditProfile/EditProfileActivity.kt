@@ -28,6 +28,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.StartScreen.StartScreen
 import com.ncs.o2.databinding.ActivityEditProfileBinding
 import com.ncs.o2.databinding.ChooseDesignationBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -180,15 +181,18 @@ class EditProfileActivity : AppCompatActivity() {
                             val currentUser= PrefManager.getcurrentUserdetails()
                             val  role= currentUser.ROLE
                             val email=currentUser.EMAIL
+                            val new_dp_url : String? = response.DP_URL
 
                             Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
                             PrefManager.putProjectsList(listOf("NCSOxygen"))
                             PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role))
+                            PrefManager.setDpUrl(new_dp_url)
 
                             Toast.makeText(this, "Updated", Toast.LENGTH_SHORT)
                                 .show()
 
-                            onBackPressed()
+                            startActivity(Intent(this,StartScreen::class.java))
+                            finishAffinity()
 
                         }
                     }

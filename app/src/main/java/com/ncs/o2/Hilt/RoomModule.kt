@@ -33,7 +33,6 @@ Tasks FUTURE ADDITION :
 @Module
 object RoomModule {
 
-
     @Singleton
     @Provides
     fun providesNotificationDatabase(@ApplicationContext context : Context) : NotificationDatabase{

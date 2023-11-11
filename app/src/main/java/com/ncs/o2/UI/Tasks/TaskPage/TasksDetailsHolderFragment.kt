@@ -1,4 +1,4 @@
-package com.ncs.o2.UI.Tasks.TaskDetails
+package com.ncs.o2.UI.Tasks.TaskPage
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -40,18 +40,21 @@ class TasksDetailsHolderFragment : Fragment() {
 
     private fun setUpViewPager() {
 
-        val adapter = TaskDetailsViewPagerAdpater(this, 2)
+        val adapter = TaskDetailsViewPagerAdpater(this, 3)
         binding.viewPager2.adapter = adapter
         setUpTabsLayout()
     }
 
     private fun setUpTabsLayout() {
+
+
         TabLayoutMediator(
             activityBinding.binding.gioActionbar.tabLayout, binding.viewPager2
         ) { tab, position ->
             when(position){
                 0-> tab.text="Details"
                 1-> tab.text="Activity"
+                2-> tab.text="Checklist"
             }
         }.attach()
     }

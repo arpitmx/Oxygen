@@ -59,7 +59,7 @@ class UserDetailsFragment : Fragment() {
                 Endpoints.User.ROLE to 1,
                 Endpoints.User.DETAILS_ADDED to true,
                 Endpoints.User.PHOTO_ADDED to false,
-                Endpoints.User.NOTIFICATION_TIME_STAMP to Timestamp.now().seconds
+                Endpoints.User.NOTIFICATION_TIME_STAMP to 0
             )
 
             FirebaseFirestore.getInstance().collection(Endpoints.USERS).document(FirebaseAuth.getInstance().currentUser?.email!!)
