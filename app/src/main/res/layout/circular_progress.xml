@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    android:background="#AE020202"
+    android:background="#020202"
     android:elevation="10dp"
     android:layout_gravity="center"
     android:id="@+id/progress_layout"

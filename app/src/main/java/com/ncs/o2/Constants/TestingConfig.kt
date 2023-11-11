@@ -32,6 +32,7 @@ object TestingConfig {
         ADD_NOTIFICATIONS,
         ADD_TASKS,
         ADD_NOTIFICATION_ROOM,
+        FETCH_LATEST_NOTIFICATION_FIRESTORE,
     }
 
 }

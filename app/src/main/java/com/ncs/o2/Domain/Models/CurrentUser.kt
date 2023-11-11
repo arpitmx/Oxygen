@@ -26,4 +26,5 @@ data class CurrentUser (
             val ROLE:Long=1,
             val DP_URL:String?=null,
             val FCM_TOKEN: String="",
+            val NOTIFICATION_LAST_SEEN : Long = 0
 )

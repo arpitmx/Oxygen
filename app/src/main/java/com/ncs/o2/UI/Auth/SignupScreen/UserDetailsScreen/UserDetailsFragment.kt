@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -58,6 +59,7 @@ class UserDetailsFragment : Fragment() {
                 Endpoints.User.ROLE to 1,
                 Endpoints.User.DETAILS_ADDED to true,
                 Endpoints.User.PHOTO_ADDED to false,
+                Endpoints.User.NOTIFICATION_TIME_STAMP to Timestamp.now().seconds
             )
 
             FirebaseFirestore.getInstance().collection(Endpoints.USERS).document(FirebaseAuth.getInstance().currentUser?.email!!)

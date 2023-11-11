@@ -18,18 +18,34 @@
         tools:layout_editor_absoluteX="-16dp"
         tools:layout_editor_absoluteY="-136dp">
 
+        <TextView
+            android:id="@+id/test_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_display_semibold"
+            android:padding="10dp"
+            android:text="Test title"
+            android:textAlignment="textStart"
+            android:textColor="@color/secondaryBlue"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/go_btn" />
+
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
             android:layout_weight="4">
+
 
             <TextView
                 android:id="@+id/logs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/secondary_bg_black"
-                android:minHeight="100dp"
+                android:minHeight="400dp"
                 android:padding="10dp"
                 android:paddingBottom="20dp"
                 android:text="Test logs will appear here.."
@@ -50,6 +66,7 @@
             android:gravity="top|center"
             android:orientation="vertical">
 
+
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progress"
                 android:layout_width="30dp"
@@ -68,20 +85,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/quantity_et"
                 app:layout_constraintVertical_bias="0.057" />
 
-            <TextView
-                android:id="@+id/test_title_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_display_semibold"
-                android:padding="10dp"
-                android:text="Test title"
-                android:textAlignment="textStart"
-                android:textColor="@color/secondaryBlue"
-                android:textSize="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/go_btn" />
 
 
 
@@ -112,11 +115,12 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/go_btn"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_margin="20dp"
                 android:background="@color/secondaryBlue"
-                android:text="Go!"
+                android:text="Execute"
+                android:fontFamily="@font/outfitmedium"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

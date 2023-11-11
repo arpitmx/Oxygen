@@ -27,22 +27,19 @@ import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
-import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
+import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback,
-    SegmentSelectionBottomSheet.SegmentSelectionListener,
-    AddProjectBottomSheet.ProjectAddedListener {
+class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener  {
     private lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
 
@@ -53,10 +50,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
     // Views and data
     private lateinit var search: LinearLayout
     val segmentText = MutableLiveData<String>()
-
-    companion object{
-        val TAG = "MainActivity"
-    }
 
     // Utils
     private val easyElements: GlobalUtils.EasyElements by lazy {
@@ -89,8 +82,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
     private fun setUpViews() {
 
         // Set up various views and components
-        binding.lottieProgressInclude.progressbarBlock.gone()
-
         setUpProjects()
         setUpActionBar()
         setUpViewsOnClicks()
@@ -138,8 +129,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
         binding.gioActionbar.btnHam.setOnClickThrottleBounceListener {
 
             // Toggle the navigation drawer
-            val gravity =
-                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
+            val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
 
         }
@@ -166,7 +156,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
 
             val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
             startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
             drawerLayout.closeDrawer(GravityCompat.START)
 
         }
@@ -182,23 +172,22 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
 
     private fun setUpProjects() {
 
-
         // Set up the list of projects and related UI components
         binding.lottieProgressInclude.progressbarStrip.visible()
+        binding.lottieProgressInclude.progressbarBlock.gone()
 
         viewModel.fetchUserProjectsFromRepository()
-        val user = PrefManager.getcurrentUserdetails()
-        binding.drawerheaderfile.username.text = user.USERNAME
-        binding.drawerheaderfile.designation.text = user.DESIGNATION
-        binding.drawerheaderfile.email.text = user.EMAIL
-
-        Timber.tag(TAG).d("DP URL : ${PrefManager.getDpUrl()}")
+        val user=PrefManager.getcurrentUserdetails()
+        binding.drawerheaderfile.username.text=user.USERNAME
+        binding.drawerheaderfile.designation.text=user.DESIGNATION
+        binding.drawerheaderfile.email.text=user.EMAIL
 
         Glide.with(this)
             .load(PrefManager.getDpUrl())
             .placeholder(R.drawable.profile_pic_placeholder)
-            .error(R.drawable.ncs)
-            .override(200, 200)
+            .error(R.drawable.logogradhd)
+            .override(200,200)
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
             .into(binding.drawerheaderfile.userDp)
 
         viewModel.showprogressLD.observe(this) { show ->
@@ -210,11 +199,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
         }
 
         viewModel.showDialogLD.observe(this) { data ->
-            easyElements.singleBtnDialog(data[0], data[1], "OK", {})
+            easyElements.singleBtnDialog(data[0], data[1],"OK",{})
         }
 
         viewModel.projectListLiveData.observe(this) { projectList ->
-            projects = PrefManager.getProjectsList().toMutableList()
+
+            projects=projectList!!.toMutableList()
             projectListAdapter = ListAdapter(this, projects)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }
@@ -226,7 +216,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.initialize(this)
         PrefManager.setcurrentsegment("Select Segment")
-        binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
+        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
 
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
@@ -253,10 +243,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback,
     }
 
 
+
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
         projects.addAll(userProjects)
-        PrefManager.putProjectsList(userProjects)
         projectListAdapter.notifyDataSetChanged()
     }
 

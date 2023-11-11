@@ -1,31 +1,63 @@
 package com.ncs.o2.UI.EditProfile
 
+import android.Manifest
+import android.app.Activity
+import android.content.ContentResolver
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityEditProfileBinding
 import com.ncs.o2.databinding.ChooseDesignationBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import java.io.InputStream
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditProfileActivity : AppCompatActivity() {
 
     private val TAG= "EditProfileActivity"
 
+    @Inject
+    lateinit var util : GlobalUtils.EasyElements
+
     private val viewModel: EditProfileViewModel by viewModels()
     private lateinit var binding: ActivityEditProfileBinding
     private lateinit var userInfo: UserInfo
     private lateinit var newUserInfo: UserInfo
     private lateinit var bottomSheetBinding: ChooseDesignationBottomSheetBinding
+
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_IMAGE_PICK = 2
+    private val CAMERA_PERMISSION_REQUEST = 100
+    private lateinit var userDPRef : StorageReference
+
+    private var bitmap: Bitmap?=null
+    private var newImageUrl: String?= null
+    private var newBio: String?= null
+    var newUsername: String?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,27 +97,34 @@ class EditProfileActivity : AppCompatActivity() {
 
         binding.btnEdit.setOnClickListener {
 
-            var newUsername: String?= null
+
             binding.etName.text?.trim()?.let {
-                newUsername= binding.etName.toString()
+                newUsername= binding.etName.text.toString()
             }
 
             val newDesignation= binding.etDesignation.text.toString() ?: null
-            var newBio: String?= null
-            binding.etBio.text?.trim()?.let {
-                newBio= binding.etBio.toString()
-            }
 
-            val newImageUrl= "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/quiz0.jpg?alt=media&token=d16f5af1-f85e-4ffb-9c7d-7e8acebd97b9"
+            binding.etBio.text?.trim()?.let {
+                newBio= binding.etBio.text.toString()
+            }
 
             newUserInfo= UserInfo(
                 newUsername ?: userInfo.USERNAME,
-                newDesignation ?: userInfo.DESIGNATION,
                 newBio ?: userInfo.BIO,
+                newDesignation ?: userInfo.DESIGNATION,
                 newImageUrl ?: userInfo.DP_URL
             )
 
-            editUserDetails(newUserInfo)
+            if(bitmap!= null){
+
+                showProgressBar()
+                binding.btnEdit.isEnabled = false
+                binding.btnEdit.isClickable = false
+                binding.btnEdit.setText(R.string.hold_on)
+                uploadImageToFirebaseStorage(bitmap!!)
+            }else{
+                editUserDetails(newUserInfo)
+            }
         }
     }
 
@@ -100,11 +139,14 @@ class EditProfileActivity : AppCompatActivity() {
         userInfo.BIO?.let {
             binding.etBio.setText(it)
         }
-        userInfo.DP_URL?.let {url ->
+
+        userInfo.DP_URL?.let { url ->
             try {
 
                 Glide.with(this)
                     .load(url)
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .fitCenter()
                     .placeholder(R.drawable.profile_pic_placeholder)
                     .error(R.drawable.ncs)
@@ -131,6 +173,18 @@ class EditProfileActivity : AppCompatActivity() {
                             binding.btnEdit.isEnabled = true
                             binding.btnEdit.isClickable = true
                             binding.btnEdit.setText(R.string.edit)
+
+                            val bio=response.BIO
+                            val designation=response.DESIGNATION
+                            val username=response.USERNAME
+                            val currentUser= PrefManager.getcurrentUserdetails()
+                            val  role= currentUser.ROLE
+                            val email=currentUser.EMAIL
+
+                            Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
+                            PrefManager.putProjectsList(listOf("NCSOxygen"))
+                            PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role))
+
                             Toast.makeText(this, "Updated", Toast.LENGTH_SHORT)
                                 .show()
 
@@ -160,6 +214,10 @@ class EditProfileActivity : AppCompatActivity() {
                     else -> {}
                 }
             }
+        }else{
+            Toast.makeText(this, "Updated", Toast.LENGTH_SHORT)
+                .show()
+            onBackPressed()
         }
     }
 
@@ -218,10 +276,163 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
+
+        PrefManager.initialize(this)
+
+        binding.ivPicPreview.setOnClickThrottleBounceListener{
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    CAMERA_PERMISSION_REQUEST
+                )
+            } else {
+                pickImage()
+            }
+        }
+
+
         val backBtn = binding.toolbar.btnBackEditProfile
         backBtn.setOnClickThrottleBounceListener {
             onBackPressed()
 
         }
+    }
+
+    private fun uploadImageToFirebaseStorage(bitmap: Bitmap) {
+
+        viewModel.uploadDPthroughRepository(bitmap).observe(this) { result ->
+
+            when(result){
+                is ServerResult.Failure -> {
+                    util.singleBtnDialog_InputError("Upload Errors",
+                        "There was an issue in uploading the profile picture, ${result.exception.message} \n\nplease retry",
+                        "Retry"
+                    ) {
+                        hideProgressBar()
+                        editUserDetails(newUserInfo)
+                    }
+
+                }
+                ServerResult.Progress -> {
+                    showProgressBar()
+                    binding.btnEdit.isEnabled = false
+                    binding.btnEdit.isClickable = false
+                    binding.btnEdit.setText(R.string.hold_on)
+
+                }
+                is ServerResult.Success -> {
+                    val imgStorageReference = result.data
+                    Timber.tag("userDpIMageCheck").d(imgStorageReference.path)
+                    getImageDownloadUrl(imgStorageReference)
+                }
+            }
+
+
+
+        }
+    }
+    private fun getImageDownloadUrl(imageRef: StorageReference) {
+
+        viewModel.getDPUrlThroughRepository(imageRef).observe(this) { result ->
+
+            when(result){
+                is ServerResult.Failure -> {
+                    util.singleBtnDialog_InputError("Upload Errors",
+                        "There was an issue in uploading the profile picture, ${result.exception.message},\n\nplease retry",
+                        "Retry"
+                    ) {
+                        hideProgressBar()
+                        imageRef.delete()
+                        editUserDetails(newUserInfo)
+                    }
+                }
+                ServerResult.Progress -> {
+                    showProgressBar()
+                    binding.btnEdit.isEnabled = false
+                    binding.btnEdit.isClickable = false
+                    binding.btnEdit.setText(R.string.hold_on)
+
+                }
+                is ServerResult.Success -> {
+
+                    PrefManager.setDpUrl(result.data)
+                    newImageUrl= result.data
+                    editUserDetails(newUserInfo)
+                }
+            }
+        }
+    }
+
+
+    private fun pickImage() {
+
+        val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Choose an option")
+        builder.setItems(options) { dialog, item ->
+            when (options[item]) {
+                "Take Photo" -> {
+                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+                }
+                "Choose from Gallery" -> {
+                    val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    startActivityForResult(intent, REQUEST_IMAGE_PICK)
+                }
+                "Cancel" -> {
+                    dialog.dismiss()
+                }
+            }
+        }
+        builder.show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_IMAGE_CAPTURE -> {
+                    val imageBitmap = data?.extras?.get("data") as Bitmap
+                    bitmap=imageBitmap
+                    binding.ivPicPreview?.setImageBitmap(imageBitmap)
+                }
+                REQUEST_IMAGE_PICK -> {
+                    val selectedImage = data?.data
+                    bitmap=uriToBitmap(this.contentResolver,selectedImage!!)
+                    binding.ivPicPreview?.setImageURI(selectedImage)
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                pickImage()
+            } else {
+                Toast.makeText(this,"Camera Permission Denied, can't take photo",Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
+        var bitmap: Bitmap? = null
+        try {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream.close()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return bitmap
     }
 }

@@ -11,24 +11,27 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
 import com.ncs.o2.databinding.TaskItemBinding
+import java.util.Date
 
-class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
+class TaskListAdapter(val repository: FirestoreRepository) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
     private var taskList: ArrayList<TaskItem> = ArrayList()
-
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(task: TaskItem) {
+        fun bind(task: TaskItem,user: User) {
             Glide.with(binding.root)
-                .load(task.assignee_DP_URL)
+                .load(user.profileDPUrl)
                 .listener(object : RequestListener<Drawable> {
 
                     override fun onLoadFailed(
@@ -65,8 +68,19 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.taskTitle.paintFlags=binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
+            val timeDifference = Date().time - task.timestamp!!.toDate().time
+            val minutes = (timeDifference / (1000 * 60)).toInt()
+            val hours = minutes / 60
+            val days = hours / 24
 
-            binding.taskDuration.text = "about ${task.duration} hours ago"
+            val timeAgo: String = when {
+                days > 0 -> "about $days days ago"
+                hours > 0 -> "about $hours hours ago"
+                minutes > 0 -> "about $minutes minutes ago"
+                else -> "just now"
+            }
+
+            binding.taskDuration.text = "$timeAgo"
             binding.taskId.text = task.id
             binding.taskTitle.text = task.title
             binding.difficulty.text = task.getDifficultyString()
@@ -92,8 +106,10 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
     }
 
     override fun onBindViewHolder(holder: TaskItemViewHolder, position: Int) {
-        holder.bind(taskList[position])
 
+        fetchAssigneeDetails(taskList[position].assignee_id) { user ->
+            holder.bind(taskList[position], user)
+        }
         holder.itemView.setOnClickFadeInListener {
             if (onClickListener != null) {
                 onClickListener!!.onCLick(position, taskList[position])
@@ -129,6 +145,24 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>
             val oldTask = oldList[oldItemPosition]
             val newTask = newList[newItemPosition]
             return oldTask == newTask
+        }
+    }
+    private fun fetchAssigneeDetails(assigneeId: String, onUserFetched: (User) -> Unit) {
+        repository.getUserInfobyId(assigneeId) { result ->
+            when (result) {
+                is ServerResult.Success -> {
+                    val user = result.data
+                    if (user != null) {
+                        onUserFetched(user)
+                    }
+                }
+                is ServerResult.Failure -> {
+
+                }
+                is ServerResult.Progress->{
+
+                }
+            }
         }
     }
 

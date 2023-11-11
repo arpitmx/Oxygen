@@ -1,10 +1,13 @@
 package com.ncs.o2.UI.Tasks.TaskDetails.Details
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,11 +15,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.Colors
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
@@ -31,7 +36,10 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskDetails.TaskDetailViewModel
+import com.ncs.o2.UI.Tasks.TaskDetails.TasksDetailsHolderFragment
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.LinkAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
@@ -42,6 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.datafaker.Faker
+import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -53,9 +62,14 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
+    private val tasksHolderBinding:TasksDetailsHolderFragment by lazy {
+        (requireParentFragment() as TasksDetailsHolderFragment)
+    }
     private val viewModel: TaskDetailViewModel by viewModels()
-
-
+    lateinit var taskDetails:Task
+    var tags:MutableList<Tag> = mutableListOf()
+    var users:MutableList<User> = mutableListOf()
+    private val TextViewList = mutableListOf<TextView>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,17 +81,26 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpViews()
-        Log.d("id",activityBinding.taskId)
         setdetails(activityBinding.taskId)
+
+        CoroutineScope(Dispatchers.Main).launch{
+            withContext(Dispatchers.Main){
+                binding.activity.setOnClickThrottleBounceListener {
+                    val viewpager=tasksHolderBinding.binding.viewPager2
+                    val next=viewpager.currentItem+1
+                    if (next < 2) {
+                        viewpager.currentItem=next
+                    }
+                }
+            }
+        }
+
     }
 
 
     @Later("1. Check if the request has already made, if made then set text and clickability on the button accordingly")
     private fun setUpViews() {
 
-
-        setTagsView()
-        setContributors()
 
         activityBinding.binding.gioActionbar.btnRequestWork.setOnClickSingleTimeBounceListener {
 
@@ -164,84 +187,188 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         )
     }
 
-    private fun setContributors() {
-
+    private fun setContributors(list: MutableList<User>) {
         val contriRecyclerView = binding.contributorsRecyclerView
         val layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         contriRecyclerView.layoutManager = layoutManager
-
-
-        val dataList = listOf(
-            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj"),
-            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"),
-            User("https://picsum.photos/200"),
-            User("https://picsum.photos/300"),
-            User("https://picsum.photos/350"),
-            User("https://picsum.photos/450"),
-            User("https://picsum.photos/230"),
-            User("https://picsum.photos/231"),
-            User("https://picsum.photos/202"),
-            User("https://picsum.photos/234")
-        )
-
-        val adapter = ContributorAdapter(dataList as MutableList<User>, this, false)
+        val adapter = ContributorAdapter(list, this, false)
         contriRecyclerView.adapter = adapter
     }
 
-    private fun setTagsView() {
-
+    private fun setTagsView(list: MutableList<Tag>) {
         val tagsRecyclerView = binding.tagRecyclerView
         val layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         tagsRecyclerView.layoutManager = layoutManager
-
-        val dataList = listOf(
-            Tag("Critical", Colors.WHITE, Colors.BLACK, ""),
-            Tag("Bug", Colors.RED, Colors.WHITE, ""),
-            Tag("Feature", Colors.BLUE, Colors.WHITE, ""),
-            Tag("New", Colors.GREEN, Colors.BLACK, ""),
-            Tag("Critical", Colors.WHITE, Colors.BLACK, ""),
-
-            )
-        val adapter = TagAdapter(dataList)
+        val adapter = TagAdapter(list)
         tagsRecyclerView.adapter = adapter
+    }
+    private fun setLinksView(list: MutableList<String>) {
+        val num=list.size
+        val parentLayout = binding.linksCont
+        val inflater = LayoutInflater.from(requireContext())
+        TextViewList.clear()
+        for (i in 0 until num) {
+            val text = inflater.inflate(
+                R.layout.links_item,
+                parentLayout,
+                false
+            ) as TextView
+            TextViewList.add(text)
+            parentLayout.addView(text)
+            text.text=list[i]
+        }
+        for (i in 0 until num) {
+            CoroutineScope(Dispatchers.IO).launch{
+                withContext(Dispatchers.Main){
+                    TextViewList[i] .setOnClickThrottleBounceListener{
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
+                        startActivity(intent)
+                    }
+                }
+            }
+
+        }
+
     }
 
     override fun onProfileClick(user: User, position: Int) {
-        val bottomSheet = ProfileBottomSheet(user.profileDPUrl!!)
+        val bottomSheet = ProfileBottomSheet(user)
         bottomSheet.show(childFragmentManager, "bottomsheet")
     }
 
     override fun removeClick(user: User, position: Int) {
         TODO("Not yet implemented")
     }
-    fun setdetails(id:String){
-        viewModel.getTasksbyId(id,PrefManager.getcurrentProject()) { result ->
+    fun setdetails(id: String) {
+        viewModel.getTasksbyId(id, PrefManager.getcurrentProject()) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     binding.progressBar.gone()
                     binding.scrollView2.visible()
                     CoroutineScope(Dispatchers.IO).launch {
-                        val task = result.data
-                        binding.titleTv.text=task.title
-                        binding.descriptionTv.text=task.description
+                        withContext(Dispatchers.Main) {
+                            val task = result.data
+                            taskDetails = task
+                            setTags()
+                            fetchUsers()
+                            binding.titleTv.text = task.title
+                            binding.descriptionTv.text = taskDetails.description
+                            when (task.status) {
+                                0 -> binding.taskStatus.text = "Unassigned"
+                                1 -> binding.taskStatus.text = "Assigned"
+                                2 -> binding.taskStatus.text = "Finished"
+                            }
+                            binding.duration.text = "${task.duration}Hr+"
+                            when (task.difficulty) {
+                                1 -> binding.difficulty.text = "Easy"
+                                2 -> binding.difficulty.text = "Medium"
+                                3 -> binding.difficulty.text = "Difficult"
+                            }
+                            val timeDifference = Date().time - task.time_STAMP!!.toDate().time
+                            val minutes = (timeDifference / (1000 * 60)).toInt()
+                            val hours = minutes / 60
+                            val days = hours / 24
+
+                            val timeAgo: String = when {
+                                days > 0 -> "$days days ago"
+                                hours > 0 -> "$hours hours ago"
+                                minutes > 0 -> "$minutes minutes ago"
+                                else -> "just now"
+                            }
+                            binding.openedBy.text = "${task.assigner} created this task $timeAgo"
+                            withContext(Dispatchers.Main) {
+                                if (task.links.isEmpty()) {
+                                    binding.link.gone()
+                                    binding.linksCont.gone()
+                                }
+                                if (task.links.isNotEmpty()) {
+                                    binding.link.visible()
+                                    binding.linksCont.visible()
+                                    setLinksView(task.links.toMutableList())
+                                }
+                            }
+                        }
                     }
                 }
                 is ServerResult.Failure -> {
                     val errorMessage = result.exception.message
                     binding.progressBar.gone()
                 }
-                is ServerResult.Progress->{
+                is ServerResult.Progress -> {
                     binding.progressBar.visible()
                 }
-
             }
-
         }
+    }
 
+    fun setTags(){
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main){
+                for(i in 0 until taskDetails.tags.size) {
+                    viewModel.getTagsbyId(taskDetails.tags[i], PrefManager.getcurrentProject()) { result ->
+                        when (result) {
+                            is ServerResult.Success -> {
+                                binding.progressBar.gone()
+                                binding.scrollView2.visible()
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val tag = result.data
+                                    tags.add(tag)
+                                }
+                                setTagsView(tags)
 
+                            }
+
+                            is ServerResult.Failure -> {
+                                val errorMessage = result.exception.message
+                                binding.progressBar.gone()
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+    fun fetchUsers(){
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main){
+                for(i in 0 until taskDetails.assignee.size) {
+                    viewModel.getUserbyId(taskDetails.assignee[i]) { result ->
+                        when (result) {
+                            is ServerResult.Success -> {
+                                binding.progressBar.gone()
+                                binding.scrollView2.visible()
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val user = result.data
+                                    users.add(user!!)
+                                }
+                                setContributors(users)
+                            }
+
+                            is ServerResult.Failure -> {
+                                val errorMessage = result.exception.message
+                                binding.progressBar.gone()
+
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -10,28 +10,34 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Tag
-import com.ncs.o2.Domain.Models.User
-import com.ncs.o2.Domain.Utility.Colors
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
-import com.ncs.o2.UI.CreateTask.CreateTaskActivity
-import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
+import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.databinding.AddTagBottomSheetBinding
+import com.ncs.versa.Constants.Endpoints
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.datafaker.Faker
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val callback : getSelectedTagsCallback?=null,private var selectedTagsList: MutableList<Tag>): BottomSheetDialogFragment(){
     private var tagList: MutableList<Tag> = mutableListOf()
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
 
     lateinit var binding: AddTagBottomSheetBinding
     private val faker: Faker by lazy { Faker() }
-
+    @Inject
+    @FirebaseRepository
+    lateinit var repository: Repository
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,29 +53,24 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
         super.onViewCreated(view, savedInstanceState)
         binding.progressbar.visible()
         binding.chipGroup.gone()
+        PrefManager.initialize(requireContext())
         val job =  CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.Main) {
-                val firestore = FirebaseFirestore.getInstance()
-                val projectDocRef = firestore.collection("Projects").document("Versa") // Replace with actual project name
-
-                projectDocRef.get()
+                FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(PrefManager.getcurrentProject()).collection(Endpoints.Project.TAGS).get()
                     .addOnSuccessListener { documentSnapshot ->
-                        if (documentSnapshot.exists()) {
-                            val tags = documentSnapshot.get("TAGS") as List<HashMap<String, Any>>
-
-                            for (tagData in tags) {
-                                val tag = Tag(
-                                    tagData["tagText"].toString(),
-                                    tagData["bgColor"].toString(),
-                                    tagData["textColor"].toString(),
-                                    tagData["tagID"].toString()
-                                )
-                                TagListfromFireStore.add(tag)
-
-                            }
-                        } else {
+                        for (document in documentSnapshot.documents) {
+                            val tagText = document.getString("tagText")
+                            val tagID = document.getString("tagID")
+                            val textColor = document.getString("textColor")!!
+                            val bgColor = document.getString("bgColor")
+                            val tagItem = Tag(
+                                tagText = tagText!!,
+                                tagID = tagID,
+                                textColor = textColor,
+                                bgColor = bgColor!!,
+                            )
+                            TagListfromFireStore.add(tagItem)
                         }
-
                         TagsList = (selectedTagsList+TagsList+TagListfromFireStore).distinctBy {it.tagID}.toMutableList()
                         tagList = TagsList.toMutableList()
 
@@ -113,11 +114,11 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
             chip.isClickable = true
             chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.bgColor)))
             chip.setTextColor(ColorStateList.valueOf(Color.parseColor(tag.textColor)))
-            chip.isChecked=tag.isChecked
+            chip.isChecked=tag.checked
             chipGroup.addView(chip)
             chip.setOnCheckedChangeListener { buttonView, isCheckedT ->
                 val tag = TagsList[i]
-                tag.isChecked = isCheckedT
+                tag.checked = isCheckedT
                 callback!!.onSelectedTags(tag, isCheckedT)
             }
         }

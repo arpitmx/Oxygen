@@ -27,6 +27,7 @@ Tasks FUTURE ADDITION :
 
 @Entity(tableName = Endpoints.ROOM.NOTIFICATIONS.NOTIFICATIONS_TABLE)
 data class Notification(
+
     @PrimaryKey
     @ColumnInfo(name = "notificationID")
     val notificationID: String,

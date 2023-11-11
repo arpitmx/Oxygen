@@ -63,6 +63,8 @@
             android:name=".UI.MainActivity"
             android:exported="true" />
 
+
+
         <service
             android:name=".Services.FCMessagingService"
             android:exported="false">
