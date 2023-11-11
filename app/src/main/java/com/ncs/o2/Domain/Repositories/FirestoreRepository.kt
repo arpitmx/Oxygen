@@ -613,6 +613,23 @@ class FirestoreRepository @Inject constructor(
 
 
 
+    fun getSection(projectName: String, segmentName: String, result: (ServerResult<List<*>>) -> Unit){
+
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.SEGMENT).document(segmentName)
+            .get()
+            .addOnSuccessListener {
+//                val section_list = mutableListOf<String>()
+                if (it.exists()){
+                    val section_list = it.get("sections") as List<*>
+                    result(ServerResult.Success(section_list))
+                }
+            }
+            .addOnFailureListener {exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
     fun getSegments(
         projectName: String, result: (ServerResult<List<Segment>>) -> Unit
     ) {
