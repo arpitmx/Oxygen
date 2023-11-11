@@ -58,7 +58,6 @@ interface Repository {
     suspend fun setFCMToken(token : String , serverResult: (ServerResult<Int>) -> Unit)
 
 
-
     fun maintenanceCheck(): LiveData<maintainceCheck>
 
     // User DP Related

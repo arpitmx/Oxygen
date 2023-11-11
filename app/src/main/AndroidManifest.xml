@@ -20,6 +20,9 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.UIComponents.BottomSheets.sectionDisplayBottomSheet"
+            android:exported="false" />
+        <activity
             android:name=".UI.StartScreen.maintainingScreen"
             android:exported="false" />
         <activity
@@ -28,7 +31,6 @@
         <activity
             android:name=".UI.Testing.TestingActivity"
             android:exported="false" />
-
         <activity
             android:name=".UI.Auth.AuthScreenActivity"
             android:exported="true" />
@@ -60,8 +62,6 @@
         <activity
             android:name=".UI.MainActivity"
             android:exported="true" />
-
-
 
         <service
             android:name=".Services.FCMessagingService"
