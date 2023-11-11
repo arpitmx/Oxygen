@@ -25,7 +25,7 @@
         android:id="@+id/project_title"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:fontFamily="@font/outfitregular"
+        android:fontFamily="@font/sf_pro_display_regular"
         android:gravity="center_vertical"
         android:paddingStart="10dp"
         android:text="Versa"

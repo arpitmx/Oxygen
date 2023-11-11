@@ -6,7 +6,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.viewModels
+import com.google.firebase.Timestamp
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
@@ -14,9 +16,11 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class NotificationsActivity : AppCompatActivity() {
@@ -30,45 +34,34 @@ class NotificationsActivity : AppCompatActivity() {
     private val viewModel : NotificationsViewModel by viewModels()
 
     private lateinit var backBtn : ImageView
+
+    companion object{
+        const val TAG = "NotificationsActivity"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
+        PrefManager.initialize(this)
         setUpView()
         updateNotificationLastSeen()
     }
 
     private fun updateNotificationLastSeen() {
-        viewModel.updateNotificationViewTimeStamp()
+        //viewModel.updateNotificationViewTimeStamp()
         handleUpdateNotification_TimeStamp()
     }
 
     private fun handleUpdateNotification_TimeStamp() {
-        viewModel.serverResultLiveData.observe(this){ result ->
 
-            when(result){
-                is ServerResult.Failure -> {
-                    binding.progress.gone()
-                    utils.dialog("Failure","${result.exception}\n Retry?",
-                        getString(R.string.retry),
-                        getString(R.string.cancel),
-                        {
-                        handleUpdateNotification_TimeStamp()
-                    },{
-                        finish()
-                    })
-                }
-                ServerResult.Progress -> {
-                    binding.progress.visible()
-                }
-                is ServerResult.Success -> {
-                    binding.progress.gone()
-                    toast("Timestamp updated")
-
-                }
-            }
-
+        with(PrefManager){
+            setNotificationCount(0)
+            val newLastSeen = Timestamp.now().seconds
+            setLastSeenTimeStamp(newLastSeen)
+            Timber.tag(TAG).d("Timestamp updated : Last seen timestamp ${newLastSeen}")
         }
+
     }
 
     private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {

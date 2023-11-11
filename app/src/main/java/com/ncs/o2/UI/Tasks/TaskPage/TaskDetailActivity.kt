@@ -1,4 +1,4 @@
-package com.ncs.o2.UI.Tasks.TaskDetails
+package com.ncs.o2.UI.Tasks.TaskPage
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +28,7 @@ class TaskDetailActivity : AppCompatActivity() {
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
             onBackPressed()
         }
+
         binding.gioActionbar.btnFav.setOnClickThrottleBounceListener{
             binding.gioActionbar.btnFav.setImageDrawable(resources.getDrawable(R.drawable.star_filled))
         }
