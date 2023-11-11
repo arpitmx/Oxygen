@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             .placeholder(R.drawable.profile_pic_placeholder)
             .error(R.drawable.logogradhd)
             .override(200,200)
-            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
             .into(binding.drawerheaderfile.userDp)
 
         viewModel.showprogressLD.observe(this) { show ->

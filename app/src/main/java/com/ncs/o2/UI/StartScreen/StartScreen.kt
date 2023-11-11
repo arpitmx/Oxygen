@@ -28,6 +28,7 @@ import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -74,7 +75,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     }
 
     companion object {
-        val DELAY = 2000L
+        val DELAY = 500L
         val DELAY_ACTIVITY_START = 0L
         val TAG = "StartScreen"
     }
@@ -176,7 +177,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 //        }
 
         ball.rotateInfinity(this)
-        val maxsize = 12f
+        val maxsize = 15f
 
         valueAnimator = ValueAnimator.ofFloat(2f, maxsize)
         valueAnimator.setDuration(300L)
@@ -191,6 +192,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
         valueAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animator: Animator) {
+                binding.progress.gone()
             }
 
             override fun onAnimationEnd(animator: Animator) {
@@ -342,9 +344,13 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
 
+                val dp_url = document.getString(Endpoints.User.DP_URL)
+                val dp_url_pref = PrefManager.getDpUrl()
 
-                if (PrefManager.getDpUrl()==null){
-                    val dp_url = document.getString(Endpoints.User.DP_URL)
+                if (dp_url_pref==null){
+                    PrefManager.setDpUrl(dp_url)
+                }else if (dp_url_pref!=dp_url){
+                    Timber.tag(TAG).d("New DP is avaialable : ${dp_url}")
                     PrefManager.setDpUrl(dp_url)
                 }
 
@@ -416,7 +422,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                     showBallError(Errors.NotificationErrors.NOTIFICATION_FETCH_FAILED,result.exception)
                 }
                 ServerResult.Progress -> {
-                    util.showSnackbar(binding.root,"Fetching Notifications", 500)
+                    //util.showSnackbar(binding.root,"Fetching Notifications", 500)
                 }
                 is ServerResult.Success -> {
 

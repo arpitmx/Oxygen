@@ -50,7 +50,9 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/better_white"
-            android:text="Alok Ranjan" />
+            android:text="Alok Ranjan"
+            android:fontFamily="@font/sf_pro_display_medium"
+            />
 
         <TextView
             android:id="@+id/userPost"
@@ -58,7 +60,9 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@color/dim_purple"
-            android:text="Android developer" />
+            android:text="Android developer"
+            android:fontFamily="@font/sf_pro_display_regular"
+            />
 
     </LinearLayout>
 

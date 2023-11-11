@@ -2,6 +2,7 @@
 <resources>
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#86ff7c</color>
+<!--    <color name="primary">#86ff7c</color>-->
     <color name="secondaryPink">#ff89b3</color>
     <color name="secondaryBlue">#0061ff</color>
     <color name="primarybg">#0d0c0b</color>
@@ -22,7 +23,7 @@
     <color name="darkbg_main">#131313</color>
     <color name="darkbg_main_a80">#94131313</color>
     <color name="secondary_bg_black">#202020</color>
-    <color name="grabblue">#41FFAF</color>
+    <color name="grabblue">#86ff7c</color>
     <color name="item_bg_glow">#1D2930</color>
     <color name="better_white">#E3E1E1</color>
     <color name="card_bg">#3F4041</color>

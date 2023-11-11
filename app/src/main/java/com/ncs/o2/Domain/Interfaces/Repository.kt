@@ -57,11 +57,12 @@ interface Repository {
         result: (ServerResult<Tag>) -> Unit
     )
 
-    fun getTasksbyId(
+
+    suspend fun getTasksbyId(
         id: String,
         projectName: String,
-        result: (ServerResult<Task>) -> Unit
-    )
+    ): ServerResult<Task>
+
 
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
