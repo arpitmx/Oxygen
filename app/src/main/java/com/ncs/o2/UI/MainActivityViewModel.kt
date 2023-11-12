@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.UseCases.LoadSectionsUseCase
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +32,8 @@ Tasks FUTURE ADDITION :
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     @FirebaseRepository val repository: Repository,
-    val sectionsUseCase: LoadSectionsUseCase
+    val sectionsUseCase: LoadSectionsUseCase,
+    private val firestoreRepository: FirestoreRepository
 ) :
     ViewModel() {
 
@@ -62,5 +65,6 @@ class MainActivityViewModel @Inject constructor(
             }
         }
     }
+
 
 }

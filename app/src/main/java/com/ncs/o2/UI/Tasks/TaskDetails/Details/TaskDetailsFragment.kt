@@ -364,7 +364,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                                 binding.progressBar.visible()
 
                             }
-
                         }
                     }
                 }

@@ -328,10 +328,8 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
 
 
-                if (PrefManager.getDpUrl()==null){
-                    val dp_url = document.getString(Endpoints.User.DP_URL)
-                    PrefManager.setDpUrl(dp_url)
-                }
+                val dp_url = document.getString(Endpoints.User.DP_URL)
+                PrefManager.setDpUrl(dp_url)
 
                 if (isDetailsAdded == null) {
                     showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL, Exception("No details added"))
