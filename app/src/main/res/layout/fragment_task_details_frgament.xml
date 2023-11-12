@@ -6,44 +6,42 @@
     android:layout_height="match_parent"
     android:background="@color/secondary_bg_black"
     android:orientation="vertical"
-    tools:context=".UI.Tasks.TaskDetails.Details.TaskDetailsFragment"
+    tools:context=".UI.Tasks.TaskPage.Details.TaskDetailsFragment"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progress_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#F5131313"
         android:elevation="5dp"
-        android:background="@color/darkbg_main_a80"
-        android:visibility="visible"
-        >
+        android:visibility="visible">
         <ProgressBar
+            android:id="@+id/progressBar2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:elevation="3dp"
-            android:scaleX="0.2"
-            android:scaleY="0.2"
             android:indeterminate="true"
             android:indeterminateTint="#03A9F4"
+            android:scaleX="0.2"
+            android:scaleY="0.2"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <ScrollView
         android:id="@+id/scrollView2"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="true"
         android:elevation="2dp"
         android:paddingTop="10dp"
         android:visibility="gone"
-        android:paddingBottom="80dp"
-        android:scrollbarThumbVertical="@color/s3bg"
+        android:scrollbarThumbVertical="@color/border_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -64,7 +62,7 @@
                     android:id="@+id/tagRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
+                    android:clipToPadding="true"
                     android:layoutAnimation="@anim/layout_animation_slidedown"
                     android:nestedScrollingEnabled="false" />
 
@@ -72,6 +70,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
+
 
                     <TextView
                         android:id="@+id/title_tv"
@@ -83,7 +83,7 @@
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
                         android:text="Versa needs revamp for its appbar design"
-                        android:textColor="@color/white"
+                        android:textColor="@color/better_white"
                         android:textSize="22dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +105,7 @@
                             android:layout_gravity="start"
                             android:layout_marginStart="10dp"
                             android:background="@drawable/card_view_background"
-                            android:fontFamily="@font/outfitmedium"
+                            android:fontFamily="@font/sf_pro_display_medium"
                             android:gravity="center"
                             android:padding="10dp"
                             android:text="Unassigned"
@@ -125,7 +125,7 @@
                             android:layout_gravity="start"
                             android:layout_marginStart="10dp"
                             android:background="@drawable/card_view_background_yellow"
-                            android:fontFamily="@font/outfitregular"
+                            android:fontFamily="@font/sf_pro_display_regular"
                             android:gravity="center"
                             android:padding="10dp"
                             android:text="3Hr+"
@@ -146,7 +146,7 @@
                             android:layout_gravity="start"
                             android:layout_marginStart="10dp"
                             android:background="@drawable/card_view_background_purple"
-                            android:fontFamily="@font/outfitregular"
+                            android:fontFamily="@font/sf_pro_display_regular"
                             android:gravity="center"
                             android:padding="10dp"
                             android:text="Easy"
@@ -168,12 +168,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:layout_marginBottom="10dp"
-                        android:fontFamily="@font/outfitmedium"
+                        android:fontFamily="@font/sf_pro_display_medium"
                         android:gravity="start"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
                         android:text="Alok created this task 2 days ago"
-                        android:textColor="#DCFFFFFF"
+                        android:textColor="@color/better_white"
                         android:textSize="15dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -197,7 +197,7 @@
                     android:id="@+id/description_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/outfitregular"
+                    android:fontFamily="@font/sf_pro_display_regular"
                     android:gravity="start"
                     android:padding="10dp"
                     android:textColor="#CEFFFFFF"
@@ -233,13 +233,11 @@
                             android:id="@+id/contributors_tv"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:fontFamily="@font/outfitmedium"
+                            android:fontFamily="@font/sf_pro_display_medium"
                             android:gravity="start"
-                            android:paddingStart="10dp"
-                            android:paddingEnd="10dp"
+                            android:visibility="visible"
                             android:text="Contributors :"
-                            android:textColor="@color/s2bg"
+                            android:textColor="@color/account"
                             android:textSize="16dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -276,11 +274,10 @@
                         android:layout_marginBottom="5dp"
                         android:fontFamily="@font/outfitmedium"
                         android:gravity="start"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
                         android:text="Link :"
-                        android:textColor="@color/s3bg"
-                        android:textSize="18dp"
+                        android:visibility="gone"
+                        android:textColor="@color/account"
+                        android:textSize="16dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
@@ -292,7 +289,11 @@
                         android:id="@+id/links_cont"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+
+                        >
 
                     </LinearLayout>
 
@@ -310,10 +311,11 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
                 <TextView
                     android:id="@+id/activity"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/outfitlight"
+                    android:fontFamily="@font/sf_pro_display_semibold"
                     android:gravity="center"
+                    android:layout_gravity="center"
                     android:layout_marginTop="30dp"
                     android:layout_marginBottom="30dp"
                     android:paddingStart="10dp"
@@ -324,6 +326,20 @@
                     app:layout_constraintBottom_toBottomOf="@+id/linearLayoutCompat2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_gravity="center"
+                    android:background="@color/orange"
+                    android:paddingStart="10dp"
+                    android:gravity="center"
+                    android:alpha="0.9"
+                    android:visibility="gone"
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:textColor="@color/account"
+                    />
             </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
 

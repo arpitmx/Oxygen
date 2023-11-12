@@ -4,16 +4,15 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
-import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
-import com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionViewModel
-import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.o2.Domain.Models.UserInfo
+import com.ncs.o2.UI.StartScreen.maintainceCheck
 
 /*
 File : Repository.kt -> com.ncs.o2.Domain.Interfaces
@@ -38,16 +37,19 @@ interface Repository {
 
 
     fun setCallback(callback: ServerErrorCallback)
-    fun createUniqueID(idType: IDType, projectID: String, generatedID:(String)->Unit)
+    fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit)
+
     //Task related
-    suspend fun postTask(task: Task, serverResult: (ServerResult<Int>)-> Unit)
+    suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit)
 
-    suspend fun postTags(tag: Tag,projectName: String, serverResult: (ServerResult<Int>) -> Unit)
-    suspend fun fetchProjectTags(projectName: String,projectListCallback: (ServerResult<List<Tag>>) -> Unit)
+    suspend fun postTags(tag: Tag, projectName: String, serverResult: (ServerResult<Int>) -> Unit)
+    suspend fun fetchProjectTags(
+        projectName: String,
+        projectListCallback: (ServerResult<List<Tag>>) -> Unit
+    )
 
 
-
-        //User related
+    //User related
 
     fun getTagbyId(
         id: String,
@@ -55,13 +57,15 @@ interface Repository {
         result: (ServerResult<Tag>) -> Unit
     )
 
-    fun getTasksbyId(
+
+    suspend fun getTasksbyId(
         id: String,
         projectName: String,
-        result: (ServerResult<Task>) -> Unit
-    )
+    ): ServerResult<Task>
+
+
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
-    fun getUserInfobyId(id:String,serverResult: (ServerResult<User?>) -> Unit)
+    fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
 
     fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit)
     fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)
@@ -73,12 +77,18 @@ interface Repository {
 
     //Notifications Related
     suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Long>) -> Unit)
-    suspend fun getNewNotifications(lastSeenTimeStamp : Long, serverResult: (ServerResult<List<Notification>>) -> Unit)
-    suspend fun postNotification(notification: Notification, serverResult: (ServerResult<Int>) -> Unit)
+    suspend fun getNewNotifications(
+        lastSeenTimeStamp: Long,
+        serverResult: (ServerResult<List<Notification>>) -> Unit
+    )
 
-    suspend fun setFCMToken(token : String , serverResult: (ServerResult<Int>) -> Unit)
+    suspend fun postNotification(
+        notification: Notification,
+        serverResult: (ServerResult<Int>) -> Unit
+    )
+
+    suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
-
 
 
     fun maintenanceCheck(): LiveData<maintainceCheck>
@@ -86,7 +96,11 @@ interface Repository {
     // User DP Related
     fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>>
     fun uploadUserDP(bitmap: Bitmap): LiveData<ServerResult<StorageReference>>
-    fun addImageUrlToFirestore(DPUrl:String): LiveData<Boolean>
+    fun addImageUrlToFirestore(DPUrl: String): LiveData<Boolean>
 
-    fun checkIfSegmentNameExists(fieldName : String, projectID : String, result: (ServerResult<Boolean>) -> Unit)
+    fun checkIfSegmentNameExists(
+        fieldName: String,
+        projectID: String,
+        result: (ServerResult<Boolean>) -> Unit
+    )
 }

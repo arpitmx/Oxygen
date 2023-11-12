@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         PrefManager.initialize(this)
         setContentView(binding.root)
 
+        PrefManager.initialize(this)
         setUpViews()
     }
 
@@ -104,17 +105,25 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        setNotificationCountOnActionBar()
+    }
+
+
     private fun setUpActionBar() {
 
         // Set up the action bar, navigation drawer, and other UI components
-        PrefManager.initialize(this)
 
         search = binding.gioActionbar.searchCont
+        setNotificationCountOnActionBar()
 
         // Rotate animation for CreateTaskButton
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
         }, 1000)
+
 
         val drawerLayout = binding.drawer
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
@@ -170,6 +179,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
     }
 
+    private fun setNotificationCountOnActionBar() {
+        val notificationCount = PrefManager.getNotificationCount()
+        if (notificationCount>0){
+
+            binding.gioActionbar.notificationCountET.text = notificationCount.toString()
+            binding.gioActionbar.notificationCountET.visible()
+
+        }else {
+            binding.gioActionbar.notificationCountET.gone()
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle options item clicks, including navigation drawer toggle
         if (toggle.onOptionsItemSelected(item)) {
@@ -195,7 +216,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             .placeholder(R.drawable.profile_pic_placeholder)
             .error(R.drawable.logogradhd)
             .override(200,200)
-            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
             .into(binding.drawerheaderfile.userDp)
 
         viewModel.showprogressLD.observe(this) { show ->

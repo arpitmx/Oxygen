@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,6 +73,7 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
         binding.doneButton.setOnClickThrottleBounceListener {
 
             val tag=Tag(tagText = binding.tagTitle.text.toString(), bgColor = initialbgcolor, textColor = initialtextcolor, tagID = RandomIDGenerator.generateRandomTaskId(6) )
+
             if (tag.tagText.isNotEmpty()) {
                 binding.doneButton.animate().alpha(0f).setDuration(300).withEndAction {
                     binding.doneButton.visibility = View.GONE

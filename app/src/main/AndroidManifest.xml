@@ -20,7 +20,10 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
-            android:name=".UI.StartScreen.MaintainingScreen"
+            android:name=".UI.UIComponents.BottomSheets.sectionDisplayBottomSheet"
+            android:exported="false" />
+        <activity
+            android:name=".UI.StartScreen.maintainingScreen"
             android:exported="false" />
         <activity
             android:name=".UI.EditProfile.EditProfileActivity"
@@ -28,7 +31,6 @@
         <activity
             android:name=".UI.Testing.TestingActivity"
             android:exported="false" />
-
         <activity
             android:name=".UI.Auth.AuthScreenActivity"
             android:exported="true" />
@@ -55,7 +57,7 @@
             android:name=".UI.Notifications.NotificationsActivity"
             android:exported="false" />
         <activity
-            android:name=".UI.Tasks.TaskDetails.TaskDetailActivity"
+            android:name=".UI.Tasks.TaskPage.TaskDetailActivity"
             android:exported="false" />
         <activity
             android:name=".UI.MainActivity"

@@ -13,6 +13,7 @@ object Codes {
         const val INTENT_ERROR_CODE = "errorCode"
         var isMaintaining = ""
         var maintaninDesc = ""
+        var segmentText = ""
     }
 
     object Status {
