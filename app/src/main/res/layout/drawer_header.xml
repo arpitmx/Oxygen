@@ -42,8 +42,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/username"
-                android:fontFamily="@font/outfitsemibold"
-                android:layout_marginTop="10dp"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:layout_marginTop="5dp"
                 android:text="Alok Ranjan"
                 android:textColor="#D8D8D8"
                 android:textSize="20dp" />
@@ -51,9 +51,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:id="@+id/designation"
-                    android:fontFamily="@font/outfitregular"
+                    android:fontFamily="@font/sf_pro_display_regular"
                     android:text="Android Developer"
                     android:textColor="@color/green"
                     android:textSize="14dp" />
@@ -61,7 +61,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/outfitregular"
+                    android:fontFamily="@font/sf_pro_display_regular"
                     android:text="sudoarmax@gmail.com"
                     android:id="@+id/email"
                     android:textColor="#97CDCDCD"
@@ -72,6 +72,7 @@
 
 
            <ImageButton
+               android:id="@+id/ibEditProfile"
                android:layout_width="0dp"
                android:layout_weight="2"
                android:layout_height="50dp"
@@ -139,7 +140,7 @@
             android:paddingStart="10dp"
             android:textSize="15dp"
             android:gravity="start|center_vertical"
-            android:fontFamily="@font/outfitregular"
+            android:fontFamily="@font/sf_pro_display_regular"
             android:background="@null"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="15dp"
@@ -182,7 +183,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:fontFamily="@font/outfitmedium"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:text="Oxygen 1.0"
         android:textColor="#686666"
         app:layout_constraintEnd_toEndOf="parent"
@@ -194,7 +195,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_gravity="center"
-        android:fontFamily="@font/outfitmedium"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:text="Crafted with ❤️ By NCS"
         android:textColor="#686666"
         app:layout_constraintEnd_toEndOf="parent"

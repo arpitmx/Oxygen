@@ -8,22 +8,41 @@
     tools:context=".UI.StartScreen.StartScreen"
     >
 
-
-    <ImageView
-        android:id="@+id/ball"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:visibility="visible"
-        android:elevation="5dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/baseline_circle_24"
+    <FrameLayout
+        android:id="@+id/fragContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/darkbg_main" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:indeterminate="false"
+            android:indeterminateTint="@color/orange"
+            />
+
+        <ImageView
+            android:id="@+id/ball"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:elevation="5dp"
+            android:src="@drawable/baseline_circle_24"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/darkbg_main" />
+
+    </FrameLayout>
+
+
 
 
 

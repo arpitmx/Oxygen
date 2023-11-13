@@ -2,7 +2,6 @@ package com.ncs.o2.HelperClasses
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
@@ -44,23 +43,23 @@ object PrefManager {
     //Notification View Timestamp
 
     fun saveTimestamp(timestamp: Timestamp) {
-        sharedPreferences.edit().putString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, timestamp.toString()).apply()
+        sharedPreferences.edit().putString(Endpoints.Notifications.NOTIFICATION_LAST_SEEN, timestamp.toString()).apply()
     }
 
     fun getTimestamp(): String {
-        return sharedPreferences.getString(Endpoints.Notifications.NOTIFICATION_TIME_STAMP, "NONE")!!
+        return sharedPreferences.getString(Endpoints.Notifications.NOTIFICATION_LAST_SEEN, "NONE")!!
     }
 
 
 
     fun clearTimestamp() {
-        sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_TIME_STAMP).apply()
+        sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_LAST_SEEN).apply()
     }
 
 
     //DP related
 
-    fun setDpUrl(url:String){
+    fun setDpUrl(url:String?){
         if (url != null){
             editor.putString(Endpoints.User.DP_URL, url)
         }
@@ -115,10 +114,14 @@ object PrefManager {
         editor.putString(Endpoints.User.USERNAME,user.USERNAME)
         editor.putString(Endpoints.User.EMAIL,user.EMAIL)
         editor.putString(Endpoints.User.BIO,user.BIO)
+        editor.putString(Endpoints.User.DP_URL,user.DP_URL)
+
         editor.putString(Endpoints.User.DESIGNATION,user.DESIGNATION)
         editor.putLong(Endpoints.User.ROLE,user.ROLE)
         editor.apply()
     }
+
+
     fun getcurrentUserdetails():CurrentUser{
 
         val username = sharedPreferences.getString(Endpoints.User.USERNAME, "")
@@ -129,9 +132,50 @@ object PrefManager {
         return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role)
     }
 
+
     fun getCurrentUserEmail():String{
         return getcurrentUserdetails().EMAIL
     }
+
+    fun getUserFCMToken(): String {
+        return getcurrentUserdetails().FCM_TOKEN
+    }
+
+    fun setUserFCMToken(token : String){
+        editor.putString(Endpoints.User.FCM_TOKEN,token)
+        editor.apply()
+    }
+
+    fun setLastSeenTimeStamp(timestamp: Long){
+        editor.putLong(Endpoints.Notifications.NOTIFICATION_LAST_SEEN,timestamp)
+        editor.apply()
+    }
+
+    fun getLastSeenTimeStamp():Long{
+        return sharedPreferences.getLong(Endpoints.Notifications.NOTIFICATION_LAST_SEEN,0)
+    }
+
+
+    fun setNotificationCount(count: Int){
+        editor.putInt(Endpoints.Notifications.NOTIFICATION_COUNT, count)
+        editor.apply()
+    }
+
+    fun getNotificationCount():Int{
+        return sharedPreferences.getInt(Endpoints.Notifications.NOTIFICATION_COUNT,0)
+    }
+
+
+    fun setLatestNotificationTimeStamp(timestamp: Long){
+        editor.putLong(Endpoints.Notifications.LATEST_NOTIFICATION_TIME_STAMP,timestamp)
+        editor.apply()
+    }
+
+    fun getLatestNotificationTimeStamp():Long{
+        return sharedPreferences.getLong(Endpoints.Notifications.LATEST_NOTIFICATION_TIME_STAMP,0)
+    }
+
+
 
     fun lastaddedproject(project:String){
         val lastproject = sharedPreferences.getString("last_project", null)

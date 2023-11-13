@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
-import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -98,7 +98,7 @@ class CreateSectionsBottomSheet : BottomSheetDialogFragment(){
                 ServerExceptions.projectDoesNotExists.exceptionDescription -> {
                     binding.validationsTxt.text = getString(R.string.this_project_doesn_t_exist)
                 }
-                Codes.Status.VALID_INPUT -> {
+                Errors.Status.VALID_INPUT -> {
                     binding.validationsTxt.text = getString(R.string.creating_your_segment)
                 }
 

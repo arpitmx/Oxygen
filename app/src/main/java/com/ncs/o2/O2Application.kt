@@ -2,18 +2,31 @@ package com.ncs.o2
 
 import android.app.Application
 import android.content.Context
-import androidx.multidex.MultiDexApplication
+import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import com.google.firebase.Timestamp
 import com.google.firebase.messaging.FirebaseMessaging
-import dagger.hilt.android.HiltAndroidApp
-import timber.log.Timber
-import com.ncs.o2.Services.NotificationApiService
+import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.Domain.Workers.FCMWorker
+import com.ncs.o2.Services.NotificationApiService
+import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.logging.Handler
 import javax.inject.Inject
+import kotlin.random.Random
+
 
 /*
 
@@ -41,14 +54,78 @@ class O2Application : Application(), Configuration.Provider{
     @Inject
     lateinit var customWorkerFactory: CustomWorkerFactory
 
+    @Inject
+    @FirebaseRepository
+    lateinit var repository: Repository
+
     override fun onCreate() {
         super.onCreate()
+
 
         if (BuildConfig.DEBUG)  {
             Timber.plant(Timber.DebugTree())
         }
 
         fcmToken()
+    }
+
+    fun isUIThread(): Boolean {
+        return Looper.getMainLooper().thread === Thread.currentThread()
+    }
+
+    fun handleUncaughtException(thread: Thread?, e: Throwable) {
+        e.printStackTrace() // not all Android versions will print the stack trace automatically
+        if (isUIThread()) {
+         //   invokeLogActivity()
+        } else {  //handle non UI thread throw uncaught exception
+        //    Handler(Looper.getMainLooper).(Runnable { invokeLogActivity() })
+
+        }
+    }
+    private fun sendIssueThroughBot(e: Throwable) {
+        val task= Task(
+            title = e.cause.toString(),
+            description = e.stackTraceToString(),
+            id ="#T${RandomIDGenerator.generateRandomTaskId(5)}",
+            difficulty = 2,
+            priority = 2,
+            status = 0,
+            assigner = "oxygenbot@hackncs.in",
+            deadline = "None",
+            project_ID = "NCSOxygen",
+            segment = "Bugs\uD83D\uDC1E", //change segments here //like Design
+            section = "Bugs Found",  //Testing // Completed //Ready //Ongoing
+            assignee_DP_URL = "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/oxygenbot%40hackncs.in%2FDP%2Fdp?alt=media&token=e8c8c439-fa80-4faa-82de-10a5f86dd992",
+            completed = false,
+            duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),
+            time_STAMP = Timestamp.now()
+        )
+
+        CoroutineScope(Dispatchers.Main).launch {
+
+
+            repository.postTask(task) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+                        Timber.d("O2Appxyz : Failure in sending issue!")
+                        Toast.makeText(applicationContext, "Failed", Toast.LENGTH_SHORT).show()
+                    }
+
+                    ServerResult.Progress -> {
+
+                    }
+
+                    is ServerResult.Success -> {
+                        Timber.d("O2Appxyz : Sent Issue!")
+                        Toast.makeText(applicationContext, "Passed", Toast.LENGTH_SHORT).show()
+
+                    }
+
+                }
+            }
+        }
     }
 
     //Xiami : cmMiVraYTkyhLGCWh8aorx:APA91bGe-6OkspkpxE9-fpxsOwslGHAlwRxG45gbeg2dxY6MckcpS-PnOl1TQvOVaZ9E90VFtWCBw3qftKJS2DkdYCEgqgGrWxRrjnsbIz4SD0j40oeLbC3OfXRe9ebC38-2xoLMDjmN

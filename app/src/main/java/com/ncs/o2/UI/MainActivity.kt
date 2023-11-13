@@ -1,10 +1,9 @@
 package com.ncs.o2.UI
 
-import android.content.SharedPreferences
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -15,12 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
-import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
@@ -29,23 +23,19 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
-import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
-import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
-import com.ncs.o2.UI.Tasks.TasksHolderFragment
-import com.ncs.o2.UI.Tasks.TasksHolderViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
+import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.FieldPosition
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -86,6 +76,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         PrefManager.initialize(this)
         setContentView(binding.root)
 
+        PrefManager.initialize(this)
         setUpViews()
     }
 
@@ -106,17 +97,25 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        setNotificationCountOnActionBar()
+    }
+
+
     private fun setUpActionBar() {
 
         // Set up the action bar, navigation drawer, and other UI components
-        PrefManager.initialize(this)
 
         search = binding.gioActionbar.searchCont
+        setNotificationCountOnActionBar()
 
         // Rotate animation for CreateTaskButton
         Handler(Looper.getMainLooper()).postDelayed({
             binding.gioActionbar.createTaskButton.rotate180(this)
         }, 1000)
+
 
         val drawerLayout = binding.drawer
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
@@ -160,6 +159,28 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             project.projectAddedListener = this
             project.show(supportFragmentManager, "Add Project")
         }
+
+        // setting up Edit Profile
+        binding.drawerheaderfile.ibEditProfile.setOnClickListener {
+
+            val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            drawerLayout.closeDrawer(GravityCompat.START)
+
+        }
+    }
+
+    private fun setNotificationCountOnActionBar() {
+        val notificationCount = PrefManager.getNotificationCount()
+        if (notificationCount>0){
+
+            binding.gioActionbar.notificationCountET.text = notificationCount.toString()
+            binding.gioActionbar.notificationCountET.visible()
+
+        }else {
+            binding.gioActionbar.notificationCountET.gone()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -187,7 +208,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             .placeholder(R.drawable.profile_pic_placeholder)
             .error(R.drawable.logogradhd)
             .override(200,200)
-            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
             .into(binding.drawerheaderfile.userDp)
 
         viewModel.showprogressLD.observe(this) { show ->
@@ -203,7 +224,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
         viewModel.projectListLiveData.observe(this) { projectList ->
-            projects=PrefManager.getProjectsList().toMutableList()
+
+            projects=projectList!!.toMutableList()
             projectListAdapter = ListAdapter(this, projects)
             binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
         }
@@ -246,7 +268,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
         projects.addAll(userProjects)
-        PrefManager.putProjectsList(userProjects)
         projectListAdapter.notifyDataSetChanged()
     }
 

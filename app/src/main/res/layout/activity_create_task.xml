@@ -368,7 +368,7 @@
                     android:gravity="start"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:text="Status:"
+                    android:text="Segment:"
                     android:textColor="@color/better_white"
                     android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -380,7 +380,7 @@
 
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/status"
+                    android:id="@+id/segment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
@@ -390,7 +390,53 @@
                     android:fontFamily="@font/outfitmedium"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:text="Set Status"
+                    android:text="Set Segment"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+<androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/eeeee"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="start"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Section:"
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/btnBack"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/section"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/card_view_background_purple"
+                    android:elevation="6dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:text="Show Sections"
                     android:textAllCaps="false"
                     android:textColor="@color/better_white"
                     android:textSize="18dp"

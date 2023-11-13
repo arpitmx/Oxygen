@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/darkbg_main"
     android:orientation="vertical"
-    tools:context=".UI.Tasks.TaskDetails.TaskDetailActivity">
+    tools:context=".UI.Tasks.TaskPage.TaskDetailActivity">
 
     <include
         android:id="@+id/gio_actionbar"

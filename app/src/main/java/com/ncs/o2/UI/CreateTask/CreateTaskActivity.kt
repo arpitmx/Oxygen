@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
@@ -14,14 +15,18 @@ import com.google.android.material.chip.Chip
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.Colors
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
 import net.datafaker.Faker
@@ -32,12 +37,17 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback,AddTagsBottomSheet.getSelectedTagsCallback{
+class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback,AddTagsBottomSheet.getSelectedTagsCallback,
+    SegmentSelectionBottomSheet.SegmentSelectionListener,
+    SegmentSelectionBottomSheet.sendSectionsListListner {
     private var OList: MutableList<User> = mutableListOf()
     private var List: MutableList<Tag> = mutableListOf()
     private var TagList: MutableList<Tag> = mutableListOf()
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
 
+    private var tagIdList = ArrayList<String?>()
+
+    private lateinit var segmentText :String
     private val selectedTags = mutableListOf<Tag>()
     private var showsheet=false
 
@@ -65,6 +75,10 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        Codes.STRINGS.segmentText = ""
+
+
         OList = mutableListOf(
             User(
                 "https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj",
@@ -128,6 +142,25 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             val userListBottomSheet = UserlistBottomSheet(OList, this)
             userListBottomSheet.show(supportFragmentManager, "OList")
 
+        }
+
+        binding.segment.setOnClickThrottleBounceListener {
+
+            val segment = SegmentSelectionBottomSheet()
+            segment.segmentSelectionListener = this
+            segment.sectionSelectionListener = this
+            segment.show(supportFragmentManager, "Segment Selection")
+        }
+
+        binding.section.setOnClickThrottleBounceListener {
+
+            if (Codes.STRINGS.segmentText == ""){
+                Toast.makeText(this,"First please select segment",Toast.LENGTH_SHORT).show()
+            }
+            else{
+                val sections = sectionDisplayBottomSheet()
+                sections.show(supportFragmentManager, "Segment Selection")
+            }
         }
 
         binding.addtags.setOnClickThrottleBounceListener {
@@ -215,7 +248,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 selectedTags.remove(tag)
                 if (TagList.contains(tag)){
                     val index=TagList.indexOf(tag)
-                    TagList[index].isChecked=false
+                    TagList[index].checked=false
                 }
                 updateChipGroup()
             }
@@ -224,7 +257,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 selectedTags.remove(tag)
                 if (TagList.contains(tag)){
                     val index=TagList.indexOf(tag)
-                    TagList[index].isChecked=false
+                    TagList[index].checked=false
                 }
                 updateChipGroup()
 
@@ -283,6 +316,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         binding.gioActionbar.titleTv.visible()
         binding.gioActionbar.titleTv.text = getString(R.string.new_task)
 
+        binding.gioActionbar.btnDone.visible()
+        binding.gioActionbar.btnFav.gone()
+        binding.gioActionbar.btnRequestWork.gone()
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
             onBackPressedDispatcher.onBackPressed()
             finish()
@@ -316,14 +352,16 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onSelectedTags(tag: Tag,isChecked: Boolean) {
         if (isChecked) {
             selectedTags.add(tag)
+            tagIdList.add(tag.tagID)
             updateChipGroup()
-
         }
         else{
             selectedTags.remove(tag)
+            tagIdList.remove(tag.tagID)
             updateChipGroup()
         }
 
+        Log.d("checktagIds", tagIdList.toString())
     }
 
     override fun onTagListUpdated(tagList: MutableList<Tag>) {
@@ -331,6 +369,13 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         TagList=tagList
     }
 
+    override fun onSegmentSelected(segmentName: String) {
+        binding.segment.text = segmentName
+        Codes.STRINGS.segmentText = segmentName
+    }
+
+    override fun sendSectionsList(list: MutableList<String>) {
+    }
 
 
 }

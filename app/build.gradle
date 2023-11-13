@@ -76,8 +76,6 @@ dependencies {
     //Cloudnary
     implementation 'com.cloudinary:kotlin-url-gen:1.6.0'
 
-
-
     // Room
     def room_version = "2.6.0"
 
@@ -97,9 +95,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
 
-    //Transition button
-    implementation 'com.github.roynx98:transition-button-android:c1bf882dc3'
-
     //Dagger Hilt
     implementation 'com.google.dagger:hilt-android:2.48.1'
     kapt "com.google.dagger:hilt-android-compiler:2.48.1"
@@ -117,11 +112,8 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-
-
     //Timber
     implementation 'com.jakewharton.timber:timber:5.0.1'
-
 
     //Bottom Navigation
     def navigation_version = "2.6.0"

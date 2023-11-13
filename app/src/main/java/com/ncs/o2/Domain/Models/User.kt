@@ -1,5 +1,6 @@
 package com.ncs.o2.Domain.Models
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 import com.ncs.o2.Domain.Utility.Later
 
@@ -23,9 +24,11 @@ Tasks FUTURE ADDITION :
 @Later("Add name")
 data class User (
         val firebaseID : String ,
-        val profileDPUrl : String = "",
-        val username : String="",
+        val profileDPUrl : String? = "",
+        val username : String?="",
         val post: String= "",
         val profileIDUrl : String="",
+        val timestamp:Timestamp?=null,
+        val designation:String="",
         @Exclude var isChecked : Boolean = false,
         )

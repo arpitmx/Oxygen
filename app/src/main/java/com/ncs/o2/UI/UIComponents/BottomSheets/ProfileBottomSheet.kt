@@ -13,8 +13,12 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.databinding.ProfileBottomSheetBinding
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 /*
@@ -36,7 +40,7 @@ Tasks FUTURE ADDITION :
 
 */
 class ProfileBottomSheet (
-    var dp_url: String
+    var user: User
 ) :BottomSheetDialogFragment() {
 
     lateinit var binding: ProfileBottomSheetBinding
@@ -53,7 +57,7 @@ class ProfileBottomSheet (
     override fun onViewCreated( view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Glide.with(requireContext())
-            .load(dp_url)
+            .load(user.profileDPUrl)
             .listener(object : RequestListener<Drawable> {
 
 
@@ -85,7 +89,15 @@ class ProfileBottomSheet (
 
             )
             .into(binding.roomDp)
-
-
+        binding.roomNameBs.text=user.username
+        binding.hostNameBs.text=user.firebaseID
+        val timestamp = user.timestamp
+        if (timestamp != null) {
+            val date = timestamp.toDate()
+            val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+            val formattedDate = dateFormat.format(date)
+            binding.time.text="Joined on $formattedDate"
+        }
+        binding.totalMembersBs.text=user.designation
     }
 }

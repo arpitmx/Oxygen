@@ -35,8 +35,8 @@ Tasks FUTURE ADDITION :
 class NotificationsViewModel @Inject constructor
     (@FirebaseRepository val repository: Repository) : ViewModel()
 {
-    private val _serverResultLiveData = MutableLiveData<ServerResult<Int>>()
-    val serverResultLiveData: LiveData<ServerResult<Int>> get() = _serverResultLiveData
+    private val _serverResultLiveData = MutableLiveData<ServerResult<Long>>()
+    val serverResultLiveData: LiveData<ServerResult<Long>> get() = _serverResultLiveData
 
 
     fun updateNotificationViewTimeStamp(){

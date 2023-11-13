@@ -21,6 +21,7 @@ Tasks FUTURE ADDITION :
 
 object RandomIDGenerator {
     private const val CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*^%$#@!"
+    private const val Numbers = "0123456789"
     private const val ID_LENGTH = 15
 
     fun generateRandomId(): String {
@@ -30,6 +31,19 @@ object RandomIDGenerator {
         repeat(ID_LENGTH) {
             val randomIndex = random.nextInt(CHARACTERS.length)
             val randomChar = CHARACTERS[randomIndex]
+            idBuilder.append(randomChar)
+        }
+
+        return idBuilder.toString()
+    }
+
+    fun generateRandomTaskId(length : Int): String {
+        val random = java.util.Random()
+        val idBuilder = StringBuilder()
+
+        repeat(length) {
+            val randomIndex = random.nextInt(Numbers.length)
+            val randomChar = Numbers[randomIndex]
             idBuilder.append(randomChar)
         }
 

@@ -8,9 +8,12 @@ object Codes {
 
     object STRINGS {
 
-        var NAME: StorageReference = TODO()
+//        var NAME: StorageReference = TODO()
         const val TIME_ZONE_INDIA = "Asia/Kolkata"
         const val INTENT_ERROR_CODE = "errorCode"
+        var isMaintaining = ""
+        var maintaninDesc = ""
+        var segmentText = ""
     }
 
     object Status {

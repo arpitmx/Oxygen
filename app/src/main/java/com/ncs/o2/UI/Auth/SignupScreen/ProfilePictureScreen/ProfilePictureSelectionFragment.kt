@@ -21,6 +21,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -175,13 +176,13 @@ class ProfilePictureSelectionFragment : Fragment() {
                 REQUEST_IMAGE_CAPTURE -> {
                     val imageBitmap = data?.extras?.get("data") as Bitmap
                     bitmap=imageBitmap
-                    binding.picPreview?.setImageBitmap(imageBitmap)
+                    binding.picPreview.setImageBitmap(imageBitmap)
                 }
                 REQUEST_IMAGE_PICK -> {
                     val selectedImage = data?.data
                     bitmap=uriToBitmap(requireContext().contentResolver,selectedImage!!)
                     val imageSize = bitmap?.byteCount
-                    binding.picPreview?.setImageURI(selectedImage)
+                    binding.picPreview.setImageURI(selectedImage)
                 }
             }
         }
@@ -205,7 +206,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
             when(result){
                 is ServerResult.Failure -> {
-                    util.singleBtnDialog_InputError("Upload Error",
+                    util.singleBtnDialog_InputError("Upload Errors",
                         "There was an issue in uploading the profile picture, ${result.exception.message} \n\nplease retry",
                         "Retry"
                     ) {
@@ -233,7 +234,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
             when(result){
                 is ServerResult.Failure -> {
-                    util.singleBtnDialog_InputError("Upload Error",
+                    util.singleBtnDialog_InputError("Upload Errors",
                         "There was an issue in uploading the profile picture, ${result.exception.message},\n\nplease retry",
                         "Retry"
                     ) {
@@ -264,7 +265,8 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                 val userData = mapOf(
                     "PHOTO_ADDED" to true,
-                    "PROJECTS" to listOf("NCSOxygen")
+                    "PROJECTS" to listOf("NCSOxygen"),
+                    "TIMESTAMP" to Timestamp.now()
                 )
 
                 FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
@@ -283,11 +285,32 @@ class ProfilePictureSelectionFragment : Fragment() {
                                         val email=document.getString(Endpoints.User.EMAIL)
                                         val username=document.getString(Endpoints.User.USERNAME)
                                         val role= document.getLong(Endpoints.User.ROLE)
+                                        var fcm : String? = document.getString(Endpoints.User.FCM_TOKEN)
+
+                                        if (fcm==null){
+                                            fcm = ""
+                                        }
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
-                                        PrefManager.putProjectsList(listOf("NCSOxygen"))
-                                        PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email!!, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role!!))
+                                        with(PrefManager){
+
+                                            putProjectsList(listOf("NCSOxygen"))
+
+                                            setLastSeenTimeStamp(0)
+                                            setLatestNotificationTimeStamp(0)
+
+                                            setcurrentUserdetails(CurrentUser(
+                                                EMAIL = email!!,
+                                                USERNAME = username!!,
+                                                BIO = bio!!,
+                                                DESIGNATION = designation!!,
+                                                ROLE = role!!,
+                                                FCM_TOKEN = fcm,
+                                            ))
+
+                                        }
+
                                         requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                         requireActivity().finish()
                                     }
@@ -296,7 +319,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                     val exception = task.exception
                                     exception?.printStackTrace()
 
-                                    util.singleBtnDialog_InputError("Error",
+                                    util.singleBtnDialog_InputError("Errors",
                                         "There was an error : ${exception?.message} \nPlease retry",
                                         "Retry"
                                     ) {
@@ -307,7 +330,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                             }
                     }
                     .addOnFailureListener { e ->
-                        util.singleBtnDialog_InputError("Error",
+                        util.singleBtnDialog_InputError("Errors",
                             "There was an error : ${e.message} \nPlease retry",
                             "Retry"
                         ) {
@@ -321,7 +344,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
             } else {
 
-                    util.singleBtnDialog_InputError("Upload Error",
+                    util.singleBtnDialog_InputError("Upload Errors",
                         "There was an issue in uploading the profile picture,\n\nplease retry",
                         "Retry"
                     ) {
