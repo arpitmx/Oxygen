@@ -3,7 +3,6 @@ package com.ncs.o2.Domain.Repositories
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
@@ -146,7 +145,7 @@ class FirestoreRepository @Inject constructor(
                 }
             }
             .addOnFailureListener {
-                Log.d("checks", "failed")
+                Timber.tag("checks").d("failed")
             }
 
         return liveData
@@ -577,6 +576,28 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+
+    override fun getSection(
+        projectName: String,
+        segmentName: String,
+        result: (ServerResult<List<*>>) -> Unit
+    ) {
+
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.SEGMENT).document(segmentName)
+            .get()
+            .addOnSuccessListener {
+//                val section_list = mutableListOf<String>()
+                if (it.exists()) {
+                    val section_list = it.get("sections") as List<*>
+                    result(ServerResult.Success(section_list))
+                }
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
     override fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit) {
         return try {
 
@@ -706,7 +727,12 @@ class FirestoreRepository @Inject constructor(
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
                     val duration = document.getString("duration")
-                    val time = document.get("time_STAMP") as Timestamp
+                    var time = document.get("time_STAMP") as Timestamp
+
+                    if (time == null) {
+                        time = Timestamp.now()
+                    }
+
                     val completed = document.getBoolean("completed")
                     if (document.getString("assigner_email") != null) {
                         assignerID = document.getString("assigner_email")!!
@@ -813,9 +839,9 @@ class FirestoreRepository @Inject constructor(
         projectName: String,
     ): ServerResult<Task> {
 
-       return try {
+        return try {
 
-           val task =
+            val task =
                 firestore.collection(Endpoints.PROJECTS)
                     .document(projectName)
                     .collection(Endpoints.Project.TASKS)
@@ -831,18 +857,17 @@ class FirestoreRepository @Inject constructor(
 
                 taskData?.let {
                     return ServerResult.Success(it)
-                }?: ServerResult.Failure(Exception("Document not found for title: $id"))
+                } ?: ServerResult.Failure(Exception("Document not found for title: $id"))
 
             } else {
                 return ServerResult.Failure(Exception("Document not found for title: $id"))
             }
 
-       } catch (e: Exception) {
+        } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
 
     }
-
 
 
 }

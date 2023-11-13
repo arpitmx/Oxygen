@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.appcompat.widget.LinearLayoutCompat
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="5dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/tagIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:gravity="center"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="1dp"
+        android:src="@drawable/profile_pic_placeholder"
+        android:textColor="@color/negativeButtonTextColor"
+        android:textSize="12dp"
+        />
+
+    <TextView
+        android:id="@+id/normalET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:gravity="top"
+        android:paddingStart="@dimen/padding_start_task_create"
+        android:paddingEnd="@dimen/padding_start_task_create"
+        android:maxLength="10"
+        android:maxLines="1"
+        android:text="armax"
+        android:ellipsize="end"
+        android:textColor="@color/better_white"
+        android:textSize="15dp"
+        />
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+
+
+

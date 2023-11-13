@@ -1,7 +1,9 @@
 package com.ncs.o2.Constants
 
 import com.ncs.o2.UI.Auth.AuthScreenActivity
+import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Testing.TestingActivity
 
 /*

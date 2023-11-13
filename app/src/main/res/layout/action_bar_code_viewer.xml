@@ -23,12 +23,12 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
-            android:fontFamily="@font/sf_pro_display_semibold"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:layout_marginStart="10dp"
-            android:text="Title"
+            android:text="Code"
             android:textColor="@color/primary"
-            android:textSize="20dp"
+            android:textSize="22dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -40,7 +40,7 @@
             android:id="@+id/btnBack"
             android:layout_width="30dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:src="@drawable/ic_back_arrow"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -69,12 +69,12 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <ImageButton
-            android:id="@+id/btn_fav"
+            android:id="@+id/btn_copy"
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="52dp"
             android:background="@null"
-            android:src="@drawable/star_unfilled"
+            android:src="@drawable/baseline_content_copy_24"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,11 +83,11 @@
             app:tint="@color/primary" />
 
         <ImageButton
-            android:id="@+id/btnRequestWork"
+            android:id="@+id/btnShare"
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:background="@null"
-            android:src="@drawable/baseline_design_services_24"
+            android:src="@drawable/baseline_share_24"
             android:visibility="visible"
             android:layout_marginEnd="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -112,15 +112,13 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
-
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="3dp"-->
-<!--        android:background="@color/secondaryBlue"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/tabLayout"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent" />-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/better_white"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

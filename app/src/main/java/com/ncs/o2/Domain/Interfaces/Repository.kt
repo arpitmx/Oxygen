@@ -66,6 +66,7 @@ interface Repository {
 
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
+    fun getSection(projectName: String, segmentName: String, result: (ServerResult<List<*>>) -> Unit)
 
     fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit)
     fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)

@@ -16,7 +16,15 @@
         <item name="android:textSize">28sp</item>
         <item name="android:fontFamily">@font/sf_pro_display_regular</item>
         <item name="android:textColor">@color/better_white</item>
-.
+    </style>
+
+    <style name="LabelStyleTaskTab">
+        <item name="android:textSize">15dp</item>
+        <item name="android:gravity">start|bottom</item>
+        <item name="android:fontFamily">@font/sf_pro_display_medium</item>
+        <item name="android:textColor">@color/account</item>
+
+
     </style>
 
     <style name="SolidButtonStyle" parent="Widget.AppCompat.Button.Borderless">

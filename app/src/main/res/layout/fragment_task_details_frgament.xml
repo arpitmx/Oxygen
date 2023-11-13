@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/darkTheme_bg"
     android:orientation="vertical"
-    tools:context=".UI.Tasks.TaskPage.Details.TaskDetailsFragment"
-    >
+    tools:context=".UI.Tasks.TaskPage.Details.TaskDetailsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progress_bar"
@@ -35,313 +34,307 @@
 
 
     <ScrollView
-        android:id="@+id/scrollView2"
+        android:id="@+id/parent_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="true"
         android:elevation="2dp"
         android:paddingTop="10dp"
-        android:visibility="visible"
+        android:nestedScrollingEnabled="true"
         android:scrollbarThumbVertical="@color/border_grey"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        android:visibility="visible">
 
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearLayoutCompat2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tagRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="true"
+                android:layoutAnimation="@anim/layout_animation_slidedown"
+                android:nestedScrollingEnabled="false" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/linearLayoutCompat2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/tagRecyclerView"
+
+                <TextView
+                    android:id="@+id/title_tv"
+                    style="@style/CustomTabTextAppearance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="true"
-                    android:layoutAnimation="@anim/layout_animation_slidedown"
-                    android:nestedScrollingEnabled="false" />
+                    android:layout_marginTop="10dp"
+                    android:gravity="start"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Versa needs revamp for its appbar design"
+                    android:textColor="@color/better_white"
+                    android:textSize="22dp" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-
-
-                    <TextView
-                        android:id="@+id/title_tv"
-                        style="@style/CustomTabTextAppearance"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="start"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:text="Versa needs revamp for its appbar design"
-                        android:textColor="@color/better_white"
-                        android:textSize="22dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toEndOf="@+id/btnBack"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
-
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/taskStatus"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginStart="10dp"
-                            android:background="@drawable/card_view_background"
-                            android:fontFamily="@font/sf_pro_display_medium"
-                            android:gravity="center"
-                            android:padding="10dp"
-                            android:text="Unassigned"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
-
-                        <TextView
-                            android:id="@+id/duration"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginStart="10dp"
-                            android:background="@drawable/card_view_background_yellow"
-                            android:fontFamily="@font/sf_pro_display_regular"
-                            android:gravity="center"
-                            android:padding="10dp"
-                            android:text="3Hr+"
-                            android:textColor="#000000"
-                            android:textSize="14dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
-
-
-                        <TextView
-                            android:id="@+id/difficulty"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginStart="10dp"
-                            android:background="@drawable/card_view_background_purple"
-                            android:fontFamily="@font/sf_pro_display_regular"
-                            android:gravity="center"
-                            android:padding="10dp"
-                            android:text="Easy"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
-
-
-                    </androidx.appcompat.widget.LinearLayoutCompat>
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/openedBy"
-                        android:layout_width="match_parent"
+                        android:id="@+id/taskStatus"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_gravity="start"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/card_view_background"
                         android:fontFamily="@font/sf_pro_display_medium"
-                        android:gravity="start"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:text="Alok created this task 2 days ago"
-                        android:textColor="@color/better_white"
-                        android:textSize="15dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toEndOf="@+id/btnBack"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="Unassigned"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14dp" />
+
+                    <TextView
+                        android:id="@+id/duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/card_view_background_yellow"
+                        android:fontFamily="@font/sf_pro_display_regular"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="3Hr+"
+                        android:textColor="#000000"
+                        android:textSize="14dp" />
+
+
+                    <TextView
+                        android:id="@+id/difficulty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/card_view_background_purple"
+                        android:fontFamily="@font/sf_pro_display_regular"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="Easy"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14dp" />
+
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="15dp"
-                    android:background="#56838383" />
-
                 <TextView
-                    android:id="@+id/description_tv"
+                    android:id="@+id/openedBy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_display_regular"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start"
-                    android:padding="10dp"
-                    android:textColor="#CEFFFFFF"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Alok created this task 2 days ago"
+                    android:textColor="@color/better_white"
+                    android:textSize="15dp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="15dp"
-                    android:background="#56838383" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:background="#56838383" />
 
+            <TextView
+                android:id="@+id/description_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_display_regular"
+                android:gravity="start"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:textColor="@color/darkbg_main"
+                android:background="@color/better_white"
+                android:textSize="18dp"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/description_progressbar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:elevation="3dp"
+                android:indeterminate="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:indeterminateTint="#03A9F4"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <br.tiagohm.markdownview.MarkdownView
+                android:id="@+id/markdown_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_view_background_white_outline"
+                android:visibility="gone"
+                app:escapeHtml="false"
+                android:layout_marginTop="10dp"
+                android:nestedScrollingEnabled="true"
+                />
+
+            <WebView
+                android:id="@+id/webview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:gravity="start"
+                android:padding="10dp"
+                android:visibility="gone"
+
+                />
+
+            <!--                <HorizontalScrollView-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="match_parent">-->
+
+            <!--                    <androidx.compose.ui.platform.ComposeView-->
+            <!--                        android:id="@+id/markdownView"-->
+            <!--                        android:layout_width="match_parent"-->
+            <!--                        android:layout_height="match_parent"-->
+            <!--                        android:padding="10dp"-->
+            <!--                        android:background="@color/secondary_bg_black"-->
+            <!--                        />-->
+
+            <!--                </HorizontalScrollView>-->
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="15dp"
+                android:background="#56838383" />
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
                     android:orientation="vertical">
 
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/contributors_tv"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/sf_pro_display_medium"
-                            android:gravity="start"
-                            android:visibility="visible"
-                            android:text="Contributors :"
-                            android:textColor="@color/account"
-                            android:textSize="16dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
-
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/contributorsRecyclerView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:clipToPadding="false"
-                            android:layoutAnimation="@anim/layout_animation_popscale"
-                            android:nestedScrollingEnabled="false" />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginEnd="15dp"
-                        android:background="#56838383" />
-
                     <TextView
-                        android:id="@+id/link"
+                        android:id="@+id/contributors_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="5dp"
-                        android:fontFamily="@font/outfitmedium"
+                        android:fontFamily="@font/sf_pro_display_medium"
                         android:gravity="start"
-                        android:text="Link :"
-                        android:visibility="gone"
+                        android:text="Contributors :"
                         android:textColor="@color/account"
                         android:textSize="16dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toEndOf="@+id/btnBack"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
+                        android:visibility="visible" />
 
-                    <LinearLayout
-                        android:id="@+id/links_cont"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-
-                        >
-
-                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/linksRecyclerView"
+                        android:id="@+id/contributorsRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
                         android:clipToPadding="false"
                         android:layoutAnimation="@anim/layout_animation_popscale"
-                        android:nestedScrollingEnabled="false"
-                        android:visibility="gone" />
-
-
+                        android:nestedScrollingEnabled="false" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
-                <TextView
-                    android:id="@+id/activity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_display_semibold"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="30dp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="View comments and other activity"
-                    android:textColor="@color/secondaryBlue"
-                    android:textSize="16dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/linearLayoutCompat2"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
 
 
-                <TextView
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="5dp"
-                    android:layout_gravity="center"
-                    android:background="@color/orange"
-                    android:paddingStart="10dp"
-                    android:gravity="center"
-                    android:alpha="0.9"
-                    android:visibility="gone"
-                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:layout_height="2dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="15dp"
+                    android:background="#56838383" />
+
+                <TextView
+                    android:id="@+id/link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="5dp"
+                    android:fontFamily="@font/outfitmedium"
+                    android:gravity="start"
+                    android:text="Link :"
                     android:textColor="@color/account"
-                    />
+                    android:textSize="16dp"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/links_cont"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:orientation="vertical"
+
+                    >
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/linksRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_animation_popscale"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+
             </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <TextView
+                android:id="@+id/activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="View comments and other activity"
+                android:textColor="@color/secondaryBlue"
+                android:textSize="16dp" />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_gravity="center"
+                android:alpha="0.9"
+                android:background="@color/orange"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:textColor="@color/account"
+                android:visibility="gone" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
