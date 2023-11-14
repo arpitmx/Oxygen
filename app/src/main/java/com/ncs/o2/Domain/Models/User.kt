@@ -28,7 +28,7 @@ data class User (
         val username : String?="",
         val post: String= "",
         val profileIDUrl : String="",
-        val timestamp:Timestamp?=null,
+        val timestamp:Timestamp? = null,
         val designation:String="",
         @Exclude var isChecked : Boolean = false,
         )

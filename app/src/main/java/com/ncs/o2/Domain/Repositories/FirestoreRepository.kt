@@ -29,6 +29,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
@@ -472,7 +473,17 @@ class FirestoreRepository @Inject constructor(
         } catch (exception: Exception) {
             serverResult(ServerResult.Failure(exception))
         }
+    }
 
+    override suspend fun addTask(task: Task) {
+        try {
+            firestore.collection(Endpoints.PROJECTS).document(PrefManager.getcurrentProject()).collection(Endpoints.Project.TASKS).document(task.id).set(task)
+                .await()
+
+        } catch (e: Exception) {
+            // Handle exceptions appropriately
+            Log.e("addTaskChecking", "Error adding user to Firestore", e)
+        }
     }
 
     override fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit) {
@@ -773,6 +784,21 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+    fun getContributors(projectName: String, result: (ServerResult<List<String>>) -> Unit){
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .get()
+            .addOnSuccessListener {data->
+//                val section_list = mutableListOf<String>()
+                if (data.exists()){
+                    val contributor_list = data.get("contributors") as List<String>
+                    result(ServerResult.Success(contributor_list))
+                }
+            }
+            .addOnFailureListener {exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
     override fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit) {
 
         firestore.collection(Endpoints.USERS)
@@ -784,13 +810,13 @@ class FirestoreRepository @Inject constructor(
                     val firebaseID = document.getString("EMAIL")
                     val profileDPUrl = document.getString("DP_URL")
                     val name = document.getString("USERNAME")!!
-                    val time = document.get("TIMESTAMP") as Timestamp
+//                    val time= document.get("TIMESTAMP") as Timestamp
                     val designation = document.getString("DESIGNATION")
                     val user = User(
                         firebaseID = firebaseID!!,
                         profileDPUrl = profileDPUrl,
                         username = name,
-                        timestamp = time,
+//                        timestamp = time,
                         designation = designation!!
                     )
                     serverResult(ServerResult.Success(user))

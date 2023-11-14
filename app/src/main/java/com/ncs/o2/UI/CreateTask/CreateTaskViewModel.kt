@@ -4,11 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ncs.o2.Constants.IDType
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.UseCases.CreateTaskUseCase
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,7 +38,7 @@ Tasks FUTURE ADDITION :
 
 @HiltViewModel
 class CreateTaskViewModel @Inject constructor
-    (val createTaskUseCase: CreateTaskUseCase) : ViewModel(), ServerErrorCallback
+    (val createTaskUseCase: CreateTaskUseCase, @FirebaseRepository val repository: Repository) : ViewModel(), ServerErrorCallback
     {
 
         private val _serverExceptionLiveData = MutableLiveData<String>()
@@ -51,6 +56,26 @@ class CreateTaskViewModel @Inject constructor
             createTaskUseCase.repository.setCallback(this)
         }
 
+//        fun publishTask(task: Task, result: (ServerResult<Int>) -> Unit) {
+//
+//            repository.createUniqueID(idType = IDType.TaskID, task.project_ID) { taskID ->
+//
+//                CoroutineScope(Dispatchers.IO).launch {
+//                    task.id = taskID
+//                    repository.postTask(task) { repoResult ->
+//                        Timber.tag(CreateTaskUseCase.TAG).d(repoResult.toString())
+//                        result(repoResult)
+//                    }
+//
+//                }
+//            }
+//        }
+
+        fun addTaskThroughRepository(task: Task) {
+            viewModelScope.launch {
+                repository.addTask(task)
+            }
+        }
         fun createTask(task : Task){
           viewModelScope.launch{
               try {
