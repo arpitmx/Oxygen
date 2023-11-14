@@ -354,7 +354,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                     PrefManager.setDpUrl(dp_url)
                 }
 
-                val dp_url = document.getString(Endpoints.User.DP_URL)
                 PrefManager.setDpUrl(dp_url)
 
                 if (isDetailsAdded == null) {
