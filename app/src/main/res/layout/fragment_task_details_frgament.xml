@@ -16,7 +16,6 @@
         android:background="#F5131313"
         android:elevation="5dp"
         android:visibility="visible">
-
         <ProgressBar
             android:id="@+id/progressBar2"
             android:layout_width="match_parent"
@@ -41,7 +40,7 @@
         android:clipToPadding="true"
         android:elevation="2dp"
         android:paddingTop="10dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:scrollbarThumbVertical="@color/border_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

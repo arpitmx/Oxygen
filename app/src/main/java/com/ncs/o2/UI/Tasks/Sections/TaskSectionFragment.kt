@@ -99,14 +99,11 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
     private fun setupRecyclerView() {
 
-        taskList = ArrayList<TaskItem>()
-
+        taskList = ArrayList()
+        binding.recyclerView.gone()
         viewModel.getTasksItemsForSegment(projectName, segmentName, sectionName) { result ->
             when (result) {
                 is ServerResult.Success -> {
-
-                    binding.lottieProgressInclude.progressbarBlock.gone()
-
                     val task = result.data
                     taskList.clear()
 
@@ -120,13 +117,12 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
                     } else {
                         binding.layout.visible()
+                        binding.lottieProgressInclude.progressbarBlock.gone()
                         binding.placeholder.gone()
-
                         recyclerView = binding.recyclerView
                         taskListAdapter = TaskListAdapter(firestoreRepository)
                         taskListAdapter.setTaskList(taskList)
                         taskListAdapter.notifyDataSetChanged()
-
                         taskListAdapter.setOnClickListener(this)
                         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                         layoutManager.reverseLayout = false
@@ -134,6 +130,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                             this.layoutManager = layoutManager
                             adapter = taskListAdapter
                             edgeEffectFactory = BounceEdgeEffectFactory()
+                            visibility=View.VISIBLE
                         }
 
                         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -172,9 +169,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                 }
 
                 is ServerResult.Progress -> {
-                    binding.lottieProgressInclude.progressbarBlock.gone()
-                    binding.layout.gone()
-                    binding.placeholder.visible()
+                    binding.lottieProgressInclude.progressbarBlock.visible()
                 }
 
             }

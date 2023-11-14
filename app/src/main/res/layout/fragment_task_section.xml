@@ -39,7 +39,7 @@
             android:layoutAnimation="@anim/layout_animation_popscale"
             android:nestedScrollingEnabled="false"
             android:paddingBottom="40dp"
-            android:visibility="visible"
+            android:visibility="gone"
             android:elevation="2dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 

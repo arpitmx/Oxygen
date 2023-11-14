@@ -466,11 +466,11 @@ fun fetchUsers() {
                         is ServerResult.Progress -> {
                             binding.progressBar.visible()
                         }
-                    }
-                }
+                            }
+                        }
 
+                }
             }
         }
     }
-}
 }
