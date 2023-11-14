@@ -130,6 +130,7 @@
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/tvTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Set Title here..."
@@ -182,6 +183,7 @@
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/tvDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Set Description here..."
@@ -323,9 +325,6 @@
                     android:visibility="gone" />
 
 
-
-
-
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/add_contributors_btn"
                     android:layout_width="match_parent"
@@ -399,7 +398,8 @@
                     app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-<androidx.appcompat.widget.LinearLayoutCompat
+
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -436,7 +436,7 @@
                     android:fontFamily="@font/outfitmedium"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:text="Show Sections"
+                    android:text="Set Section"
                     android:textAllCaps="false"
                     android:textColor="@color/better_white"
                     android:textSize="18dp"
@@ -470,16 +470,16 @@
                     app:layout_constraintStart_toEndOf="@+id/btnBack"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0" />
+
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroup"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-                </com.google.android.material.chip.ChipGroup>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"></com.google.android.material.chip.ChipGroup>
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/addtags"
@@ -529,6 +529,7 @@
                     app:layout_constraintVertical_bias="0.0" />
 
                 <com.google.android.material.chip.ChipGroup
+                    android:id = "@+id/diffChipGp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"

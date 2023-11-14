@@ -1,7 +1,6 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.Codes.STRINGS.segmentText
@@ -19,7 +17,6 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.sectionListAdapter
-import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
 import com.ncs.o2.databinding.ActivitySectionDisplayBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -30,12 +27,15 @@ import net.datafaker.Faker
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class sectionDisplayBottomSheet() : BottomSheetDialogFragment() {
+class sectionDisplayBottomSheet() : BottomSheetDialogFragment(), sectionListAdapter.OnClickCallback {
     @Inject lateinit var firestoreRepository: FirestoreRepository
     lateinit var binding: ActivitySectionDisplayBottomSheetBinding
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewSegments
     }
+
+    private var sectionName = ""
+    var sectionSelectionListener: SectionSelectionListener? = null
 
     lateinit var sectionList:MutableList<String>
     private val faker: Faker by lazy { Faker() }
@@ -80,7 +80,7 @@ class sectionDisplayBottomSheet() : BottomSheetDialogFragment() {
 
     private fun setRecyclerView(sections_list: List<*>) {
 
-        val adapter = sectionListAdapter(sections_list)
+        val adapter = sectionListAdapter(sections_list, this@sectionDisplayBottomSheet)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         recyclerView.layoutManager = linearLayoutManager
@@ -89,22 +89,19 @@ class sectionDisplayBottomSheet() : BottomSheetDialogFragment() {
         binding.progressbar.gone()
     }
 
-//    override fun onClick(segment: Segment, position: Int) {
-//        Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
-//        PrefManager.initialize(requireContext())
-//        PrefManager.setcurrentsegment(segment.segment_NAME)
-//        segmentName=segment.segment_NAME
-//        sendsectionList(PrefManager.getcurrentProject())
-//        segmentSelectionListener?.onSegmentSelected(segment.segment_NAME)
-//        sectionSelectionListener?.sendSectionsList(sectionList)
-//        dismiss()
-//    }
-    interface SegmentSelectionListener {
-        fun onSegmentSelected(segmentName: String)
+    override fun onClick(sectionName: String) {
+        Toast.makeText(requireContext(),sectionName,Toast.LENGTH_SHORT).show()
+        sectionSelectionListener?.onSectionSelected(sectionName)
+        dismiss()
     }
+
     interface sendSectionsListListner{
         fun sendSectionsList(list:MutableList<String>)
 
+    }
+
+    interface SectionSelectionListener {
+        fun onSectionSelected(sectionName: String)
     }
 
     private fun fetchSegments(projectName: String) {
@@ -131,6 +128,8 @@ class sectionDisplayBottomSheet() : BottomSheetDialogFragment() {
             }
         }
     }
+
+
 //    private fun sendsectionList(projectName: String) {
 //        firestoreRepository.getSegments(projectName) { serverResult ->
 //            when (serverResult) {
