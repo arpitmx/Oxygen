@@ -15,6 +15,11 @@ object Endpoints {
     }
 
 
+    object CodeViewer{
+        const val CODE = "CODE"
+
+    }
+
     object Storage{
         const val DP_PATH = "/DP/dp"
     }

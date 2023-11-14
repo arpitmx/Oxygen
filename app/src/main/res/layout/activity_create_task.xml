@@ -4,19 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/darkbg_main"
     tools:context=".UI.CreateTask.CreateTaskActivity">
 
 
     <include
         android:id="@+id/gio_actionbar"
-        layout="@layout/actionbar_task"
+        layout="@layout/actionbar_create_task"
         android:layout_width="0dp"
         android:layout_height="@dimen/_53dp"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/scrollView2" />
+        app:layout_constraintTop_toTopOf="@+id/parent_scrollview" />
 
     <include
         android:id="@+id/progress_circular_include"
@@ -30,177 +30,371 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
-        android:id="@+id/scrollView2"
+        android:id="@+id/parent_scrollview"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingTop="@dimen/action_bar"
-        android:paddingBottom="80dp"
-        android:scrollbarThumbVertical="@color/s3bg"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/gio_actionbar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+
+        android:paddingBottom="20dp"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@color/better_white">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/darkbg_main"
             android:orientation="vertical">
 
 
-            <ImageView
-                android:id="@+id/taskid"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:fontFamily="@font/outfitmedium"
-                android:gravity="center"
-                android:scaleType="centerCrop"
-                android:src="@drawable/baseline_groups_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/btnBack"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0"
-                app:tint="@color/s2bg" />
-
-            <TextView
-                android:id="@+id/taskisd"
+            <HorizontalScrollView
+                android:id="@+id/details_scrollview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/outfitmedium"
-                android:gravity="center"
-                android:text="Create a task +"
-                android:textColor="@color/s2bg"
-                android:textSize="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/btnBack"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                android:layout_height="80dp"
+                android:layout_marginTop="10dp"
+                android:clipToPadding="false"
+                android:paddingEnd="10dp"
+                android:scrollbarSize="2dp"
+                android:fadeScrollbars="false"
+                android:scrollbarThumbHorizontal="@color/primary">
 
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/projectName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/project" />
+
+                        <TextView
+                            android:id="@+id/projectNameET"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:gravity="top"
+                            android:maxLength="10"
+                            android:maxLines="1"
+                            android:padding="5dp"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Medona"
+                            android:textColor="@color/better_white"
+                            android:textSize="15dp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/priority"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Priority" />
+
+
+                        <include
+                            android:id="@+id/priorityInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/taskType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/type"
+
+                            />
+
+                        <include
+                            android:id="@+id/typeInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/assignee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Assignee"
+                            android:textSize="15dp" />
+
+                        <include
+                            layout="@layout/task_creation_detail_item_assignee"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/state"
+                            android:textSize="15dp" />
+
+                        <include
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/difficulty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/difficulty"
+                            android:textSize="15dp" />
+
+                        <include
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/taskDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Duration" />
+
+                        <TextView
+                            android:id="@+id/taskDurationET"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:gravity="top"
+                            android:maxLength="10"
+                            android:maxLines="1"
+                            android:padding="5dp"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="5 Hour"
+                            android:textColor="@color/better_white"
+                            android:textSize="15dp" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </HorizontalScrollView>
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/task_title_parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="15dp"
-                android:orientation="vertical">
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="15dp"
+                >
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/segment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/card_view_background_white_outline"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Development"
+                    android:textAllCaps="false"
+                    android:textColor="@color/primary"
+                    android:textSize="15dp" />
 
 
                 <TextView
-                    android:id="@+id/tt"
-                    android:layout_width="match_parent"
+                    android:id="@+id/kkkk"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="3"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
                     android:fontFamily="@font/outfitmedium"
-                    android:gravity="start"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    android:text="Task Title"
+                    android:text=">"
                     android:textColor="@color/better_white"
-                    android:textSize="15dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    android:textSize="20dp" />
 
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                    android:layout_width="match_parent"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/section"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_weight="7"
-                    app:boxBackgroundColor="#C3BCED"
-                    app:hintEnabled="false">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/tvTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Set Title here..."
-                        android:textColorHint="@color/darkbg_main_a80" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@drawable/card_view_background_white_outline"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Ongoing now"
+                    android:textAllCaps="false"
+                    android:textColor="@color/primary"
+                    android:textSize="15dp" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/description_title_parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/title_editor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:orientation="vertical">
+                android:layout_marginTop="10dp"
+                android:layout_weight="7"
+                android:layout_margin="10dp"
+                app:endIconMode="clear_text"
+                android:hint="Title"
+                app:hintTextColor="@color/darkTheme_bg"
+                app:hintEnabled="true">
 
-                <TextView
-                    android:id="@+id/dd"
+                <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="3"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="start"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    android:text="Task Description"
-                    android:textColor="@color/better_white"
-                    android:textSize="15dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:maxLines="2"
+                    android:textAlignment="textStart"
+                    android:background="@drawable/card_view_white"
+                    android:textColor="@color/darkbg_main"
+                    android:textSize="17dp" />
 
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/desc_editor"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_view_white"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="7"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="15dp"
-                    android:layout_weight="7"
-                    app:boxBackgroundColor="@color/dim_purple"
-                    app:hintEnabled="false">
+                    android:ellipsize="end"
+                    android:fontFamily="@font/sf_pro_display_regular"
+                    android:gravity="top|start"
+                    android:hint="Write Task Summary here..."
+                    android:inputType="textMultiLine"
+                    android:maxHeight="300dp"
+                    android:maxLength="200"
+                    android:minHeight="100dp"
+                    android:textColor="@color/darkbg_main"
+                    android:textColorHint="@color/account"
+                    android:textSize="16dp" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/tvDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Set Description here..."
-                        android:inputType="textMultiLine"
-                        android:minHeight="100dp"
-                        android:textColorHint="@color/darkbg_main_a80" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
+            </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
+                android:visibility="gone"
                 android:orientation="vertical">
 
                 <TextView
@@ -208,11 +402,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:text="Task Tenure 📅:"
+                    android:text="Task Tenure :"
                     android:textColor="@color/better_white"
                     android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -231,9 +425,9 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp"
-                    android:background="@drawable/card_view_background_purple_outline"
+                    android:background="@drawable/card_view_background_white_outline"
                     android:elevation="6dp"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:orientation="vertical"
                     android:text="Set Start Date"
                     android:textAllCaps="false"
@@ -250,9 +444,9 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp"
-                    android:background="@drawable/card_view_background_purple_outline"
+                    android:background="@drawable/card_view_background_white_outline"
                     android:elevation="6dp"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:text="Set Deadline Date"
@@ -270,7 +464,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:background="@drawable/card_view_background_purple"
+                    android:background="@drawable/card_view_background"
                     android:elevation="6dp"
                     android:fontFamily="@font/outfitmedium"
                     android:gravity="center"
@@ -279,11 +473,14 @@
                     android:textAllCaps="false"
                     android:textColor="@color/better_white"
                     android:textSize="18dp"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
+
+
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -293,24 +490,16 @@
                 android:layout_margin="10dp"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/dddd"
+
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="start"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:text="Contributors 🧑🏽‍💻:"
-                    android:textColor="@color/white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    android:layout_height="1dp"
+                    android:background="#65686B"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="8dp"
+
+                    />
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/contributorsRecyclerView"
@@ -322,154 +511,67 @@
                     android:clipToPadding="false"
                     android:layoutAnimation="@anim/layout_animation_popscale"
                     android:nestedScrollingEnabled="false"
+                    android:orientation="horizontal"
                     android:visibility="gone" />
 
 
-                <androidx.appcompat.widget.AppCompatButton
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/add_contributors_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/card_view_background_purple"
-                    android:drawableEnd="@drawable/outline_add_24"
-                    android:drawablePadding="-50dp"
-                    android:drawableTint="@color/white"
-                    android:elevation="6dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:minHeight="50dp"
-                    android:orientation="vertical"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    android:text="Add Contributors"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:orientation="horizontal"
+                    android:weightSum="10"
+                    >
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/baseline_assignment_ind_24"
+                        app:tint="@color/better_white"
+                        android:paddingStart="0dp"
+                        />
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="9"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/sf_pro_display_regular"
+                        android:gravity="start|center_vertical"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="10dp"
+                        android:text="Add Moderators"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#65686B"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+
+                />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/ddddd"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="start"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:text="Segment:"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
-
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/segment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/card_view_background_purple"
-                    android:elevation="6dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:text="Set Segment"
-                    android:textAllCaps="false"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/eeeee"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="start"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:text="Section:"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
-
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/section"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/card_view_background_purple"
-                    android:elevation="6dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:text="Set Section"
-                    android:textAllCaps="false"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/ddddtags"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="start"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:text="Tags:"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroup"
@@ -479,35 +581,52 @@
                     android:paddingEnd="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"></com.google.android.material.chip.ChipGroup>
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/addtags"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/card_view_background_purple"
-                    android:elevation="6dp"
-                    android:fontFamily="@font/outfitmedium"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:text="Add Tags"
-                    android:textAllCaps="false"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="10"
+                    >
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/baseline_label_24"
+                        app:tint="@color/white"
+                        android:paddingStart="0dp"
+                        />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="9"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/sf_pro_display_regular"
+                        android:gravity="start|center_vertical"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="10dp"
+                        android:text="Add Tags"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/dddd3d"
@@ -529,7 +648,6 @@
                     app:layout_constraintVertical_bias="0.0" />
 
                 <com.google.android.material.chip.ChipGroup
-                    android:id = "@+id/diffChipGp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"

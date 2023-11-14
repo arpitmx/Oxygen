@@ -47,10 +47,6 @@ import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -322,4 +318,5 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         fragmentTransaction.commit()
 
     }
+
 }

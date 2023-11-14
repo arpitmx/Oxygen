@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Details
 
+import com.ncs.o2.R
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -12,10 +13,16 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import br.tiagohm.markdownview.css.InternalStyleSheet
+import br.tiagohm.markdownview.css.styles.Github
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -35,7 +42,6 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment
@@ -43,7 +49,10 @@ import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
+import io.noties.markwon.Markwon
+import io.noties.markwon.editor.MarkwonEditor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,6 +61,7 @@ import net.datafaker.Faker
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback {
@@ -71,6 +81,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     var users: MutableList<User> = mutableListOf()
     private val TextViewList = mutableListOf<TextView>()
 
+    private lateinit var markwon: Markwon
+    private lateinit var mdEditor: MarkwonEditor
 
     companion object {
         const val TAG = "TaskDetailsFragment"
@@ -78,8 +90,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentTaskDetailsFrgamentBinding.inflate(inflater, container, false)
         return binding.root
@@ -98,7 +109,29 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 viewpager.currentItem = next
             }
         }
+    }
 
+
+    private fun setUpMarkwonMarkdown() {
+
+//        val activity = requireActivity()
+//        markwon = Markwon.builder(activity)
+//            .usePlugin(ImagesPlugin.create())
+//            .usePlugin(GlideImagesPlugin.create(activity))
+//            .usePlugin(TablePlugin.create(activity))
+//            .usePlugin(TaskListPlugin.create(activity))
+//            .usePlugin(HtmlPlugin.create())
+//            .usePlugin(StrikethroughPlugin.create())
+//            .usePlugin(object : AbstractMarkwonPlugin() {
+//                override fun configure(registry: MarkwonPlugin.Registry) {
+//                    registry.require(ImagesPlugin::class.java) { imagesPlugin ->
+//                        imagesPlugin.addSchemeHandler(DataUriSchemeHandler.create())
+//                    }
+//                }
+//            })
+//            .build()
+//
+//        mdEditor = MarkwonEditor.create(markwon)
 
     }
 
@@ -106,12 +139,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     @Later("1. Check if the request has already made, if made then set text and clickability on the button accordingly")
     private fun setUpViews() {
 
+        setUpMarkwonMarkdown()
 
         activityBinding.binding.gioActionbar.btnRequestWork.setOnClickSingleTimeBounceListener {
-
             activityBinding.binding.gioActionbar.btnRequestWork.animFadein(requireContext())
             sendRequestNotification()
-
         }
 
         handleRequestNotificationResult()
@@ -141,13 +173,12 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                     binding.progressBar.gone()
                     utils.dialog("Request Failed",
                         "Try retrying as request sending was failed to server due to ${result.exception.message.toString()}",
-                        getString(R.string.retry),
-                        getString(R.string.cancel),
+                        getString(com.ncs.o2.R.string.retry),
+                        getString(com.ncs.o2.R.string.cancel),
                         {
                             sendRequestNotification()
                         },
-                        {}
-                    )
+                        {})
                 }
 
                 ServerResult.Progress -> {
@@ -220,9 +251,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         for (i in 0 until num) {
             val text = inflater.inflate(
-                R.layout.links_item,
-                parentLayout,
-                false
+                com.ncs.o2.R.layout.links_item, parentLayout, false
             ) as TextView
             TextViewList.add(text)
             parentLayout.addView(text)
@@ -232,8 +261,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         for (i in 0 until num) {
 
             TextViewList[i].setOnClickThrottleBounceListener {
-                val intent =
-                    Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
                 startActivity(intent)
             }
         }
@@ -253,14 +281,15 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     fun setTaskDetails(task: Task) {
 
         binding.progressBar.gone()
-        binding.scrollView2.visible()
+        binding.parentScrollview.visible()
 
         taskDetails = task
         setTags()
         fetchUsers()
 
         binding.titleTv.text = task.title
-        binding.descriptionTv.text = taskDetails.description
+
+        setUpTaskDescription(taskDetails.description)
 
         val statusText = when (task.status) {
             0 -> "Unassigned"
@@ -270,7 +299,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         }
         binding.taskStatus.text = statusText
 
-        binding.duration.text = "${task.duration}Hr+"
+        binding.duration.text = "${task.duration}"
 
         val difficultyText = when (task.difficulty) {
             1 -> "Easy"
@@ -294,7 +323,74 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-    fun setCreator(task: Task){
+    private val javascriptCode = "javascript:document.a.style.background= #000;"
+    val script = """
+     var allPreTags = document.querySelectorAll('pre');
+
+    allPreTags.forEach(function(preTag) {
+      preTag.addEventListener('click', function() {
+        var clickedText = preTag.textContent;
+        send.sendCode(clickedText);
+       
+      });
+    });
+"""
+
+    private fun setUpTaskDescription(description: String) {
+
+        val css: InternalStyleSheet = Github()
+
+        with(css) {
+            addFontFace("o2font", "normal", "normal", "normal", "url('file:///android_res/font/sfregular.ttf')")
+            addRule("body","font-family:o2font")
+            addRule("body","font-size:17px")
+            addRule("body", "background-color: #131313")
+            addRule("body", "color: #fff")
+            addRule("body", "padding: 0px 0px 0px 0px")
+            addRule("a", "color: #86ff7c")
+            addRule("pre", "border: 1px solid #000;")
+            addRule("pre", "border-radius: 4px;")
+            addRule("pre", "max-height: 350px;")
+            addRule("pre", "overflow:auto")
+            addRule("pre", "white-space: pre-line")
+
+        }
+
+        binding.markdownView.settings.javaScriptEnabled = true
+        binding.markdownView.addStyleSheet(css)
+
+        binding.markdownView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                binding.descriptionProgressbar.gone()
+                binding.markdownView.visible()
+                view?.evaluateJavascript(script) {}
+            }
+        }
+
+        binding.markdownView.addJavascriptInterface(AndroidToJsInterface(), "send")
+        binding.markdownView.loadMarkdown(description)
+
+    }
+
+
+    inner class AndroidToJsInterface {
+        @JavascriptInterface
+        fun sendCode(codeText: String) {
+            requireActivity().runOnUiThread {
+
+                val codeViewerIntent = Intent(requireActivity(), CodeViewerActivity::class.java)
+                codeViewerIntent.putExtra(Endpoints.CodeViewer.CODE, codeText.trimIndent().trim())
+                startActivity(codeViewerIntent)
+                requireActivity().overridePendingTransition(
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_left
+                )
+            }
+        }
+    }
+
+
+    private fun setCreator(task: Task) {
 
         val timeDifference = Date().time - task.time_STAMP!!.toDate().time
         val minutes = (timeDifference / (1000 * 60)).toInt()
@@ -318,159 +414,158 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         val endIndex = startIndex + task.assigner.length
 
         // Bold
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        binding.openedBy.text =spannableString
+        spannableString.setSpan(
+            StyleSpan(Typeface.BOLD), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.openedBy.text = spannableString
     }
 
-    fun setdetails(id: String) {
+    private fun setdetails(id: String) {
 
         viewLifecycleOwner.lifecycleScope.launch {
 
             try {
 
-                    val taskResult = withContext(Dispatchers.IO) {viewModel.getTasksById(id, PrefManager.getcurrentProject())}
-                    Timber.tag(TAG).d("Fetched task result : ${taskResult}")
+                val taskResult = withContext(Dispatchers.IO) {
+                    viewModel.getTasksById(
+                        id, PrefManager.getcurrentProject()
+                    )
+                }
+                Timber.tag(TAG).d("Fetched task result : ${taskResult}")
 
-                    when (taskResult) {
-                        is ServerResult.Failure -> {
+                when (taskResult) {
+                    is ServerResult.Failure -> {
 
-                            utils.singleBtnDialog(
-                                "Failure",
-                                "Failure in fetching Contributors : ${taskResult.exception.message}",
-                                "Okay"
-                            ) {
-                                requireActivity().finish()
-                            }
-
-                            binding.progressBar.gone()
-
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in fetching Contributors : ${taskResult.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
                         }
 
-                        ServerResult.Progress -> {
-                            binding.progressBar.visible()
-                        }
-
-                        is ServerResult.Success -> {
-                            setTaskDetails(taskResult.data)
-                        }
+                        binding.progressBar.gone()
 
                     }
 
+                    ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
 
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e)
-            binding.progressBar.gone()
-            utils.singleBtnDialog(
-                "Failure",
-                "Failure in fetching Contributors : ${e.message}",
-                "Okay"
-            ) {
-                requireActivity().finish()
+                    is ServerResult.Success -> {
+                        setTaskDetails(taskResult.data)
+                    }
+
+                }
+
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+                utils.singleBtnDialog(
+                    "Failure", "Failure in fetching Contributors : ${e.message}", "Okay"
+                ) {
+                    requireActivity().finish()
+                }
+            }
+
+        }
+    }
+
+
+    private fun typingAnimation(view: TextView, text: String, length: Int) {
+        var delay = 200L
+        if (Character.isWhitespace(text.elementAt(length - 1))) {
+            delay = 600L
+        }
+        view.text = text.substring(0, length)
+        when (length) {
+            text.length -> return
+            else -> Handler(Looper.getMainLooper()).postDelayed({
+                typingAnimation(view, text, length + 1)
+            }, delay)
+        }
+    }
+
+    private fun setTags() {
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main) {
+                for (i in 0 until taskDetails.tags.size) {
+                    viewModel.getTagsbyId(
+                        taskDetails.tags[i], PrefManager.getcurrentProject()
+                    ) { result ->
+                        when (result) {
+                            is ServerResult.Success -> {
+                                binding.progressBar.gone()
+                                binding.parentScrollview.visible()
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val tag = result.data
+                                    tags.add(tag)
+                                }
+                                setTagsView(tags)
+
+                            }
+
+                            is ServerResult.Failure -> {
+                                val errorMessage = result.exception.message
+                                binding.progressBar.gone()
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
+                        }
+                    }
+                }
             }
         }
-
-
     }
 
+    private fun fetchUsers() {
 
-}
+        viewLifecycleOwner.lifecycleScope.launch {
 
+            withContext(Dispatchers.IO) {
+                for (assignee in taskDetails.assignee) {
 
-private fun typingAnimation(view: TextView, text: String, length: Int) {
-    var delay = 200L
-    if (Character.isWhitespace(text.elementAt(length - 1))) {
-        delay = 600L
-    }
-    view.text = text.substring(0, length)
-    when (length) {
-        text.length -> return
-        else -> Handler(Looper.getMainLooper()).postDelayed({
-            typingAnimation(view, text, length + 1)
-        }, delay)
-    }
-}
+                    viewModel.getUserbyId(assignee) { result ->
 
-fun setTags() {
-    CoroutineScope(Dispatchers.IO).launch {
-        withContext(Dispatchers.Main) {
-            for (i in 0 until taskDetails.tags.size) {
-                viewModel.getTagsbyId(
-                    taskDetails.tags[i],
-                    PrefManager.getcurrentProject()
-                ) { result ->
-                    when (result) {
-                        is ServerResult.Success -> {
-                            binding.progressBar.gone()
-                            binding.scrollView2.visible()
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val tag = result.data
-                                tags.add(tag)
+                        when (result) {
+
+                            is ServerResult.Success -> {
+
+                                binding.progressBar.gone()
+                                binding.parentScrollview.visible()
+
+                                val user = result.data
+                                users.add(user!!)
+                                setContributors(users)
                             }
-                            setTagsView(tags)
 
+
+                            is ServerResult.Failure -> {
+
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in fetching Contributors : ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+                                binding.progressBar.gone()
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
                         }
-
-                        is ServerResult.Failure -> {
-                            val errorMessage = result.exception.message
-                            binding.progressBar.gone()
-                        }
-
-                        is ServerResult.Progress -> {
-                            binding.progressBar.visible()
-                        }
-
                     }
 
                 }
             }
         }
     }
+
+
 }
 
-fun fetchUsers() {
 
-    viewLifecycleOwner.lifecycleScope.launch {
-
-        withContext(Dispatchers.IO) {
-            for (assignee in taskDetails.assignee) {
-
-                viewModel.getUserbyId(assignee) { result ->
-
-                    when (result) {
-
-                        is ServerResult.Success -> {
-
-                            binding.progressBar.gone()
-                            binding.scrollView2.visible()
-
-                            val user = result.data
-                            users.add(user!!)
-                            setContributors(users)
-
-                        }
-
-
-                        is ServerResult.Failure -> {
-
-                            utils.singleBtnDialog(
-                                "Failure",
-                                "Failure in fetching Contributors : ${result.exception.message}",
-                                "Okay"
-                            ) {
-                                requireActivity().finish()
-                            }
-                            binding.progressBar.gone()
-
-                        }
-
-                        is ServerResult.Progress -> {
-                            binding.progressBar.visible()
-                        }
-                            }
-                        }
-
-                }
-            }
-        }
-    }
-}
