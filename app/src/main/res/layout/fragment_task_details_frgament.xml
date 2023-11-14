@@ -26,9 +26,28 @@
             android:indeterminateTint="@color/primary"
             android:scaleX="0.2"
             android:scaleY="0.2"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/progressbar_block"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:elevation="10dp"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/blockloaderanim"
+            app:lottie_speed="1" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

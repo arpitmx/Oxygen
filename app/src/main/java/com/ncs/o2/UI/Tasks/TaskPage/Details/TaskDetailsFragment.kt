@@ -340,10 +340,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         val css: InternalStyleSheet = Github()
 
-
-
-
-
         with(css) {
             addFontFace("o2font", "normal", "normal", "normal", "url('file:///android_res/font/sfregular.ttf')")
             addRule("body","font-family:o2font")
@@ -354,6 +350,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             addRule("a", "color: #86ff7c")
             addRule("pre", "border: 1px solid #000;")
             addRule("pre", "border-radius: 4px;")
+            addRule("pre", "max-height: 350px;")
             addRule("pre", "overflow:auto")
             addRule("pre", "white-space: pre-line")
 

@@ -9,16 +9,12 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isEmpty
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import com.ncs.o2.Domain.Interfaces.Repository
-import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
@@ -27,12 +23,10 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
-import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
-import com.ncs.o2.UI.Auth.LoginScreen.LoginScreenViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
@@ -41,11 +35,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.setDurationBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
@@ -57,7 +47,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     SegmentSelectionBottomSheet.SegmentSelectionListener,
     SegmentSelectionBottomSheet.sendSectionsListListner,
     setDurationBottomSheet.DurationAddedListener,
-    sectionDisplayBottomSheet.SectionSelectionListener{
+    sectionDisplayBottomSheet.SectionSelectionListener {
     private var contriList: MutableList<User> = mutableListOf()
     private var contributorList: MutableList<String> = mutableListOf()
     private var contributorDpList: MutableList<String> = mutableListOf()
@@ -99,73 +89,72 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         Codes.STRINGS.segmentText = ""
 
-
-        binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
-
-            if (binding.tvTitle.text!!.isEmpty() ||
-                binding.tvDescription.text!!.isEmpty() ||
-                binding.startDate.text == "Set Start Date" ||
-                binding.endDate.text == "Set Deadline Date" ||
-                binding.duration.text == "Set Duration" ||
-                binding.segment.text == "Set Segment" ||
-                binding.section.text == "Set Section" ||
-                binding.chipGroup.isEmpty() ||
-                binding.contributorsRecyclerView.isEmpty() ||
-                diffLevel == 0
-            ) {
-                val currentTimestamp = Timestamp.now()
-                Log.d("TimeStampCheck", currentTimestamp.toString())
-                Toast.makeText(this, "Pls complete the entries", Toast.LENGTH_SHORT).show()
-
-            } else {
-                val currentUser= PrefManager.getcurrentUserdetails()
-                val task = Task(
-                    id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
-                    title = binding.tvTitle.text.toString(),
-                    description = binding.tvDescription.text.toString(),
-                    difficulty = diffLevel,
-                    assignee = contributorList,
-                    assigner = currentUser.USERNAME,
-                    deadline = binding.endDate.text.toString(),
-                    duration = binding.duration.text.toString(),
-                    assigner_email = currentUser.EMAIL,
-                    tags = tagIdList,
-                    segment = binding.segment.text.toString(),
-                    section = binding.section.text.toString(),
-                    time_STAMP = Timestamp.now(),
-                    completed = false,
-                )
-
-                viewModel.addTaskThroughRepository(task)
-
-                Log.d("taskCheck", task.toString())
-
-                Toast.makeText(this, "Task Created", Toast.LENGTH_SHORT).show()
-
-                onBackPressedDispatcher.onBackPressed()
-                finish()
-            }
-
-
-        }
+//
+//        binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
+//
+//            if (binding.tvTitle.text!!.isEmpty() ||
+//                binding.tvDescription.text!!.isEmpty() ||
+//                binding.startDate.text == "Set Start Date" ||
+//                binding.endDate.text == "Set Deadline Date" ||
+//                binding.duration.text == "Set Duration" ||
+//                binding.segment.text == "Set Segment" ||
+//                binding.section.text == "Set Section" ||
+//                binding.chipGroup.isEmpty() ||
+//                binding.contributorsRecyclerView.isEmpty() ||
+//                diffLevel == 0
+//            ) {
+//                val currentTimestamp = Timestamp.now()
+//                Log.d("TimeStampCheck", currentTimestamp.toString())
+//                Toast.makeText(this, "Pls complete the entries", Toast.LENGTH_SHORT).show()
+//                return@setOnClickThrottleBounceListener
+//            }
+//
+//            val currentUser = PrefManager.getcurrentUserdetails()
+//            val task = Task(
+//                id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
+//                title = binding.tvTitle.text.toString(),
+//                description = binding.tvDescription.text.toString(),
+//                difficulty = diffLevel,
+//                assignee = contributorList,
+//                assigner = currentUser.USERNAME,
+//                deadline = binding.endDate.text.toString(),
+//                duration = binding.duration.text.toString(),
+//                assigner_email = currentUser.EMAIL,
+//                tags = tagIdList,
+//                segment = binding.segment.text.toString(),
+//                section = binding.section.text.toString(),
+//                time_STAMP = Timestamp.now(),
+//                completed = false,
+//            )
+//
+//            viewModel.addTaskThroughRepository(task)
+//
+//            Log.d("taskCheck", task.toString())
+//
+//            Toast.makeText(this, "Task Created", Toast.LENGTH_SHORT).show()
+//
+//            onBackPressedDispatcher.onBackPressed()
+//            finish()
+//
+//        }
 
         // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
 
 
-        binding.diffChipGp.setOnCheckedChangeListener { group, checkedId ->
-            // Handle chip selection change
-            val selectedChip = findViewById<Chip>(checkedId)
-            // Do something with the selected chip
-            if (!selectedChip.isNull) {
-                if (selectedChip.text == "Easy") {
-                    diffLevel = 1
-                } else if (selectedChip.text == "Medium") {
-                    diffLevel = 2
-                } else if (selectedChip.text == "Difficult") {
-                    diffLevel = 3
-                }
-            }
-        }
+//        binding.diffChipGp.setOnCheckedChangeListener { group, checkedId ->
+//            // Handle chip selection change
+//            val selectedChip = findViewById<Chip>(checkedId)
+//            // Do something with the selected chip
+//            if (!selectedChip.isNull) {
+//                if (selectedChip.text == "Easy") {
+//                    diffLevel = 1
+//                } else if (selectedChip.text == "Medium") {
+//                    diffLevel = 2
+//                } else if (selectedChip.text == "Difficult") {
+//                    diffLevel = 3
+//                }
+//            }
+//        }
 
 
         binding.duration.setOnClickThrottleBounceListener {

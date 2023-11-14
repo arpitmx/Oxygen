@@ -298,6 +298,7 @@ class FirestoreRepository @Inject constructor(
         return liveData
     }
 
+
     ////////////////////////////// FIREBASE USER DP FUNCTIONALITY //////////////////////////
 
     fun getProjectRef(projectID: String): DocumentReference {
@@ -474,10 +475,13 @@ class FirestoreRepository @Inject constructor(
         } catch (exception: Exception) {
             serverResult(ServerResult.Failure(exception))
         }
+    }
+
 
     override suspend fun addTask(task: Task) {
         try {
-            firestore.collection(Endpoints.PROJECTS).document(PrefManager.getcurrentProject()).collection(Endpoints.Project.TASKS).document(task.id).set(task)
+            firestore.collection(Endpoints.PROJECTS).document(PrefManager.getcurrentProject())
+                .collection(Endpoints.Project.TASKS).document(task.id).set(task)
                 .await()
 
         } catch (e: Exception) {
@@ -538,7 +542,10 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
-    override fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit) {
+    override fun editUserInfo(
+        userInfo: UserInfo,
+        serverResult: (ServerResult<UserInfo?>) -> Unit
+    ) {
 
         serverResult(ServerResult.Progress)
 
@@ -589,27 +596,6 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    override fun getSection(
-        projectName: String,
-        segmentName: String,
-        result: (ServerResult<List<*>>) -> Unit
-    ) {
-
-        firestore.collection(Endpoints.PROJECTS).document(projectName)
-            .collection(Endpoints.Project.SEGMENT).document(segmentName)
-            .get()
-            .addOnSuccessListener {
-//                val section_list = mutableListOf<String>()
-                if (it.exists()) {
-                    val section_list = it.get("sections") as List<*>
-                    result(ServerResult.Success(section_list))
-                }
-            }
-            .addOnFailureListener { exception ->
-                result(ServerResult.Failure(exception))
-            }
-    }
-
     override fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit) {
         return try {
 
@@ -656,20 +642,23 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-
-    fun getSection(projectName: String, segmentName: String, result: (ServerResult<List<*>>) -> Unit){
+    override fun getSection(
+        projectName: String,
+        segmentName: String,
+        result: (ServerResult<List<*>>) -> Unit
+    ) {
 
         firestore.collection(Endpoints.PROJECTS).document(projectName)
             .collection(Endpoints.Project.SEGMENT).document(segmentName)
             .get()
             .addOnSuccessListener {
 //                val section_list = mutableListOf<String>()
-                if (it.exists()){
+                if (it.exists()) {
                     val section_list = it.get("sections") as List<*>
                     result(ServerResult.Success(section_list))
                 }
             }
-            .addOnFailureListener {exception ->
+            .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
     }
@@ -811,17 +800,17 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    fun getContributors(projectName: String, result: (ServerResult<List<String>>) -> Unit){
+    fun getContributors(projectName: String, result: (ServerResult<List<String>>) -> Unit) {
         firestore.collection(Endpoints.PROJECTS).document(projectName)
             .get()
-            .addOnSuccessListener {data->
+            .addOnSuccessListener { data ->
 //                val section_list = mutableListOf<String>()
-                if (data.exists()){
+                if (data.exists()) {
                     val contributor_list = data.get("contributors") as List<String>
                     result(ServerResult.Success(contributor_list))
                 }
             }
-            .addOnFailureListener {exception ->
+            .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
     }
@@ -838,7 +827,7 @@ class FirestoreRepository @Inject constructor(
                     val profileDPUrl = document.getString("DP_URL")
                     val name = document.getString("USERNAME")!!
                     var time = document.get("TIMESTAMP") as Timestamp?
-                    if (time.isNull){
+                    if (time.isNull) {
                         time = Timestamp.now()
                     }
 
@@ -912,12 +901,12 @@ class FirestoreRepository @Inject constructor(
                 return ServerResult.Failure(Exception("Document not found for title: $id"))
             }
 
-       } catch (e: Exception) {
+        } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
 
     }
 
 
+}
 
-}}

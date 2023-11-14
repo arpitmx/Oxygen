@@ -63,6 +63,18 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/border_grey"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         style="@style/CustomTabLayout2"
