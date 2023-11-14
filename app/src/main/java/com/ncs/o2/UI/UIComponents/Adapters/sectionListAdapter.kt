@@ -5,10 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.databinding.SegmetSelectionItemBinding
 
-class sectionListAdapter constructor (
-    val sections: List<*>
+class sectionListAdapter(
+    val sections: List<*>,
+    val onClickCallback: OnClickCallback
 ) : RecyclerView.Adapter<sectionListAdapter.ViewHolder>() {
 
 
@@ -22,13 +24,17 @@ class sectionListAdapter constructor (
         val section = sections[position]
 
         holder.binding.segmentTitle.text = section.toString()
-//        holder.binding.root.setOnClickThrottleBounceListener {
-//            onClickCallback.onClick(segment, position)
-//        }
+        holder.binding.root.setOnClickThrottleBounceListener {
+            onClickCallback.onClick(section.toString())
+        }
     }
 
     override fun getItemCount(): Int {
         return sections.size
+    }
+
+    interface OnClickCallback {
+        fun onClick(sectionName: String)
     }
 
     inner class ViewHolder(val binding: SegmetSelectionItemBinding) :

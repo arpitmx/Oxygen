@@ -8,6 +8,12 @@ annotation class annotationUtility(val str:String)
 @Target(AnnotationTarget.FIELD)
 annotation class Positive
 
+@Target(
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.VALUE_PARAMETER,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.TYPE
+)
 @Qualifier
 @MustBeDocumented
 @Retention(AnnotationRetention.RUNTIME)

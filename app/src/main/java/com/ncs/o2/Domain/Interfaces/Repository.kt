@@ -43,6 +43,7 @@ interface Repository {
     //Task related
     suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit)
 
+    suspend fun addTask(task: Task)
     suspend fun postTags(tag: Tag, projectName: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun fetchProjectTags(
         projectName: String,
