@@ -6,50 +6,71 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isEmpty
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.chip.Chip
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.Codes
-import com.ncs.o2.Domain.Utility.Colors
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.Auth.LoginScreen.LoginScreenViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.setDurationBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.datafaker.Faker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback,AddTagsBottomSheet.getSelectedTagsCallback,
+class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback,
+    UserlistBottomSheet.getContributorsCallback, AddTagsBottomSheet.getSelectedTagsCallback,
     SegmentSelectionBottomSheet.SegmentSelectionListener,
-    SegmentSelectionBottomSheet.sendSectionsListListner {
-    private var OList: MutableList<User> = mutableListOf()
-    private var List: MutableList<Tag> = mutableListOf()
+    SegmentSelectionBottomSheet.sendSectionsListListner,
+    setDurationBottomSheet.DurationAddedListener,
+    sectionDisplayBottomSheet.SectionSelectionListener{
+    private var contriList: MutableList<User> = mutableListOf()
+    private var contributorList: MutableList<String> = mutableListOf()
+    private var contributorDpList: MutableList<String> = mutableListOf()
     private var TagList: MutableList<Tag> = mutableListOf()
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
+    private var diffLevel = 0
+    private var tagIdList: ArrayList<String> = ArrayList()
 
-    private var tagIdList = ArrayList<String?>()
+    private val viewModel: CreateTaskViewModel by viewModels()
 
-    private lateinit var segmentText :String
+    private lateinit var segmentText: String
     private val selectedTags = mutableListOf<Tag>()
-    private var showsheet=false
+    private var showsheet = false
 
 
     private val binding: ActivityCreateTaskBinding by lazy {
@@ -79,68 +100,87 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         Codes.STRINGS.segmentText = ""
 
 
-        OList = mutableListOf(
-            User(
-                "https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj",
-                "armax",
-                "android",
-                "url1"
-            ),
-            User(
-                "https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*",
-                "abhishek",
-                "android",
-                "url2"
-            ),
-            User("https://picsum.photos/200", "vivek", "design", "url3"),
-            User("https://picsum.photos/300", "lalit", "web", "url4"),
-            User("https://picsum.photos/350", "yogita", "design", "url5"),
-            User("https://picsum.photos/450", "aditi", "design", "url6"),
-        )
-        TagList = mutableListOf(
-            Tag(
-                tagText = "Critical",
-                bgColor = Colors.WHITE,
-                textColor = Colors.BLACK,
-                tagID = "1111"
-            ),
-            Tag(tagText = "Bug", bgColor = Colors.RED, textColor = Colors.WHITE, tagID = "2222"),
-            Tag(
-                tagText = "Feature",
-                bgColor = Colors.BLUE,
-                textColor = Colors.WHITE,
-                tagID = "3333"
-            ),
-            Tag(tagText = "New", bgColor = Colors.GREEN, textColor = Colors.BLACK, tagID = "4444"),
-        )
+        binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
 
-        val testTask = Task(
-            Faker().animal().scientificName().toString(),
-            Faker().code().asin(),
-            id = "",
-            1,
-            emptyList(),
-            1,
-            1,
-            emptyList(),
-            "userid1",
-            "01/04/2023",
-            duration = "3Hr+",
-            project_ID = "Versa",
-            segment = "Development",
-            section = "TaskSection4",
-        )
+            if (binding.tvTitle.text!!.isEmpty() ||
+                binding.tvDescription.text!!.isEmpty() ||
+                binding.startDate.text == "Set Start Date" ||
+                binding.endDate.text == "Set Deadline Date" ||
+                binding.duration.text == "Set Duration" ||
+                binding.segment.text == "Set Segment" ||
+                binding.section.text == "Set Section" ||
+                binding.chipGroup.isEmpty() ||
+                binding.contributorsRecyclerView.isEmpty() ||
+                diffLevel == 0
+            ) {
+                val currentTimestamp = Timestamp.now()
+                Log.d("TimeStampCheck", currentTimestamp.toString())
+                Toast.makeText(this, "Pls complete the entries", Toast.LENGTH_SHORT).show()
+
+            } else {
+                val currentUser= PrefManager.getcurrentUserdetails()
+                val task = Task(
+                    id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
+                    title = binding.tvTitle.text.toString(),
+                    description = binding.tvDescription.text.toString(),
+                    difficulty = diffLevel,
+                    assignee = contributorList,
+                    assigner = currentUser.USERNAME,
+                    deadline = binding.endDate.text.toString(),
+                    duration = binding.duration.text.toString(),
+                    assigner_email = currentUser.EMAIL,
+                    tags = tagIdList,
+                    segment = binding.segment.text.toString(),
+                    section = binding.section.text.toString(),
+                    time_STAMP = Timestamp.now(),
+                    completed = false,
+                )
+
+                viewModel.addTaskThroughRepository(task)
+
+                Log.d("taskCheck", task.toString())
+
+                Toast.makeText(this, "Task Created", Toast.LENGTH_SHORT).show()
+
+                onBackPressedDispatcher.onBackPressed()
+                finish()
+            }
+
+
+        }
 
         // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
 
+
+        binding.diffChipGp.setOnCheckedChangeListener { group, checkedId ->
+            // Handle chip selection change
+            val selectedChip = findViewById<Chip>(checkedId)
+            // Do something with the selected chip
+            if (!selectedChip.isNull) {
+                if (selectedChip.text == "Easy") {
+                    diffLevel = 1
+                } else if (selectedChip.text == "Medium") {
+                    diffLevel = 2
+                } else if (selectedChip.text == "Difficult") {
+                    diffLevel = 3
+                }
+            }
+        }
+
+
         binding.duration.setOnClickThrottleBounceListener {
 //            viewmodel.createTask(testTask)
+
+            val durationBottomSheet = setDurationBottomSheet()
+            durationBottomSheet.durationAddedListener = this
+            durationBottomSheet.show(supportFragmentManager, "duration")
+
         }
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
 
-            val userListBottomSheet = UserlistBottomSheet(OList, this)
-            userListBottomSheet.show(supportFragmentManager, "OList")
+            val userListBottomSheet = UserlistBottomSheet(this)
+            userListBottomSheet.show(supportFragmentManager, "contributer list")
 
         }
 
@@ -154,21 +194,23 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         binding.section.setOnClickThrottleBounceListener {
 
-            if (Codes.STRINGS.segmentText == ""){
-                Toast.makeText(this,"First please select segment",Toast.LENGTH_SHORT).show()
-            }
-            else{
+            if (Codes.STRINGS.segmentText == "") {
+                Toast.makeText(this, "First please select segment", Toast.LENGTH_SHORT).show()
+            } else {
                 val sections = sectionDisplayBottomSheet()
-                sections.show(supportFragmentManager, "Segment Selection")
+                sections.sectionSelectionListener = this
+                sections.show(supportFragmentManager, "Section Selection")
             }
         }
 
         binding.addtags.setOnClickThrottleBounceListener {
-            val addTagsBottomSheet = AddTagsBottomSheet(TagList, this@CreateTaskActivity,selectedTags)
+            val addTagsBottomSheet =
+                AddTagsBottomSheet(TagList, this@CreateTaskActivity, selectedTags)
             addTagsBottomSheet.show(supportFragmentManager, "OList")
         }
-        if (showsheet){
-            val addTagsBottomSheet = AddTagsBottomSheet(TagList, this@CreateTaskActivity,selectedTags)
+        if (showsheet) {
+            val addTagsBottomSheet =
+                AddTagsBottomSheet(TagList, this@CreateTaskActivity, selectedTags)
             addTagsBottomSheet.show(supportFragmentManager, "OList")
         }
 
@@ -177,7 +219,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
 
     }
-
 
 
     private fun setUpLiveData() {
@@ -234,10 +275,11 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             enddatePickerDialog.show()
         }
     }
+
     private fun updateChipGroup() {
         val chipGroup = binding.chipGroup
         chipGroup.removeAllViews()
-        Log.d("select",selectedTags.toString())
+        Log.d("select", selectedTags.toString())
         for (tag in selectedTags) {
             val chip = Chip(this)
             chip.text = tag.tagText
@@ -246,18 +288,18 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             chip.setTextColor(ColorStateList.valueOf(Color.parseColor(tag.textColor)))
             chip.setOnCloseIconClickListener {
                 selectedTags.remove(tag)
-                if (TagList.contains(tag)){
-                    val index=TagList.indexOf(tag)
-                    TagList[index].checked=false
+                if (TagList.contains(tag)) {
+                    val index = TagList.indexOf(tag)
+                    TagList[index].checked = false
                 }
                 updateChipGroup()
             }
             chipGroup.addView(chip)
             chip.setOnClickListener {
                 selectedTags.remove(tag)
-                if (TagList.contains(tag)){
-                    val index=TagList.indexOf(tag)
-                    TagList[index].checked=false
+                if (TagList.contains(tag)) {
+                    val index = TagList.indexOf(tag)
+                    TagList[index].checked = false
                 }
                 updateChipGroup()
 
@@ -329,44 +371,50 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     override fun removeClick(user: User, position: Int) {
+        contriList = UserlistBottomSheet.DataHolder.users
         contriAdapter.removeUser(user)
-        val pos = OList.indexOf(user)
-        OList[pos].isChecked = false
+        val pos = UserlistBottomSheet.DataHolder.users.indexOf(user)
+        UserlistBottomSheet.DataHolder.users[pos].isChecked = false
     }
 
     override fun onSelectedContributors(contributor: User, isChecked: Boolean) {
         if (isChecked) {
             if (!contriAdapter.isUserAdded(contributor)) {
                 contriAdapter.addUser(contributor)
+                contributorList.add(contributor.firebaseID)
+                contributorDpList.add(contributor.profileIDUrl)
             }
         } else {
             contriAdapter.removeUser(contributor)
+            contributorList.remove(contributor.firebaseID)
+            contributorDpList.remove(contributor.profileIDUrl)
         }
     }
+
 
     override fun onTListUpdated(TList: MutableList<User>) {
-        OList.clear()
-        OList = TList
+        UserlistBottomSheet.DataHolder.users.clear()
+        UserlistBottomSheet.DataHolder.users = TList
     }
 
-    override fun onSelectedTags(tag: Tag,isChecked: Boolean) {
+    override fun onSelectedTags(tag: Tag, isChecked: Boolean) {
         if (isChecked) {
             selectedTags.add(tag)
-            tagIdList.add(tag.tagID)
+            tag.tagID?.let { tagIdList.add(it) }
             updateChipGroup()
-        }
-        else{
+        } else {
             selectedTags.remove(tag)
-            tagIdList.remove(tag.tagID)
+            tag.tagID?.let { tagIdList.remove(it) }
             updateChipGroup()
         }
 
         Log.d("checktagIds", tagIdList.toString())
+
     }
 
     override fun onTagListUpdated(tagList: MutableList<Tag>) {
         TagList.clear()
-        TagList=tagList
+        TagList = tagList
     }
 
     override fun onSegmentSelected(segmentName: String) {
@@ -375,6 +423,14 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     override fun sendSectionsList(list: MutableList<String>) {
+    }
+
+    override fun onDurationAdded(duration: String) {
+        binding.duration.text = duration
+    }
+
+    override fun onSectionSelected(sectionName: String) {
+        binding.section.text = sectionName
     }
 
 
