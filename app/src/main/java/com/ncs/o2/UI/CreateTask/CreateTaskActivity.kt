@@ -30,6 +30,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.LoginScreen.LoginScreenViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
@@ -63,7 +64,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private var TagList: MutableList<Tag> = mutableListOf()
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
     private var diffLevel = 0
-    private var tagIdList: List<String> = listOf()
+    private var tagIdList: ArrayList<String> = ArrayList()
 
     private val viewModel: CreateTaskViewModel by viewModels()
 
@@ -117,15 +118,17 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 Toast.makeText(this, "Pls complete the entries", Toast.LENGTH_SHORT).show()
 
             } else {
+                val currentUser= PrefManager.getcurrentUserdetails()
                 val task = Task(
-                    id = "#T${RandomIDGenerator.generateRandomTaskId(7)}",
+                    id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                     title = binding.tvTitle.text.toString(),
                     description = binding.tvDescription.text.toString(),
                     difficulty = diffLevel,
                     assignee = contributorList,
+                    assigner = currentUser.USERNAME,
                     deadline = binding.endDate.text.toString(),
                     duration = binding.duration.text.toString(),
-                    assigner_email = FirebaseAuth.getInstance().currentUser?.email!!,
+                    assigner_email = currentUser.EMAIL,
                     tags = tagIdList,
                     segment = binding.segment.text.toString(),
                     section = binding.section.text.toString(),
@@ -397,11 +400,11 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onSelectedTags(tag: Tag, isChecked: Boolean) {
         if (isChecked) {
             selectedTags.add(tag)
-            tagIdList = listOf((tagIdList + tag.tagID).toString())
+            tag.tagID?.let { tagIdList.add(it) }
             updateChipGroup()
         } else {
             selectedTags.remove(tag)
-            tagIdList = listOf((tagIdList - tag.tagID).toString())
+            tag.tagID?.let { tagIdList.remove(it) }
             updateChipGroup()
         }
 
