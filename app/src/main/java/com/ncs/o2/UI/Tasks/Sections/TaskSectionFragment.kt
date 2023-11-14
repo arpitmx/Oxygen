@@ -75,19 +75,19 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         projectName = PrefManager.getcurrentProject()
         segmentName = PrefManager.getcurrentsegment()
         setupViews()
+        showLoader(1)
 
     }
 
     private fun setupViews() {
 
-        if (segmentName=="Select Segment"){
+        if (segmentName == "Select Segment") {
             binding.placeholderText.visible()
             binding.layout.gone()
             activityBinding.gioActionbar.tabLayout.gone()
             activityBinding.gioActionbar.searchCont.gone()
             activityBinding.gioActionbar.line.gone()
-        }
-        else {
+        } else {
             binding.placeholderText.gone()
             binding.layout.visible()
             activityBinding.gioActionbar.tabLayout.visible()
@@ -97,15 +97,51 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         }
     }
 
+    private fun showLoader(show : Int){
+
+        if (show == 1){
+
+            // Tasks loading
+
+            binding.layout.visible()
+            binding.progressbarBlock.visible()
+
+            binding.recyclerView.gone()
+            binding.placeholder.gone()
+
+        }else if (show == 0){
+
+            //Tasks loaded
+
+            binding.layout.visible()
+            binding.recyclerView.visible()
+
+            binding.progressbarBlock.gone()
+            binding.placeholder.gone()
+
+        }else if (show == -1){
+
+            //Empty tasks
+
+            binding.layout.gone()
+            binding.recyclerView.gone()
+            binding.progressbarBlock.gone()
+
+            binding.placeholder.visible()
+
+        }
+    }
+
+
     private fun setupRecyclerView() {
 
-        taskList = ArrayList<TaskItem>()
+        taskList = ArrayList()
 
         viewModel.getTasksItemsForSegment(projectName, segmentName, sectionName) { result ->
             when (result) {
                 is ServerResult.Success -> {
 
-                    binding.lottieProgressInclude.progressbarBlock.gone()
+                    showLoader(1)
 
                     val task = result.data
                     taskList.clear()
@@ -115,12 +151,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     }
 
                     if (taskList.isEmpty()) {
-                        binding.layout.gone()
-                        binding.placeholder.visible()
+
+                       showLoader(-1)
 
                     } else {
-                        binding.layout.visible()
-                        binding.placeholder.gone()
 
                         recyclerView = binding.recyclerView
                         taskListAdapter = TaskListAdapter(firestoreRepository)
@@ -128,7 +162,8 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                         taskListAdapter.notifyDataSetChanged()
 
                         taskListAdapter.setOnClickListener(this)
-                        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                        val layoutManager =
+                            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                         layoutManager.reverseLayout = false
                         with(recyclerView) {
                             this.layoutManager = layoutManager
@@ -154,32 +189,33 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                                 }
                             }
                         })
+
+                        showLoader(0)
+
                     }
-
-
-
 
                 }
 
                 is ServerResult.Failure -> {
                     val errorMessage = result.exception.message
-                    binding.lottieProgressInclude.progressbarBlock.gone()
-                    util.singleBtnDialog("Failure",
-                        "Failure in loading tasks, try again","Reload"
+                    showLoader(-1)
+                    util.singleBtnDialog(
+                        "Failure",
+                        "Failure in loading tasks, try again", "Reload"
                     ) {
                         setupRecyclerView()
                     }
                 }
 
                 is ServerResult.Progress -> {
-                    binding.lottieProgressInclude.progressbarBlock.gone()
-                    binding.layout.gone()
-                    binding.placeholder.visible()
+                    showLoader(1)
                 }
 
             }
 
         }
+
+
 
 
         activityBinding.gioActionbar.filterBtn.setOnClickListener {
@@ -230,6 +266,9 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
 
     }
+
+
+
 
     private fun showSearch() {
         searchCont.visible()

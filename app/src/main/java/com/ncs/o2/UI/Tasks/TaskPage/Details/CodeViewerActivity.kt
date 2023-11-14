@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.graphics.Color
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityCodeViewerBinding
@@ -50,6 +51,8 @@ class CodeViewerActivity : AppCompatActivity() {
                 .withCode(receivedCode)
                 .withFont(Font.Consolas)
                 .withTheme(ColorTheme.MONOKAI))
+
+            binding.codeView.setupShadows(true)
 
         }
 

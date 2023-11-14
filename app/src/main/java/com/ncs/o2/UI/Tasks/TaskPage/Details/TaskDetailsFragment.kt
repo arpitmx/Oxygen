@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Details
 
+import com.ncs.o2.R
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -16,7 +17,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -41,7 +42,6 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment
@@ -57,7 +57,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.shouheng.utils.app.ActivityUtils.overridePendingTransition
 import net.datafaker.Faker
 import timber.log.Timber
 import java.util.Date
@@ -300,7 +299,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         }
         binding.taskStatus.text = statusText
 
-        binding.duration.text = "${task.duration}Hr+"
+        binding.duration.text = "${task.duration}"
 
         val difficultyText = when (task.difficulty) {
             1 -> "Easy"
@@ -341,14 +340,22 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         val css: InternalStyleSheet = Github()
 
+
+
+
+
         with(css) {
-            addRule("body", "background-color: #202020")
+            addFontFace("o2font", "normal", "normal", "normal", "url('file:///android_res/font/sfregular.ttf')")
+            addRule("body","font-family:o2font")
+            addRule("body","font-size:17px")
+            addRule("body", "background-color: #131313")
             addRule("body", "color: #fff")
             addRule("body", "padding: 0px 0px 0px 0px")
             addRule("a", "color: #86ff7c")
             addRule("pre", "border: 1px solid #000;")
             addRule("pre", "border-radius: 4px;")
             addRule("pre", "overflow:auto")
+            addRule("pre", "white-space: pre-line")
 
         }
 
@@ -359,11 +366,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             override fun onPageFinished(view: WebView?, url: String?) {
                 binding.descriptionProgressbar.gone()
                 binding.markdownView.visible()
-                view?.evaluateJavascript(script){}
+                view?.evaluateJavascript(script) {}
             }
         }
 
-        binding.markdownView.addJavascriptInterface(AndroidToJsInterface(),"send")
+        binding.markdownView.addJavascriptInterface(AndroidToJsInterface(), "send")
         binding.markdownView.loadMarkdown(description)
 
     }
@@ -375,9 +382,12 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             requireActivity().runOnUiThread {
 
                 val codeViewerIntent = Intent(requireActivity(), CodeViewerActivity::class.java)
-                codeViewerIntent.putExtra(Endpoints.CodeViewer.CODE,codeText)
+                codeViewerIntent.putExtra(Endpoints.CodeViewer.CODE, codeText.trimIndent().trim())
                 startActivity(codeViewerIntent)
-                requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                requireActivity().overridePendingTransition(
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_left
+                )
             }
         }
     }
@@ -557,8 +567,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             }
         }
     }
-
-
 
 
 }

@@ -27,6 +27,7 @@ import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.versa.Constants.Endpoints
@@ -792,7 +793,11 @@ class FirestoreRepository @Inject constructor(
                     val firebaseID = document.getString("EMAIL")
                     val profileDPUrl = document.getString("DP_URL")
                     val name = document.getString("USERNAME")!!
-                    val time = document.get("TIMESTAMP") as Timestamp
+                    var time = document.get("TIMESTAMP") as Timestamp?
+                    if (time.isNull){
+                        time = Timestamp.now()
+                    }
+
                     val designation = document.getString("DESIGNATION")
                     val user = User(
                         firebaseID = firebaseID!!,

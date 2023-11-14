@@ -22,6 +22,8 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION :
 
 */
+
+// Todo Remove deprecated fields like assigner
 data class Task(
 
     val title: String = "",

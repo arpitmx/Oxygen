@@ -21,4 +21,6 @@
     <dimen name="padding_left_offset">20dp</dimen>
     <dimen name="padding_start_task_create">10dp</dimen>
     <dimen name="selector_gap">10dp</dimen>
+    <dimen name="bottm_navigation_offset">40dp</dimen>
+    <dimen name="padding_start_task_details">15dp</dimen>
 </resources>

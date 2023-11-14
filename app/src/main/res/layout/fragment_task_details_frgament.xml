@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkTheme_bg"
+    android:background="@color/darkbg_main_a80"
     android:orientation="vertical"
     tools:context=".UI.Tasks.TaskPage.Details.TaskDetailsFragment">
 
@@ -12,7 +12,7 @@
         android:id="@+id/progress_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F5131313"
+        android:background="#F5000000"
         android:elevation="5dp"
         android:visibility="visible">
 
@@ -23,7 +23,7 @@
             android:layout_gravity="center"
             android:elevation="3dp"
             android:indeterminate="true"
-            android:indeterminateTint="#03A9F4"
+            android:indeterminateTint="@color/primary"
             android:scaleX="0.2"
             android:scaleY="0.2"
             android:visibility="visible"
@@ -39,11 +39,10 @@
         android:layout_height="match_parent"
         android:clipToPadding="true"
         android:elevation="2dp"
-        android:paddingTop="10dp"
         android:nestedScrollingEnabled="true"
+        android:paddingTop="10dp"
         android:scrollbarThumbVertical="@color/border_grey"
         android:visibility="visible">
-
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linearLayoutCompat2"
@@ -72,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="start"
-                    android:paddingStart="10dp"
+                    android:paddingStart="@dimen/padding_start_task_details"
                     android:paddingEnd="10dp"
                     android:text="Versa needs revamp for its appbar design"
                     android:textColor="@color/better_white"
@@ -89,7 +88,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="@dimen/padding_start_task_details"
                         android:background="@drawable/card_view_background"
                         android:fontFamily="@font/sf_pro_display_medium"
                         android:gravity="center"
@@ -138,7 +137,7 @@
                     android:layout_marginBottom="10dp"
                     android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start"
-                    android:paddingStart="10dp"
+                    android:paddingStart="@dimen/padding_start_task_details"
                     android:paddingEnd="10dp"
                     android:text="Alok created this task 2 days ago"
                     android:textColor="@color/better_white"
@@ -155,28 +154,15 @@
                 android:layout_marginEnd="15dp"
                 android:background="#56838383" />
 
-            <TextView
-                android:id="@+id/description_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_display_regular"
-                android:gravity="start"
-                android:layout_margin="10dp"
-                android:padding="10dp"
-                android:textColor="@color/darkbg_main"
-                android:background="@color/better_white"
-                android:textSize="18dp"
-                android:visibility="gone" />
-
             <ProgressBar
                 android:id="@+id/description_progressbar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:elevation="3dp"
-                android:indeterminate="true"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
+                android:elevation="3dp"
+                android:indeterminate="true"
                 android:indeterminateTint="#03A9F4"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -186,38 +172,11 @@
                 android:id="@+id/markdown_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/card_view_background_white_outline"
-                android:visibility="gone"
-                app:escapeHtml="false"
                 android:layout_marginTop="10dp"
+                android:background="@drawable/card_view_background_white_outline"
                 android:nestedScrollingEnabled="true"
-                />
-
-            <WebView
-                android:id="@+id/webview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:gravity="start"
-                android:padding="10dp"
                 android:visibility="gone"
-
-                />
-
-            <!--                <HorizontalScrollView-->
-            <!--                    android:layout_width="match_parent"-->
-            <!--                    android:layout_height="match_parent">-->
-
-            <!--                    <androidx.compose.ui.platform.ComposeView-->
-            <!--                        android:id="@+id/markdownView"-->
-            <!--                        android:layout_width="match_parent"-->
-            <!--                        android:layout_height="match_parent"-->
-            <!--                        android:padding="10dp"-->
-            <!--                        android:background="@color/secondary_bg_black"-->
-            <!--                        />-->
-
-            <!--                </HorizontalScrollView>-->
-
+                app:escapeHtml="false" />
 
             <View
                 android:layout_width="match_parent"
