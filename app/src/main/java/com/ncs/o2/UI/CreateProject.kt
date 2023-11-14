@@ -7,9 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.compose.ui.text.toLowerCase
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -21,11 +18,9 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
-import com.ncs.o2.R
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
-import com.ncs.o2.UI.UIComponents.BottomSheets.UserlistBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateProjectBinding
-import java.util.Random
 
 class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback, UserlistBottomSheet.getContributorsCallback {
     private var OList: MutableList<User> = mutableListOf()
@@ -61,7 +56,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             User("https://picsum.photos/450","aditi","design","url6"),
         )
         binding.addModeratorsBtn.setOnClickThrottleBounceListener{
-            val userListBottomSheet = UserlistBottomSheet(OList,this)
+            val userListBottomSheet = UserlistBottomSheet(this)
             userListBottomSheet.show(supportFragmentManager, "OList")
         }
 
