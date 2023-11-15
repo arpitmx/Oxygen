@@ -366,14 +366,14 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         binding.markdownView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
-                binding.descriptionProgressbar.gone()
-                binding.markdownView.visible()
                 view?.evaluateJavascript(script) {}
             }
         }
 
         binding.markdownView.addJavascriptInterface(AndroidToJsInterface(), "send")
         binding.markdownView.loadMarkdown(description)
+        binding.descriptionProgressbar.gone()
+        binding.markdownView.visible()
 
     }
 
