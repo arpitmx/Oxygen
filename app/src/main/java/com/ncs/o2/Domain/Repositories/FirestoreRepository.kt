@@ -641,28 +641,6 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
-
-    override fun getSection(
-        projectName: String,
-        segmentName: String,
-        result: (ServerResult<List<*>>) -> Unit
-    ) {
-
-        firestore.collection(Endpoints.PROJECTS).document(projectName)
-            .collection(Endpoints.Project.SEGMENT).document(segmentName)
-            .get()
-            .addOnSuccessListener {
-//                val section_list = mutableListOf<String>()
-                if (it.exists()) {
-                    val section_list = it.get("sections") as List<*>
-                    result(ServerResult.Success(section_list))
-                }
-            }
-            .addOnFailureListener { exception ->
-                result(ServerResult.Failure(exception))
-            }
-    }
-
     fun getSegments(
         projectName: String, result: (ServerResult<List<Segment>>) -> Unit
     ) {
@@ -851,7 +829,7 @@ class FirestoreRepository @Inject constructor(
 
     override fun getUserTasks(
         sectionName: String,
-        serverResult: (ServerResult<List<String>?>, ) -> Unit
+        serverResult: (ServerResult<List<String>?>) -> Unit
     ) {
 
         firestore.collection(Endpoints.USERS)
@@ -994,17 +972,18 @@ class FirestoreRepository @Inject constructor(
                         assignee_DP_URL = assignee_DP_URL!!,
                         assignee_id = assignerID,
                     )
-                    Log.d("taskrepo",taskItem.toString())
+                    Log.d("taskrepo", taskItem.toString())
                     result(ServerResult.Success(taskItem))
                 }
 
-                }
             }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
-
     }
+
+
 }
+
 
 

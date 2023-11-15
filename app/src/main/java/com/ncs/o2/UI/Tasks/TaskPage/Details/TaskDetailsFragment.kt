@@ -349,6 +349,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             )
             addRule("body", "font-family:o2font")
             addRule("body", "font-size:17px")
+            addRule("body", "line-height:21px")
             addRule("body", "background-color: #131313")
             addRule("body", "color: #fff")
             addRule("body", "padding: 0px 0px 0px 0px")
