@@ -76,7 +76,8 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         })
 
         setUpViewPager(sectionsList)
-
+        activityBinding.gioActionbar.constraintLayout2.visible()
+        activityBinding.gioActionbar.constraintLayoutworkspace.gone()
     }
 
     private fun setUpViewPager(list:MutableList<String>) {

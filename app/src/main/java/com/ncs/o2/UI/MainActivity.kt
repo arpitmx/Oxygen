@@ -13,10 +13,14 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
@@ -30,7 +34,9 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.Assigned.AssignedFragment
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
+import com.ncs.o2.UI.DoneScreen.DoneFragment
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
@@ -38,6 +44,7 @@ import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -46,6 +53,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener  {
     private lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
+    lateinit var bottmNav: BottomNavigationView
 
     // ViewModels
     private val viewmodel: TaskSectionViewModel by viewModels()
@@ -89,6 +97,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Set up various views and components
         setUpProjects()
         setUpActionBar()
+        setBottomNavBar()
         setUpViewsOnClicks()
     }
 
@@ -146,6 +155,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             drawerLayout.openDrawer(gravity)
 
         }
+
 
         binding.gioActionbar.notifications.setOnClickThrottleBounceListener {
 
@@ -274,5 +284,38 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         projectListAdapter.notifyDataSetChanged()
     }
 
+    fun setBottomNavBar() {
+
+        bottmNav = binding.bottomNav
+        bottmNav.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+
+                R.id.assigned_item -> {
+                    replaceFragment(AssignedFragment())
+                    true
+                }
+
+                R.id.project_stats_item -> {
+                    replaceFragment(DoneFragment())
+                    true
+                }
+
+                else -> {
+                    replaceFragment(TasksHolderFragment())
+                    true
+                }
+            }
+
+
+        }
+
+    }
+    private fun replaceFragment(fragment: Fragment) {
+
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.nav_host_fragment_activity_main, fragment)
+        fragmentTransaction.commit()
+
+    }
 
 }

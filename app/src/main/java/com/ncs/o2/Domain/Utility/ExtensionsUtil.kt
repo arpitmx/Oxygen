@@ -1,5 +1,7 @@
 package com.ncs.o2.Domain.Utility
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -269,6 +271,20 @@ object ExtensionsUtil {
             }
         this.startAnimation(animation)
     }
+    fun View.set180(context: Context, animDuration: Long = 500L) {
+        clearAnimation()
+        val currentRotation = tag as? Float ?: 0f
+        val targetRotation = if (currentRotation == 0f) 180f else 0f
+        val rotationProperty = PropertyValuesHolder.ofFloat(View.ROTATION, currentRotation, targetRotation)
+        val animator = ObjectAnimator.ofPropertyValuesHolder(this, rotationProperty)
+            .apply {
+                duration = animDuration
+            }
+        tag = targetRotation
+
+        animator.start()
+    }
+
 
 
     fun View.rotateInfinity(context: Context) = run {
