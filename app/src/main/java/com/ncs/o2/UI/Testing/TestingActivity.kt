@@ -50,7 +50,6 @@ class TestingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        PrefManager.initialize(this)
 
         binding.goBtn.setOnClickThrottleBounceListener {
             binding.logs.text = "Logs will appear here..."

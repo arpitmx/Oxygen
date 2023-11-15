@@ -47,7 +47,6 @@ class CodeViewerActivity : AppCompatActivity() {
             code = receivedCode
 
             binding.codeView.setOptions(Options.Default.get(this)
-                .withLanguage("kotlin")
                 .withCode(receivedCode)
                 .withFont(Font.Consolas)
                 .withTheme(ColorTheme.MONOKAI))

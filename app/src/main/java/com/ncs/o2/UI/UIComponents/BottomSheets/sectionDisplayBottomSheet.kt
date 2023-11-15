@@ -46,7 +46,7 @@ class sectionDisplayBottomSheet() : BottomSheetDialogFragment(), sectionListAdap
         savedInstanceState: Bundle?
     ): View {
         binding = ActivitySectionDisplayBottomSheetBinding.inflate(inflater, container, false)
-        PrefManager.initialize(requireContext())
+
         fetchSegments(PrefManager.getcurrentProject())
         return binding.root
     }

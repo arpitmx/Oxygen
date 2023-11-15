@@ -281,7 +281,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun setUpView() {
 
-        PrefManager.initialize(this)
 
         binding.ivPicPreview.setOnClickThrottleBounceListener{
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {

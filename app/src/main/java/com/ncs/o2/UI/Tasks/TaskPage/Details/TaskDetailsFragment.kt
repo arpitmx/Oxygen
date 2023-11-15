@@ -1,6 +1,5 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Details
 
-import com.ncs.o2.R
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -17,7 +16,6 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +40,7 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment
@@ -341,16 +340,22 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         val css: InternalStyleSheet = Github()
 
         with(css) {
-            addFontFace("o2font", "normal", "normal", "normal", "url('file:///android_res/font/sfregular.ttf')")
-            addRule("body","font-family:o2font")
-            addRule("body","font-size:17px")
+            addFontFace(
+                "o2font",
+                "normal",
+                "normal",
+                "normal",
+                "url('file:///android_res/font/sfregular.ttf')"
+            )
+            addRule("body", "font-family:o2font")
+            addRule("body", "font-size:17px")
             addRule("body", "background-color: #131313")
             addRule("body", "color: #fff")
             addRule("body", "padding: 0px 0px 0px 0px")
             addRule("a", "color: #86ff7c")
             addRule("pre", "border: 1px solid #000;")
             addRule("pre", "border-radius: 4px;")
-            addRule("pre", "max-height: 350px;")
+            addRule("pre", "max-height: 400px;")
             addRule("pre", "overflow:auto")
             addRule("pre", "white-space: pre-line")
 

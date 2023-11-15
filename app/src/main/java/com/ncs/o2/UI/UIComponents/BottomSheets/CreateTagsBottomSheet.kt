@@ -65,7 +65,7 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
 
     }
     private fun setActionbar() {
-        PrefManager.initialize(requireContext())
+
         binding.closeBottmSheet.setOnClickThrottleBounceListener{
             dismiss()
         }

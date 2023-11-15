@@ -32,11 +32,6 @@ constructor(
         val TAG = "StartScreenViewModel"
     }
 
-    init {
-        PrefManager.initialize(application.applicationContext)
-    }
-
-
     private val _serverResultLiveData = MutableLiveData<ServerResult<List<Notification>>>()
     val serverResultLiveData: LiveData<ServerResult<List<Notification>>> get() = _serverResultLiveData
 

@@ -59,7 +59,7 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
 
     override fun onViewCreated( view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        PrefManager.initialize(requireContext())
+
         val current_project=PrefManager.getcurrentProject()
 
         binding.doneButton.setOnClickThrottleBounceListener{

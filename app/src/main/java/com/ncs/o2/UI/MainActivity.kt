@@ -239,7 +239,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         // Handle click on a project in the list
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
-        PrefManager.initialize(this)
         PrefManager.setcurrentsegment("Select Segment")
         binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
 

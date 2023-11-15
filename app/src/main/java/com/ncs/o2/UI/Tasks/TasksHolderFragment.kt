@@ -59,7 +59,6 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        PrefManager.initialize(requireContext())
         segmentName=PrefManager.getcurrentsegment()
 
         val sectionsList = PrefManager.getsectionsList().toMutableList()
@@ -82,7 +81,6 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
     private fun setUpViewPager(list:MutableList<String>) {
 
-        PrefManager.initialize(requireContext())
         val adapter = TaskSectionViewPagerAdapter(this, list.size,list)
         binding.viewPager2.adapter = adapter
         setUpTabsLayout(list)
