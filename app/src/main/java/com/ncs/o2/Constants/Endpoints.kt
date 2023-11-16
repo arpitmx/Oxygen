@@ -39,6 +39,12 @@ object Endpoints {
         const val DETAILS_ADDED = "DETAILS_ADDED"
         const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_LAST_SEEN"
 
+
+    }
+    object Workspace{
+        const val WORKSPACE="WORKSPACE"
+        const val STATUS="STATUS"
+        const val ID="ID"
     }
 
     object Project{

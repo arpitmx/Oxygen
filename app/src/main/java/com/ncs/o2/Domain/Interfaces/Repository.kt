@@ -13,6 +13,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
+import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.UI.StartScreen.maintainceCheck
 
 /*
@@ -68,7 +69,6 @@ interface Repository {
 
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
-    fun getSection(projectName: String, segmentName: String, result: (ServerResult<List<*>>) -> Unit)
 
     fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit)
     fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)
@@ -76,7 +76,7 @@ interface Repository {
     //Project related
     fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit)
 
-    fun getUserTasks(sectionName:String,serverResult: (ServerResult<List<String>?>) -> Unit)
+    fun getUserTasks(sectionName: String, serverResult: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit)
     fun getSection(projectName: String, segmentName: String, result: (ServerResult<List<*>>) -> Unit)
     fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit)
 

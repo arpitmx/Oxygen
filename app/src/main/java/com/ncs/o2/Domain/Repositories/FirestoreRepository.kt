@@ -27,6 +27,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
+import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
@@ -642,26 +643,6 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    override fun getSection(
-        projectName: String,
-        segmentName: String,
-        result: (ServerResult<List<*>>) -> Unit
-    ) {
-
-        firestore.collection(Endpoints.PROJECTS).document(projectName)
-            .collection(Endpoints.Project.SEGMENT).document(segmentName)
-            .get()
-            .addOnSuccessListener {
-//                val section_list = mutableListOf<String>()
-                if (it.exists()) {
-                    val section_list = it.get("sections") as List<*>
-                    result(ServerResult.Success(section_list))
-                }
-            }
-            .addOnFailureListener { exception ->
-                result(ServerResult.Failure(exception))
-            }
-    }
 
     fun getSegments(
         projectName: String, result: (ServerResult<List<Segment>>) -> Unit
@@ -851,27 +832,31 @@ class FirestoreRepository @Inject constructor(
 
     override fun getUserTasks(
         sectionName: String,
-        serverResult: (ServerResult<List<String>?>, ) -> Unit
+        serverResult: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit
     ) {
-
+        val user = FirebaseAuth.getInstance().currentUser?.email!!
         firestore.collection(Endpoints.USERS)
-            .document(FirebaseAuth.getInstance().currentUser?.email!!).collection("Workspace")
-            .document(sectionName)
+            .document(user)
+            .collection(Endpoints.Workspace.WORKSPACE)
+            .whereEqualTo(Endpoints.Workspace.STATUS, sectionName)
             .get()
             .addOnSuccessListener { querySnapshot ->
-                val taskIds: List<Any>
-                if (querySnapshot.get("taskIds") == null) {
-                    serverResult(ServerResult.Success(emptyList()))
-                } else {
-                    taskIds = querySnapshot.get("taskIds") as List<String>
-                    serverResult(ServerResult.Success(taskIds))
+                val workspaceTaskItemList = mutableListOf<WorkspaceTaskItem>()
+
+                for (document in querySnapshot.documents) {
+                    val id=document.getString(Endpoints.Workspace.ID)
+                    val status=document.getString(Endpoints.Workspace.STATUS)
+                    val workspaceTaskItem = WorkspaceTaskItem(ID = id!!, STATUS = status!!)
+                    workspaceTaskItemList.add(workspaceTaskItem)
                 }
 
+                serverResult(ServerResult.Success(workspaceTaskItemList))
             }
             .addOnFailureListener { exception ->
                 serverResult(ServerResult.Failure(exception))
             }
     }
+
 
     override suspend fun postTags(
         tag: Tag,
@@ -999,11 +984,9 @@ class FirestoreRepository @Inject constructor(
                 }
 
                 }
-            }
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
-
     }
 }
 

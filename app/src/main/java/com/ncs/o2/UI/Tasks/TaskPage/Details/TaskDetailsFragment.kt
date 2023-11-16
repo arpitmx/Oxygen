@@ -10,6 +10,7 @@ import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
 import com.google.android.flexbox.FlexDirection
@@ -325,7 +328,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private val javascriptCode = "javascript:document.a.style.background= #000;"
     val script = """
-     var allPreTags = document.querySelectorAll('pre');
+    var allPreTags = document.querySelectorAll('pre');
 
     allPreTags.forEach(function(preTag) {
       preTag.addEventListener('click', function() {
@@ -334,6 +337,19 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
        
       });
     });
+    
+    var allImgTags = document.querySelectorAll('img');
+    var imgArray = [];
+
+    allImgTags.forEach(function(imgTag) {
+    // Check if the element is an img tag directly
+        if (imgTag.tagName.toLowerCase() === 'img' && imgTag.parentElement.tagName.toLowerCase() !== 'pre') {
+        imgArray.push(imgTag.src);
+    }
+});
+
+    send.sendImages(imgArray);
+
 """
 
     private fun setUpTaskDescription(description: String) {
@@ -385,6 +401,17 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                     R.anim.slide_in_left,
                     R.anim.slide_out_left
                 )
+            }
+        }
+
+        @JavascriptInterface
+        fun sendImages(imageUrls: Array<String>) {
+            requireActivity().runOnUiThread {
+                val recyclerView = binding.imageRecyclerView
+                recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+                Log.d("list",imageUrls.toMutableList().toString())
+                val adapter = ImageAdapter(imageUrls.toMutableList())
+                recyclerView.adapter = adapter
             }
         }
     }
