@@ -15,6 +15,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
@@ -85,9 +88,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        PrefManager.initialize(this)
-
 
         setBallAnimator()
         setUpViews(TestingConfig.isTesting)
@@ -165,7 +165,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     private fun setBallAnimator() {
 
         ball = binding.fragContainer
-        PrefManager.initialize(this)
 
 //        if (PrefManager.getDpUrl()!=null){
 //        Glide.with(this)
@@ -173,7 +172,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 //            .placeholder(R.drawable.profile_pic_placeholder)
 //            .error(R.drawable.logogradhd)
 //            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
-//            .into(ball)
+//            .into(binding.ball)
 //        }
 
         ball.rotateInfinity(this)
@@ -349,10 +348,12 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                 if (dp_url_pref==null){
                     PrefManager.setDpUrl(dp_url)
-                }else if (dp_url_pref!=dp_url){
+                }else if (dp_url_pref!=dp_url) {
                     Timber.tag(TAG).d("New DP is avaialable : ${dp_url}")
                     PrefManager.setDpUrl(dp_url)
                 }
+
+                PrefManager.setDpUrl(dp_url)
 
                 if (isDetailsAdded == null) {
                     showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL, Exception("No details added"))

@@ -47,7 +47,6 @@ interface ProjectCallback{
 
      init {
         this.mInflator = LayoutInflater.from(context)
-         PrefManager.initialize(context)
          selectedPosition=PrefManager.getcurrentRadioButton()
     }
 

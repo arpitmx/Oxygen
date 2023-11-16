@@ -66,7 +66,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         savedInstanceState: Bundle?
     ): View {
         binding = SegmetSelectionBottomSheetBinding.inflate(inflater, container, false)
-        PrefManager.initialize(requireContext())
+
         fetchSegments(PrefManager.getcurrentProject())
         return binding.root
     }
@@ -123,7 +123,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
 
     override fun onClick(segment: Segment, position: Int) {
         Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
-        PrefManager.initialize(requireContext())
+
         PrefManager.setcurrentsegment(segment.segment_NAME)
         segmentName=segment.segment_NAME
         sendsectionList(PrefManager.getcurrentProject())

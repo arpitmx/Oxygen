@@ -28,6 +28,7 @@ import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.StartScreen.maintainceCheck
@@ -147,7 +148,7 @@ class FirestoreRepository @Inject constructor(
                 }
             }
             .addOnFailureListener {
-                Log.d("checks", "failed")
+                Timber.tag("checks").d("failed")
             }
 
         return liveData
@@ -296,6 +297,7 @@ class FirestoreRepository @Inject constructor(
             }
         return liveData
     }
+
 
     ////////////////////////////// FIREBASE USER DP FUNCTIONALITY //////////////////////////
 
@@ -475,9 +477,11 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+
     override suspend fun addTask(task: Task) {
         try {
-            firestore.collection(Endpoints.PROJECTS).document(PrefManager.getcurrentProject()).collection(Endpoints.Project.TASKS).document(task.id).set(task)
+            firestore.collection(Endpoints.PROJECTS).document(PrefManager.getcurrentProject())
+                .collection(Endpoints.Project.TASKS).document(task.id).set(task)
                 .await()
 
         } catch (e: Exception) {
@@ -538,7 +542,10 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
-    override fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit) {
+    override fun editUserInfo(
+        userInfo: UserInfo,
+        serverResult: (ServerResult<UserInfo?>) -> Unit
+    ) {
 
         serverResult(ServerResult.Progress)
 
@@ -588,6 +595,7 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+
     override fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit) {
         return try {
 
@@ -630,25 +638,6 @@ class FirestoreRepository @Inject constructor(
             .addOnFailureListener {
                 Timber.tag(TAG).d("Firestore Exception : ${it}")
                 result(ServerResult.Failure(it))
-            }
-    }
-
-
-
-    fun getSection(projectName: String, segmentName: String, result: (ServerResult<List<*>>) -> Unit){
-
-        firestore.collection(Endpoints.PROJECTS).document(projectName)
-            .collection(Endpoints.Project.SEGMENT).document(segmentName)
-            .get()
-            .addOnSuccessListener {
-//                val section_list = mutableListOf<String>()
-                if (it.exists()){
-                    val section_list = it.get("sections") as List<*>
-                    result(ServerResult.Success(section_list))
-                }
-            }
-            .addOnFailureListener {exception ->
-                result(ServerResult.Failure(exception))
             }
     }
 
@@ -735,7 +724,12 @@ class FirestoreRepository @Inject constructor(
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
                     val duration = document.getString("duration")
-                    val time = document.get("time_STAMP") as Timestamp
+                    var time = document.get("time_STAMP") as Timestamp
+
+                    if (time == null) {
+                        time = Timestamp.now()
+                    }
+
                     val completed = document.getBoolean("completed")
                     if (document.getString("assigner_email") != null) {
                         assignerID = document.getString("assigner_email")!!
@@ -784,17 +778,17 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    fun getContributors(projectName: String, result: (ServerResult<List<String>>) -> Unit){
+    fun getContributors(projectName: String, result: (ServerResult<List<String>>) -> Unit) {
         firestore.collection(Endpoints.PROJECTS).document(projectName)
             .get()
-            .addOnSuccessListener {data->
+            .addOnSuccessListener { data ->
 //                val section_list = mutableListOf<String>()
-                if (data.exists()){
+                if (data.exists()) {
                     val contributor_list = data.get("contributors") as List<String>
                     result(ServerResult.Success(contributor_list))
                 }
             }
-            .addOnFailureListener {exception ->
+            .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
     }
@@ -810,19 +804,47 @@ class FirestoreRepository @Inject constructor(
                     val firebaseID = document.getString("EMAIL")
                     val profileDPUrl = document.getString("DP_URL")
                     val name = document.getString("USERNAME")!!
-//                    val time= document.get("TIMESTAMP") as Timestamp
+                    var time = document.get("TIMESTAMP") as Timestamp?
+                    if (time.isNull) {
+                        time = Timestamp.now()
+                    }
+
                     val designation = document.getString("DESIGNATION")
                     val user = User(
                         firebaseID = firebaseID!!,
                         profileDPUrl = profileDPUrl,
                         username = name,
-//                        timestamp = time,
+                        timestamp = time,
                         designation = designation!!
                     )
                     serverResult(ServerResult.Success(user))
                 } else {
                     serverResult(ServerResult.Failure(Exception("Document not found for title: $id")))
                 }
+            }
+            .addOnFailureListener { exception ->
+                serverResult(ServerResult.Failure(exception))
+            }
+    }
+
+    override fun getUserTasks(
+        sectionName: String,
+        serverResult: (ServerResult<List<String>?>) -> Unit
+    ) {
+
+        firestore.collection(Endpoints.USERS)
+            .document(FirebaseAuth.getInstance().currentUser?.email!!).collection("Workspace")
+            .document(sectionName)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val taskIds: List<Any>
+                if (querySnapshot.get("taskIds") == null) {
+                    serverResult(ServerResult.Success(emptyList()))
+                } else {
+                    taskIds = querySnapshot.get("taskIds") as List<String>
+                    serverResult(ServerResult.Success(taskIds))
+                }
+
             }
             .addOnFailureListener { exception ->
                 serverResult(ServerResult.Failure(exception))
@@ -857,9 +879,9 @@ class FirestoreRepository @Inject constructor(
         projectName: String,
     ): ServerResult<Task> {
 
-       return try {
+        return try {
 
-           val task =
+            val task =
                 firestore.collection(Endpoints.PROJECTS)
                     .document(projectName)
                     .collection(Endpoints.Project.TASKS)
@@ -875,18 +897,93 @@ class FirestoreRepository @Inject constructor(
 
                 taskData?.let {
                     return ServerResult.Success(it)
-                }?: ServerResult.Failure(Exception("Document not found for title: $id"))
+                } ?: ServerResult.Failure(Exception("Document not found for title: $id"))
 
             } else {
                 return ServerResult.Failure(Exception("Document not found for title: $id"))
             }
 
-       } catch (e: Exception) {
+        } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
 
     }
 
+    override fun getSection(
+        projectName: String,
+        segmentName: String,
+        result: (ServerResult<List<*>>) -> Unit
+    ) {
+
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.SEGMENT).document(segmentName)
+            .get()
+            .addOnSuccessListener {
+//                val section_list = mutableListOf<String>()
+                if (it.exists()) {
+                    val section_list = it.get("sections") as List<*>
+                    result(ServerResult.Success(section_list))
+                }
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
+    fun getTaskItembyId(
+        id: String,
+        projectName: String,
+        result: (ServerResult<TaskItem>) -> Unit
+    ) {
+
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+            .whereEqualTo("id", id)
+            .get()
+            .addOnSuccessListener { querySnapshot1 ->
+                if (querySnapshot1.documents.isEmpty()) {
+                    // Log or handle the case where no document is found
+                    Log.d("debuf", "No document found with ID: $id")
+                    result(ServerResult.Failure(Exception("Document not found")))
+                } else {
+                    val querySnapshot = querySnapshot1.documents[0]
+                    var assignerID: String
+                    val title = querySnapshot.getString("title")
+                    val id = querySnapshot.getString("id")
+                    val difficulty = querySnapshot.get("difficulty")
+                    val duration = querySnapshot.getString("duration")
+                    val time = querySnapshot.get("time_STAMP") as Timestamp
+                    val completed = querySnapshot.getBoolean("completed")
+                    if (querySnapshot.getString("assigner_email") != null) {
+                        assignerID = querySnapshot.getString("assigner_email")!!
+                    } else {
+                        assignerID = "mohit@mail.com"
+                    }
+                    val assignee_DP_URL = querySnapshot.getString("assignee_DP_URL")
+
+                    val taskItem = TaskItem(
+                        title = title!!,
+                        id = id!!,
+                        difficulty = difficulty.toString().toInt(),
+                        duration = duration!!,
+                        timestamp = time,
+                        completed = completed.toString().toBoolean(),
+                        assignee_DP_URL = assignee_DP_URL!!,
+                        assignee_id = assignerID,
+                    )
+                    Log.d("taskrepo", taskItem.toString())
+                    result(ServerResult.Success(taskItem))
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
 
 
 }
+
+
+

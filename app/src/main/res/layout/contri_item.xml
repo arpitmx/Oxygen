@@ -28,8 +28,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contriProfileImage"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
             android:src="@color/app_icon_background"
@@ -40,8 +40,8 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:id="@+id/remove"
             android:src="@drawable/remove"
             app:layout_constraintEnd_toEndOf="parent"
