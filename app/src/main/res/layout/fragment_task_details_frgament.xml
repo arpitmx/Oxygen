@@ -197,14 +197,22 @@
                 android:visibility="gone"
                 app:escapeHtml="false" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/imageRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_animation_popscale"
+                android:nestedScrollingEnabled="false" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="15dp"
                 android:background="#56838383" />
-
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -299,6 +307,8 @@
                 android:text="View comments and other activity"
                 android:textColor="@color/secondaryBlue"
                 android:textSize="16dp" />
+
+
 
 
             <TextView

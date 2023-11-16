@@ -5,6 +5,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -15,7 +16,7 @@ class AssignedViewModel @Inject constructor(private val firestoreRepository: Fir
 
     fun getUserTasksId(
         sectionName:String,
-        resultCallback: (ServerResult<List<String>?>) -> Unit
+        resultCallback: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit
     ) {
         firestoreRepository.getUserTasks(sectionName,resultCallback)
     }
