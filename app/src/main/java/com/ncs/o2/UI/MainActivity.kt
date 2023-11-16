@@ -99,6 +99,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setUpActionBar()
         setBottomNavBar()
         setUpViewsOnClicks()
+        setupProjectsList()
     }
 
     private fun setUpViewsOnClicks() {
@@ -208,8 +209,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private fun setUpProjects() {
 
         // Set up the list of projects and related UI components
-        binding.lottieProgressInclude.progressbarStrip.visible()
-        binding.lottieProgressInclude.progressbarBlock.gone()
+//        binding.lottieProgressInclude.progressbarStrip.visible()
+//        binding.lottieProgressInclude.progressbarBlock.gone()
 
         viewModel.fetchUserProjectsFromRepository()
         val user=PrefManager.getcurrentUserdetails()
@@ -225,24 +226,33 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
             .into(binding.drawerheaderfile.userDp)
 
-        viewModel.showprogressLD.observe(this) { show ->
-            if (show) {
-                binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
-            } else {
-                binding.lottieProgressInclude.progressLayout.progressGone(this, 400)
-            }
-        }
+//        viewModel.showprogressLD.observe(this) { show ->
+//            if (show) {
+//                binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
+//            } else {
+//                binding.lottieProgressInclude.progressLayout.progressGone(this, 400)
+//            }
+//        }
 
         viewModel.showDialogLD.observe(this) { data ->
             easyElements.singleBtnDialog(data[0], data[1],"OK",{})
         }
 
-        viewModel.projectListLiveData.observe(this) { projectList ->
+//        viewModel.projectListLiveData.observe(this) { projectList ->
+//
+//            projects=projectList!!.toMutableList()
+//            projectListAdapter = ListAdapter(this, projects)
+//            binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
+//        }
 
-            projects=projectList!!.toMutableList()
-            projectListAdapter = ListAdapter(this, projects)
-            binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
-        }
+
+
+
+    }
+    private fun setupProjectsList(){
+        projects=PrefManager.getProjectsList().toMutableList()
+        projectListAdapter=ListAdapter(this,projects)
+        binding.drawerheaderfile.projectlistView.adapter=projectListAdapter
     }
 
     override fun onClick(projectID: String, position: Int) {
