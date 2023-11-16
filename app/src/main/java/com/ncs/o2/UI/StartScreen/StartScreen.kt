@@ -89,9 +89,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        PrefManager.initialize(this)
-
-
         setBallAnimator()
         setUpViews(TestingConfig.isTesting)
 
@@ -168,7 +165,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     private fun setBallAnimator() {
 
         ball = binding.fragContainer
-        PrefManager.initialize(this)
 
 //        if (PrefManager.getDpUrl()!=null){
 //        Glide.with(this)

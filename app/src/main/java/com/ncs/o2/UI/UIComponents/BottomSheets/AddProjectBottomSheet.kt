@@ -55,7 +55,6 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
     }
 
     private fun setActionbar() {
-        PrefManager.initialize(requireContext())
         binding.closeBtn.setOnClickThrottleBounceListener{
             dismiss()
         }

@@ -71,7 +71,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TaskSectionViewModel::class.java)
-        PrefManager.initialize(requireContext())
+
         projectName = PrefManager.getcurrentProject()
         segmentName = PrefManager.getcurrentsegment()
         setupViews()

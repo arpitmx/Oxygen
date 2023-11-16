@@ -643,7 +643,6 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-
     fun getSegments(
         projectName: String, result: (ServerResult<List<Segment>>) -> Unit
     ) {
@@ -979,15 +978,19 @@ class FirestoreRepository @Inject constructor(
                         assignee_DP_URL = assignee_DP_URL!!,
                         assignee_id = assignerID,
                     )
-                    Log.d("taskrepo",taskItem.toString())
+                    Log.d("taskrepo", taskItem.toString())
                     result(ServerResult.Success(taskItem))
                 }
 
-                }
+             }
+
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
     }
+
+
 }
+
 
 

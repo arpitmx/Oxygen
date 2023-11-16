@@ -17,8 +17,10 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.Domain.Workers.FCMWorker
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Services.NotificationApiService
 import dagger.hilt.android.HiltAndroidApp
+import io.github.kbiakov.codeview.classifier.CodeProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,9 +59,21 @@ class O2Application : Application(), Configuration.Provider{
     @FirebaseRepository
     lateinit var repository: Repository
 
+
+    //Todo : Check if initiations taking too long, before production
     override fun onCreate() {
         super.onCreate()
 
+
+
+        //Initiations
+
+        //PrefManager
+        PrefManager.initialize(this@O2Application)
+
+
+        //CodeViewer
+        CodeProcessor.init(this@O2Application)
 
         if (BuildConfig.DEBUG)  {
             Timber.plant(Timber.DebugTree())

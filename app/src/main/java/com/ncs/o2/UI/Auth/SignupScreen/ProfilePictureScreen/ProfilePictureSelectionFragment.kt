@@ -144,7 +144,6 @@ class ProfilePictureSelectionFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        PrefManager.initialize(requireContext())
     }
     private fun pickImage() {
 

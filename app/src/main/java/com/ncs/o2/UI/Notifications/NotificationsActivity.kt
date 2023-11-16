@@ -43,7 +43,6 @@ class NotificationsActivity : AppCompatActivity() {
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        PrefManager.initialize(this)
         setUpView()
         updateNotificationLastSeen()
     }

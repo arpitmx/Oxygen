@@ -53,7 +53,7 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
         super.onViewCreated(view, savedInstanceState)
         binding.progressbar.visible()
         binding.chipGroup.gone()
-        PrefManager.initialize(requireContext())
+
         val job =  CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.Main) {
                 FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(PrefManager.getcurrentProject()).collection(Endpoints.Project.TAGS).get()
