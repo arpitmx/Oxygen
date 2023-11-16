@@ -58,6 +58,7 @@ class EditProfileActivity : AppCompatActivity() {
     private var bitmap: Bitmap?=null
     private var newImageUrl: String?= null
     private var newBio: String?= null
+    private var newDesignation: String?= null
     var newUsername: String?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,7 +104,7 @@ class EditProfileActivity : AppCompatActivity() {
                 newUsername= binding.etName.text.toString()
             }
 
-            val newDesignation= binding.etDesignation.text.toString() ?: null
+            newDesignation= binding.etDesignation.text.toString()
 
             binding.etBio.text?.trim()?.let {
                 newBio= binding.etBio.text.toString()
@@ -219,7 +220,7 @@ class EditProfileActivity : AppCompatActivity() {
                 }
             }
         }else{
-            Toast.makeText(this, "Updated", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "No changes", Toast.LENGTH_SHORT)
                 .show()
             onBackPressed()
         }
@@ -361,6 +362,13 @@ class EditProfileActivity : AppCompatActivity() {
 
                     PrefManager.setDpUrl(result.data)
                     newImageUrl= result.data
+
+                    newUserInfo= UserInfo(
+                        newUsername ?: userInfo.USERNAME,
+                        newBio ?: userInfo.BIO,
+                        newDesignation ?: userInfo.DESIGNATION,
+                        newImageUrl ?: userInfo.DP_URL
+                    )
                     editUserDetails(newUserInfo)
                 }
             }
