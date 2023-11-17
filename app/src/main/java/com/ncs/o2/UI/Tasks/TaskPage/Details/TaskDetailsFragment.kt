@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Details
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -66,7 +67,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback {
+class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback , ImageAdapter.ImagesListner{
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
@@ -341,11 +342,13 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     var imgArray = [];
 
     allImgTags.forEach(function(imgTag) {
-    // Check if the element is an img tag directly
         if (imgTag.tagName.toLowerCase() === 'img' && imgTag.parentElement.tagName.toLowerCase() !== 'pre') {
+        imgTag.addEventListener('click', function() {
+            send.sendsingleImage(imgTag.src);
+        });
         imgArray.push(imgTag.src);
     }
-});
+    });
 
     send.sendImages(imgArray);
 
@@ -416,10 +419,18 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 val recyclerView = binding.imageRecyclerView
                 recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
                 Log.d("list",imageUrls.toMutableList().toString())
-                val adapter = ImageAdapter(imageUrls.toMutableList())
+                val adapter = ImageAdapter(imageUrls.toMutableList(),this@TaskDetailsFragment)
                 recyclerView.adapter = adapter
             }
         }
+
+        @JavascriptInterface
+        fun sendsingleImage(imageUrl: String) {
+            requireActivity().runOnUiThread {
+                onImageClicked(0, mutableListOf(imageUrl))
+            }
+        }
+
     }
 
 
@@ -596,6 +607,20 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 }
             }
         }
+    }
+
+    override fun onImageClicked(position: Int, imageList: MutableList<String>) {
+        val imageViewerIntent = Intent(requireActivity(), ImageViewerActivity::class.java)
+        imageViewerIntent.putExtra("position", position)
+        imageViewerIntent.putStringArrayListExtra("images", ArrayList(imageList))
+        startActivity(
+            ImageViewerActivity.createIntent(
+                requireContext(),
+                ArrayList(imageList),
+                position
+            ),
+        )
+
     }
 
 
