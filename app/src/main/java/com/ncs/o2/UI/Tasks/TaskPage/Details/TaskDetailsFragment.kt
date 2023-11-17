@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Details
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -17,10 +18,10 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
@@ -38,7 +39,6 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
@@ -67,7 +67,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback {
+class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback , ImageAdapter.ImagesListner{
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
@@ -142,7 +142,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     @Later("1. Check if the request has already made, if made then set text and clickability on the button accordingly")
     private fun setUpViews() {
 
-        setUpBackpress()
         setUpMarkwonMarkdown()
 
         activityBinding.binding.gioActionbar.btnRequestWork.setOnClickSingleTimeBounceListener {
@@ -156,16 +155,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         binding.duration.setOnClickThrottleBounceListener {}
         binding.difficulty.setOnClickThrottleBounceListener {}
 
-
-    }
-
-    private fun setUpBackpress() {
-
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                requireActivity().finish()
-            }
-        })
 
     }
 
@@ -353,8 +342,10 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     var imgArray = [];
 
     allImgTags.forEach(function(imgTag) {
-    // Check if the element is an img tag directly
         if (imgTag.tagName.toLowerCase() === 'img' && imgTag.parentElement.tagName.toLowerCase() !== 'pre') {
+        imgTag.addEventListener('click', function() {
+            send.sendsingleImage(imgTag.src);
+        });
         imgArray.push(imgTag.src);
     }
     });
@@ -426,13 +417,20 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         fun sendImages(imageUrls: Array<String>) {
             requireActivity().runOnUiThread {
                 val recyclerView = binding.imageRecyclerView
-                recyclerView.layoutManager =
-                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-                Log.d("list", imageUrls.toMutableList().toString())
-                val adapter = ImageAdapter(imageUrls.toMutableList())
+                recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+                Log.d("list",imageUrls.toMutableList().toString())
+                val adapter = ImageAdapter(imageUrls.toMutableList(),this@TaskDetailsFragment)
                 recyclerView.adapter = adapter
             }
         }
+
+        @JavascriptInterface
+        fun sendsingleImage(imageUrl: String) {
+            requireActivity().runOnUiThread {
+                onImageClicked(0, mutableListOf(imageUrl))
+            }
+        }
+
     }
 
 
@@ -609,6 +607,20 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 }
             }
         }
+    }
+
+    override fun onImageClicked(position: Int, imageList: MutableList<String>) {
+        val imageViewerIntent = Intent(requireActivity(), ImageViewerActivity::class.java)
+        imageViewerIntent.putExtra("position", position)
+        imageViewerIntent.putStringArrayListExtra("images", ArrayList(imageList))
+        startActivity(
+            ImageViewerActivity.createIntent(
+                requireContext(),
+                ArrayList(imageList),
+                position
+            ),
+        )
+
     }
 
 
