@@ -1,6 +1,7 @@
 package com.ncs.o2.UI
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,10 +9,14 @@ import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.Toast
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.os.BuildCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -25,10 +30,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.Navigator
@@ -90,7 +97,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         PrefManager.initialize(this)
         setUpViews()
+
+
+
     }
+
+
 
     private fun setUpViews() {
 
@@ -101,6 +113,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setUpViewsOnClicks()
         setupProjectsList()
     }
+
+
 
     private fun setUpViewsOnClicks() {
 
@@ -139,11 +153,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.titleTv.animFadein(this, 500)
         binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
 
+
+
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
 
-            // Show a segment selection bottom sheet
             val segment = SegmentSelectionBottomSheet()
             segment.segmentSelectionListener = this
+
+            // Show a segment selection bottom sheet
+            this.performHapticFeedback()
             segment.show(supportFragmentManager, "Segment Selection")
             binding.gioActionbar.switchSegmentButton.rotate180(this)
 

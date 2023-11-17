@@ -17,10 +17,10 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
@@ -38,6 +38,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
@@ -141,6 +142,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     @Later("1. Check if the request has already made, if made then set text and clickability on the button accordingly")
     private fun setUpViews() {
 
+        setUpBackpress()
         setUpMarkwonMarkdown()
 
         activityBinding.binding.gioActionbar.btnRequestWork.setOnClickSingleTimeBounceListener {
@@ -154,6 +156,16 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         binding.duration.setOnClickThrottleBounceListener {}
         binding.difficulty.setOnClickThrottleBounceListener {}
 
+
+    }
+
+    private fun setUpBackpress() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        })
 
     }
 
@@ -345,7 +357,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         if (imgTag.tagName.toLowerCase() === 'img' && imgTag.parentElement.tagName.toLowerCase() !== 'pre') {
         imgArray.push(imgTag.src);
     }
-});
+    });
 
     send.sendImages(imgArray);
 
@@ -414,8 +426,9 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         fun sendImages(imageUrls: Array<String>) {
             requireActivity().runOnUiThread {
                 val recyclerView = binding.imageRecyclerView
-                recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
-                Log.d("list",imageUrls.toMutableList().toString())
+                recyclerView.layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                Log.d("list", imageUrls.toMutableList().toString())
                 val adapter = ImageAdapter(imageUrls.toMutableList())
                 recyclerView.adapter = adapter
             }

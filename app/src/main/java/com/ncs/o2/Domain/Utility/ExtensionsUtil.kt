@@ -335,7 +335,7 @@ object ExtensionsUtil {
     private const val SHORT_HAPTIC_FEEDBACK_DURATION = 5L
     fun Context.performHapticFeedback() {
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        val vibrationEffect = VibrationEffect.createOneShot(100L, VibrationEffect.DEFAULT_AMPLITUDE)
+        val vibrationEffect = VibrationEffect.createOneShot(5L, VibrationEffect.DEFAULT_AMPLITUDE)
         vibrator.vibrate(vibrationEffect)
     }
 
@@ -362,7 +362,7 @@ object ExtensionsUtil {
         this.setOnClickListener(object : View.OnClickListener {
             private var clicked : Boolean = false
             override fun onClick(v: View) {
-                context.performHapticFeedback()
+                //context.performHapticFeedback()
                 v.bounce(context)
                 if (clicked) return
                 else onClick()
@@ -373,7 +373,7 @@ object ExtensionsUtil {
 
     inline fun View.setOnClickFadeInListener(crossinline onClick : ()->Unit){
         setOnClickListener{
-            context.performHapticFeedback()
+            // context.performHapticFeedback()
             it.animFadein(context,100)
             onClick()
         }

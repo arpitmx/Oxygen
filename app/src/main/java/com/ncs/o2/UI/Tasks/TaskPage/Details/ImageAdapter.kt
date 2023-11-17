@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ncs.o2.R
 
+
+// Todo : Use interface to implement onclick @Mohit
 class ImageAdapter (private var images:MutableList<String>): RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
 

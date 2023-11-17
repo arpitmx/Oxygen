@@ -6,9 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.graphics.Color
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityCodeViewerBinding
 import com.ncs.versa.Constants.Endpoints
@@ -55,6 +57,12 @@ class CodeViewerActivity : AppCompatActivity() {
 
         }
 
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
     }
 
     private fun shareCode(textToShare: String) {
@@ -75,6 +83,7 @@ class CodeViewerActivity : AppCompatActivity() {
         clipboardManager.setPrimaryClip(clipData)
         Toast.makeText(this, "Code copied to clipboard", Toast.LENGTH_SHORT).show()
     }
+
 
 
     private fun setUpActionBar() {
