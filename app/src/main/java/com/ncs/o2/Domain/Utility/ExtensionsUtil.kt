@@ -15,12 +15,15 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.Snackbar
 import com.ncs.o2.R
@@ -186,6 +189,14 @@ object ExtensionsUtil {
         if (this == null) {
             block()
         }
+    }
+
+    fun ImageView.load(url: Any, placeholder: Int) {
+        Glide.with(context)
+            .setDefaultRequestOptions(RequestOptions().placeholder(placeholder))
+            .load(url)
+            .error(placeholder)
+            .into(this)
     }
 
     //Date formatting
