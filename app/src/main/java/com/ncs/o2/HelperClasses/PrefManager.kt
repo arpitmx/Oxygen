@@ -122,7 +122,12 @@ object PrefManager {
         editor.apply()
     }
 
-
+    fun setUserRole(role:Long){
+        if (role != null){
+            editor.putLong(Endpoints.User.ROLE, role)
+        }
+        editor.apply()
+    }
     fun getcurrentUserdetails():CurrentUser{
 
         val username = sharedPreferences.getString(Endpoints.User.USERNAME, "")

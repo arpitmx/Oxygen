@@ -20,6 +20,9 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.CreateTask.DescriptionEditorActivity"
+            android:exported="false" />
+        <activity
             android:name=".UI.Tasks.TaskPage.Details.ImageViewerActivity"
             android:exported="false" />
         <activity

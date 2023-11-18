@@ -1,3 +1,4 @@
+import android.content.Context
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -22,7 +23,7 @@ import com.ncs.o2.R
 import com.ncs.o2.databinding.TaskItemBinding
 import java.util.Date
 
-class TaskListAdapter(val repository: FirestoreRepository) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
+class TaskListAdapter(val repository: FirestoreRepository,val context: Context) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
     private var taskList: ArrayList<TaskItem> = ArrayList()
@@ -84,7 +85,13 @@ class TaskListAdapter(val repository: FirestoreRepository) : RecyclerView.Adapte
             binding.taskId.text = task.id
             binding.taskTitle.text = task.title
             binding.difficulty.text = task.getDifficultyString()
-            binding.difficulty.setBackgroundColor(task.getDifficultyColor())
+            when (task.difficulty){
+                1 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_green)
+                2 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_yellow)
+                3 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_red)
+
+
+            }
         }
     }
 

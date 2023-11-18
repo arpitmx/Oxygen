@@ -105,7 +105,6 @@ class CreateSegmentViewModel @Inject constructor(
                                _showprogressLD.postValue(false)
                                 _segmentValidityLiveData.postValue(Errors.Status.VALID_INPUT)
                             }
-
                         }
                     }
             }

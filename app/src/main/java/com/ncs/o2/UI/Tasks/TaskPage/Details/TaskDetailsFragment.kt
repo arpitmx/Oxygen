@@ -3,6 +3,7 @@ package com.ncs.o2.UI.Tasks.TaskPage.Details
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -25,6 +26,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -151,10 +159,100 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         handleRequestNotificationResult()
 
-        binding.taskStatus.setOnClickThrottleBounceListener {}
-        binding.duration.setOnClickThrottleBounceListener {}
-        binding.difficulty.setOnClickThrottleBounceListener {}
 
+
+
+    }
+
+    private fun setDefaultViews(task: Task){
+        binding.projectNameET.text=task.project_ID
+
+        val priority= when(task.priority){
+            1->"Low"
+            2->"Medium"
+            3->"High"
+            4->"Critical"
+            else -> ""
+        }
+
+        val type= when(task.type){
+            1->"Bug"
+            2->"Feature"
+            3->"Feature request"
+            4->"Task"
+            5->"Exception"
+            6->"Security"
+            7->"Performance"
+            else -> ""
+        }
+        val status= when(task.status){
+            1->"Unassigned"
+            2->"Ongoing"
+            3->"Open"
+            4->"Review"
+            5->"Testing"
+            else -> ""
+        }
+        val difficulty= when(task.difficulty){
+            1->"Easy"
+            2->"Medium"
+            3->"Hard"
+            else -> ""
+        }
+
+        binding.priorityInclude.tagIcon.text=priority.substring(0,1)
+        binding.priorityInclude.tagText.text=priority
+
+        binding.typeInclude.tagIcon.text=type.substring(0,1)
+        binding.typeInclude.tagText.text=type
+        fetchUserbyId(task.assignee[0]) {
+            Glide.with(requireContext())
+                .load(it?.profileDPUrl)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+                })
+                .encodeQuality(80)
+                .override(40, 40)
+                .apply(
+                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+
+                )
+                .error(R.drawable.profile_pic_placeholder)
+                .into(binding.assigneeInclude.tagIcon)
+
+            binding.assigneeInclude.normalET.text = it?.username
+        }
+
+        binding.stateInclude.tagIcon.text=status.substring(0,1)
+        binding.stateInclude.tagText.text=status
+
+        binding.difficultyInclude.tagIcon.text=difficulty.substring(0,1)
+        binding.difficultyInclude.tagText.text=difficulty
+        when(task.difficulty){
+            1->binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_green)
+            2->binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_yellow)
+            3->binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_red)
+        }
+
+        binding.taskDurationET.text=task.duration
+        binding.taskDurationET.text=task.duration
 
     }
 
@@ -295,14 +393,14 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         setUpTaskDescription(taskDetails.description)
 
         val statusText = when (task.status) {
-            0 -> "Unassigned"
-            1 -> "Assigned"
-            2 -> "Finished"
+            1 -> "Unassigned"
+            2 -> "Assigned"
+            3 -> "Finished"
+            4 -> "Review"
+            5 -> "Testing"
             else -> ""
         }
-        binding.taskStatus.text = statusText
 
-        binding.duration.text = "${task.duration}"
 
         val difficultyText = when (task.difficulty) {
             1 -> "Easy"
@@ -310,7 +408,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             3 -> "Difficult"
             else -> ""
         }
-        binding.difficulty.text = difficultyText
 
         setCreator(task)
 
@@ -498,6 +595,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
                     is ServerResult.Success -> {
                         setTaskDetails(taskResult.data)
+                        setDefaultViews(taskResult.data)
                     }
 
                 }
@@ -569,9 +667,9 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         viewLifecycleOwner.lifecycleScope.launch {
 
             withContext(Dispatchers.IO) {
-                for (assignee in taskDetails.assignee) {
+                for (contributors in taskDetails.contributors) {
 
-                    viewModel.getUserbyId(assignee) { result ->
+                    viewModel.getUserbyId(contributors) { result ->
 
                         when (result) {
 
@@ -608,6 +706,37 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             }
         }
     }
+    private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                viewModel.getUserbyId(id) { result ->
+                    when (result) {
+                        is ServerResult.Success -> {
+                            binding.progressBar.gone()
+                            binding.parentScrollview.visible()
+                            val user = result.data!!
+                            callback(user)
+                        }
+                        is ServerResult.Failure -> {
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in fetching Contributors : ${result.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
+                            }
+                            binding.progressBar.gone()
+                            callback(null) // or handle error case accordingly
+                        }
+                        is ServerResult.Progress -> {
+                            binding.progressBar.visible()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     override fun onImageClicked(position: Int, imageList: MutableList<String>) {
         val imageViewerIntent = Intent(requireActivity(), ImageViewerActivity::class.java)

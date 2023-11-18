@@ -807,6 +807,7 @@ class FirestoreRepository @Inject constructor(
                     val profileDPUrl = document.getString("DP_URL")
                     val name = document.getString("USERNAME")!!
                     var time = document.get("TIMESTAMP") as Timestamp?
+                    var role=document.get("ROLE")
                     if (time.isNull) {
                         time = Timestamp.now()
                     }
@@ -817,7 +818,8 @@ class FirestoreRepository @Inject constructor(
                         profileDPUrl = profileDPUrl,
                         username = name,
                         timestamp = time,
-                        designation = designation!!
+                        designation = designation!!,
+                        role = role.toString().toLong()
                     )
                     serverResult(ServerResult.Success(user))
                 } else {

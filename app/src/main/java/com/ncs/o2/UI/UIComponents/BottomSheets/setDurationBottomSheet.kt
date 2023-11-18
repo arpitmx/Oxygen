@@ -15,10 +15,9 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.databinding.DurationSetBottomSheetBinding
 
-class setDurationBottomSheet: BottomSheetDialogFragment() {
+class setDurationBottomSheet(private val durationAddedListener: DurationAddedListener): BottomSheetDialogFragment() {
 
     lateinit var binding: DurationSetBottomSheetBinding
-    var durationAddedListener: DurationAddedListener? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,7 +36,7 @@ class setDurationBottomSheet: BottomSheetDialogFragment() {
         binding.doneBtn.setOnClickListener {
 
             if (binding.projectLink.text!!.isEmpty()){
-                Toast.makeText(requireContext(), "Pls set some duration", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Duration is Required", Toast.LENGTH_SHORT).show()
             }
             else{
                 val selectedRadioButtonId = radioGroup.checkedRadioButtonId
@@ -45,7 +44,7 @@ class setDurationBottomSheet: BottomSheetDialogFragment() {
                     val selectedRadioButton: RadioButton = view.findViewById(selectedRadioButtonId)
                     val selectedOption = selectedRadioButton.text.toString()
 
-                    durationAddedListener?.onDurationAdded("${binding.projectLink.text} $selectedOption")
+                    durationAddedListener.onDurationAdded("${binding.projectLink.text} $selectedOption")
                     Toast.makeText(requireContext(), "${binding.projectLink.text} $selectedOption", Toast.LENGTH_SHORT).show()
                     dismiss()
                 }
@@ -65,6 +64,6 @@ class setDurationBottomSheet: BottomSheetDialogFragment() {
     }
 
     interface DurationAddedListener {
-        fun onDurationAdded(segmentName: String)
+        fun onDurationAdded(duration: String)
     }
 }
