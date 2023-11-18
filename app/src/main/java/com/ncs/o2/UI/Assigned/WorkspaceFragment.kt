@@ -138,7 +138,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                                 binding.lottieProgressInclude.progressbarBlock.gone()
                                 binding.placeholder.gone()
                                 recyclerView = binding.recyclerView
-                                taskListAdapter = TaskListAdapter(firestoreRepository)
+                                taskListAdapter = TaskListAdapter(firestoreRepository,requireContext())
                                 taskListAdapter.setTaskList(taskList)
                                 taskListAdapter.notifyDataSetChanged()
                                 taskListAdapter.setOnClickListener(this@WorkspaceFragment)

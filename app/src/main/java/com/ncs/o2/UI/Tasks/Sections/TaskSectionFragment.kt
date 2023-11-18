@@ -164,7 +164,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     } else {
 
                         recyclerView = binding.recyclerView
-                        taskListAdapter = TaskListAdapter(firestoreRepository)
+                        taskListAdapter = TaskListAdapter(firestoreRepository,requireContext())
                         taskListAdapter.setTaskList(taskList)
                         taskListAdapter.notifyDataSetChanged()
 

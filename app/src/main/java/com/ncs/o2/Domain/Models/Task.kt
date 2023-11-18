@@ -44,7 +44,10 @@ data class Task(
     val segment: String = "",
     val section: String = "",
     val assignee_DP_URL: String = "",
-    val completed:Boolean=false
+    val completed:Boolean=false,
+    val type:Int=0,
+    val contributors:List<String> = listOf()
+
     ) {
 
     @Exclude
@@ -53,7 +56,18 @@ data class Task(
             1 -> return Color.GREEN
             2 -> return Color.YELLOW
             3 -> return Color.RED
+            4 -> return Color.WHITE
             else -> return Color.BLACK
+        }
+    }
+    @Exclude
+    fun getPriorityString(): String {
+        when (priority) {
+            1 -> return "LOW"
+            2 -> return "MEDIUM"
+            3 -> return "HIGH"
+            4 -> return "CRITICAL"
+            else -> return ""
         }
     }
 

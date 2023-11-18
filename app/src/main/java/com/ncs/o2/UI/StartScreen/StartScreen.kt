@@ -28,6 +28,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.TestingConfig
 import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
@@ -342,6 +343,8 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
+                val role=document.get(Endpoints.User.ROLE)
+                PrefManager.setUserRole(role.toString().toLong())
 
                 val dp_url = document.getString(Endpoints.User.DP_URL)
                 val dp_url_pref = PrefManager.getDpUrl()

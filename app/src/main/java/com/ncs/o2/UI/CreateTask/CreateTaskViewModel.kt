@@ -8,6 +8,7 @@ import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.UseCases.CreateTaskUseCase
 import com.ncs.o2.Domain.Utility.FirebaseRepository
@@ -108,6 +109,13 @@ class CreateTaskViewModel @Inject constructor
               }
           }
 
+        }
+        fun getTagsbyId(
+            id:String,
+            projectName: String,
+            resultCallback: (ServerResult<Tag>) -> Unit
+        ) {
+            repository.getTagbyId(id,projectName, resultCallback)
         }
 
         override fun handleServerException(exceptionMessage: String) {
