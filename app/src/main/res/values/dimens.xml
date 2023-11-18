@@ -23,4 +23,11 @@
     <dimen name="selector_gap">10dp</dimen>
     <dimen name="bottm_navigation_offset">40dp</dimen>
     <dimen name="padding_start_task_details">15dp</dimen>
+
+    <dimen name="margin_start_80">80dp</dimen>
+    <dimen name="input_box_size">65dp</dimen>
+    <dimen name="chat_msg_text_size">15dp</dimen>
+    <dimen name="msg_font_size">15dp</dimen>
+    <dimen name="designation_textsize">16sp</dimen>
+
 </resources>

@@ -11,7 +11,6 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.google.firebase.Timestamp
 import com.google.firebase.messaging.FirebaseMessaging
-import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.FirebaseRepository
@@ -57,7 +56,7 @@ class O2Application : Application(), Configuration.Provider{
 
     @Inject
     @FirebaseRepository
-    lateinit var repository: Repository
+    lateinit var repository: com.ncs.o2.Domain.Interfaces.Repository
 
 
     //Todo : Check if initiations taking too long, before production

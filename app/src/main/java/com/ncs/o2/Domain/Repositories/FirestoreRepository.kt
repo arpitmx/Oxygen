@@ -71,7 +71,7 @@ class FirestoreRepository @Inject constructor(
 ) : Repository {
 
     private val storageReference = FirebaseStorage.getInstance().reference
-    private val TAG: String = FirestoreRepository::class.java.simpleName
+    private val TAG: String = com.ncs.o2.Domain.Repositories.FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback: ServerErrorCallback
 //    private val editor : SharedPreferences.Editor by lazy {
 //        pref.edit()

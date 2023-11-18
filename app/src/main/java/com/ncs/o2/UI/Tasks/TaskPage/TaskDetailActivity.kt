@@ -25,6 +25,7 @@ class TaskDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
         taskId = intent.getStringExtra("task_id")!!
         setActionbar()
+
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
             onBackPressed()
         }
@@ -44,7 +45,6 @@ class TaskDetailActivity : AppCompatActivity() {
     private fun setActionbar() {
         binding.gioActionbar.titleTv.text = taskId
         binding.gioActionbar.doneItem.gone()
-
     }
 
 }

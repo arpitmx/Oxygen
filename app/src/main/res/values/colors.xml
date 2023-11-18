@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#FFFFFFFF</color>
+<!--    <color name="primary">#FFB84D</color>-->
+<!--    <color name="primary">#7CB7FF</color>-->
     <color name="primary">#86ff7c</color>
 <!--    <color name="primary">#86ff7c</color>-->
+<!--    <color name="primary">#FF2DDC</color>-->
+
     <color name="secondaryPink">#ff89b3</color>
     <color name="secondaryBlue">#0061ff</color>
     <color name="primarybg">#0d0c0b</color>
@@ -11,7 +15,7 @@
 
     <color name="darkTheme_bg">#242222</color>
 
-    <color name="green">@color/s1bg</color>
+    <color name="green">@color/primary</color>
     <color name="yello">@color/s3bg</color>
     <color name="red">@color/secondaryPink</color>
     <color name="redx">#FF5252</color>
@@ -23,7 +27,6 @@
     <color name="darkbg_main">#191919</color>
     <color name="darkbg_main_a80">#131313</color>
     <color name="secondary_bg_black">#202020</color>
-    <color name="grabblue">#86ff7c</color>
     <color name="item_bg_glow">#1D2930</color>
     <color name="better_white">#E3E1E1</color>
     <color name="card_bg">#3F4041</color>
@@ -39,7 +42,9 @@
     <color name="black_overlay">#66000000</color>
 
 
-
+    <color name="bot_bubble_bg">#FFF8E1</color>
+    <color name="black200">#4A4A4A</color>
+    <color name="chat_progress_bg">#8A1E71FF</color>
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>

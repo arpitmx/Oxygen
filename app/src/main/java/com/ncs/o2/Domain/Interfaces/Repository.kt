@@ -38,7 +38,7 @@ Tasks FUTURE ADDITION :
 interface Repository {
 
 
-    fun setCallback(callback: ServerErrorCallback)
+    fun setCallback(callback: com.ncs.o2.Domain.Interfaces.ServerErrorCallback)
     fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit)
 
     //Task related

@@ -1,4 +1,4 @@
-package com.ncs.o2.Room.NotificationRepository
+package com.ncs.o2.Data.Room.NotificationRepository
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

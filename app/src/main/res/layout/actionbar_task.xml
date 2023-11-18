@@ -113,6 +113,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
+        android:visibility="gone"
         android:background="@color/border_grey"
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintLeft_toLeftOf="parent"

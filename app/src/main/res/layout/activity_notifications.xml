@@ -59,11 +59,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/notificationRV"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingTop="6dp"
-            android:visibility="gone"
-            tools:listitem="@layout/project_list_item" />
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="30dp"
+            android:visibility="visible"
+            tools:listitem="@layout/notification_mention_item" />
 
 
 

@@ -1,6 +1,5 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Details
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -21,7 +20,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
@@ -67,19 +65,28 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback , ImageAdapter.ImagesListner{
+class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback,
+    ImageAdapter.ImagesListner {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
-    lateinit var binding: FragmentTaskDetailsFrgamentBinding
+
+    private var _binding: FragmentTaskDetailsFrgamentBinding? = null
+    private val binding get() = _binding!!
+
+
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
+
     private val tasksHolderBinding: TasksDetailsHolderFragment by lazy {
         (requireParentFragment() as TasksDetailsHolderFragment)
     }
+
+
     private val viewModel: TaskDetailViewModel by viewModels()
     private lateinit var taskDetails: Task
+
     var tags: MutableList<Tag> = mutableListOf()
     var users: MutableList<User> = mutableListOf()
     private val TextViewList = mutableListOf<TextView>()
@@ -92,10 +99,15 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentTaskDetailsFrgamentBinding.inflate(inflater, container, false)
+        _binding = FragmentTaskDetailsFrgamentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -112,6 +124,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 viewpager.currentItem = next
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 
@@ -136,6 +153,14 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 //
 //        mdEditor = MarkwonEditor.create(markwon)
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
 
@@ -176,8 +201,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                     binding.progressBar.gone()
                     utils.dialog("Request Failed",
                         "Try retrying as request sending was failed to server due to ${result.exception.message.toString()}",
-                        getString(com.ncs.o2.R.string.retry),
-                        getString(com.ncs.o2.R.string.cancel),
+                        getString(R.string.retry),
+                        getString(R.string.cancel),
                         {
                             sendRequestNotification()
                         },
@@ -417,9 +442,10 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         fun sendImages(imageUrls: Array<String>) {
             requireActivity().runOnUiThread {
                 val recyclerView = binding.imageRecyclerView
-                recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
-                Log.d("list",imageUrls.toMutableList().toString())
-                val adapter = ImageAdapter(imageUrls.toMutableList(),this@TaskDetailsFragment)
+                recyclerView.layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                Log.d("list", imageUrls.toMutableList().toString())
+                val adapter = ImageAdapter(imageUrls.toMutableList(), this@TaskDetailsFragment)
                 recyclerView.adapter = adapter
             }
         }

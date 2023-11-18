@@ -1,4 +1,4 @@
-package com.ncs.o2.Room.NotificationRepository
+package com.ncs.o2.Data.Room.NotificationRepository
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

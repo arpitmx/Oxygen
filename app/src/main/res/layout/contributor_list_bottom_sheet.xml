@@ -38,7 +38,7 @@
             android:layout_toEndOf="@+id/close_btn"
             android:gravity="center"
             android:textColor="@color/better_white"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:textSize="16dp"
             android:text="Select Members" />
 
