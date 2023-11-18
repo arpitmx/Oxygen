@@ -205,39 +205,45 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         binding.typeInclude.tagIcon.text=type.substring(0,1)
         binding.typeInclude.tagText.text=type
-        fetchUserbyId(task.assignee[0]) {
-            Glide.with(requireContext())
-                .load(it?.profileDPUrl)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
+        if (task.assignee[0]!="None") {
+            fetchUserbyId(task.assignee[0]) {
+                Glide.with(requireContext())
+                    .load(it?.profileDPUrl)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-                })
-                .encodeQuality(80)
-                .override(40, 40)
-                .apply(
-                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
+                    })
+                    .encodeQuality(80)
+                    .override(40, 40)
+                    .apply(
+                        RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
 
-                )
-                .error(R.drawable.profile_pic_placeholder)
-                .into(binding.assigneeInclude.tagIcon)
+                    )
+                    .error(R.drawable.profile_pic_placeholder)
+                    .into(binding.assigneeInclude.tagIcon)
 
-            binding.assigneeInclude.normalET.text = it?.username
+                binding.assigneeInclude.normalET.text = it?.username
+            }
+        }
+        else{
+            binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
+            binding.assigneeInclude.normalET.text = "No Assignee"
         }
 
         binding.stateInclude.tagIcon.text=status.substring(0,1)
@@ -667,41 +673,47 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         viewLifecycleOwner.lifecycleScope.launch {
 
             withContext(Dispatchers.IO) {
-                for (contributors in taskDetails.contributors) {
+                if (taskDetails.contributors[0]!="None") {
+                    for (contributors in taskDetails.contributors) {
 
-                    viewModel.getUserbyId(contributors) { result ->
+                        viewModel.getUserbyId(contributors) { result ->
 
-                        when (result) {
+                            when (result) {
 
-                            is ServerResult.Success -> {
+                                is ServerResult.Success -> {
 
-                                binding.progressBar.gone()
-                                binding.parentScrollview.visible()
+                                    binding.progressBar.gone()
+                                    binding.parentScrollview.visible()
 
-                                val user = result.data
-                                users.add(user!!)
-                                setContributors(users)
-                            }
-
-
-                            is ServerResult.Failure -> {
-
-                                utils.singleBtnDialog(
-                                    "Failure",
-                                    "Failure in fetching Contributors : ${result.exception.message}",
-                                    "Okay"
-                                ) {
-                                    requireActivity().finish()
+                                    val user = result.data
+                                    users.add(user!!)
+                                    setContributors(users)
                                 }
-                                binding.progressBar.gone()
-                            }
 
-                            is ServerResult.Progress -> {
-                                binding.progressBar.visible()
+
+                                is ServerResult.Failure -> {
+
+                                    utils.singleBtnDialog(
+                                        "Failure",
+                                        "Failure in fetching Contributors : ${result.exception.message}",
+                                        "Okay"
+                                    ) {
+                                        requireActivity().finish()
+                                    }
+                                    binding.progressBar.gone()
+                                }
+
+                                is ServerResult.Progress -> {
+                                    binding.progressBar.visible()
+                                }
                             }
                         }
-                    }
 
+                    }
+                }
+                else{
+                    binding.contributorsRecyclerView.gone()
+                    binding.noContributors.visible()
                 }
             }
         }
