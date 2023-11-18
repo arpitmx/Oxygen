@@ -26,7 +26,7 @@
             android:indeterminateTint="@color/primary"
             android:scaleX="0.2"
             android:scaleY="0.2"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -425,8 +425,15 @@
                         android:textColor="@color/account"
                         android:textSize="16dp"
                         android:visibility="visible" />
-
-
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">'
+                        <ImageView
+                            android:id="@+id/noContributors"
+                            android:visibility="gone"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/tasknull_placeholder"/>
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/contributorsRecyclerView"
                         android:layout_width="match_parent"
@@ -435,6 +442,7 @@
                         android:clipToPadding="false"
                         android:layoutAnimation="@anim/layout_animation_popscale"
                         android:nestedScrollingEnabled="false" />
+                    </RelativeLayout>
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
 
