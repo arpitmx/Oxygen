@@ -1,6 +1,7 @@
 package com.ncs.o2.Domain.Models
 
 import android.graphics.Color
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 
@@ -23,6 +24,8 @@ Tasks FUTURE ADDITION :
 */
 
 // Todo Remove deprecated fields like assigner
+
+
 data class Task(
 
     val title: String = "",
@@ -32,22 +35,22 @@ data class Task(
     val links: List<String> = emptyList(),
     val priority: Int = 0,
     val status: Int = -1,
-    val assignee: List<String> = emptyList(),
-    val assigner: String = "",
-    val assigner_email:String="",
-    val deadline: String = "",
+
+    val assignee: List<String> = emptyList(), // Make it String instead of List,store email
+    val assignee_DP_URL: String = "", // Remove and get from Firestore passing assignee email
+    val assigner: String = "",  //  (Store email of assigner here instead of name)
+    val assigner_email:String="", // Remove
+    val deadline: String = "", // Remove
+    val contributors:List<String> = listOf(), // Change the name to moderators
+
     var time_STAMP: Timestamp? =null,
-//    val timestamp: FieldValue= FieldValue.serverTimestamp(),
     val duration: String = "",
     val tags: List<String> = listOf(),
     val project_ID: String = "",
     val segment: String = "",
     val section: String = "",
-    val assignee_DP_URL: String = "",
     val completed:Boolean=false,
     val type:Int=0,
-    val contributors:List<String> = listOf()
-
     ) {
 
     @Exclude

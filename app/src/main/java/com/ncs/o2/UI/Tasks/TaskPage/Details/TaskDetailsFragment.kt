@@ -45,6 +45,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
@@ -122,6 +123,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setUpViews()
         setdetails(activityBinding.taskId)
 
@@ -185,55 +187,55 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         handleRequestNotificationResult()
 
 
-
-
     }
 
-    private fun setDefaultViews(task: Task){
-        binding.projectNameET.text=task.project_ID
+    private fun setDefaultViews(task: Task) {
+        binding.projectNameET.text = task.project_ID
 
-        val priority= when(task.priority){
-            1->"Low"
-            2->"Medium"
-            3->"High"
-            4->"Critical"
+        val priority = when (task.priority) {
+            1 -> "Low"
+            2 -> "Medium"
+            3 -> "High"
+            4 -> "Critical"
             else -> ""
         }
 
-        val type= when(task.type){
-            1->"Bug"
-            2->"Feature"
-            3->"Feature request"
-            4->"Task"
-            5->"Exception"
-            6->"Security"
-            7->"Performance"
+        val type = when (task.type) {
+            1 -> "Bug"
+            2 -> "Feature"
+            3 -> "Feature request"
+            4 -> "Task"
+            5 -> "Exception"
+            6 -> "Security"
+            7 -> "Performance"
             else -> ""
         }
-        val status= when(task.status){
-            1->"Unassigned"
-            2->"Ongoing"
-            3->"Open"
-            4->"Review"
-            5->"Testing"
+        val status = when (task.status) {
+            1 -> "Unassigned"
+            2 -> "Ongoing"
+            3 -> "Open"
+            4 -> "Review"
+            5 -> "Testing"
             else -> ""
         }
-        val difficulty= when(task.difficulty){
-            1->"Easy"
-            2->"Medium"
-            3->"Hard"
+        val difficulty = when (task.difficulty) {
+            1 -> "Easy"
+            2 -> "Medium"
+            3 -> "Hard"
             else -> ""
         }
 
-        binding.priorityInclude.tagIcon.text=priority.substring(0,1)
-        binding.priorityInclude.tagText.text=priority
+        binding.priorityInclude.tagIcon.text = priority.substring(0, 1)
+        binding.priorityInclude.tagText.text = priority
 
-        binding.typeInclude.tagIcon.text=type.substring(0,1)
-        binding.typeInclude.tagText.text=type
-        if (task.assignee[0]!="None") {
-            fetchUserbyId(task.assignee[0]) {
+        binding.typeInclude.tagIcon.text = type.substring(0, 1)
+        binding.typeInclude.tagText.text = type
+
+        if (task.assignee[0] != Endpoints.TaskDetails.EMPTY_MODERATORS) {
+
+            fetchUserbyId(task.assignee[0]) { user ->
                 Glide.with(requireContext())
-                    .load(it?.profileDPUrl)
+                    .load(user?.profileDPUrl)
                     .listener(object : RequestListener<Drawable> {
                         override fun onLoadFailed(
                             e: GlideException?,
@@ -263,27 +265,33 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                     .error(R.drawable.profile_pic_placeholder)
                     .into(binding.assigneeInclude.tagIcon)
 
-                binding.assigneeInclude.normalET.text = it?.username
+                binding.assigneeInclude.normalET.text = user?.username
             }
-        }
-        else{
+        } else {
+
             binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
             binding.assigneeInclude.normalET.text = "No Assignee"
+
         }
 
-        binding.stateInclude.tagIcon.text=status.substring(0,1)
-        binding.stateInclude.tagText.text=status
+        binding.stateInclude.tagIcon.text = status.substring(0, 1)
+        binding.stateInclude.tagText.text = status
 
-        binding.difficultyInclude.tagIcon.text=difficulty.substring(0,1)
-        binding.difficultyInclude.tagText.text=difficulty
-        when(task.difficulty){
-            1->binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_green)
-            2->binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_yellow)
-            3->binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_red)
+        binding.difficultyInclude.tagIcon.text = difficulty.substring(0, 1)
+        binding.difficultyInclude.tagText.text = difficulty
+        when (task.difficulty) {
+            1 -> binding.difficultyInclude.tagIcon.background =
+                resources.getDrawable(R.drawable.label_cardview_green)
+
+            2 -> binding.difficultyInclude.tagIcon.background =
+                resources.getDrawable(R.drawable.label_cardview_yellow)
+
+            3 -> binding.difficultyInclude.tagIcon.background =
+                resources.getDrawable(R.drawable.label_cardview_red)
         }
 
-        binding.taskDurationET.text=task.duration
-        binding.taskDurationET.text=task.duration
+        binding.taskDurationET.text = task.duration
+        binding.taskDurationET.text = task.duration
 
     }
 
@@ -454,7 +462,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-    private val javascriptCode = "javascript:document.a.style.background= #000;"
     val script = """
     var allPreTags = document.querySelectorAll('pre');
 
@@ -600,18 +607,18 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             try {
 
                 val taskResult = withContext(Dispatchers.IO) {
-                    viewModel.getTasksById(
-                        id, PrefManager.getcurrentProject()
-                    )
+                    viewModel.getTasksById(id, PrefManager.getcurrentProject())
                 }
+
                 Timber.tag(TAG).d("Fetched task result : ${taskResult}")
 
                 when (taskResult) {
+
                     is ServerResult.Failure -> {
 
                         utils.singleBtnDialog(
                             "Failure",
-                            "Failure in fetching Contributors : ${taskResult.exception.message}",
+                            "Failure in task fetching : ${taskResult.exception.message}",
                             "Okay"
                         ) {
                             requireActivity().finish()
@@ -621,11 +628,13 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
                     }
 
-                    ServerResult.Progress -> {
+                    is ServerResult.Progress -> {
                         binding.progressBar.visible()
                     }
 
                     is ServerResult.Success -> {
+
+                        binding.progressBar.gone()
                         setTaskDetails(taskResult.data)
                         setDefaultViews(taskResult.data)
                     }
@@ -633,13 +642,16 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 }
 
             } catch (e: Exception) {
+
                 Timber.tag(TAG).e(e)
                 binding.progressBar.gone()
-                utils.singleBtnDialog(
-                    "Failure", "Failure in fetching Contributors : ${e.message}", "Okay"
-                ) {
-                    requireActivity().finish()
-                }
+
+//                utils.singleBtnDialog(
+//                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
+//                ) {
+//                    requireActivity().finish()
+//                }
+
             }
 
         }
@@ -696,82 +708,92 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private fun fetchUsers() {
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        Timber.d("Contributor list : ${taskDetails.contributors}")
 
-            withContext(Dispatchers.IO) {
-                if (taskDetails.contributors[0]!="None") {
-                    for (contributors in taskDetails.contributors) {
+        if (taskDetails.contributors.isEmpty()) {
+            //toast("Contributor empty")
+            binding.contributorsRecyclerView.gone()
+            binding.noContributors.visible()
 
-                        viewModel.getUserbyId(contributors) { result ->
+        } else if (taskDetails.contributors[0] == Endpoints.TaskDetails.EMPTY_MODERATORS) {
+           // toast("Contributor not empty None")
+            binding.contributorsRecyclerView.gone()
+            binding.noContributors.visible()
 
-                            when (result) {
+        } else {
 
-                                is ServerResult.Success -> {
+            binding.contributorsRecyclerView.visible()
+            binding.noContributors.gone()
 
-                                    binding.progressBar.gone()
-                                    binding.parentScrollview.visible()
+            for (contributors in taskDetails.contributors) {
 
-                                    val user = result.data
-                                    users.add(user!!)
-                                    setContributors(users)
-                                }
+                viewModel.getUserbyId(contributors) { result ->
 
-
-                                is ServerResult.Failure -> {
-
-                                    utils.singleBtnDialog(
-                                        "Failure",
-                                        "Failure in fetching Contributors : ${result.exception.message}",
-                                        "Okay"
-                                    ) {
-                                        requireActivity().finish()
-                                    }
-                                    binding.progressBar.gone()
-                                }
-
-                                is ServerResult.Progress -> {
-                                    binding.progressBar.visible()
-                                }
-                            }
-                        }
-
-                    }
-                }
-                else{
-                    binding.contributorsRecyclerView.gone()
-                    binding.noContributors.visible()
-                }
-            }
-        }
-    }
-    private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                viewModel.getUserbyId(id) { result ->
                     when (result) {
+
                         is ServerResult.Success -> {
                             binding.progressBar.gone()
                             binding.parentScrollview.visible()
-                            val user = result.data!!
-                            callback(user)
+
+                            val user = result.data
+                            users.add(user!!)
+                            setContributors(users)
                         }
+
+
                         is ServerResult.Failure -> {
+
                             utils.singleBtnDialog(
                                 "Failure",
-                                "Failure in fetching Contributors : ${result.exception.message}",
+                                "Failure in fetching Moderators : ${result.exception.message}",
                                 "Okay"
                             ) {
                                 requireActivity().finish()
                             }
                             binding.progressBar.gone()
-                            callback(null) // or handle error case accordingly
                         }
+
                         is ServerResult.Progress -> {
                             binding.progressBar.visible()
                         }
                     }
                 }
             }
+        }
+    }
+
+
+    private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
+
+
+        viewModel.getUserbyId(id) { result ->
+
+            when (result) {
+                is ServerResult.Success -> {
+                    binding.progressBar.gone()
+                    binding.parentScrollview.visible()
+                    val user = result.data!!
+                    callback(user)
+                }
+
+                is ServerResult.Failure -> {
+                    utils.singleBtnDialog(
+                        "Failure",
+                        "Failure in fetching User object : ${result.exception.message}",
+                        "Okay"
+                    ) {
+                        requireActivity().finish()
+                    }
+                    binding.progressBar.gone()
+                    callback(null) // or handle error case accordingly
+                }
+
+                is ServerResult.Progress -> {
+                    binding.progressBar.visible()
+                }
+            }
+
+
         }
     }
 

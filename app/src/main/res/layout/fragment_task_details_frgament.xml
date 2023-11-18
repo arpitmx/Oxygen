@@ -72,11 +72,11 @@
                 android:id="@+id/details_scrollview"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:layout_marginBottom="10dp"
                 android:clipToPadding="false"
                 android:fadeScrollbars="false"
                 android:paddingEnd="10dp"
                 android:scrollbarSize="2dp"
+                android:background="@color/darkbg_main"
                 android:scrollbarThumbHorizontal="@color/primary">
 
 
@@ -309,20 +309,15 @@
 
 
             </HorizontalScrollView>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tagRecyclerView"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="true"
-                android:layoutAnimation="@anim/layout_animation_slidedown"
-                android:nestedScrollingEnabled="false" />
+                android:layout_height="2dp"
+                android:background="#56838383" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
 
                 <TextView
                     android:id="@+id/title_tv"
@@ -343,8 +338,8 @@
                     android:id="@+id/openedBy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
                     android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start"
                     android:paddingStart="@dimen/padding_start_task_details"
@@ -352,6 +347,15 @@
                     android:text="Alok created this task 2 days ago"
                     android:textColor="@color/better_white"
                     android:textSize="15dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/tagRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:padding="10dp"
+                    android:layoutAnimation="@anim/layout_animation_slidedown"
+                    android:nestedScrollingEnabled="false" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -404,6 +408,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="15dp"
                 android:background="#56838383" />
+
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -421,19 +426,32 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_display_medium"
                         android:gravity="start"
-                        android:text="Contributors :"
+                        android:paddingStart="5dp"
+                        android:text="@string/moderators"
                         android:textColor="@color/account"
                         android:textSize="16dp"
                         android:visibility="visible" />
+
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">'
-                        <ImageView
+                        android:layout_height="wrap_content"
+                        >
+
+                        <TextView
                             android:id="@+id/noContributors"
                             android:visibility="gone"
+                            android:text="No Moderators here..."
+                            android:gravity="start"
+                            android:paddingStart="@dimen/_5dp"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/sf_pro_display_medium"
+                            android:textColor="@color/better_white"
+                            android:textSize="16dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:src="@drawable/tasknull_placeholder"/>
+                            />
+
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/contributorsRecyclerView"
                         android:layout_width="match_parent"
@@ -443,6 +461,7 @@
                         android:layoutAnimation="@anim/layout_animation_popscale"
                         android:nestedScrollingEnabled="false" />
                     </RelativeLayout>
+
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
 
@@ -474,7 +493,6 @@
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
                     android:orientation="vertical"
-
                     >
 
                 </LinearLayout>

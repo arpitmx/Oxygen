@@ -21,6 +21,12 @@ object Endpoints {
         const val DP_PATH = "/DP/dp"
     }
 
+    object TaskDetails{
+
+        const val EMPTY_MODERATORS = "None"
+
+    }
+
 
     object User {
 
