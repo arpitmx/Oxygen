@@ -333,20 +333,31 @@
                     android:textSize="22dp" />
 
 
-
-                <TextView
-                    android:id="@+id/openedBy"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/sf_pro_display_medium"
-                    android:gravity="start"
-                    android:paddingStart="@dimen/padding_start_task_details"
-                    android:paddingEnd="10dp"
-                    android:text="Alok created this task 2 days ago"
-                    android:textColor="@color/better_white"
-                    android:textSize="15dp" />
+                    android:orientation="horizontal"
+                    android:paddingStart="15dp"
+                    android:layout_height="wrap_content">
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/asigneer_dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_marginTop="@dimen/margin_top"
+                        android:src="@drawable/profile_pic_placeholder" />
+                    <TextView
+                        android:id="@+id/openedBy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/sf_pro_display_medium"
+                        android:gravity="start"
+                        android:paddingStart="@dimen/padding_start_task_details"
+                        android:paddingEnd="10dp"
+                        android:text="Alok created this task 2 days ago"
+                        android:textColor="@color/better_white"
+                        android:textSize="15dp" />
+                </LinearLayout>
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tagRecyclerView"

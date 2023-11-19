@@ -231,9 +231,42 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         binding.typeInclude.tagIcon.text = type.substring(0, 1)
         binding.typeInclude.tagText.text = type
 
-        if (task.assignee[0] != Endpoints.TaskDetails.EMPTY_MODERATORS) {
+        fetchUserbyId(task.assigner){
+            Glide.with(requireContext())
+                .load(it?.profileDPUrl)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
 
-            fetchUserbyId(task.assignee[0]) { user ->
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+                })
+                .encodeQuality(80)
+                .override(40, 40)
+                .apply(
+                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+
+                )
+                .error(R.drawable.profile_pic_placeholder)
+                .into(binding.asigneerDp)
+        }
+
+        if (task.assignee != Endpoints.TaskDetails.EMPTY_MODERATORS) {
+
+            fetchUserbyId(task.assignee) { user ->
                 Glide.with(requireContext())
                     .load(user?.profileDPUrl)
                     .listener(object : RequestListener<Drawable> {
@@ -450,15 +483,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         setCreator(task)
 
-        if (task.links.isEmpty()) {
-            binding.link.gone()
-            binding.linksCont.gone()
-        }
-        if (task.links.isNotEmpty()) {
-            binding.link.visible()
-            binding.linksCont.visible()
-            setLinksView(task.links.toMutableList())
-        }
+
     }
 
 
@@ -585,19 +610,20 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             minutes > 0 -> "$minutes minutes ago"
             else -> "just now"
         }
+        fetchUserbyId(task.assigner) {
+            val fullText = "${it?.username} created this task $timeAgo"
+            val spannableString = SpannableString(fullText)
 
-        val fullText = "${task.assigner} created this task $timeAgo"
-        val spannableString = SpannableString(fullText)
 
+            val startIndex = 0
+            val endIndex = startIndex + task.assigner.length
 
-        val startIndex = 0
-        val endIndex = startIndex + task.assigner.length
-
-        // Bold
-        spannableString.setSpan(
-            StyleSpan(Typeface.BOLD), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        binding.openedBy.text = spannableString
+            // Bold
+            spannableString.setSpan(
+                StyleSpan(Typeface.BOLD), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            binding.openedBy.text = spannableString
+        }
     }
 
     private fun setdetails(id: String) {
@@ -708,14 +734,14 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private fun fetchUsers() {
 
-        Timber.d("Contributor list : ${taskDetails.contributors}")
+        Timber.d("Moderators list : ${taskDetails.moderators}")
 
-        if (taskDetails.contributors.isEmpty()) {
+        if (taskDetails.moderators.isEmpty()) {
             //toast("Contributor empty")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
 
-        } else if (taskDetails.contributors[0] == Endpoints.TaskDetails.EMPTY_MODERATORS) {
+        } else if (taskDetails.moderators[0] == Endpoints.TaskDetails.EMPTY_MODERATORS) {
            // toast("Contributor not empty None")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
@@ -725,7 +751,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             binding.contributorsRecyclerView.visible()
             binding.noContributors.gone()
 
-            for (contributors in taskDetails.contributors) {
+            for (contributors in taskDetails.moderators) {
 
                 viewModel.getUserbyId(contributors) { result ->
 
@@ -785,7 +811,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                         requireActivity().finish()
                     }
                     binding.progressBar.gone()
-                    callback(null) // or handle error case accordingly
+                    callback(null)
                 }
 
                 is ServerResult.Progress -> {

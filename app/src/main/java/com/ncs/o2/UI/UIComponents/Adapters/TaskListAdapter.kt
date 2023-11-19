@@ -44,7 +44,6 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context) 
                         binding.progressBar.gone()
                         return false
                     }
-
                     override fun onResourceReady(
                         resource: Drawable?,
                         model: Any?,

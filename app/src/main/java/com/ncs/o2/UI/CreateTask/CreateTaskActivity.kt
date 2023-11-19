@@ -351,30 +351,26 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 }
                 if (PrefManager.getcurrentUserdetails().ROLE>=2){
                     val assignee=selectedAssignee[0].firebaseID
-                val task= Task(
-                    title = title.toString(),
-                    description = "",
-                    id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
-                    difficulty = difficulty,
-                    links = emptyList(),
-                    priority = priority,
-                    status = status,
-                    assignee = listOf(assignee),
-                    assigner = assigner.USERNAME,
-                    assigner_email = assigner.EMAIL,
-                    deadline = "",
-                    duration = duration.text.toString(),
-                    time_STAMP = Timestamp.now(),
-                    tags = tags.toList(),
-                    project_ID = PrefManager.getcurrentProject(),
-                    segment = segment.toString(),
-                    section = section.toString(),
-                    assignee_DP_URL = PrefManager.getDpUrl()!!,
-                    completed = false,
-                    type = type,
-                    contributors = contributorList
-                )
-                postTask(task)
+                    val task= Task(
+                        title = title.toString(),
+                        description = "",
+                        id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
+                        difficulty = difficulty,
+                        priority = priority,
+                        status = status,
+                        assignee = assignee,
+                        assigner = assigner.EMAIL,
+                        duration = duration.text.toString(),
+                        time_STAMP = Timestamp.now(),
+                        tags = tags.toList(),
+                        project_ID = PrefManager.getcurrentProject(),
+                        segment = segment.toString(),
+                        section = section.toString(),
+                        completed = false,
+                        type = type,
+                        moderators = contributorList
+                    )
+                    postTask(task)
                 }
                 else{
                     val task= Task(
@@ -382,23 +378,19 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         description = "",
                         id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                         difficulty = difficulty,
-                        links = emptyList(),
                         priority = priority,
                         status = status,
-                        assignee = listOf("None"),
-                        assigner = assigner.USERNAME,
-                        assigner_email = assigner.EMAIL,
-                        deadline = "",
+                        assignee = "None",
+                        assigner = assigner.EMAIL,
                         duration = duration.text.toString(),
                         time_STAMP = Timestamp.now(),
                         tags = tags.toList(),
                         project_ID = PrefManager.getcurrentProject(),
                         segment = segment.toString(),
                         section = section.toString(),
-                        assignee_DP_URL = PrefManager.getDpUrl()!!,
                         completed = false,
                         type = type,
-                        contributors = listOf("None")
+                        moderators = listOf("None")
                     )
                     postTask(task)
                 }
