@@ -95,50 +95,50 @@ class O2Application : Application(), Configuration.Provider{
         }
     }
     private fun sendIssueThroughBot(e: Throwable) {
-        val task= Task(
-            title = e.cause.toString(),
-            description = e.stackTraceToString(),
-            id ="#T${RandomIDGenerator.generateRandomTaskId(5)}",
-            difficulty = 2,
-            priority = 2,
-            status = 0,
-            assigner = "oxygenbot@hackncs.in",
-            deadline = "None",
-            project_ID = "NCSOxygen",
-            segment = "Bugs\uD83D\uDC1E", //change segments here //like Design
-            section = "Bugs Found",  //Testing // Completed //Ready //Ongoing
-            assignee_DP_URL = "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/oxygenbot%40hackncs.in%2FDP%2Fdp?alt=media&token=e8c8c439-fa80-4faa-82de-10a5f86dd992",
-            completed = false,
-            duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),
-            time_STAMP = Timestamp.now(),
-            assigner_email = "slow@gmail.com"
-        )
-
-        CoroutineScope(Dispatchers.Main).launch {
-
-
-            repository.postTask(task) { result ->
-
-                when (result) {
-
-                    is ServerResult.Failure -> {
-                        Timber.d("O2Appxyz : Failure in sending issue!")
-                        Toast.makeText(applicationContext, "Failed", Toast.LENGTH_SHORT).show()
-                    }
-
-                    ServerResult.Progress -> {
-
-                    }
-
-                    is ServerResult.Success -> {
-                        Timber.d("O2Appxyz : Sent Issue!")
-                        Toast.makeText(applicationContext, "Passed", Toast.LENGTH_SHORT).show()
-
-                    }
-
-                }
-            }
-        }
+//        val task= Task(
+//            title = e.cause.toString(),
+//            description = e.stackTraceToString(),
+//            id ="#T${RandomIDGenerator.generateRandomTaskId(5)}",
+//            difficulty = 2,
+//            priority = 2,
+//            status = 0,
+//            assigner = "oxygenbot@hackncs.in",
+//            deadline = "None",
+//            project_ID = "NCSOxygen",
+//            segment = "Bugs\uD83D\uDC1E", //change segments here //like Design
+//            section = "Bugs Found",  //Testing // Completed //Ready //Ongoing
+//            assignee_DP_URL = "https://firebasestorage.googleapis.com/v0/b/ncso2app.appspot.com/o/oxygenbot%40hackncs.in%2FDP%2Fdp?alt=media&token=e8c8c439-fa80-4faa-82de-10a5f86dd992",
+//            completed = false,
+//            duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),
+//            time_STAMP = Timestamp.now(),
+//            assigner_email = "slow@gmail.com"
+//        )
+//
+//        CoroutineScope(Dispatchers.Main).launch {
+//
+//
+//            repository.postTask(task) { result ->
+//
+//                when (result) {
+//
+//                    is ServerResult.Failure -> {
+//                        Timber.d("O2Appxyz : Failure in sending issue!")
+//                        Toast.makeText(applicationContext, "Failed", Toast.LENGTH_SHORT).show()
+//                    }
+//
+//                    ServerResult.Progress -> {
+//
+//                    }
+//
+//                    is ServerResult.Success -> {
+//                        Timber.d("O2Appxyz : Sent Issue!")
+//                        Toast.makeText(applicationContext, "Passed", Toast.LENGTH_SHORT).show()
+//
+//                    }
+//
+//                }
+//            }
+//        }
     }
 
     //Xiami : cmMiVraYTkyhLGCWh8aorx:APA91bGe-6OkspkpxE9-fpxsOwslGHAlwRxG45gbeg2dxY6MckcpS-PnOl1TQvOVaZ9E90VFtWCBw3qftKJS2DkdYCEgqgGrWxRrjnsbIz4SD0j40oeLbC3OfXRe9ebC38-2xoLMDjmN

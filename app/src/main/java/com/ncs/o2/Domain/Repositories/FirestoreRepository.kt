@@ -725,7 +725,6 @@ class FirestoreRepository @Inject constructor(
                     val title = document.getString("title")
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
-                    val duration = document.getString("duration")
                     var time = document.get("time_STAMP") as Timestamp
 
                     if (time == null) {
@@ -738,16 +737,13 @@ class FirestoreRepository @Inject constructor(
                     } else {
                         assignerID = "mohit@mail.com"
                     }
-                    val assignee_DP_URL = document.getString("assignee_DP_URL")
 
                     val taskItem = TaskItem(
                         title = title!!,
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
-                        duration = duration!!,
                         timestamp = time,
                         completed = completed.toString().toBoolean(),
-                        assignee_DP_URL = assignee_DP_URL!!,
                         assignee_id = assignerID,
                     )
                     sectionList.add(taskItem)
@@ -960,7 +956,6 @@ class FirestoreRepository @Inject constructor(
                     val title = querySnapshot.getString("title")
                     val id = querySnapshot.getString("id")
                     val difficulty = querySnapshot.get("difficulty")
-                    val duration = querySnapshot.getString("duration")
                     val time = querySnapshot.get("time_STAMP") as Timestamp
                     val completed = querySnapshot.getBoolean("completed")
                     if (querySnapshot.getString("assigner_email") != null) {
@@ -968,16 +963,13 @@ class FirestoreRepository @Inject constructor(
                     } else {
                         assignerID = "mohit@mail.com"
                     }
-                    val assignee_DP_URL = querySnapshot.getString("assignee_DP_URL")
 
                     val taskItem = TaskItem(
                         title = title!!,
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
-                        duration = duration!!,
                         timestamp = time,
                         completed = completed.toString().toBoolean(),
-                        assignee_DP_URL = assignee_DP_URL!!,
                         assignee_id = assignerID,
                     )
                     Log.d("taskrepo", taskItem.toString())

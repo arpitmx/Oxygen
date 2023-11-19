@@ -9,10 +9,8 @@ data class TaskItem(
     var id: String="",
     val assignee_id:String="",
     val difficulty: Int = 0,
-    val duration: String = "",
     val timestamp: Timestamp?=null,
     val completed:Boolean=false,
-    val assignee_DP_URL: String = "",
 ) {
     @Exclude
     fun getDifficultyColor(): Int {
