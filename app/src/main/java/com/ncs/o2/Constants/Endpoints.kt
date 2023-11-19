@@ -13,6 +13,7 @@ object Endpoints {
 
 
     object CodeViewer {
+        val LANG = "LANG"
         const val CODE = "CODE"
 
     }

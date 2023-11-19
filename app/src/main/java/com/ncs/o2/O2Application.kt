@@ -72,7 +72,7 @@ class O2Application : Application(), Configuration.Provider{
 
 
         //CodeViewer
-        CodeProcessor.init(this@O2Application)
+        //CodeProcessor.init(this@O2Application)
 
         if (BuildConfig.DEBUG)  {
             Timber.plant(Timber.DebugTree())

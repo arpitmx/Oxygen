@@ -6,8 +6,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -191,13 +194,39 @@ object ExtensionsUtil {
         }
     }
 
-    fun ImageView.load(url: Any, placeholder: Int) {
-        Glide.with(context)
-            .setDefaultRequestOptions(RequestOptions().placeholder(placeholder))
-            .load(url)
-            .error(placeholder)
-            .into(this)
+    /**
+     * Set Drawable to the left of EditText
+     * @param icon - Drawable to set
+     */
+    fun EditText.setDrawable(icon: Drawable) {
+        this.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
     }
+
+
+    /**
+     * Function to run a delayed function
+     * @param millis - Time to delay
+     * @param function - Function to execute
+     */
+    fun runDelayed(millis: Long, function: () -> Unit) {
+        Handler(Looper.getMainLooper()).postDelayed(function, millis)
+    }
+
+    /**
+     * Show multiple views
+     */
+    fun showViews(vararg views: View) {
+        views.forEach { view -> view.visible() }
+    }
+
+
+    /**
+     * Hide multiple views
+     */
+    fun hideViews(vararg views: View) {
+        views.forEach { view -> view.gone() }
+    }
+
 
     //Date formatting
     fun String.toDate(format: String = "yyyy-MM-dd HH:mm:ss"): Date? {
@@ -228,6 +257,45 @@ object ExtensionsUtil {
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
     }
 
+
+    fun ImageView.load(url: Any, placeholder: Drawable) {
+        Glide.with(context)
+            .setDefaultRequestOptions(RequestOptions().placeholder(placeholder))
+            .load(url)
+            .thumbnail(0.05f)
+            .error(placeholder)
+            .into(this)
+    }
+
+    /**
+     * Load image to ImageView
+     * @param url - Url of the image, can be Int, drawable or String
+     * @param placeholder - Placeholder to show when loading image
+     * @param thumbnail - Image thumbnail url
+     */
+    fun ImageView.load(url: Any, placeholder: Int, thumbnail: String) {
+        Glide.with(context)
+            .setDefaultRequestOptions(RequestOptions()
+                .placeholder(placeholder))
+            .load(url)
+            .thumbnail(Glide.with(context).asDrawable().load(thumbnail).thumbnail(0.1f))
+            .into(this)
+    }
+
+    /**
+     * Load image to ImageView
+     * @param url - Url of the image, can be Int, drawable or String
+     * @param placeholder - Placeholder to show when loading image
+     * @param thumbnail - Image thumbnail url
+     */
+    fun ImageView.load(url: Any, placeholder: Drawable, thumbnail: String) {
+        Glide.with(context)
+            .setDefaultRequestOptions(RequestOptions()
+                .placeholder(placeholder))
+            .load(url)
+            .thumbnail(Glide.with(context).asDrawable().load(thumbnail).thumbnail(0.1f))
+            .into(this)
+    }
 
     //Animation
     fun View.animSlideUp(context: Context, animDuration: Long = 1500L) = run {

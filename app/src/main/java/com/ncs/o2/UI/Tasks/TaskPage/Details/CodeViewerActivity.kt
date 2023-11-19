@@ -43,17 +43,33 @@ class CodeViewerActivity : AppCompatActivity() {
     private fun setUpCodeViewer() {
         val intent = intent
         val receivedCode = intent.getStringExtra(Endpoints.CodeViewer.CODE)
+        val receivedLang = intent.getStringExtra(Endpoints.CodeViewer.LANG)
+
 
         if (receivedCode!=null){
 
             code = receivedCode
 
-            binding.codeView.setOptions(Options.Default.get(this)
-                .withCode(receivedCode)
-                .withFont(Font.Consolas)
-                .withTheme(ColorTheme.MONOKAI))
+            if (receivedLang!=null){
+                binding.bottomBar.languageTv.text= receivedLang
+                binding.codeView.setOptions(Options.Default.get(this)
+                    .withLanguage(receivedLang)
+                    .withCode(receivedCode)
+                    .withFont(Font.Consolas)
+                    .withTheme(ColorTheme.MONOKAI))
 
-            binding.codeView.setupShadows(true)
+                binding.codeView.setupShadows(true)
+            }else {
+                binding.bottomBar.languageTv.text= "Text"
+                binding.codeView.setOptions(Options.Default.get(this)
+                    .withLanguage("kotlin")
+                    .withCode(receivedCode)
+                    .withFont(Font.Consolas)
+                    .withTheme(ColorTheme.MONOKAI))
+
+                binding.codeView.setupShadows(true)
+            }
+
 
         }
 

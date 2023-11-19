@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
@@ -43,9 +44,9 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
@@ -185,8 +186,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         }
 
         handleRequestNotificationResult()
-
-
     }
 
     private fun setDefaultViews(task: Task) {
@@ -197,7 +196,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             2 -> "Medium"
             3 -> "High"
             4 -> "Critical"
-            else -> ""
+            else -> "Undefined"
         }
 
         val type = when (task.type) {
@@ -208,7 +207,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             5 -> "Exception"
             6 -> "Security"
             7 -> "Performance"
-            else -> ""
+            else -> "Undefined"
         }
         val status = when (task.status) {
             1 -> "Unassigned"
@@ -216,13 +215,13 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             3 -> "Open"
             4 -> "Review"
             5 -> "Testing"
-            else -> ""
+            else -> "Undefined"
         }
         val difficulty = when (task.difficulty) {
             1 -> "Easy"
             2 -> "Medium"
             3 -> "Hard"
-            else -> ""
+            else -> "Undefined"
         }
 
         binding.priorityInclude.tagIcon.text = priority.substring(0, 1)
@@ -279,6 +278,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         binding.difficultyInclude.tagIcon.text = difficulty.substring(0, 1)
         binding.difficultyInclude.tagText.text = difficulty
+
         when (task.difficulty) {
             1 -> binding.difficultyInclude.tagIcon.background =
                 resources.getDrawable(R.drawable.label_cardview_green)
@@ -391,7 +391,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         for (i in 0 until num) {
             val text = inflater.inflate(
-                com.ncs.o2.R.layout.links_item, parentLayout, false
+                R.layout.links_item, parentLayout, false
             ) as TextView
             TextViewList.add(text)
             parentLayout.addView(text)
@@ -429,24 +429,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         binding.titleTv.text = task.title
 
-        setUpTaskDescription(taskDetails.description)
 
-        val statusText = when (task.status) {
-            1 -> "Unassigned"
-            2 -> "Assigned"
-            3 -> "Finished"
-            4 -> "Review"
-            5 -> "Testing"
-            else -> ""
+        runDelayed(500) {
+            setUpTaskDescription(taskDetails.description)
         }
 
-
-        val difficultyText = when (task.difficulty) {
-            1 -> "Easy"
-            2 -> "Medium"
-            3 -> "Difficult"
-            else -> ""
-        }
 
         setCreator(task)
 
@@ -468,7 +455,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     allPreTags.forEach(function(preTag) {
       preTag.addEventListener('click', function() {
         var clickedText = preTag.textContent;
-        send.sendCode(clickedText);
+        var languageType = preTag.getAttribute('language');
+        send.sendCode(clickedText, languageType);
        
       });
     });
@@ -518,28 +506,39 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         binding.markdownView.settings.javaScriptEnabled = true
         binding.markdownView.addStyleSheet(css)
+        binding.markdownView.addJavascriptInterface(AndroidToJsInterface(), "send")
 
         binding.markdownView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 view?.evaluateJavascript(script) {}
+
+//                view?.evaluateJavascript(
+//                    "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
+//                ) { html ->
+//                    Timber.tag("HTML").d(html!!)
+//
+//                }
             }
         }
 
-        binding.markdownView.addJavascriptInterface(AndroidToJsInterface(), "send")
         binding.markdownView.loadMarkdown(description)
+
         binding.descriptionProgressbar.gone()
         binding.markdownView.visible()
+        binding.markdownView.animFadein(requireActivity(),500)
 
     }
 
 
     inner class AndroidToJsInterface {
         @JavascriptInterface
-        fun sendCode(codeText: String) {
+        fun sendCode(codeText: String, language : String?) {
             requireActivity().runOnUiThread {
 
                 val codeViewerIntent = Intent(requireActivity(), CodeViewerActivity::class.java)
                 codeViewerIntent.putExtra(Endpoints.CodeViewer.CODE, codeText.trimIndent().trim())
+                codeViewerIntent.putExtra(Endpoints.CodeViewer.LANG, language?.trimIndent()?.trim())
+
                 startActivity(codeViewerIntent)
                 requireActivity().overridePendingTransition(
                     R.anim.slide_in_left,

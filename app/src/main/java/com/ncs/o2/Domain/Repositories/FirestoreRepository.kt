@@ -738,7 +738,7 @@ class FirestoreRepository @Inject constructor(
                     } else {
                         assignerID = "mohit@mail.com"
                     }
-                    val assignee_DP_URL = document.getString("assignee_DP_URL")
+                    val assignee_DP_URL = document.getString("assignee_DP_URL")?:""
 
                     val taskItem = TaskItem(
                         title = title!!,
@@ -747,7 +747,7 @@ class FirestoreRepository @Inject constructor(
                         duration = duration!!,
                         timestamp = time,
                         completed = completed.toString().toBoolean(),
-                        assignee_DP_URL = assignee_DP_URL!!,
+                        assignee_DP_URL = assignee_DP_URL,
                         assignee_id = assignerID,
                     )
                     sectionList.add(taskItem)
