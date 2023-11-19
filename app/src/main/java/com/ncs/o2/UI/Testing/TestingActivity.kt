@@ -1172,15 +1172,12 @@ See [`LICENSE`](LICENSE) for full of the license text.
                 priority = Random(System.currentTimeMillis()).nextInt(1, 4),
                 status = Random(System.currentTimeMillis()).nextInt(0, 3),
                 assigner = Faker().funnyName().name().toString(),
-                deadline = "${Random(System.currentTimeMillis()).nextInt(1, 5)} days",
                 project_ID = "NCSOxygen",
                 segment = "Backend", //change segments here //like Design
                 section = "CI/CD\uD83C\uDF4D",  //Testing // Completed //Ready //Ongoing
-                assignee_DP_URL = "https://picsum.photos/200",
                 completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1, 5).toString(),
                 time_STAMP = Timestamp.now(),
-                assigner_email = "slow@gmail.com"
             )
 
             CoroutineScope(Dispatchers.Main).launch {
