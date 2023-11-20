@@ -370,7 +370,7 @@
                         android:background="@drawable/card_view_white"
                         android:fontFamily="@font/sf_pro_display_medium"
                         android:maxLines="2"
-                        android:maxLength="30"
+                        android:maxLength="100"
                         android:textAlignment="textStart"
                         android:textColor="@color/darkbg_main"
                         android:textSize="17dp" />

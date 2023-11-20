@@ -4,6 +4,8 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.firebase.firebase-perf'
+
 }
 
 
@@ -190,6 +192,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:20.3.0'
     //Firebase messaging
     implementation 'com.google.firebase:firebase-messaging-ktx'
+    //Firebase performance
+    implementation("com.google.firebase:firebase-perf")
+
 
 
     //Utils library

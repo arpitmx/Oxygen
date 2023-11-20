@@ -105,79 +105,195 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     lateinit var calendar: Calendar
 
 
+
+    val description2 : String = """
+        # bitscuit 🍪  [![](https://jitpack.io/v/arpitmx/bitscuit.svg)](https://jitpack.io/#arpitmx/bitscuit)
+
+        bitscuit updater is an android library which the developers can hook into their project and use it to update their apps in just 3 lines of code. bitscuit is hosted at  <a href="https://jitpack.io/#arpitmx/bitscuit/1.0.5">Jitpack repository</a>
+
+        ![Logo](https://github.com/arpitmx/bitscuit/assets/59350776/4b40f173-7f7c-4357-b0a0-43b7a6cb5733)
+
+
+
+        ## Applications 
+        bitscuit is suited for those application :
+        - Apps which aren't hosted on any store like google play store
+        - Distributing updates apps to testers
+        - Apps which have more frequent updates cause app stores like playstore takes a lot of time (1-2 day) for verification of each update  
+        - For updates involving minor upgrades in the app
+
+
+        ## Features
+
+
+        <br><img src="https://github.com/arpitmx/bitscuit/assets/59350776/77c7d735-1c1c-40e4-bb77-1f10c8a4c9c2" width="350"><br><br>
+
+
+        - **Easy integration** : bitscuit can be easily integrated into any Android app with just three lines of code, handles permissions, configurations, version comparisions,etc. saving developers valuable time and effort, why recreating the wheel? right.
+        <br><br>
+        <p float="left">
+        <img src="https://github.com/arpitmx/bitscuit/assets/59350776/3df5b3a9-3194-46f8-9013-8d1f48edf25b" width="350">
+        <img src="https://github.com/arpitmx/bitscuit/assets/59350776/8c58fc11-fe35-4be0-90cd-cc7d9101ec8a)" width="350">
+        </p><br><br>
+
+
+        - **Seamless updates** : bitscuit ensures that app updates happen seamlessly, without interrupting user experience or requiring the user to manually update the app.
+
+        <br><br>
+        <img src="https://github.com/arpitmx/bitscuit/assets/59350776/a703cc37-19e0-4e33-9214-bb744fec87cb" width="350"><br><br>
+
+
+        - **Error handling** : bitscuit handles errors and edge cases like connection problems gracefully, ensuring that the update process is as smooth and error-free as possible for both developers and users.
+
+
+        ## Installation
+
+        Installing bistcuit is very simple , you can install bitscuit using github release by downloading the latest jar file  
+
+        ### Using Gradle 
+
+        #### Step 1 : Use this in build.gradle(module: project)
+        ```gradle
+          allprojects {
+        		repositories {
+        			...
+        			maven { url 'https://jitpack.io' }
+        		}
+        	}
+
+        //For Gradle 7.0 and above add 'maven { url 'https://jitpack.io' }' in settings.gradle file
+
+
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+                maven { url 'https://jitpack.io' }
+            }
+        }
+
+
+        ```
+
+
+
+
+        #### Step 2 : Use this in build.gradle(module: app)
+        ```gradle
+         dependencies {
+        	    implementation 'com.github.arpitmx:bitscuit:1.0.5'
+        	}
+        ```
+
+        ### Using Maven
+
+        ```xml
+        <repositories>
+        	<repository>
+        		<id>jitpack.io</id>
+        		<url>https://jitpack.io</url>
+        	</repository>
+        </repositories>
+        ```
+
+        ```xml
+        <dependency>
+         	<groupId>com.github.arpitmx</groupId>
+        	<artifactId>bitscuit</artifactId>
+        	<version>1.0.6</version>
+        </dependency>
+        ```
+
+        Do not forget to add internet permission in manifest if already not present
+        ```xml
+        <uses-permission android:name="android.permission.INTERNET" />
+        ```
+
+
+
+            
+        ## Sample usage 
+
+        ```kotlin
+         ...
+
+        //This data can be fetched from your database 
+         val url = "https://example.com/update.apk"
+         val latestVersion = "1.0.1"
+         val changeLogs = "Change logs..."
+
+
+        // Use the buitscuit builder to create the bitscuit instance 
+        val bitscuit = Bitscuit.BitscuitBuilder(this)
+                            .config(url = updatedURL,version="1.0.1",changeLogs="Change logs..")
+                            .build() 
+          
+               
+        // Use the listenUpdate() function to start listening for updates 
+          bitscuit.listenUpdate()   
+
+         ...                 
+                            
+        ```
+        ## License
+        ```
+           Copyright (C) 2023 Alok Ranjan
+
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+
+               http://www.apache.org/licenses/LICENSE-2.0
+
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+
+           
+        ```
+
+        ## Contributing to bitscuit
+        All pull requests are welcome, make sure to follow the [contribution guidelines](Contribution.md)
+        when you submit pull request.
+        ## Links
+        [![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://github.com/arpitmx/)
+        [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/alokandro/)
+        [![twitter](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/sudoarmax)
+
+
+    """.trimIndent()
+    val desc3 = """
+        Enable debug logging for Performance Monitoring at build time by adding a <meta-data> element to your app's AndroidManifest.xml file, like so:
+
+        ```xml
+            <application>
+                <meta-data
+                  android:name="firebase_performance_logcat_enabled"
+                  android:value="true" />
+            </application>
+        ```
+        
+        Check your log messages for any error messages.
+
+        Performance Monitoring tags its log messages with FirebasePerformance. Using logcat filtering, you can specifically view duration trace and HTTP/S network request logging by running the following command:
+
+
+        adb logcat -s FirebasePerformance
+        Check for the following types of logs which indicate that Performance Monitoring is logging performance events:
+
+        Logging trace metric: TRACE_NAME, FIREBASE_PERFORMANCE_CONSOLE_URL
+        Logging network request trace: URL
+    """.trimIndent()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         Codes.STRINGS.segmentText = ""
-
-//
-//        binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
-//
-//            if (binding.tvTitle.text!!.isEmpty() ||
-//                binding.tvDescription.text!!.isEmpty() ||
-//                binding.startDate.text == "Set Start Date" ||
-//                binding.endDate.text == "Set Deadline Date" ||
-//                binding.duration.text == "Set Duration" ||
-//                binding.segment.text == "Set Segment" ||
-//                binding.section.text == "Set Section" ||
-//                binding.chipGroup.isEmpty() ||
-//                binding.contributorsRecyclerView.isEmpty() ||
-//                diffLevel == 0
-//            ) {
-//                val currentTimestamp = Timestamp.now()
-//                Log.d("TimeStampCheck", currentTimestamp.toString())
-//                Toast.makeText(this, "Pls complete the entries", Toast.LENGTH_SHORT).show()
-//                return@setOnClickThrottleBounceListener
-//            }
-//
-//            val currentUser = PrefManager.getcurrentUserdetails()
-//            val task = Task(
-//                id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
-//                title = binding.tvTitle.text.toString(),
-//                description = binding.tvDescription.text.toString(),
-//                difficulty = diffLevel,
-//                assignee = contributorList,
-//                assigner = currentUser.USERNAME,
-//                deadline = binding.endDate.text.toString(),
-//                duration = binding.duration.text.toString(),
-//                assigner_email = currentUser.EMAIL,
-//                tags = tagIdList,
-//                segment = binding.segment.text.toString(),
-//                section = binding.section.text.toString(),
-//                time_STAMP = Timestamp.now(),
-//                completed = false,
-//            )
-//
-//            viewModel.addTaskThroughRepository(task)
-//
-//            Log.d("taskCheck", task.toString())
-//
-//            Toast.makeText(this, "Task Created", Toast.LENGTH_SHORT).show()
-//
-//            onBackPressedDispatcher.onBackPressed()
-//            finish()
-//
-//        }
-
-        // Activity -> Viewmodel -> PostUsecase + GetUsecase -> Repository(DB)-> Firestore db
-
-
-//        binding.diffChipGp.setOnCheckedChangeListener { group, checkedId ->
-//            // Handle chip selection change
-//            val selectedChip = findViewById<Chip>(checkedId)
-//            // Do something with the selected chip
-//            if (!selectedChip.isNull) {
-//                if (selectedChip.text == "Easy") {
-//                    diffLevel = 1
-//                } else if (selectedChip.text == "Medium") {
-//                    diffLevel = 2
-//                } else if (selectedChip.text == "Difficult") {
-//                    diffLevel = 3
-//                }
-//            }
-//        }
-
 
         binding.duration.setOnClickThrottleBounceListener {
 //            viewmodel.createTask(testTask)
@@ -283,8 +399,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 val assigneeListBottomSheet = AssigneeListBottomSheet(OList, selectedAssignee,this@CreateTaskActivity)
                 assigneeListBottomSheet.show(supportFragmentManager, "assigneelist")
             }
-
         }
+
         binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
             var validate=true
             if (binding.taskDurationET.text=="Select"){
@@ -353,7 +469,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     val assignee=selectedAssignee[0].firebaseID
                     val task= Task(
                         title = title.toString(),
-                        description = "",
+                        description = desc3,
                         id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                         difficulty = difficulty,
                         priority = priority,
@@ -375,7 +491,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 else{
                     val task= Task(
                         title = title.toString(),
-                        description = "",
+                        description = desc3,
                         id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                         difficulty = difficulty,
                         priority = priority,
@@ -394,11 +510,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     )
                     postTask(task)
                 }
-
             }
-
-
-
 
         }
 
@@ -421,8 +533,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
                     ServerResult.Progress -> {
                         binding.progressBar.visible()
-
-
                     }
 
                     is ServerResult.Success -> {
@@ -439,21 +549,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
 
     private fun setUpLiveData() {
-        //Progress listener
-//        viewmodel.progressLiveData.observe(this){ visibility ->
-//            if (visibility){
-//                binding.progressCircularInclude.root.visible()
-//            }else {
-//                binding.progressCircularInclude.root.gone()
-//            }
-//        }
-//
-//        viewmodel.successLiveData.observe(this){
-//            if (it){
-//                toast("Task Published...")
-//                finish()
-//            }
-//        }
+
 
     }
 

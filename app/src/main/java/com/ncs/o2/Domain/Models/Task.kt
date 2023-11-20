@@ -36,9 +36,9 @@ data class Task(
     val priority: Int = 0,
     val status: Int = -1,
 
-    val assignee: String = "", // Make it String instead of List,store email
-    val assigner: String = "",  //  (Store email of assigner here instead of name)
-    val moderators:List<String> = listOf(), // Change the name to moderators
+    val assignee: String = "",
+    val assigner: String = "",
+    val moderators:List<String> = listOf(),
 
     var time_STAMP: Timestamp? =null,
     val duration: String = "",
