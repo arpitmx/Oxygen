@@ -25,6 +25,7 @@ import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.R
+import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.UserMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +57,7 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var messageDatabase: MessageDatabase
     var db: UsersDao
+    var users:MutableList<UserInMessage> = mutableListOf()
 
     init {
         messageDatabase = Room.databaseBuilder(context, MessageDatabase::class.java, Endpoints.ROOM.MESSAGES.USERLIST_DB).build()
@@ -68,142 +70,86 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
         const val FILE_MSG = 2
     }
 
-    private inner class UserMessage_ViewHolder( val binding: UserMessageItemBinding) :
+    private inner class UserMessage_ViewHolder( val binding: ChatMessageItemBinding) :
         RecyclerView.ViewHolder(binding.root){
 
 
-        fun bind(position: Int){
-            CoroutineScope(Dispatchers.Main).launch {
-                if (db.getUserbyId(msgList[position].senderId) == null) {
-                    fetchUser(msgList[position].senderId){
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Log.d("DB","This a new user, now saving in DB....")
-                            db.insertUser(it)
-                            var user=it
-                            val msg = msgList.get(position).content
-                            binding.message.setText(msg)
-                            val timeDifference = Date().time - msgList[position].timestamp!!.toDate().time
-                            val minutes = (timeDifference / (1000 * 60)).toInt()
-                            val hours = minutes / 60
-                            val days = hours / 24
-                            val weeks = days / 7
-                            val months = days / 30
-                            val years = days / 365
+        fun bind(position: Int) {
+            val senderId = msgList[position].senderId
+            val localUser = users.find { it.EMAIL == senderId }
 
-                            val timeAgo: String = when {
-                                years > 0 -> "about $years ${if (years == 1) "year" else "years"} ago"
-                                months > 0 -> "about $months ${if (months == 1) "month" else "months"} ago"
-                                weeks > 0 -> "about $weeks ${if (weeks == 1) "week" else "weeks"} ago"
-                                days > 0 -> "about $days ${if (days == 1) "day" else "days"} ago"
-                                hours > 0 -> "about $hours ${if (hours == 1) "hour" else "hours"} ago"
-                                minutes > 0 -> "about $minutes ${if (minutes == 1) "minute" else "minutes"} ago"
-                                else -> "just now"
-                            }
-
-                            binding.timeStamp.text=timeAgo
-                            Glide.with(binding.root)
-                                .load(user.DP_URL)
-                                .listener(object : RequestListener<Drawable> {
-
-                                    override fun onLoadFailed(
-                                        e: GlideException?,
-                                        model: Any?,
-                                        target: Target<Drawable>?,
-                                        isFirstResource: Boolean
-                                    ): Boolean {
-                                        return false
-                                    }
-                                    override fun onResourceReady(
-                                        resource: Drawable?,
-                                        model: Any?,
-                                        target: Target<Drawable>?,
-                                        dataSource: DataSource?,
-                                        isFirstResource: Boolean
-                                    ): Boolean {
-                                        return false
-                                    }
-                                })
-                                .encodeQuality(80)
-                                .override(40,40)
-                                .apply(
-                                    RequestOptions().
-                                    diskCacheStrategy(DiskCacheStrategy.ALL)
-                                )
-                                .error(R.drawable.profile_pic_placeholder)
-                                .into(binding.userDp)
-                            binding.userName.text=user.USERNAME
-                        }
-
-                    }
-                }
-                if (db.getUserbyId(msgList[position].senderId)!=null){
-                    Log.d("DB","This is a returning user, retrieving from DB....")
-
-                    var user= db.getUserbyId(msgList[position].senderId)!!
-                    val msg = msgList.get(position).content
-                    binding.message.setText(msg)
-                    val timeDifference = Date().time - msgList[position].timestamp!!.toDate().time
-                    val minutes = (timeDifference / (1000 * 60)).toInt()
-                    val hours = minutes / 60
-                    val days = hours / 24
-                    val weeks = days / 7
-                    val months = days / 30
-                    val years = days / 365
-
-                    val timeAgo: String = when {
-                        years > 0 -> "about $years ${if (years == 1) "year" else "years"} ago"
-                        months > 0 -> "about $months ${if (months == 1) "month" else "months"} ago"
-                        weeks > 0 -> "about $weeks ${if (weeks == 1) "week" else "weeks"} ago"
-                        days > 0 -> "about $days ${if (days == 1) "day" else "days"} ago"
-                        hours > 0 -> "about $hours ${if (hours == 1) "hour" else "hours"} ago"
-                        minutes > 0 -> "about $minutes ${if (minutes == 1) "minute" else "minutes"} ago"
-                        else -> "just now"
-                    }
-
-                    binding.timeStamp.text=timeAgo
-                    Glide.with(binding.root)
-                        .load(user.DP_URL)
-                        .listener(object : RequestListener<Drawable> {
-
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                return false
-                            }
-                            override fun onResourceReady(
-                                resource: Drawable?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                dataSource: DataSource?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                return false
-                            }
-                        })
-                        .encodeQuality(80)
-                        .override(40,40)
-                        .apply(
-                            RequestOptions().
-                            diskCacheStrategy(DiskCacheStrategy.ALL)
-                        )
-                        .error(R.drawable.profile_pic_placeholder)
-                        .into(binding.userDp)
-                    binding.userName.text=user.USERNAME
+            if (localUser != null) {
+                setChatItem(localUser, binding, position)
+                Log.d("DB", "fetching from local")
+            } else {
+                fetchUser(senderId) { newUser ->
+                    users.add(newUser)
+                    Log.d("DB", "fetching from db")
+                    setChatItem(newUser, binding, position)
                 }
             }
-
         }
     }
+    fun setChatItem(user:UserInMessage,binding: ChatMessageItemBinding,position: Int){
+        val msg = msgList.get(position).content
+        binding.tvMessage.setText(msg)
+        val timeDifference = Date().time - msgList[position].timestamp!!.toDate().time
+        val minutes = (timeDifference / (1000 * 60)).toInt()
+        val hours = minutes / 60
+        val days = hours / 24
+        val weeks = days / 7
+        val months = days / 30
+        val years = days / 365
 
+        val timeAgo: String = when {
+            years > 0 -> "about $years ${if (years == 1) "year" else "years"} ago"
+            months > 0 -> "about $months ${if (months == 1) "month" else "months"} ago"
+            weeks > 0 -> "about $weeks ${if (weeks == 1) "week" else "weeks"} ago"
+            days > 0 -> "about $days ${if (days == 1) "day" else "days"} ago"
+            hours > 0 -> "about $hours ${if (hours == 1) "hour" else "hours"} ago"
+            minutes > 0 -> "about $minutes ${if (minutes == 1) "minute" else "minutes"} ago"
+            else -> "just now"
+        }
+
+        binding.tvTimestamp.text=timeAgo
+        Glide.with(binding.root)
+            .load(user.DP_URL)
+            .listener(object : RequestListener<Drawable> {
+
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    return false
+                }
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    return false
+                }
+            })
+            .encodeQuality(80)
+            .override(40,40)
+            .apply(
+                RequestOptions().
+                diskCacheStrategy(DiskCacheStrategy.ALL)
+            )
+            .error(R.drawable.profile_pic_placeholder)
+            .into(binding.imgDp)
+        binding.tvName.text=user.USERNAME
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
 
             NORMAL_MSG -> {
-                UserMessage_ViewHolder(UserMessageItemBinding.inflate(LayoutInflater.from(context),parent,false))
+                UserMessage_ViewHolder(ChatMessageItemBinding.inflate(LayoutInflater.from(context),parent,false))
             }
 
             else -> {
