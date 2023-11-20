@@ -5,13 +5,14 @@ import androidx.lifecycle.LiveData
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.UI.StartScreen.maintainceCheck
@@ -44,6 +45,14 @@ interface Repository {
     //Task related
     suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit)
 
+    suspend fun postMessage(projectName: String, taskId:String, message: Message, serverResult: (ServerResult<Int>) -> Unit)
+
+    fun getMessages(
+        projectName: String,
+        taskId:String,
+        result: (ServerResult<List<Message>>) -> Unit
+    )
+
     suspend fun addTask(task: Task)
     suspend fun postTags(tag: Tag, projectName: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun fetchProjectTags(
@@ -59,7 +68,7 @@ interface Repository {
         projectName: String,
         result: (ServerResult<Tag>) -> Unit
     )
-
+    fun getMessageUserInfobyId(id: String, serverResult: (ServerResult<UserInMessage>) -> Unit)
 
     suspend fun getTasksbyId(
         id: String,

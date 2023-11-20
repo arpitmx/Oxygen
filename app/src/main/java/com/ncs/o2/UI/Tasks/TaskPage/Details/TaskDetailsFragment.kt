@@ -218,7 +218,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private fun setDefaultViews(task: Task) {
         binding.projectNameET.text = task.project_ID
-
+        viewModel.task=task
         val priority = when (task.priority) {
             1 -> "Low"
             2 -> "Medium"
