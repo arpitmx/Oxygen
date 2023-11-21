@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -46,7 +47,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
     private lateinit var taskList: ArrayList<TaskItem>
-    private var taskIdsList:MutableList<String> = mutableListOf()
+    private var taskIdsList:MutableList<WorkspaceTaskItem> = mutableListOf()
     private lateinit var projectName: String
     val state = arrayOf(1)
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
@@ -119,7 +120,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
         CoroutineScope(Dispatchers.IO).launch {
             for (i in 0 until taskIdsList.size) {
                 viewModel.getTasksItembyId(
-                    id = taskIdsList[i],
+                    id = taskIdsList[i].ID,
                     projectName = projectName
                 ) { result ->
                     when (result) {
@@ -137,7 +138,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                                 binding.lottieProgressInclude.progressbarBlock.gone()
                                 binding.placeholder.gone()
                                 recyclerView = binding.recyclerView
-                                taskListAdapter = TaskListAdapter(firestoreRepository)
+                                taskListAdapter = TaskListAdapter(firestoreRepository,requireContext())
                                 taskListAdapter.setTaskList(taskList)
                                 taskListAdapter.notifyDataSetChanged()
                                 taskListAdapter.setOnClickListener(this@WorkspaceFragment)

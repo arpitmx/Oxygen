@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="5dp">
@@ -14,6 +15,18 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progress_actionbar"
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
+            android:indeterminate="true"
+            android:layout_marginEnd="12dp"
+            android:visibility="gone"
+            android:indeterminateTint="@color/primary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_fav"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <TextView
@@ -70,12 +83,12 @@
             android:id="@+id/btn_fav"
             android:layout_width="30dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="52dp"
+            android:layout_marginEnd="12dp"
             android:background="@null"
             android:src="@drawable/star_unfilled"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnRequestWork"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
             app:tint="@color/primary" />
@@ -84,10 +97,10 @@
             android:id="@+id/btnRequestWork"
             android:layout_width="30dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_design_services_24"
             android:visibility="visible"
-            android:layout_marginEnd="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -113,6 +126,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
+        android:visibility="gone"
         android:background="@color/border_grey"
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -1,8 +1,5 @@
 package com.ncs.versa.Constants
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
-
 object Endpoints {
 
     const val USERS = "Users"
@@ -10,24 +7,31 @@ object Endpoints {
     const val USERID = "userid1"
 
 
-    object SharedPref{
+    object SharedPref {
         const val SHAREDPREFERENCES = "O2PREF"
     }
 
 
-    object CodeViewer{
+    object CodeViewer {
+        val LANG = "LANG"
         const val CODE = "CODE"
 
     }
 
-    object Storage{
+    object Storage {
         const val DP_PATH = "/DP/dp"
+    }
+
+    object TaskDetails{
+
+        const val EMPTY_MODERATORS = "None"
+
     }
 
 
     object User {
 
-        val FCM_TOKEN= "FCM_TOKEN"
+        val FCM_TOKEN = "FCM_TOKEN"
         val DP_URL = "DP_URL"
         const val PROJECTS = "PROJECTS"
         const val EMAIL = "EMAIL"
@@ -39,9 +43,16 @@ object Endpoints {
         const val DETAILS_ADDED = "DETAILS_ADDED"
         const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_LAST_SEEN"
 
+
     }
 
-    object Project{
+    object Workspace {
+        const val WORKSPACE = "WORKSPACE"
+        const val STATUS = "STATUS"
+        const val ID = "ID"
+    }
+
+    object Project {
 
         const val ALL_SEGMENT = "ALL_SEGMENT"
         const val TASKS = "TASKS"
@@ -49,11 +60,11 @@ object Endpoints {
         const val CONTRIBUTERS = "CONTRIBUTERS"
         const val PROJECTID = "PROJECT_ID"
         const val PROJECTNAME = "PROJECT_NAME"
-        const val TAGS="TAGS"
+        const val TAGS = "TAGS"
 
     }
 
-    object Notifications{
+    object Notifications {
         const val NOTIFICATION_LAST_SEEN = "NOTIFICATION_LAST_SEEN"
         const val NOTIFICATION_COUNT = "NOTIFICATION_COUNT"
         const val LATEST_NOTIFICATION_TIME_STAMP = "LATEST_NOTIFICATION_TIME_STAMP"
@@ -64,18 +75,26 @@ object Endpoints {
         const val notificationType: String = "notificationType"
 
 
-        const val taskID: String= "taskID"
-        const val title: String= "title"
-        const val message: String= "message"
+        const val taskID: String = "taskID"
+        const val title: String = "title"
+        const val message: String = "message"
 
-        const val fromUser: String="fromUser"
+        const val fromUser: String = "fromUser"
         const val toUser: String = "toUser"
         const val timeStamp: String = "timeStamp"
+
+        object Types {
+            const val REQUEST_FAILED_NOTIFICATION = 1
+            const val TASK_REQUEST_RECIEVED_NOTIFICATION = 2
+            const val TASK_CREATION_NOTIFICATION = 3
+            const val TASK_COMMENT_MENTION_NOTIFICATION = 4
+            const val UNKNOWN_TYPE_NOTIFICATION = -1
+        }
 
     }
 
 
-    object SEGMENT{
+    object SEGMENT {
         const val TASKS = "TASKS"
         const val ASSIGNEE = "ASSIGNEE"
         const val ASSIGNER = "ASSIGNER"
@@ -84,24 +103,26 @@ object Endpoints {
         const val TITLE = "TITLE"
 
 
-        const val SEGMENT_NAME="segment_name"
-        const val SEGMENT_ID="segment_id"
+        const val SEGMENT_NAME = "segment_name"
+        const val SEGMENT_ID = "segment_id"
         const val DESCRIPTION = "DESC"
         const val CONTRIBUTERS = "contributors"
-        const val CREATOR="creator"
-        const val CREATOR_ID="creator_id"
-        const val PROJECT_ID="project_id"
-        const val CREATION_DATETIME="creation_datetime"
+        const val CREATOR = "creator"
+        const val CREATOR_ID = "creator_id"
+        const val PROJECT_ID = "project_id"
+        const val CREATION_DATETIME = "creation_datetime"
 
     }
 
-    object ROOM{
+    object ROOM {
 
-        object NOTIFICATIONS{
+        object NOTIFICATIONS {
             const val NOTIFICATIONS_TABLE = "notifications"
             const val NOTIFICATIONS_DATABASE = "NOTIFICATION-DB"
         }
 
 
     }
+
+
 }

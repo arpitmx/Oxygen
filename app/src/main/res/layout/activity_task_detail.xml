@@ -18,7 +18,9 @@
          />
 
 
-   <androidx.constraintlayout.widget.ConstraintLayout
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
        android:id="@+id/progress_bar"
        android:layout_width="match_parent"
        android:layout_height="match_parent"
@@ -41,6 +43,19 @@
             />
 
    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:visibility="gone"
+        android:background="@color/border_grey"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
+
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -66,14 +81,26 @@
 
 
 
+
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
+        android:visibility="gone"
         android:background="@color/border_grey"
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
+
+    <ProgressBar
+        android:id="@+id/progressbar_bottom_tab"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/primary"
+        style="?android:attr/progressBarStyleHorizontal"
+
+        />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"

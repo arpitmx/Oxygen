@@ -1,17 +1,23 @@
 package com.ncs.o2.UI
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MenuItem
+import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.Toast
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.os.BuildCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -25,10 +31,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.Navigator
@@ -85,12 +93,14 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-        PrefManager.initialize(this)
         setContentView(binding.root)
 
         PrefManager.initialize(this)
         setUpViews()
+
     }
+
+
 
     private fun setUpViews() {
 
@@ -99,7 +109,21 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setUpActionBar()
         setBottomNavBar()
         setUpViewsOnClicks()
+        setupProjectsList()
     }
+
+//    private fun makeFullScreen() {
+//        // Hide the status bar
+//        window.decorView.systemUiVisibility = (
+//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                        or View.SYSTEM_UI_FLAG_FULLSCREEN
+//                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                )
+//    }
+
 
     private fun setUpViewsOnClicks() {
 
@@ -138,11 +162,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.titleTv.animFadein(this, 500)
         binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
 
+
+
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
 
-            // Show a segment selection bottom sheet
             val segment = SegmentSelectionBottomSheet()
             segment.segmentSelectionListener = this
+
+            // Show a segment selection bottom sheet
+            this.performHapticFeedback()
             segment.show(supportFragmentManager, "Segment Selection")
             binding.gioActionbar.switchSegmentButton.rotate180(this)
 
@@ -208,8 +236,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private fun setUpProjects() {
 
         // Set up the list of projects and related UI components
-        binding.lottieProgressInclude.progressbarStrip.visible()
-        binding.lottieProgressInclude.progressbarBlock.gone()
+//        binding.lottieProgressInclude.progressbarStrip.visible()
+//        binding.lottieProgressInclude.progressbarBlock.gone()
 
         viewModel.fetchUserProjectsFromRepository()
         val user=PrefManager.getcurrentUserdetails()
@@ -225,24 +253,33 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
             .into(binding.drawerheaderfile.userDp)
 
-        viewModel.showprogressLD.observe(this) { show ->
-            if (show) {
-                binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
-            } else {
-                binding.lottieProgressInclude.progressLayout.progressGone(this, 400)
-            }
-        }
+//        viewModel.showprogressLD.observe(this) { show ->
+//            if (show) {
+//                binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
+//            } else {
+//                binding.lottieProgressInclude.progressLayout.progressGone(this, 400)
+//            }
+//        }
 
         viewModel.showDialogLD.observe(this) { data ->
             easyElements.singleBtnDialog(data[0], data[1],"OK",{})
         }
 
-        viewModel.projectListLiveData.observe(this) { projectList ->
+//        viewModel.projectListLiveData.observe(this) { projectList ->
+//
+//            projects=projectList!!.toMutableList()
+//            projectListAdapter = ListAdapter(this, projects)
+//            binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
+//        }
 
-            projects=projectList!!.toMutableList()
-            projectListAdapter = ListAdapter(this, projects)
-            binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
-        }
+
+
+
+    }
+    private fun setupProjectsList(){
+        projects=PrefManager.getProjectsList().toMutableList()
+        projectListAdapter=ListAdapter(this,projects)
+        binding.drawerheaderfile.projectlistView.adapter=projectListAdapter
     }
 
     override fun onClick(projectID: String, position: Int) {

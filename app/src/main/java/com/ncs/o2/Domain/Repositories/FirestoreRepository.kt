@@ -27,6 +27,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInfo
+import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
@@ -70,7 +71,7 @@ class FirestoreRepository @Inject constructor(
 ) : Repository {
 
     private val storageReference = FirebaseStorage.getInstance().reference
-    private val TAG: String = FirestoreRepository::class.java.simpleName
+    private val TAG: String = com.ncs.o2.Domain.Repositories.FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback: ServerErrorCallback
 //    private val editor : SharedPreferences.Editor by lazy {
 //        pref.edit()
@@ -641,6 +642,7 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+
     fun getSegments(
         projectName: String, result: (ServerResult<List<Segment>>) -> Unit
     ) {
@@ -723,7 +725,6 @@ class FirestoreRepository @Inject constructor(
                     val title = document.getString("title")
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
-                    val duration = document.getString("duration")
                     var time = document.get("time_STAMP") as Timestamp
 
                     if (time == null) {
@@ -736,16 +737,13 @@ class FirestoreRepository @Inject constructor(
                     } else {
                         assignerID = "mohit@mail.com"
                     }
-                    val assignee_DP_URL = document.getString("assignee_DP_URL")
 
                     val taskItem = TaskItem(
                         title = title!!,
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
-                        duration = duration!!,
                         timestamp = time,
                         completed = completed.toString().toBoolean(),
-                        assignee_DP_URL = assignee_DP_URL!!,
                         assignee_id = assignerID,
                     )
                     sectionList.add(taskItem)
@@ -805,6 +803,7 @@ class FirestoreRepository @Inject constructor(
                     val profileDPUrl = document.getString("DP_URL")
                     val name = document.getString("USERNAME")!!
                     var time = document.get("TIMESTAMP") as Timestamp?
+                    var role=document.get("ROLE")
                     if (time.isNull) {
                         time = Timestamp.now()
                     }
@@ -815,7 +814,8 @@ class FirestoreRepository @Inject constructor(
                         profileDPUrl = profileDPUrl,
                         username = name,
                         timestamp = time,
-                        designation = designation!!
+                        designation = designation!!,
+                        role = role.toString().toLong()
                     )
                     serverResult(ServerResult.Success(user))
                 } else {
@@ -829,27 +829,31 @@ class FirestoreRepository @Inject constructor(
 
     override fun getUserTasks(
         sectionName: String,
-        serverResult: (ServerResult<List<String>?>) -> Unit
+        serverResult: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit
     ) {
-
+        val user = FirebaseAuth.getInstance().currentUser?.email!!
         firestore.collection(Endpoints.USERS)
-            .document(FirebaseAuth.getInstance().currentUser?.email!!).collection("Workspace")
-            .document(sectionName)
+            .document(user)
+            .collection(Endpoints.Workspace.WORKSPACE)
+            .whereEqualTo(Endpoints.Workspace.STATUS, sectionName)
             .get()
             .addOnSuccessListener { querySnapshot ->
-                val taskIds: List<Any>
-                if (querySnapshot.get("taskIds") == null) {
-                    serverResult(ServerResult.Success(emptyList()))
-                } else {
-                    taskIds = querySnapshot.get("taskIds") as List<String>
-                    serverResult(ServerResult.Success(taskIds))
+                val workspaceTaskItemList = mutableListOf<WorkspaceTaskItem>()
+
+                for (document in querySnapshot.documents) {
+                    val id=document.getString(Endpoints.Workspace.ID)
+                    val status=document.getString(Endpoints.Workspace.STATUS)
+                    val workspaceTaskItem = WorkspaceTaskItem(ID = id!!, STATUS = status!!)
+                    workspaceTaskItemList.add(workspaceTaskItem)
                 }
 
+                serverResult(ServerResult.Success(workspaceTaskItemList))
             }
             .addOnFailureListener { exception ->
                 serverResult(ServerResult.Failure(exception))
             }
     }
+
 
     override suspend fun postTags(
         tag: Tag,
@@ -952,7 +956,6 @@ class FirestoreRepository @Inject constructor(
                     val title = querySnapshot.getString("title")
                     val id = querySnapshot.getString("id")
                     val difficulty = querySnapshot.get("difficulty")
-                    val duration = querySnapshot.getString("duration")
                     val time = querySnapshot.get("time_STAMP") as Timestamp
                     val completed = querySnapshot.getBoolean("completed")
                     if (querySnapshot.getString("assigner_email") != null) {
@@ -960,23 +963,21 @@ class FirestoreRepository @Inject constructor(
                     } else {
                         assignerID = "mohit@mail.com"
                     }
-                    val assignee_DP_URL = querySnapshot.getString("assignee_DP_URL")
 
                     val taskItem = TaskItem(
                         title = title!!,
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
-                        duration = duration!!,
                         timestamp = time,
                         completed = completed.toString().toBoolean(),
-                        assignee_DP_URL = assignee_DP_URL!!,
                         assignee_id = assignerID,
                     )
                     Log.d("taskrepo", taskItem.toString())
                     result(ServerResult.Success(taskItem))
                 }
 
-            }
+             }
+
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }

@@ -20,8 +20,8 @@ Tasks FUTURE ADDITION :
 */
 
 sealed class RegistrationFormEvent {
-    data class EmailChanged (val email: String) : RegistrationFormEvent ()
-    data class PasswordChanged (val password: String) : RegistrationFormEvent ( )
-    data class RepeatedPasswordChanged ( val repeatedPassword: String) : RegistrationFormEvent ()
-    object Submit: RegistrationFormEvent()
+    data class EmailChanged (val email: String) : com.ncs.o2.Domain.Models.state.RegistrationFormEvent()
+    data class PasswordChanged (val password: String) : com.ncs.o2.Domain.Models.state.RegistrationFormEvent( )
+    data class RepeatedPasswordChanged ( val repeatedPassword: String) : com.ncs.o2.Domain.Models.state.RegistrationFormEvent()
+    object Submit: com.ncs.o2.Domain.Models.state.RegistrationFormEvent()
 }

@@ -7,7 +7,9 @@
     android:layout_height="match_parent"
     android:background="@color/darkTheme_bg"
     android:orientation="vertical"
-    tools:context=".UI.Tasks.TaskPage.Details.CodeViewerActivity">
+    tools:context=".UI.Tasks.TaskPage.Details.CodeViewerActivity"
+    android:weightSum="10"
+    >
 
     <include
         android:id="@+id/actionbar"
@@ -19,12 +21,19 @@
     <io.github.kbiakov.codeview.CodeView
         android:id="@+id/code_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
+    <include
+        android:id="@+id/bottom_bar"
+        layout="@layout/bottom_bar_code_viewer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

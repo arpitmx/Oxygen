@@ -20,6 +20,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.UI.UIComponents.Adapters.AssigneeListAdpater
 import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
 import com.ncs.o2.databinding.ContributorListBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,8 +55,7 @@ Tasks FUTURE ADDITION :
 @Issue("1. Unknown behaviour when bottom sheet shows sometime : Back elements can be clickable when dismissed , Doesn't dismiss ")
 class UserlistBottomSheet(
 //    private val OList: MutableList<User>,
-    private val callback: getContributorsCallback
-) : BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
+    private val callback: getContributorsCallback) : BottomSheetDialogFragment(), UserListAdapter.OnClickCallback {
 
     private val viewModel: UserlistViewModel by viewModels()
 
@@ -158,11 +158,10 @@ class UserlistBottomSheet(
 
                         binding.progressbar.gone()
                         val user = result.data
-                        DataHolder.users.add(user!!)
-
+                        if (user?.role!! >= 3){
+                            DataHolder.users.add(user!!)
+                        }
                         jsonString = Gson().toJson(DataHolder.users)
-
-
                         setRecyclerView(DataHolder.users)
 
                     }
@@ -196,13 +195,13 @@ class UserlistBottomSheet(
 
     private fun setRecyclerView(userList: MutableList<User>) {
 
-        val adapter = UserListAdapter(userList, this@UserlistBottomSheet)
-        val linearLayoutManager = LinearLayoutManager(requireContext())
-        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView.layoutManager = linearLayoutManager
-        recyclerView.adapter = adapter
-        recyclerView.visible()
-        binding.progressbar.gone()
+            val adapter = UserListAdapter(userList, this@UserlistBottomSheet)
+            val linearLayoutManager = LinearLayoutManager(requireContext())
+            linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView.layoutManager = linearLayoutManager
+            recyclerView.adapter = adapter
+            recyclerView.visible()
+            binding.progressbar.gone()
 
     }
 
@@ -226,6 +225,7 @@ class UserlistBottomSheet(
     interface getContributorsCallback {
         fun onSelectedContributors(contributor: User, isChecked: Boolean)
         fun onTListUpdated(TList: MutableList<User>)
+
 
     }
 

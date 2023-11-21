@@ -40,7 +40,7 @@
             android:layout_height="22dp"
             android:layout_alignParentStart="true"
             android:background="@drawable/rounded_corner_shape"
-            android:fontFamily="@font/outfitbold"
+            android:fontFamily="@font/sf_pro_display_semibold"
             android:layout_marginTop="@dimen/margin_top"
             android:gravity="center"
             android:text="H"
@@ -50,7 +50,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.207" />
+          />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/progress_bar"
@@ -71,7 +71,7 @@
             android:layout_height="25dp"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="@dimen/margin_top"
-            android:src="@drawable/remove"
+            android:src="@drawable/logovedika"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="false"
             app:layout_constraintEnd_toEndOf="parent"

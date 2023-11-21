@@ -2,7 +2,7 @@ package com.ncs.versa.Hilt
 
 import android.content.Context
 import androidx.room.Room
-import com.ncs.o2.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.versa.Constants.Endpoints
 import dagger.Module
 import dagger.Provides
@@ -35,7 +35,7 @@ object RoomModule {
 
     @Singleton
     @Provides
-    fun providesNotificationDatabase(@ApplicationContext context : Context) : NotificationDatabase{
+    fun providesNotificationDatabase(@ApplicationContext context : Context) : NotificationDatabase {
         return Room.databaseBuilder(context,
             NotificationDatabase::class.java,
             Endpoints.ROOM.NOTIFICATIONS.NOTIFICATIONS_DATABASE

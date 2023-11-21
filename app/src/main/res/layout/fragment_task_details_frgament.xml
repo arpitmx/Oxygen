@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:background="#F5000000"
         android:elevation="5dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ProgressBar
             android:id="@+id/progressBar2"
@@ -26,7 +26,7 @@
             android:indeterminateTint="@color/primary"
             android:scaleX="0.2"
             android:scaleY="0.2"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -58,8 +58,8 @@
         android:layout_height="match_parent"
         android:clipToPadding="true"
         android:elevation="2dp"
+        android:scrollbarSize="4dp"
         android:nestedScrollingEnabled="true"
-        android:paddingTop="10dp"
         android:scrollbarThumbVertical="@color/border_grey"
         android:visibility="visible">
 
@@ -69,26 +69,267 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tagRecyclerView"
+            <HorizontalScrollView
+                android:id="@+id/details_scrollview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="true"
-                android:layoutAnimation="@anim/layout_animation_slidedown"
-                android:nestedScrollingEnabled="false" />
+                android:layout_height="80dp"
+                android:background="@color/darkbg_main"
+                android:clipToPadding="false"
+                android:fadeScrollbars="false"
+                android:layout_marginBottom="10dp"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:scrollbarSize="2dp"
+                android:scrollbarThumbHorizontal="@color/primary">
+
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/projectName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/project" />
+
+                        <TextView
+                            android:id="@+id/projectNameET"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:gravity="top"
+                            android:maxLength="10"
+                            android:maxLines="1"
+                            android:padding="5dp"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Medona"
+                            android:textColor="@color/better_white"
+                            android:textSize="15dp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/priority"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Priority" />
+
+
+                        <include
+                            android:id="@+id/priorityInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/taskType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/type"
+
+                            />
+
+                        <include
+                            android:id="@+id/typeInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/assignee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Assignee"
+                            android:textSize="15dp" />
+
+                        <include
+                            android:id="@+id/assigneeInclude"
+                            layout="@layout/task_creation_detail_item_assignee"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/state"
+                            android:textSize="15dp" />
+
+                        <include
+                            android:id="@+id/stateInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/difficulty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/difficulty"
+                            android:textSize="15dp" />
+
+                        <include
+                            android:id="@+id/difficultyInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/taskDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:paddingEnd="10dp"
+                            android:text="Duration" />
+
+                        <TextView
+                            android:id="@+id/taskDurationET"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:gravity="top"
+                            android:maxLines="1"
+                            android:padding="5dp"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Select"
+                            android:textColor="@color/better_white"
+                            android:textSize="15dp" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </HorizontalScrollView>
+
 
             <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/task_detail_lin_lay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/horizontal_scrollview_bg"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="vertical">
-
 
                 <TextView
                     android:id="@+id/title_tv"
                     style="@style/CustomTabTextAppearance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/margin_top_task_detail"
                     android:gravity="start"
                     android:paddingStart="@dimen/padding_start_task_details"
                     android:paddingEnd="10dp"
@@ -96,114 +337,123 @@
                     android:textColor="@color/better_white"
                     android:textSize="22dp" />
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:paddingStart="@dimen/padding_start_task_details">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/asigneer_dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/profile_pic_placeholder" />
 
                     <TextView
-                        android:id="@+id/taskStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_marginStart="@dimen/padding_start_task_details"
-                        android:background="@drawable/card_view_background"
-                        android:fontFamily="@font/sf_pro_display_medium"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="Unassigned"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14dp" />
-
-                    <TextView
-                        android:id="@+id/duration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_marginStart="10dp"
-                        android:background="@drawable/card_view_background_yellow"
+                        android:id="@+id/openedBy"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:fontFamily="@font/sf_pro_display_regular"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="3Hr+"
-                        android:textColor="#000000"
-                        android:textSize="14dp" />
+                        android:gravity="start|center"
+                        android:paddingStart="10dp"
+                        android:text="Alok created this task 2 days ago"
+                        android:textColor="@color/better_white"
+                        android:textSize="15dp" />
+                </LinearLayout>
 
 
-                    <TextView
-                        android:id="@+id/difficulty"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_marginStart="10dp"
-                        android:background="@drawable/card_view_background_purple"
-                        android:fontFamily="@font/sf_pro_display_regular"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="Easy"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14dp" />
-
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-                <TextView
-                    android:id="@+id/openedBy"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/tagRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="10dp"
-                    android:fontFamily="@font/sf_pro_display_medium"
-                    android:gravity="start"
-                    android:paddingStart="@dimen/padding_start_task_details"
-                    android:paddingEnd="10dp"
-                    android:text="Alok created this task 2 days ago"
-                    android:textColor="@color/better_white"
-                    android:textSize="15dp" />
+                    android:clipToPadding="false"
+                    android:layout_marginBottom="5dp"
+                    android:layoutAnimation="@anim/layout_animation_slidedown"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/tag_item"
+                    android:padding="@dimen/padding_start_task_details" />
+
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="15dp"
+                android:layout_width="100dp"
+                android:layout_height="3dp"
+                android:layout_gravity="center"
+                 android:layout_marginTop="5dp"
+                android:layout_marginBottom="2dp"
+                android:visibility="gone"
                 android:background="#56838383" />
 
-            <ProgressBar
-                android:id="@+id/description_progressbar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:elevation="3dp"
-                android:indeterminate="true"
-                android:indeterminateTint="#03A9F4"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
 
-            <br.tiagohm.markdownview.MarkdownView
-                android:id="@+id/markdown_view"
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:minHeight="200dp"
+                android:background="@drawable/horizontal_scrollview_bg"
+                >
+
+                <TextView
+                    android:id="@+id/summary_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:gravity="start"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:paddingStart="15dp"
+                    android:text="Summary"
+                    android:textColor="@color/account"
+                    android:textSize="16dp"
+                    android:visibility="visible" />
+                <ProgressBar
+                    android:id="@+id/description_progressbar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_top_task_detail"
+                    android:elevation="3dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint="#03A9F4"
+                    android:visibility="visible"
+                   />
+
+                <br.tiagohm.markdownview.MarkdownView
+                    android:id="@+id/markdown_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="true"
+                    android:visibility="gone"
+                    app:escapeHtml="false" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/imageRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/card_view_background_white_outline"
-                android:nestedScrollingEnabled="true"
-                android:visibility="gone"
-                app:escapeHtml="false" />
+                android:layout_margin="10dp"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_animation_popscale"
+                android:nestedScrollingEnabled="false" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="15dp"
                 android:background="#56838383" />
-
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -222,20 +472,40 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_display_medium"
                         android:gravity="start"
-                        android:text="Contributors :"
+                        android:paddingStart="5dp"
+                        android:text="@string/moderators"
                         android:textColor="@color/account"
                         android:textSize="16dp"
                         android:visibility="visible" />
 
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/contributorsRecyclerView"
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:clipToPadding="false"
-                        android:layoutAnimation="@anim/layout_animation_popscale"
-                        android:nestedScrollingEnabled="false" />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/noContributors"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/sf_pro_display_medium"
+                            android:gravity="start"
+                            android:paddingStart="@dimen/_5dp"
+                            android:text="No Moderators here..."
+                            android:textColor="@color/better_white"
+                            android:textSize="16dp"
+                            android:visibility="gone" />
+
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/contributorsRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:clipToPadding="false"
+                            android:layoutAnimation="@anim/layout_animation_popscale"
+                            android:nestedScrollingEnabled="false" />
+                    </RelativeLayout>
+
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
 
@@ -253,7 +523,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start"
                     android:text="Link :"
                     android:textColor="@color/account"
@@ -266,9 +536,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
-                    android:orientation="vertical"
-
-                    >
+                    android:orientation="vertical">
 
                 </LinearLayout>
 

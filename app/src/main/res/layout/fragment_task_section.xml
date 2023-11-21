@@ -18,10 +18,10 @@
         android:visibility="gone"
         android:id="@+id/placeholder_text"
         android:text="Select a segment\n to continue"
-        android:fontFamily="@font/outfitbold"
+        android:fontFamily="@font/sf_pro_display_semibold"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textSize="35dp"
+        android:textSize="30dp"
         android:textColor="@color/edit_text_hint"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat

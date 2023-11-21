@@ -16,6 +16,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
@@ -68,6 +69,11 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         activityBinding.gioActionbar.titleTv
     }
 
+
+    override fun onResume() {
+        super.onResume()
+
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TaskSectionViewModel::class.java)
@@ -75,11 +81,12 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         projectName = PrefManager.getcurrentProject()
         segmentName = PrefManager.getcurrentsegment()
         setupViews()
-        showLoader(1)
 
     }
 
     private fun setupViews() {
+
+        showLoader(1)
 
         if (segmentName == "Select Segment") {
             binding.placeholderText.visible()
@@ -157,7 +164,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     } else {
 
                         recyclerView = binding.recyclerView
-                        taskListAdapter = TaskListAdapter(firestoreRepository)
+                        taskListAdapter = TaskListAdapter(firestoreRepository,requireContext())
                         taskListAdapter.setTaskList(taskList)
                         taskListAdapter.notifyDataSetChanged()
 
@@ -201,7 +208,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     showLoader(-1)
                     util.singleBtnDialog(
                         "Failure",
-                        "Failure in loading tasks, try again", "Reload"
+                        "Failure in loading tasks, try again : ${errorMessage}", "Reload"
                     ) {
                         setupRecyclerView()
                     }
