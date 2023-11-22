@@ -107,6 +107,9 @@ interface Repository {
 
     fun maintenanceCheck(): LiveData<maintainceCheck>
 
+    fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>>
+    fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>
+
     // User DP Related
     fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>>
     fun uploadUserDP(bitmap: Bitmap): LiveData<ServerResult<StorageReference>>

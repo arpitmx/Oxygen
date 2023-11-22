@@ -64,9 +64,10 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             val _title=binding.projectTitle.text.toString()
             val __title = _title.replace(" ", "")
             val title = __title.toLowerCase().capitalize()
+            val project_id = "${title}${System.currentTimeMillis().toString().substring(8,12).trim()}"
             val projectData = hashMapOf(
                 "PROJECT_NAME" to title.trim(),
-                "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12).trim()}",
+                "PROJECT_ID" to project_id,
                 "PROJECT_LINK" to "${title.toLowerCase().trim()}.ncs.in",
                 "PROJECT_DESC" to desc.toString().trim(),
             )

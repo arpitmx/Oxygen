@@ -20,6 +20,7 @@ object Endpoints {
 
     object Storage {
         const val DP_PATH = "/DP/dp"
+        const val IMAGE_PATH = "/icon/img"
     }
 
     object TaskDetails{

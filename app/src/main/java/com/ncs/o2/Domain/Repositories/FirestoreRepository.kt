@@ -232,6 +232,50 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+    override fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>> {
+
+        val liveData = MutableLiveData<ServerResult<StorageReference>>()
+        val imageFileName =
+            "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
+//            "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
+        val imageRef = storageReference.child(imageFileName)
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
+        val data = baos.toByteArray()
+        val uploadTask = imageRef.putBytes(data)
+
+
+        uploadTask.addOnSuccessListener {
+            val userData = mapOf(
+                "PHOTO_ADDED" to true,
+            )
+
+            firestore.collection("Users")
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                .update(userData)
+                .addOnSuccessListener {
+                    liveData.postValue(ServerResult.Success(imageRef))
+                }
+                .addOnFailureListener { e ->
+                    liveData.postValue(ServerResult.Failure(e))
+                }
+
+        }.addOnFailureListener { exception ->
+            liveData.postValue(ServerResult.Failure(exception))
+
+        }
+
+        return liveData
+    }
+
+    override fun getProjectIcon(reference: StorageReference): LiveData<ServerResult<StorageReference>> {
+        TODO("Not yet implemented")
+    }
+
+//    override fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>{
+//
+//    }
+
 
     ////////////////////////////// FIREBASE USER DP FUNCTIONALITY //////////////////////////
     override fun uploadUserDP(bitmap: Bitmap): LiveData<ServerResult<StorageReference>> {
