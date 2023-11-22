@@ -272,9 +272,37 @@ class FirestoreRepository @Inject constructor(
         TODO("Not yet implemented")
     }
 
-//    override fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>{
-//
-//    }
+    override fun getProjectIconUrl(reference: StorageReference): LiveData<ServerResult<String>> {
+
+        val liveData = MutableLiveData<ServerResult<String>>()
+
+        liveData.postValue(ServerResult.Progress)
+        reference.downloadUrl
+            .addOnSuccessListener { uri ->
+                val imageUrl = uri.toString()
+                liveData.postValue(ServerResult.Success(imageUrl))
+            }
+            .addOnFailureListener { exception ->
+                liveData.postValue(ServerResult.Failure(exception))
+            }
+        return liveData
+    }
+
+    override fun addProjectImageUrlToFirestore(IconUrl: String, projectName: String): LiveData<Boolean> {
+
+        val liveData = MutableLiveData<Boolean>()
+        firestore.collection("Projects")
+            .document(projectName)
+            .update("ICON_URL", IconUrl)
+            .addOnSuccessListener {
+                liveData.postValue(true)
+            }
+            .addOnFailureListener { exception ->
+                // Handle failed Firestore update
+                liveData.postValue(false)
+            }
+        return liveData
+    }
 
 
     ////////////////////////////// FIREBASE USER DP FUNCTIONALITY //////////////////////////
