@@ -954,7 +954,7 @@ class FirestoreRepository @Inject constructor(
                     result(ServerResult.Failure(Exception("Document not found")))
                 } else {
                     val querySnapshot = querySnapshot1.documents[0]
-                    var assignerID: String
+                    val assignerID: String
                     val title = querySnapshot.getString("title")
                     val id = querySnapshot.getString("id")
                     val difficulty = querySnapshot.get("difficulty")
@@ -1029,11 +1029,19 @@ class FirestoreRepository @Inject constructor(
                         val messageId=document.getString("messageId")
                         val senderId=document.getString("senderId")
                         val content=document.getString("content")
-                        val timestamp=document.getTimestamp("timestamp")
+                        val timestamp= document.getTimestamp("timestamp")
                         val messageType=document.getString("messageType")
                         val additionalData=document.get("additionalData") as HashMap<String,Any>
-                        val messageData=Message(messageId = messageId!!, senderId = senderId!!, content = content!!,
-                            timestamp = timestamp!!, messageType = com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!, additionalData = additionalData)
+
+                        val messageData=Message(
+                            messageId!!,
+                            senderId!!,
+                            content!!,
+                            timestamp!!,
+                            com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!,
+                            additionalData
+                        )
+
                         messageData.let { messageList.add(it) }
                     }
                 }

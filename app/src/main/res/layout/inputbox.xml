@@ -111,13 +111,13 @@
             >
 
      <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btn_voice"
+        android:id="@+id/btn_attach"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:layout_marginStart="10dp"
         android:background="@null"
-        android:src="@drawable/baseline_keyboard_voice_24"
+        android:src="@drawable/baseline_attach_file_24"
         android:scaleX="1"
         android:scaleY="1"
         android:tint="@color/better_white"
@@ -139,7 +139,7 @@
          android:background="@null"
          android:textColor="@color/better_white"
          android:textSize="16dp"
-         android:textColorHint="@color/better_white"
+         android:textColorHint="@color/account"
 
          />
 
@@ -156,7 +156,7 @@
             android:scaleY="1"
             android:layout_marginEnd="10dp"
             app:tint="@color/better_white"
-
+            android:visibility="gone"
             />
 
 
@@ -174,7 +174,7 @@
                 android:src="@drawable/arrow_circle_right"
                 android:scaleX="2"
                 android:scaleY="2"
-                android:tint="@color/account"
+                android:tint="@color/light_blue_600"
                 />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

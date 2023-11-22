@@ -1,10 +1,10 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,9 +25,9 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.Hilt.UtilModule
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters.ChatAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
@@ -67,40 +67,52 @@ class TaskChatFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentTaskChatBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setdetails(activityBinding.taskId)
-        messageDatabase = Room.databaseBuilder(requireContext(), MessageDatabase::class.java, Endpoints.ROOM.MESSAGES.USERLIST_DB).build()
-        db=messageDatabase.usersDao()
+        messageDatabase = Room.databaseBuilder(
+            requireContext(),
+            MessageDatabase::class.java,
+            Endpoints.ROOM.MESSAGES.USERLIST_DB
+        ).build()
+        db = messageDatabase.usersDao()
 
-        binding.inputBox.btnSend.setOnClickThrottleBounceListener{
-            if (binding.inputBox.editboxMessage.text.toString()!="") {
+        binding.inputBox.btnSend.setOnClickThrottleBounceListener {
+
+            if (binding.inputBox.editboxMessage.text.toString().isNotEmpty()) {
+
                 val message = Message(
                     messageId = RandomIDGenerator.generateRandomId(),
                     senderId = PrefManager.getcurrentUserdetails().EMAIL,
-                    content = binding.inputBox.editboxMessage.text.toString(),
+                    content = binding.inputBox.editboxMessage.text.trim().toString(),
                     messageType = MessageType.NORMAL_MSG,
                     timestamp = Timestamp.now()
                 )
                 postMessage(message)
-            }
-            else{
+
+            } else {
                 toast("Message can't be empty")
             }
         }
 
     }
 
-    fun setMessages(){
-        val recyclerView=binding.chatRecyclerview
-        chatViewModel.getMessages(PrefManager.getcurrentProject(),task.id) { result ->
+    private fun setMessages() {
+        val recyclerView = binding.chatRecyclerview
+
+        chatViewModel.getMessages(PrefManager.getcurrentProject(), task.id) { result ->
             when (result) {
                 is ServerResult.Success -> {
-                    val chatAdapter = ChatAdapter(firestoreRepository,result.data.toMutableList(),requireContext())
+
+                    val chatAdapter = ChatAdapter(
+                        firestoreRepository,
+                        result.data.toMutableList(),
+                        requireContext()
+                    )
                     val layoutManager =
                         LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                     layoutManager.reverseLayout = false
@@ -114,11 +126,20 @@ class TaskChatFragment : Fragment() {
                 }
 
                 is ServerResult.Failure -> {
+                    binding.progress.gone()
                     val errorMessage = result.exception.message
-
+                    GlobalUtils.EasyElements(requireContext())
+                        .singleBtnDialog(
+                            "Failure",
+                            "Failed to load messages with error : $errorMessage",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
                 }
 
                 is ServerResult.Progress -> {
+                    binding.progress.visible()
                 }
 
             }
@@ -127,10 +148,14 @@ class TaskChatFragment : Fragment() {
 
     }
 
-    fun postMessage(message: Message){
+    fun postMessage(message: Message) {
         CoroutineScope(Dispatchers.Main).launch {
 
-            repository.postMessage(projectName = task.project_ID, taskId = task.id, message = message) { result ->
+            repository.postMessage(
+                projectName = task.project_ID,
+                taskId = task.id,
+                message = message
+            ) { result ->
 
                 when (result) {
 
@@ -153,6 +178,7 @@ class TaskChatFragment : Fragment() {
             }
         }
     }
+
     private fun setdetails(id: String) {
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -177,7 +203,7 @@ class TaskChatFragment : Fragment() {
 
                     is ServerResult.Success -> {
                         binding.progress.gone()
-                        task=taskResult.data
+                        task = taskResult.data
                         setMessages()
                     }
 
