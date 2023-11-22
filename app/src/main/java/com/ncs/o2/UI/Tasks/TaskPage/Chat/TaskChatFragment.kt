@@ -135,6 +135,7 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                         result.data.toMutableList(),
                         requireContext()
                     )
+                    val chatAdapter = ChatAdapter(firestoreRepository,result.data.toMutableList(),requireContext(),this)
                     val layoutManager =
                         LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                     layoutManager.reverseLayout = false

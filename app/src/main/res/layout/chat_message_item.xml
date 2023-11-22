@@ -99,11 +99,17 @@
             android:nestedScrollingEnabled="true"
             android:visibility="gone"
             app:escapeHtml="false"
+            android:nestedScrollingEnabled="true"
+            android:visibility="gone"
+            android:textSize="15dp"
+            app:escapeHtml="false"
             android:fontFamily="@font/sf_pro_display_medium"
+            android:text="*This is a test message*, I wanted to talk about yesterday's match, but let's see what the heck is going on..."
             android:textColor="@color/better_white"
             android:textSize="16dp"
             android:textAlignment="textStart"
             />
+            android:textAlignment="textStart"/>
 
         <TextView
             android:id="@+id/btn_copy"

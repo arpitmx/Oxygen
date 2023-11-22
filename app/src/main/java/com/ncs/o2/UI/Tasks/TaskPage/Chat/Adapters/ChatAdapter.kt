@@ -37,10 +37,17 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
 import kotlin.time.Duration.Companion.seconds
+import io.noties.markwon.Markwon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Date
 
 
 /*
@@ -67,6 +74,7 @@ class ChatAdapter(
     var msgList: MutableList<Message>,
     val context: Context
 ) :
+class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<Message>, val context : Context,private val onchatDoubleClickListner: onChatDoubleClickListner) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var messageDatabase: MessageDatabase
     var db: UsersDao
@@ -87,6 +95,7 @@ class ChatAdapter(
         msgList.sortBy { it.timestamp?.toDate() }
 
         msgList.sortBy { it.timestamp!!.seconds }
+
     }
 
     companion object {
