@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -27,7 +28,6 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.Hilt.UtilModule
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters.ChatAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
@@ -36,6 +36,17 @@ import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
+import io.noties.markwon.AbstractMarkwonPlugin
+import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonPlugin
+import io.noties.markwon.editor.MarkwonEditor
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.ext.tasklist.TaskListPlugin
+import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.image.ImagesPlugin
+import io.noties.markwon.image.data.DataUriSchemeHandler
+import io.noties.markwon.image.glide.GlideImagesPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +55,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TaskChatFragment : Fragment() {
+class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
@@ -54,6 +65,8 @@ class TaskChatFragment : Fragment() {
     private val viewModel: TaskDetailViewModel by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
     lateinit var task: Task
+    private lateinit var markwon: Markwon
+    private lateinit var mdEditor: MarkwonEditor
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
@@ -74,6 +87,7 @@ class TaskChatFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setdetails(activityBinding.taskId)
+        setUpMarkwonMarkdown()
         messageDatabase = Room.databaseBuilder(requireContext(), MessageDatabase::class.java, Endpoints.ROOM.MESSAGES.USERLIST_DB).build()
         db=messageDatabase.usersDao()
 
@@ -87,6 +101,7 @@ class TaskChatFragment : Fragment() {
                     timestamp = Timestamp.now()
                 )
                 postMessage(message)
+                binding.inputBox.editboxMessage.text.clear()
             }
             else{
                 toast("Message can't be empty")
@@ -100,7 +115,7 @@ class TaskChatFragment : Fragment() {
         chatViewModel.getMessages(PrefManager.getcurrentProject(),task.id) { result ->
             when (result) {
                 is ServerResult.Success -> {
-                    val chatAdapter = ChatAdapter(firestoreRepository,result.data.toMutableList(),requireContext())
+                    val chatAdapter = ChatAdapter(firestoreRepository,result.data.toMutableList(),requireContext(),this)
                     val layoutManager =
                         LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                     layoutManager.reverseLayout = false
@@ -198,5 +213,33 @@ class TaskChatFragment : Fragment() {
 
         }
     }
+    private fun setUpMarkwonMarkdown() {
+
+        val activity = requireActivity()
+        markwon = Markwon.builder(activity)
+            .usePlugin(ImagesPlugin.create())
+            .usePlugin(GlideImagesPlugin.create(activity))
+            .usePlugin(TablePlugin.create(activity))
+            .usePlugin(TaskListPlugin.create(activity))
+            .usePlugin(HtmlPlugin.create())
+            .usePlugin(StrikethroughPlugin.create())
+            .usePlugin(object : AbstractMarkwonPlugin() {
+                override fun configure(registry: MarkwonPlugin.Registry) {
+                    registry.require(ImagesPlugin::class.java) { imagesPlugin ->
+                        imagesPlugin.addSchemeHandler(DataUriSchemeHandler.create())
+                    }
+                }
+            })
+            .build()
+
+        mdEditor = MarkwonEditor.create(markwon)
+
+    }
+
+    override fun onDoubleClickListner(msg: Message, senderName:String) {
+        Log.d("double","double clciked")
+        binding.inputBox.editboxMessage.setText("> ${msg.content} \n\n @$senderName \n\n")
+    }
+
 
 }

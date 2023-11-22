@@ -1,12 +1,20 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import br.tiagohm.markdownview.css.InternalStyleSheet
+import br.tiagohm.markdownview.css.styles.Github
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -24,10 +32,15 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visibleIf
 import com.ncs.o2.R
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.UserMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
+import io.noties.markwon.Markwon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,16 +66,16 @@ Tasks FUTURE ADDITION :
 
 */
 
-class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<Message>, val context : Context) :
+class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<Message>, val context : Context,private val onchatDoubleClickListner: onChatDoubleClickListner) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var messageDatabase: MessageDatabase
     var db: UsersDao
     var users:MutableList<UserInMessage> = mutableListOf()
-
     init {
         messageDatabase = Room.databaseBuilder(context, MessageDatabase::class.java, Endpoints.ROOM.MESSAGES.USERLIST_DB).build()
         db=messageDatabase.usersDao()
         msgList.sortBy { it.timestamp?.toDate() }
+
     }
     companion object {
         const val NORMAL_MSG = 0
@@ -88,11 +101,28 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
                     setChatItem(newUser, binding, position)
                 }
             }
+
+            var doubleClick: Boolean? = false
+            binding.root.setOnClickThrottleBounceListener {
+                if (doubleClick!!) {
+                    if (localUser!=null){
+                        onchatDoubleClickListner.onDoubleClickListner(msgList[position],localUser.USERNAME!!)
+                    }
+                    else{
+                        fetchUser(senderId){
+                            onchatDoubleClickListner.onDoubleClickListner(msgList[position],it.USERNAME!!)
+                        }
+                    }
+                }
+                doubleClick = true
+                Handler().postDelayed({ doubleClick = false }, 2000)
+            }
         }
     }
+
     fun setChatItem(user:UserInMessage,binding: ChatMessageItemBinding,position: Int){
         val msg = msgList.get(position).content
-        binding.tvMessage.setText(msg)
+        setMessageView(msgList[position],binding)
         val timeDifference = Date().time - msgList[position].timestamp!!.toDate().time
         val minutes = (timeDifference / (1000 * 60)).toInt()
         val hours = minutes / 60
@@ -145,6 +175,7 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
         binding.tvName.text=user.USERNAME
     }
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
 
@@ -156,6 +187,58 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
                 throw IllegalArgumentException("Invalid view type")
             }
         }
+    }
+
+    private fun setMessageView(message: Message,binding: ChatMessageItemBinding) {
+
+        val css: InternalStyleSheet = Github()
+
+        with(css) {
+            addFontFace(
+                "o2font",
+                "normal",
+                "normal",
+                "normal",
+                "url('file:///android_res/font/sfregular.ttf')"
+            )
+            addRule("body", "font-family:o2font")
+            addRule("body", "font-size:16px")
+            addRule("body", "line-height:21px")
+            addRule("body", "background-color: #131313")
+            addRule("body", "color: #fff")
+            addRule("body", "padding: 0px 0px 0px 0px")
+            addRule("a", "color: #86ff7c")
+            addRule("pre", "border: 1px solid #000;")
+            addRule("pre", "border-radius: 4px;")
+            addRule("pre", "max-height: 400px;")
+            addRule("pre", "overflow:auto")
+            addRule("pre", "white-space: pre-line")
+
+        }
+
+        binding.markdownView.settings.javaScriptEnabled = true
+        binding.markdownView.addStyleSheet(css)
+
+        binding.markdownView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+
+            }
+
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                val intent = Intent(Intent.ACTION_VIEW, request?.url)
+                context.startActivity(intent)
+                return true
+            }
+
+        }
+        binding.markdownView.loadMarkdown(message.content)
+        binding.progressbar.gone()
+        binding.markdownView.visible()
+
+
     }
 
     override fun getItemCount(): Int {
@@ -199,6 +282,9 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
                 }
             }
         }
+    }
+    interface onChatDoubleClickListner{
+        fun onDoubleClickListner(msg: Message,senderName:String)
     }
 
 }
