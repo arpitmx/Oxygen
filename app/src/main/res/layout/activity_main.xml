@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer"
+    android:background="@color/darkbg_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -53,7 +54,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:defaultNavHost="true"
+                    android:visibility="visible"
                     app:navGraph="@navigation/nav_graph" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAlignment="center"
+                    android:padding="10dp"
+                    android:visibility="gone"
+                    android:id="@+id/placeholder_text"
+                    android:text="Select a segment\n to continue"
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textSize="30dp"
+                    android:textColor="@color/edit_text_hint"/>
 
             </FrameLayout>
 

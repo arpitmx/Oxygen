@@ -21,6 +21,7 @@ import androidx.core.os.BuildCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
@@ -94,10 +95,46 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         setContentView(binding.root)
-
+        manageViews()
         PrefManager.initialize(this)
         setUpViews()
 
+        viewModel.currentSegment.observe(this, Observer { newSegment ->
+            updateUIBasedOnSegment(newSegment)
+        })
+
+
+    }
+    private fun manageViews(){
+        if (PrefManager.getcurrentsegment()== "Select Segment") {
+            binding.placeholderText.visible()
+            binding.navHostFragmentActivityMain.gone()
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+            binding.gioActionbar.line.gone()
+        } else {
+            binding.placeholderText.gone()
+            binding.navHostFragmentActivityMain.visible()
+            binding.gioActionbar.tabLayout.visible()
+            binding.gioActionbar.searchCont.visible()
+            binding.gioActionbar.line.visible()
+        }
+    }
+
+    private fun updateUIBasedOnSegment(newSegment: String) {
+        if (newSegment == "Select Segment") {
+            binding.placeholderText.visible()
+            binding.navHostFragmentActivityMain.gone()
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+            binding.gioActionbar.line.gone()
+        } else {
+            binding.placeholderText.gone()
+            binding.navHostFragmentActivityMain.visible()
+            binding.gioActionbar.tabLayout.visible()
+            binding.gioActionbar.searchCont.visible()
+            binding.gioActionbar.line.visible()
+        }
     }
 
 
@@ -287,6 +324,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Handle click on a project in the list
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.setcurrentsegment("Select Segment")
+        viewModel.updateCurrentSegment("Select Segment")
         binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
 
         PrefManager.setcurrentProject(projectID)
@@ -310,6 +348,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Handle segment selection
         binding.gioActionbar.titleTv.text = segmentName
         segmentText.value = segmentName
+        viewModel.updateCurrentSegment(segmentName)
+
 
     }
 
