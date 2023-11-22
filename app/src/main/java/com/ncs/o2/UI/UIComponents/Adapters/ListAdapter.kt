@@ -90,6 +90,7 @@ interface ProjectCallback{
                     }
                         Glide.with(context)
                             .load(imageUrl)
+                            .error(R.drawable.placeholder_image)
                             .into(vh.icon)
                 }
             }
