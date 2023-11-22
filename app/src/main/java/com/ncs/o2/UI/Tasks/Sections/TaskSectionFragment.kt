@@ -87,21 +87,21 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     private fun setupViews() {
 
         showLoader(1)
-
-        if (segmentName == "Select Segment") {
-            binding.placeholderText.visible()
-            binding.layout.gone()
-            activityBinding.gioActionbar.tabLayout.gone()
-            activityBinding.gioActionbar.searchCont.gone()
-            activityBinding.gioActionbar.line.gone()
-        } else {
-            binding.placeholderText.gone()
-            binding.layout.visible()
-            activityBinding.gioActionbar.tabLayout.visible()
-            activityBinding.gioActionbar.searchCont.visible()
-            activityBinding.gioActionbar.line.visible()
-            setupRecyclerView()
-        }
+        setupRecyclerView()
+//        if (segmentName == "Select Segment") {
+//            activityBinding.placeholderText.visible()
+//            activityBinding.navHostFragmentActivityMain.gone()
+//            activityBinding.gioActionbar.tabLayout.gone()
+//            activityBinding.gioActionbar.searchCont.gone()
+//            activityBinding.gioActionbar.line.gone()
+//        } else {
+//            activityBinding.placeholderText.gone()
+//            activityBinding.navHostFragmentActivityMain.visible()
+//            activityBinding.gioActionbar.tabLayout.visible()
+//            activityBinding.gioActionbar.searchCont.visible()
+//            activityBinding.gioActionbar.line.visible()
+//            setupRecyclerView()
+//        }
     }
 
     private fun showLoader(show : Int){

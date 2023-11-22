@@ -56,6 +56,7 @@ object Endpoints {
 
         const val ALL_SEGMENT = "ALL_SEGMENT"
         const val TASKS = "TASKS"
+        const val MESSAGES="MESSAGES"
         const val SEGMENT = "SEGMENTS"
         const val CONTRIBUTERS = "CONTRIBUTERS"
         const val PROJECTID = "PROJECT_ID"
@@ -119,6 +120,10 @@ object Endpoints {
         object NOTIFICATIONS {
             const val NOTIFICATIONS_TABLE = "notifications"
             const val NOTIFICATIONS_DATABASE = "NOTIFICATION-DB"
+        }
+        object MESSAGES{
+            const val USERLIST_TABLE="users_in_messages"
+            const val USERLIST_DB="users_in_messages_db"
         }
 
 
