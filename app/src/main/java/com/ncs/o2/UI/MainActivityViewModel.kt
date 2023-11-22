@@ -44,6 +44,9 @@ class MainActivityViewModel @Inject constructor(
     private val _projectListLiveData = MutableLiveData<List<String>?>()
     val projectListLiveData: LiveData<List<String>?> get() = _projectListLiveData
 
+    private val _currentSegment = MutableLiveData<String>()
+    val currentSegment: LiveData<String> get() = _currentSegment
+
     fun fetchUserProjectsFromRepository() {
         repository.fetchUserProjectIDs { result ->
             when (result) {
@@ -66,5 +69,8 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    fun updateCurrentSegment(newSegment: String) {
+        _currentSegment.value = newSegment
+    }
 
 }

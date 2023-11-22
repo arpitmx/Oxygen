@@ -19,6 +19,7 @@ import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
@@ -26,6 +27,7 @@ import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.Domain.Utility.Codes
@@ -982,6 +984,88 @@ class FirestoreRepository @Inject constructor(
                 result(ServerResult.Failure(exception))
             }
     }
+
+    override suspend fun postMessage(projectName: String,taskId:String,message: Message ,serverResult: (ServerResult<Int>) -> Unit) {
+
+
+        return try {
+
+            serverResult(ServerResult.Progress)
+            firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .collection(Endpoints.Project.TASKS)
+                .document(taskId)
+                .collection(Endpoints.Project.MESSAGES)
+                .document(message.messageId)
+                .set(message)
+                .await()
+
+            serverResult(ServerResult.Success(200))
+
+        } catch (exception: Exception) {
+            serverResult(ServerResult.Failure(exception))
+        }
+    }
+    override fun getMessages(
+        projectName: String,
+        taskId:String,
+        result: (ServerResult<List<Message>>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+            .document(taskId)
+            .collection(Endpoints.Project.MESSAGES)
+            .addSnapshotListener { querySnapshot, exception ->
+                if (exception != null) {
+                    result(ServerResult.Failure(exception))
+                    return@addSnapshotListener
+                }
+
+                val messageList = mutableListOf<Message>()
+
+                querySnapshot?.let { snapshot ->
+                    for (document in snapshot.documents) {
+                        val messageId=document.getString("messageId")
+                        val senderId=document.getString("senderId")
+                        val content=document.getString("content")
+                        val timestamp=document.getTimestamp("timestamp")
+                        val messageType=document.getString("messageType")
+                        val additionalData=document.get("additionalData") as HashMap<String,Any>
+                        val messageData=Message(messageId = messageId!!, senderId = senderId!!, content = content!!,
+                            timestamp = timestamp!!, messageType = com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!, additionalData = additionalData)
+                        messageData.let { messageList.add(it) }
+                    }
+                }
+
+                result(ServerResult.Success(messageList))
+            }
+    }
+
+    override fun getMessageUserInfobyId(id: String, serverResult: (ServerResult<UserInMessage>) -> Unit) {
+
+        firestore.collection(Endpoints.USERS)
+            .whereEqualTo("EMAIL", id)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    val EMAIL = document.getString("EMAIL")
+                    val DP_URL = document.getString("DP_URL")
+                    val USERNAME = document.getString("USERNAME")!!
+                    val user = UserInMessage(
+                        EMAIL = EMAIL!!, USERNAME = USERNAME, DP_URL = DP_URL
+                    )
+                    serverResult(ServerResult.Success(user))
+                } else {
+                    serverResult(ServerResult.Failure(Exception("Document not found for title: $id")))
+                }
+            }
+            .addOnFailureListener { exception ->
+                serverResult(ServerResult.Failure(exception))
+            }
+    }
+
 
 
 }

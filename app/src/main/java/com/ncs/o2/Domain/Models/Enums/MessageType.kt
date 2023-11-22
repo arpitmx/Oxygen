@@ -23,6 +23,10 @@ Tasks FUTURE ADDITION :
 enum class MessageType{
     NORMAL_MSG,  // containing only textual content
     IMAGE_MSG,   // containing only img
-    FILE_MSG     // containing only file
-
+    FILE_MSG ;    // containing only file
+    companion object {
+        fun fromString(value: String): MessageType? {
+            return values().find { it.name == value }
+        }
+    }
 }

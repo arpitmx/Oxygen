@@ -1,5 +1,6 @@
 package com.ncs.o2.Domain.Models
 
+import com.google.firebase.Timestamp
 import com.ncs.o2.Domain.Models.Enums.MessageType
 import com.ncs.o2.Domain.Utility.Version
 
@@ -41,11 +42,11 @@ Tasks FUTURE ADDITION :
 */
 
 @Version("1")
-data class Message (
+data class Message(
     val messageId: String,
     val senderId: String,
     val content: String,
-    val timestamp: Long,
+    val timestamp: Timestamp?=null,
     val messageType: MessageType,
     val additionalData: Map<String, Any> = emptyMap()
 )
