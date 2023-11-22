@@ -17,6 +17,23 @@
         android:visibility="visible"
          />
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        style="@style/CustomTabLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkbg_main"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
+        app:tabIndicatorColor="@color/better_white"
+        app:tabMode="fixed"
+        android:layoutAnimation="@anim/layout_animation_fadein"
+        app:tabIndicatorAnimationMode="fade"
+        app:tabRippleColor="@color/item_bg_glow"
+        app:tabSelectedTextColor="@color/primary"
+        app:tabTextColor="@color/account" />
+
 
 
 
@@ -82,15 +99,6 @@
 
 
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:visibility="gone"
-        android:background="@color/border_grey"
-        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
-
 
     <ProgressBar
         android:id="@+id/progressbar_bottom_tab"
@@ -102,22 +110,17 @@
 
         />
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        style="@style/CustomTabLayout2"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/darkbg_main"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-        app:tabIndicatorColor="@color/better_white"
-        app:tabMode="fixed"
-        android:layoutAnimation="@anim/layout_animation_fadein"
-        app:tabIndicatorAnimationMode="fade"
-        app:tabRippleColor="@color/item_bg_glow"
-        app:tabSelectedTextColor="@color/primary"
-        app:tabTextColor="@color/account" />
+        android:layout_height="3dp"
+        android:visibility="gone"
+        android:background="@color/border_grey"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
+
 
 
 

@@ -19,6 +19,7 @@ import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
@@ -563,6 +564,9 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         }
 
         binding.markdownView.settings.javaScriptEnabled = true
+        binding.markdownView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        binding.markdownView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
+
         binding.markdownView.addStyleSheet(css)
         binding.markdownView.addJavascriptInterface(AndroidToJsInterface(), "send")
 

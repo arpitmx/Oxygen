@@ -37,7 +37,7 @@ object DateTimeUtils {
         val timeDifference = currentTime - timestampInSeconds
 
         return when {
-            //timeDifference <=0 ->"just now"
+            timeDifference <=0 ->"just now"
             timeDifference < 60 -> "about ${timeDifference}s ago"
             timeDifference < 3600 -> "about ${timeDifference / 60}m ago"
             timeDifference < 86400 -> "about ${timeDifference / 3600}h ago"
