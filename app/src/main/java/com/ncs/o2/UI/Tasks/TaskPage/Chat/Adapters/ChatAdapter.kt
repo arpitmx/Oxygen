@@ -1,21 +1,45 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import br.tiagohm.markdownview.css.InternalStyleSheet
+import br.tiagohm.markdownview.css.styles.Github
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
+import com.google.firebase.Timestamp
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.MessageRepository.UsersDao
 import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visibleIf
+import com.ncs.o2.R
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
+import io.noties.markwon.Markwon
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -37,12 +61,16 @@ Tasks FUTURE ADDITION :
 
 */
 
+class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<Message>, val context : Context,private val onchatDoubleClickListner: onChatDoubleClickListner) :
 class ChatAdapter(
     val repository: FirestoreRepository,
     var msgList: MutableList<Message>,
     val context: Context
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    var messageDatabase: MessageDatabase
+    var db: UsersDao
+    var users:MutableList<UserInMessage> = mutableListOf()
 
     private var messageDatabase: MessageDatabase = Room.databaseBuilder(
         context,
@@ -54,6 +82,10 @@ class ChatAdapter(
     var users: MutableList<UserInMessage> = mutableListOf()
 
     init {
+        messageDatabase = Room.databaseBuilder(context, MessageDatabase::class.java, Endpoints.ROOM.MESSAGES.USERLIST_DB).build()
+        db=messageDatabase.usersDao()
+        msgList.sortBy { it.timestamp?.toDate() }
+
         msgList.sortBy { it.timestamp!!.seconds }
     }
 
@@ -81,11 +113,47 @@ class ChatAdapter(
                     setChatItem(newUser, binding, position)
                 }
             }
+
+            var doubleClick: Boolean? = false
+            binding.root.setOnClickThrottleBounceListener {
+                if (doubleClick!!) {
+                    if (localUser!=null){
+                        onchatDoubleClickListner.onDoubleClickListner(msgList[position],localUser.USERNAME!!)
+                    }
+                    else{
+                        fetchUser(senderId){
+                            onchatDoubleClickListner.onDoubleClickListner(msgList[position],it.USERNAME!!)
+                        }
+                    }
+                }
+                doubleClick = true
+                Handler().postDelayed({ doubleClick = false }, 2000)
+            }
         }
     }
 
+    fun setChatItem(user:UserInMessage,binding: ChatMessageItemBinding,position: Int){
+
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
         val msg = msgList.get(position).content
+        setMessageView(msgList[position],binding)
+        val timeDifference = Date().time - msgList[position].timestamp!!.toDate().time
+        val minutes = (timeDifference / (1000 * 60)).toInt()
+        val hours = minutes / 60
+        val days = hours / 24
+        val weeks = days / 7
+        val months = days / 30
+        val years = days / 365
+
+        val timeAgo: String = when {
+            years > 0 -> "about $years ${if (years == 1) "year" else "years"} ago"
+            months > 0 -> "about $months ${if (months == 1) "month" else "months"} ago"
+            weeks > 0 -> "about $weeks ${if (weeks == 1) "week" else "weeks"} ago"
+            days > 0 -> "about $days ${if (days == 1) "day" else "days"} ago"
+            hours > 0 -> "about $hours ${if (hours == 1) "hour" else "hours"} ago"
+            minutes > 0 -> "about $minutes ${if (minutes == 1) "minute" else "minutes"} ago"
+            else -> "just now"
+        }
         val time = msgList.get(position).timestamp!!
 
         binding.tvMessage.text = msg
@@ -93,6 +161,7 @@ class ChatAdapter(
         binding.imgDp.loadProfileImg(user.DP_URL.toString())
         binding.tvName.text = user.USERNAME
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -111,6 +180,58 @@ class ChatAdapter(
                 throw IllegalArgumentException("Invalid view type")
             }
         }
+    }
+
+    private fun setMessageView(message: Message,binding: ChatMessageItemBinding) {
+
+        val css: InternalStyleSheet = Github()
+
+        with(css) {
+            addFontFace(
+                "o2font",
+                "normal",
+                "normal",
+                "normal",
+                "url('file:///android_res/font/sfregular.ttf')"
+            )
+            addRule("body", "font-family:o2font")
+            addRule("body", "font-size:16px")
+            addRule("body", "line-height:21px")
+            addRule("body", "background-color: #131313")
+            addRule("body", "color: #fff")
+            addRule("body", "padding: 0px 0px 0px 0px")
+            addRule("a", "color: #86ff7c")
+            addRule("pre", "border: 1px solid #000;")
+            addRule("pre", "border-radius: 4px;")
+            addRule("pre", "max-height: 400px;")
+            addRule("pre", "overflow:auto")
+            addRule("pre", "white-space: pre-line")
+
+        }
+
+        binding.markdownView.settings.javaScriptEnabled = true
+        binding.markdownView.addStyleSheet(css)
+
+        binding.markdownView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+
+            }
+
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                val intent = Intent(Intent.ACTION_VIEW, request?.url)
+                context.startActivity(intent)
+                return true
+            }
+
+        }
+        binding.markdownView.loadMarkdown(message.content)
+        binding.progressbar.gone()
+        binding.markdownView.visible()
+
+
     }
 
     override fun getItemCount(): Int {
@@ -156,6 +277,9 @@ class ChatAdapter(
                 }
             }
         }
+    }
+    interface onChatDoubleClickListner{
+        fun onDoubleClickListner(msg: Message,senderName:String)
     }
 
 }
