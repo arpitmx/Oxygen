@@ -57,6 +57,7 @@ constructor(val notificationApiService: NotificationApiService,
 
     private val _notificationStatusLiveData = MutableLiveData<ServerResult<Int>>()
     val notificationStatusLiveData: LiveData<ServerResult<Int>> = _notificationStatusLiveData
+    var task: Task? = null
 
     suspend fun sendNotificationToReceiverFirebase(notification: Notification, fcmToken: String){
 

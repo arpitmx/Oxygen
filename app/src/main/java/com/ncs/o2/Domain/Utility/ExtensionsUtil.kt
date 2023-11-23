@@ -6,8 +6,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -15,12 +18,20 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.Snackbar
 import com.ncs.o2.R
@@ -158,6 +169,8 @@ object ExtensionsUtil {
     }
 
 
+
+
     // Convert px to dp
     val Int.dp: Int
         get() = (this / Resources.getSystem().displayMetrics.density).toInt()
@@ -185,6 +198,40 @@ object ExtensionsUtil {
             block()
         }
     }
+
+    /**
+     * Set Drawable to the left of EditText
+     * @param icon - Drawable to set
+     */
+    fun EditText.setDrawable(icon: Drawable) {
+        this.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+    }
+
+
+    /**
+     * Function to run a delayed function
+     * @param millis - Time to delay
+     * @param function - Function to execute
+     */
+    fun runDelayed(millis: Long, function: () -> Unit) {
+        Handler(Looper.getMainLooper()).postDelayed(function, millis)
+    }
+
+    /**
+     * Show multiple views
+     */
+    fun showViews(vararg views: View) {
+        views.forEach { view -> view.visible() }
+    }
+
+
+    /**
+     * Hide multiple views
+     */
+    fun hideViews(vararg views: View) {
+        views.forEach { view -> view.gone() }
+    }
+
 
     //Date formatting
     fun String.toDate(format: String = "yyyy-MM-dd HH:mm:ss"): Date? {
@@ -215,6 +262,80 @@ object ExtensionsUtil {
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
     }
 
+
+    fun ImageView.load(url: Any, placeholder: Drawable) {
+        Glide.with(context)
+            .setDefaultRequestOptions(RequestOptions().placeholder(placeholder))
+            .load(url)
+            .thumbnail(0.05f)
+            .error(placeholder)
+            .into(this)
+    }
+
+
+    fun ImageView.loadProfileImg(url:Any) {
+        Glide.with(context)
+            .load(url)
+            .listener(object : RequestListener<Drawable> {
+
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    return false
+                }
+            })
+            .encodeQuality(80)
+            .override(40, 40)
+            .apply(
+                RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+            )
+            .error(R.drawable.profile_pic_placeholder)
+            .into(this)
+    }
+
+
+    /**
+     * Load image to ImageView
+     * @param url - Url of the image, can be Int, drawable or String
+     * @param placeholder - Placeholder to show when loading image
+     * @param thumbnail - Image thumbnail url
+     */
+    fun ImageView.load(url: Any, placeholder: Int, thumbnail: String) {
+        Glide.with(context)
+            .setDefaultRequestOptions(RequestOptions()
+                .placeholder(placeholder))
+            .load(url)
+            .thumbnail(Glide.with(context).asDrawable().load(thumbnail).thumbnail(0.1f))
+            .into(this)
+    }
+
+    /**
+     * Load image to ImageView
+     * @param url - Url of the image, can be Int, drawable or String
+     * @param placeholder - Placeholder to show when loading image
+     * @param thumbnail - Image thumbnail url
+     */
+    fun ImageView.load(url: Any, placeholder: Drawable, thumbnail: String) {
+        Glide.with(context)
+            .setDefaultRequestOptions(RequestOptions()
+                .placeholder(placeholder))
+            .load(url)
+            .thumbnail(Glide.with(context).asDrawable().load(thumbnail).thumbnail(0.1f))
+            .into(this)
+    }
 
     //Animation
     fun View.animSlideUp(context: Context, animDuration: Long = 1500L) = run {
@@ -335,7 +456,7 @@ object ExtensionsUtil {
     private const val SHORT_HAPTIC_FEEDBACK_DURATION = 5L
     fun Context.performHapticFeedback() {
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        val vibrationEffect = VibrationEffect.createOneShot(100L, VibrationEffect.DEFAULT_AMPLITUDE)
+        val vibrationEffect = VibrationEffect.createOneShot(5L, VibrationEffect.DEFAULT_AMPLITUDE)
         vibrator.vibrate(vibrationEffect)
     }
 
@@ -362,7 +483,7 @@ object ExtensionsUtil {
         this.setOnClickListener(object : View.OnClickListener {
             private var clicked : Boolean = false
             override fun onClick(v: View) {
-                context.performHapticFeedback()
+                //context.performHapticFeedback()
                 v.bounce(context)
                 if (clicked) return
                 else onClick()
@@ -373,7 +494,7 @@ object ExtensionsUtil {
 
     inline fun View.setOnClickFadeInListener(crossinline onClick : ()->Unit){
         setOnClickListener{
-            context.performHapticFeedback()
+            // context.performHapticFeedback()
             it.animFadein(context,100)
             onClick()
         }

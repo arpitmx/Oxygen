@@ -11,14 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/secondary_bg_black"
-        android:textColor="@color/grabblue"
+        android:textColor="@color/primary"
         android:text="Welcome back Alok , your content is loaded!"
         android:gravity="center"
         android:padding="15dp"
         android:minHeight="50dp"
         android:visibility="gone"
         android:textSize="16dp"
-        android:fontFamily="@font/outfitmedium"
+        android:fontFamily="@font/sf_pro_display_medium"
 
         />
 
@@ -34,7 +34,7 @@
         android:indeterminate="true"
         android:layout_height="5dp"
         android:visibility="gone"
-        app:indicatorColor="@color/grabblue"
+        app:indicatorColor="@color/primary"
         app:indicatorDirectionLinear="leftToRight"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"

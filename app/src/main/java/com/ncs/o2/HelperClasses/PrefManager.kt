@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.versa.Constants.Endpoints
 
 /*
@@ -122,7 +123,12 @@ object PrefManager {
         editor.apply()
     }
 
-
+    fun setUserRole(role:Long){
+        if (role != null){
+            editor.putLong(Endpoints.User.ROLE, role)
+        }
+        editor.apply()
+    }
     fun getcurrentUserdetails():CurrentUser{
 
         val username = sharedPreferences.getString(Endpoints.User.USERNAME, "")
@@ -241,13 +247,13 @@ object PrefManager {
         editor.putString("projects",projectsJson)
         editor.apply()
     }
-    fun getProjectsList():List<String>{
+    fun getProjectsList():List<String> {
         val projectsJson = sharedPreferences.getString("projects", null)
         if (projectsJson != null) {
             val gson = Gson()
             val type = object : TypeToken<List<String>>() {}.type
             return gson.fromJson(projectsJson, type)
-        }else{
+        } else {
             return listOf("NCSOxygen")
         }
     }

@@ -26,6 +26,7 @@ data class User (
         val firebaseID : String ,
         val profileDPUrl : String? = "",
         val username : String?="",
+        val role:Long?=null,
         val post: String= "",
         val profileIDUrl : String="",
         val timestamp:Timestamp? = null,

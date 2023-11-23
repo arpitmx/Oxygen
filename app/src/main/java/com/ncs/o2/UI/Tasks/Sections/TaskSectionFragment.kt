@@ -16,6 +16,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
@@ -68,6 +69,11 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         activityBinding.gioActionbar.titleTv
     }
 
+
+    override fun onResume() {
+        super.onResume()
+
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TaskSectionViewModel::class.java)
@@ -75,26 +81,27 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         projectName = PrefManager.getcurrentProject()
         segmentName = PrefManager.getcurrentsegment()
         setupViews()
-        showLoader(1)
 
     }
 
     private fun setupViews() {
 
-        if (segmentName == "Select Segment") {
-            binding.placeholderText.visible()
-            binding.layout.gone()
-            activityBinding.gioActionbar.tabLayout.gone()
-            activityBinding.gioActionbar.searchCont.gone()
-            activityBinding.gioActionbar.line.gone()
-        } else {
-            binding.placeholderText.gone()
-            binding.layout.visible()
-            activityBinding.gioActionbar.tabLayout.visible()
-            activityBinding.gioActionbar.searchCont.visible()
-            activityBinding.gioActionbar.line.visible()
-            setupRecyclerView()
-        }
+        showLoader(1)
+        setupRecyclerView()
+//        if (segmentName == "Select Segment") {
+//            activityBinding.placeholderText.visible()
+//            activityBinding.navHostFragmentActivityMain.gone()
+//            activityBinding.gioActionbar.tabLayout.gone()
+//            activityBinding.gioActionbar.searchCont.gone()
+//            activityBinding.gioActionbar.line.gone()
+//        } else {
+//            activityBinding.placeholderText.gone()
+//            activityBinding.navHostFragmentActivityMain.visible()
+//            activityBinding.gioActionbar.tabLayout.visible()
+//            activityBinding.gioActionbar.searchCont.visible()
+//            activityBinding.gioActionbar.line.visible()
+//            setupRecyclerView()
+//        }
     }
 
     private fun showLoader(show : Int){
@@ -157,7 +164,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     } else {
 
                         recyclerView = binding.recyclerView
-                        taskListAdapter = TaskListAdapter(firestoreRepository)
+                        taskListAdapter = TaskListAdapter(firestoreRepository,requireContext())
                         taskListAdapter.setTaskList(taskList)
                         taskListAdapter.notifyDataSetChanged()
 
@@ -201,7 +208,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                     showLoader(-1)
                     util.singleBtnDialog(
                         "Failure",
-                        "Failure in loading tasks, try again", "Reload"
+                        "Failure in loading tasks, try again : ${errorMessage}", "Reload"
                     ) {
                         setupRecyclerView()
                     }

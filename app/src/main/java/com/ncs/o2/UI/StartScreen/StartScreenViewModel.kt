@@ -11,7 +11,7 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

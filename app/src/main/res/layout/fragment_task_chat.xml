@@ -1,19 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.Tasks.TaskPage.Chat.TaskChatFragment">
+    android:background="@color/darkbg_main_a80"
+    android:orientation="vertical"
+    android:weightSum="10">
 
-    <TextView
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="171dp"
+        android:layout_marginTop="292dp"
+        android:layout_marginEnd="170dp"
+        android:layout_marginBottom="297dp"
+        android:indeterminateTint="@color/colorAccent" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btn_scrolldown"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/input_box_container"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/scroll_down_bg"
+        android:elevation="5dp"
+        android:src="@drawable/baseline_keyboard_arrow_down_24"
+        android:tint="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chat_recyclerview"
         android:layout_width="match_parent"
-        android:layout_gravity="center"
-        android:gravity="center"
         android:layout_height="match_parent"
-        android:text="Chat Fragment"
-        android:fontFamily="@font/outfitbold"
-        android:textSize="25sp"
-        android:textColor="@color/green"
-        />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/input_box_container"
+        android:layoutAnimation="@anim/layout_animation_fadein"
+        android:nestedScrollingEnabled="false"
+        android:scrollbarSize="3dp"
+        android:scrollbarThumbVertical="@color/secondaryBlue"
+        android:scrollbars="vertical"
+        android:visibility="visible" />
 
-</FrameLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/input_box_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/suggestion_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/btn_select_pdf_from_storage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="10">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/suggestion_box_bg"
+                    android:padding="2dp"
+
+                    >
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:src="@drawable/baseline_picture_as_pdf_24"
+                            app:tint="@color/colorPrimary" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:fontFamily="@font/sfregular"
+                            android:gravity="center_vertical"
+                            android:text="Analyse pdf"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="12dp" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <ImageButton
+                    android:id="@+id/cross_btn_select_pdf"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:paddingTop="5dp"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:src="@drawable/baseline_clear_24"
+                    app:tint="@color/account"
+
+                    />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <include
+            android:id="@+id/input_box"
+            layout="@layout/inputbox"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_box_size"
+            android:layout_marginStart="0dp" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</RelativeLayout>

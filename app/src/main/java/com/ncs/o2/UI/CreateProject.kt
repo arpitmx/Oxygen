@@ -47,13 +47,13 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             startActivity(Intent(this,MainActivity::class.java))
         }
         OList = mutableListOf(
-            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj","armax","android","url1"),
-            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"
-                ,"abhishek","android","url2" ),
-            User("https://picsum.photos/200","vivek","design","url3"),
-            User("https://picsum.photos/300","lalit","web","url4"),
-            User("https://picsum.photos/350","yogita","design","url5"),
-            User("https://picsum.photos/450","aditi","design","url6"),
+//            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj","armax","android","url1"),
+//            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"
+//                ,"abhishek","android","url2" ),
+//            User("https://picsum.photos/200","vivek","design","url3"),
+//            User("https://picsum.photos/300","lalit","web","url4"),
+//            User("https://picsum.photos/350","yogita","design","url5"),
+//            User("https://picsum.photos/450","aditi","design","url6"),
         )
         binding.addModeratorsBtn.setOnClickThrottleBounceListener{
             val userListBottomSheet = UserlistBottomSheet(this)
@@ -168,4 +168,5 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         OList.clear()
         OList=TList
     }
+
 }

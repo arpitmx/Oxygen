@@ -36,7 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="9"
-            android:fontFamily="@font/outfitbold"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:layout_gravity="center"
             android:text="@string/choose_designation"
@@ -73,78 +73,78 @@
 
         <TextView
             android:id="@+id/tv_designer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/tag_height"
             android:layout_gravity="center"
-            android:background="#EF4B85"
-            android:fontFamily="@font/outfitmedium"
+            android:background="@color/border_zero_alpha"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:layout_margin="@dimen/_5dp"
             android:text="@string/designer"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/designation_textsize" />
 
         <TextView
             android:id="@+id/tv_android_developer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/tag_height"
             android:layout_gravity="center"
-            android:background="#EF4B85"
-            android:fontFamily="@font/outfitmedium"
+            android:background="@color/border_zero_alpha"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:layout_margin="@dimen/_5dp"
             android:text="@string/android_developer"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/designation_textsize"/>
 
         <TextView
             android:id="@+id/tv_web_developer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/tag_height"
             android:layout_gravity="center"
-            android:background="#EF4B85"
-            android:fontFamily="@font/outfitmedium"
+            android:background="@color/border_zero_alpha"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:layout_margin="@dimen/_5dp"
             android:text="@string/web_developer"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/designation_textsize" />
 
         <TextView
             android:id="@+id/tv_programmer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/tag_height"
             android:layout_gravity="center"
-            android:background="#EF4B85"
-            android:fontFamily="@font/outfitmedium"
+            android:background="@color/border_zero_alpha"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:layout_margin="@dimen/_5dp"
             android:text="@string/programmer"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/designation_textsize" />
 
         <TextView
             android:id="@+id/tv_backend_developer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/tag_height"
             android:layout_gravity="center"
-            android:background="#EF4B85"
-            android:fontFamily="@font/outfitmedium"
+            android:background="@color/border_zero_alpha"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:layout_margin="@dimen/_5dp"
             android:text="@string/backend_developer"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/designation_textsize" />
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

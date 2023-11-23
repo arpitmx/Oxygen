@@ -1,23 +1,24 @@
 package com.ncs.o2.UI.Notifications
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
-import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -28,23 +29,27 @@ class NotificationsActivity : AppCompatActivity() {
     private val binding: ActivityNotificationsBinding by lazy {
         ActivityNotificationsBinding.inflate(layoutInflater)
     }
-    private val utils : GlobalUtils.EasyElements by lazy {
+    private val utils: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
-    private val viewModel : NotificationsViewModel by viewModels()
+    private val viewModel: NotificationsViewModel by viewModels()
 
-    private lateinit var backBtn : ImageView
+    private lateinit var adapter: NotificationAdapter
+    private lateinit var backBtn: ImageView
+    private lateinit var notificationRV: RecyclerView
+    private lateinit var notifications: List<Notification>
 
-    companion object{
+    companion object {
         const val TAG = "NotificationsActivity"
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         setUpView()
-        updateNotificationLastSeen()
+        viewModel.fetchNotifications()
     }
 
     private fun updateNotificationLastSeen() {
@@ -54,26 +59,67 @@ class NotificationsActivity : AppCompatActivity() {
 
     private fun handleUpdateNotification_TimeStamp() {
 
-        with(PrefManager){
-            setNotificationCount(0)
+        with(PrefManager) {
             val newLastSeen = Timestamp.now().seconds
+            setNotificationCount(0)
             setLastSeenTimeStamp(newLastSeen)
             Timber.tag(TAG).d("Timestamp updated : Last seen timestamp ${newLastSeen}")
         }
 
     }
 
-    private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
-            finish()
+    private val onBackPressedCallback: OnBackPressedCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
+                finish()
+            }
         }
-    }
 
     private fun setUpView() {
         backBtn = findViewById(R.id.btnBack_notification)
+
+        setUpNotificationRV()
+
         backBtn.setOnClickThrottleBounceListener {
             onBackPressed()
+        }
+
+    }
+
+    private fun setUpNotificationRV() {
+
+        notificationRV = binding.notificationRV
+        val layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        notificationRV.layoutManager = layoutManager
+
+        viewModel.notificationsResult.observe(this) { result ->
+            when (result) {
+                is ServerResult.Failure -> {
+
+                    binding.progress.gone()
+                    utils.singleBtnDialog(
+                        "Failure",
+                        "Failed loading notifications : ${result.exception.message}",
+                        "Okay"
+                    ) { finish() }
+                }
+
+                ServerResult.Progress -> {
+                    binding.progress.visible()
+                }
+
+                is ServerResult.Success -> {
+                    binding.progress.gone()
+                    notifications = result.data
+                    adapter = NotificationAdapter(PrefManager.getLastSeenTimeStamp(),result.data)
+                    adapter.notifyDataSetChanged()
+                    notificationRV.adapter = adapter
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        handleUpdateNotification_TimeStamp()
+                    },100)
+                }
+            }
         }
 
     }
@@ -84,7 +130,6 @@ class NotificationsActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         //finish()
     }
-
 
 
 }

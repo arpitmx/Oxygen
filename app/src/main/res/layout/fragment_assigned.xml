@@ -27,7 +27,7 @@
         android:visibility="gone"
         android:id="@+id/placeholder_text"
         android:text="Select a segment\n to continue"
-        android:fontFamily="@font/outfitbold"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:layout_gravity="center"
         android:gravity="center"
         android:textSize="35dp"

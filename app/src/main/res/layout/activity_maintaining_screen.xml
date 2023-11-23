@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:gravity="center"
-            android:fontFamily="@font/outfitregular"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:text="Maintaining..."
             android:textColor="@color/border_zero_alpha"
             android:textSize="20dp" />
@@ -45,7 +45,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:background="@drawable/curvedbggraybg"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:text="Retry"
             android:textAllCaps="false"
             android:textColor="@color/primary"

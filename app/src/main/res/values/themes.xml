@@ -3,6 +3,7 @@
     <style name="Base.Theme.O2" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/darkbg_main</item>
         <item name="android:navigationBarColor">@color/darkbg_main</item>
+
     </style>
 
     <style name="Theme.O2" parent="Base.Theme.O2" />
@@ -12,7 +13,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">#000000</item>
-        <item name="android:statusBarColor">#000000</item>
+        <item name="android:statusBarColor">@color/darkbg_main</item>
+        <item name="android:navigationBarColor">@color/darkbg_main</item>
+
     </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
