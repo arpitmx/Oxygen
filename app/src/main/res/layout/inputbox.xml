@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/segment_parent"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/input_box_size"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
              android:background="@color/darkbg_main"
     >
@@ -18,10 +18,12 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:weightSum="10"
-    android:padding="8dp"
+        android:minHeight="@dimen/input_box_size"
+
+        android:padding="8dp"
     >
 
 
@@ -105,7 +107,7 @@
             android:id="@+id/msg_box"
             android:layout_width="0dp"
             android:layout_weight="9"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:visibility="visible"
             android:background="@drawable/input_box_bg"
             >
@@ -130,8 +132,12 @@
          style="@style/body_regular"
          android:layout_width="0dp"
          android:layout_weight="9"
-         android:layout_height="match_parent"
+         android:layout_height="wrap_content"
+         android:minHeight="55dp"
+         android:maxHeight="200dp"
          android:hint="Message"
+         android:paddingTop="10dp"
+         android:paddingBottom="10dp"
          android:visibility="visible"
          android:gravity="center_vertical"
          android:paddingStart="10dp"
@@ -163,6 +169,17 @@
 
 </androidx.appcompat.widget.LinearLayoutCompat>
 
+
+        <ProgressBar
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:layout_weight="1"
+            android:id="@+id/progress_bar_send_msg"
+            android:layout_marginEnd="5dp"
+            android:visibility="gone"
+            android:layout_marginStart="8dp"
+            android:indeterminateTint="@color/light_blue_600"/>
         <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btn_send"
                 android:layout_width="0dp"

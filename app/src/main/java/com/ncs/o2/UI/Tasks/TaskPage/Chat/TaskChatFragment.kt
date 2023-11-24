@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat
 
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -68,6 +69,7 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
     lateinit var task: Task
     private lateinit var markwon: Markwon
     private lateinit var mdEditor: MarkwonEditor
+    lateinit var chatAdapter: ChatAdapter
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
@@ -121,9 +123,10 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
 
     private fun setMessages() {
         val recyclerView = binding.chatRecyclerview
-        val chatAdapter = ChatAdapter(firestoreRepository, mutableListOf(), requireContext(), this)
+        chatAdapter = ChatAdapter(firestoreRepository, mutableListOf(), requireContext(), this)
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         layoutManager.reverseLayout = false
+        layoutManager.stackFromEnd=true
 
         with(recyclerView) {
             this.layoutManager = layoutManager
@@ -134,9 +137,17 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
         chatViewModel.getMessages(PrefManager.getcurrentProject(), task.id) { result ->
             when (result) {
                 is ServerResult.Success -> {
-                    chatAdapter.appendMessages(result.data)
-                    recyclerView.visible()
-                    recyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+                    if (result.data.isEmpty()){
+                        binding.progress.gone()
+                        recyclerView.gone()
+                        binding.placeholder.visible()
+                    }else {
+                        chatAdapter.appendMessages(result.data)
+                        binding.progress.gone()
+                        recyclerView.visible()
+                        binding.placeholder.gone()
+                        recyclerView.scrollToPosition(result.data.size - 1)
+                    }
                 }
 
                 is ServerResult.Failure -> {
@@ -153,14 +164,17 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                 }
 
                 is ServerResult.Progress -> {
+                    binding.progress.visible()
                     recyclerView.gone()
                 }
             }
+
         }
     }
 
 
     fun postMessage(message: Message) {
+        val recyclerView=binding.chatRecyclerview
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postMessage(
@@ -172,16 +186,21 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                 when (result) {
 
                     is ServerResult.Failure -> {
-                        binding.progress.gone()
+                        binding.inputBox.btnSend.visible()
+                        binding.inputBox.progressBarSendMsg.gone()
                     }
 
                     ServerResult.Progress -> {
-
+                        binding.inputBox.btnSend.gone()
+                        binding.inputBox.progressBarSendMsg.visible()
                     }
 
                     is ServerResult.Success -> {
-                        binding.progress.gone()
+                        binding.inputBox.btnSend.visible()
+                        binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text.clear()
+                        recyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+
 
                     }
 
