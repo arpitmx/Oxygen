@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -114,8 +113,6 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                 binding.inputBox.editboxMessage.text.clear()
             }
             else{
-
-            } else {
                 toast("Message can't be empty")
             }
         }
@@ -124,28 +121,22 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
 
     private fun setMessages() {
         val recyclerView = binding.chatRecyclerview
+        val chatAdapter = ChatAdapter(firestoreRepository, mutableListOf(), requireContext(), this)
+        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        layoutManager.reverseLayout = false
+
+        with(recyclerView) {
+            this.layoutManager = layoutManager
+            adapter = chatAdapter
+            edgeEffectFactory = BounceEdgeEffectFactory()
+        }
 
         chatViewModel.getMessages(PrefManager.getcurrentProject(), task.id) { result ->
             when (result) {
                 is ServerResult.Success -> {
-                    val chatAdapter = ChatAdapter(firestoreRepository,result.data.toMutableList(),requireContext(),this)
-
-                    val chatAdapter = ChatAdapter(
-                        firestoreRepository,
-                        result.data.toMutableList(),
-                        requireContext()
-                    )
-                    val chatAdapter = ChatAdapter(firestoreRepository,result.data.toMutableList(),requireContext(),this)
-                    val layoutManager =
-                        LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-                    layoutManager.reverseLayout = false
-                    with(recyclerView) {
-                        this.layoutManager = layoutManager
-                        adapter = chatAdapter
-                        edgeEffectFactory = BounceEdgeEffectFactory()
-                    }
-                    recyclerView.scrollToPosition(result.data.size - 1)
-
+                    chatAdapter.appendMessages(result.data)
+                    recyclerView.visible()
+                    recyclerView.scrollToPosition(chatAdapter.itemCount - 1)
                 }
 
                 is ServerResult.Failure -> {
@@ -154,7 +145,7 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                     GlobalUtils.EasyElements(requireContext())
                         .singleBtnDialog(
                             "Failure",
-                            "Failed to load messages with error : $errorMessage",
+                            "Failed to load messages with error: $errorMessage",
                             "Okay"
                         ) {
                             requireActivity().finish()
@@ -162,14 +153,12 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                 }
 
                 is ServerResult.Progress -> {
-                    binding.progress.visible()
+                    recyclerView.gone()
                 }
-
             }
-
         }
-
     }
+
 
     fun postMessage(message: Message) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -187,7 +176,6 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                     }
 
                     ServerResult.Progress -> {
-                        binding.progress.visible()
 
                     }
 
@@ -271,7 +259,6 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
     }
 
     override fun onDoubleClickListner(msg: Message, senderName:String) {
-        Log.d("double","double clciked")
         binding.inputBox.editboxMessage.setText("> ${msg.content} \n\n @$senderName \n\n")
     }
 

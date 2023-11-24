@@ -81,17 +81,6 @@
         android:layout_marginEnd="@dimen/chat_margin"
         android:orientation="vertical"
         >
-        <ProgressBar
-            android:id="@+id/progressbar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/margin_top_task_detail"
-            android:elevation="3dp"
-            android:indeterminate="true"
-            android:indeterminateTint="@color/primary"
-            android:visibility="visible"
-            />
         <br.tiagohm.markdownview.MarkdownView
             android:id="@+id/markdown_view"
             android:layout_width="match_parent"
@@ -99,17 +88,12 @@
             android:nestedScrollingEnabled="true"
             android:visibility="gone"
             app:escapeHtml="false"
-            android:nestedScrollingEnabled="true"
-            android:visibility="gone"
-            android:textSize="15dp"
-            app:escapeHtml="false"
             android:fontFamily="@font/sf_pro_display_medium"
             android:text="*This is a test message*, I wanted to talk about yesterday's match, but let's see what the heck is going on..."
             android:textColor="@color/better_white"
             android:textSize="16dp"
             android:textAlignment="textStart"
             />
-            android:textAlignment="textStart"/>
 
         <TextView
             android:id="@+id/btn_copy"
