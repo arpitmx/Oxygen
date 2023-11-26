@@ -1,8 +1,11 @@
 package com.ncs.o2.UI.Tasks.Sections
 
 import TaskListAdapter
+import TaskResultListAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,9 +43,12 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     private lateinit var viewModel: TaskSectionViewModel
     private lateinit var binding: FragmentTaskSectionBinding
     private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerViewResult: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
+    private lateinit var taskResultListAdapter: TaskResultListAdapter
     private lateinit var taskList: ArrayList<TaskItem>
     private lateinit var taskList2: ArrayList<Task>
+    private lateinit var resultList: ArrayList<TaskItem>
     private lateinit var projectName: String
     private lateinit var segmentName: String
     val state = arrayOf(1)
@@ -86,6 +92,8 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
     private fun setupViews() {
 
+        activityBinding.gioActionbar.searchBar.text?.clear()
+        setUpSearchBar()
         showLoader(1)
         setupRecyclerView()
 //        if (segmentName == "Select Segment") {
@@ -113,8 +121,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
             binding.layout.visible()
             binding.progressbarBlock.visible()
 
+            binding.recyclerViewResult.gone()
             binding.recyclerView.gone()
             binding.placeholder.gone()
+            binding.placeholderResult.gone()
 
         }else if (show == 0){
 
@@ -123,8 +133,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
             binding.layout.visible()
             binding.recyclerView.visible()
 
+            binding.recyclerViewResult.gone()
             binding.progressbarBlock.gone()
             binding.placeholder.gone()
+            binding.placeholderResult.gone()
 
         }else if (show == -1){
 
@@ -132,9 +144,35 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
             binding.layout.gone()
             binding.recyclerView.gone()
+            binding.recyclerViewResult.gone()
             binding.progressbarBlock.gone()
+            binding.placeholderResult.gone()
 
             binding.placeholder.visible()
+
+        }else if (show == 2){
+
+            //Tasks loaded
+
+            binding.layout.visible()
+            binding.recyclerViewResult.visible()
+
+            binding.recyclerView.gone()
+            binding.progressbarBlock.gone()
+            binding.placeholder.gone()
+            binding.placeholderResult.gone()
+
+        }else if (show == -2){
+
+            //No task found
+
+            binding.layout.gone()
+            binding.recyclerView.gone()
+            binding.recyclerViewResult.gone()
+            binding.progressbarBlock.gone()
+            binding.placeholder.gone()
+
+            binding.placeholderResult.visible()
 
         }
     }
@@ -275,7 +313,91 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     }
 
 
+    private fun setUpSearchBar(){
 
+        resultList = ArrayList()
+
+        activityBinding.gioActionbar.searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
+                // Do something before text changes (if needed)
+            }
+
+            override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+                // Do something while the text is changing (if needed)
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                // Do something after text has changed
+
+                val text = editable.toString().trim()
+                resultList.clear()
+
+                if(text.isNotEmpty()){
+                    resultList = ArrayList(taskList.filter { taskItem ->
+                        taskItem.title.contains(text)
+                    })
+
+                    showLoader(1)
+                    if(resultList.size>0){
+
+                        setUpResultListRV(resultList)
+
+                    }else{
+                        showLoader(-2)
+                    }
+                }else{
+                    showLoader(0)
+                }
+
+            }
+        })
+    }
+
+    private fun setUpResultListRV(resultList: ArrayList<TaskItem>){
+
+        recyclerViewResult = binding.recyclerViewResult
+        taskResultListAdapter = TaskResultListAdapter(firestoreRepository,requireContext())
+        taskResultListAdapter.setTaskList(resultList)
+        taskResultListAdapter.notifyDataSetChanged()
+
+        taskResultListAdapter.setOnClickListener(object: TaskResultListAdapter.OnClickListener {
+            override fun onCLick(position: Int, task: TaskItem) {
+                val intent = Intent(requireContext(), TaskDetailActivity::class.java)
+                intent.putExtra("task_id", task.id)
+                startActivity(intent)
+                requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+        })
+        val layoutManager =
+            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        layoutManager.reverseLayout = false
+        with(recyclerViewResult) {
+            this.layoutManager = layoutManager
+            adapter = taskResultListAdapter
+            edgeEffectFactory = BounceEdgeEffectFactory()
+        }
+
+        recyclerViewResult.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(
+                recyclerView: RecyclerView,
+                newState: Int
+            ) {
+                super.onScrollStateChanged(recyclerView, newState)
+                state[0] = newState
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
+                    hideSearch()
+                } else if (dy < -10) {
+                    showSearch()
+                }
+            }
+        })
+
+        showLoader(2)
+    }
 
     private fun showSearch() {
         searchCont.visible()

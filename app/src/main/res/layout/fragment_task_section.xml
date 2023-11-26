@@ -27,21 +27,43 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/layout"
         android:layout_width="match_parent"
+        tools:visibility="gone"
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <FrameLayout
+            android:id="@+id/fl_for_rv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:layoutAnimation="@anim/layout_animation_popscale"
-            android:nestedScrollingEnabled="false"
-            android:paddingBottom="40dp"
-            android:visibility="gone"
-            android:elevation="2dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_animation_popscale"
+                android:nestedScrollingEnabled="false"
+                android:paddingBottom="40dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:elevation="2dp"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView_result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_animation_popscale"
+                android:nestedScrollingEnabled="false"
+                android:paddingBottom="40dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:elevation="2dp"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        </FrameLayout>
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -106,6 +128,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        tools:visibility="gone"
         android:layout_gravity="center"
         android:visibility="gone"
         android:translationY="-25dp"
@@ -132,6 +155,51 @@
             android:gravity="center"
             android:layout_gravity="center"
             android:text="@string/no_current_tasks_here"
+            android:textColor="@color/account"
+            android:textSize="16dp"
+            android:translationY="-30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/placeholder_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:visibility="visible"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:translationY="-25dp"
+        android:background="@color/darkbg_main"
+        android:gravity="center"
+        android:paddingBottom="@dimen/progress_offset"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:src="@drawable/tasknull_placeholder"
+            />
+
+        <TextView
+            android:id="@+id/tv_no_talk_found"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/oops_no_tasks_found"
             android:textColor="@color/account"
             android:textSize="16dp"
             android:translationY="-30dp"

@@ -107,6 +107,7 @@
     <string name="restore_animation_duration">Restore Animation Duration : %1$d</string>
     <string name="view_drag_friction">View Drag Friction : %1$f</string>
     <string name="moderators">Moderators</string>
+    <string name="oops_no_tasks_found">Oops, No Tasks found!!</string>
 
 
 </resources>
