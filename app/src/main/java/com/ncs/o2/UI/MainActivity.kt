@@ -20,6 +20,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.os.BuildCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -228,6 +229,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             navigator.startSingleTopActivity(NotificationsActivity::class.java)
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
 
+        }
+
+        binding.gioActionbar.newChangesBtn.setOnClickThrottleBounceListener {
+            navigator.startSingleTopActivity(NewChanges::class.java)
+            overridePendingTransition(R.anim.faster_slide_bottom_to_up, R.anim.faster_slide_bottom_to_up)
         }
 
         // Add project button click listener
