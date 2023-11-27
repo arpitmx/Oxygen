@@ -1,10 +1,12 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat
 
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,6 +38,17 @@ import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
+import io.noties.markwon.AbstractMarkwonPlugin
+import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonPlugin
+import io.noties.markwon.editor.MarkwonEditor
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.ext.tasklist.TaskListPlugin
+import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.image.ImagesPlugin
+import io.noties.markwon.image.data.DataUriSchemeHandler
+import io.noties.markwon.image.glide.GlideImagesPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +57,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TaskChatFragment : Fragment() {
+class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
@@ -54,6 +67,9 @@ class TaskChatFragment : Fragment() {
     private val viewModel: TaskDetailViewModel by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
     lateinit var task: Task
+    private lateinit var markwon: Markwon
+    private lateinit var mdEditor: MarkwonEditor
+    lateinit var chatAdapter: ChatAdapter
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
@@ -74,6 +90,9 @@ class TaskChatFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setdetails(activityBinding.taskId)
+        setUpMarkwonMarkdown()
+        messageDatabase = Room.databaseBuilder(requireContext(), MessageDatabase::class.java, Endpoints.ROOM.MESSAGES.USERLIST_DB).build()
+        db=messageDatabase.usersDao()
         messageDatabase = Room.databaseBuilder(
             requireContext(),
             MessageDatabase::class.java,
@@ -93,8 +112,9 @@ class TaskChatFragment : Fragment() {
                     timestamp = Timestamp.now()
                 )
                 postMessage(message)
-
-            } else {
+                binding.inputBox.editboxMessage.text.clear()
+            }
+            else{
                 toast("Message can't be empty")
             }
         }
@@ -103,26 +123,31 @@ class TaskChatFragment : Fragment() {
 
     private fun setMessages() {
         val recyclerView = binding.chatRecyclerview
+        chatAdapter = ChatAdapter(firestoreRepository, mutableListOf(), requireContext(), this)
+        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        layoutManager.reverseLayout = false
+        layoutManager.stackFromEnd=true
+
+        with(recyclerView) {
+            this.layoutManager = layoutManager
+            adapter = chatAdapter
+            edgeEffectFactory = BounceEdgeEffectFactory()
+        }
 
         chatViewModel.getMessages(PrefManager.getcurrentProject(), task.id) { result ->
             when (result) {
                 is ServerResult.Success -> {
-
-                    val chatAdapter = ChatAdapter(
-                        firestoreRepository,
-                        result.data.toMutableList(),
-                        requireContext()
-                    )
-                    val layoutManager =
-                        LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-                    layoutManager.reverseLayout = false
-                    with(recyclerView) {
-                        this.layoutManager = layoutManager
-                        adapter = chatAdapter
-                        edgeEffectFactory = BounceEdgeEffectFactory()
+                    if (result.data.isEmpty()){
+                        binding.progress.gone()
+                        recyclerView.gone()
+                        binding.placeholder.visible()
+                    }else {
+                        chatAdapter.appendMessages(result.data)
+                        binding.progress.gone()
+                        recyclerView.visible()
+                        binding.placeholder.gone()
+                        recyclerView.scrollToPosition(result.data.size - 1)
                     }
-                    recyclerView.scrollToPosition(result.data.size - 1)
-
                 }
 
                 is ServerResult.Failure -> {
@@ -131,7 +156,7 @@ class TaskChatFragment : Fragment() {
                     GlobalUtils.EasyElements(requireContext())
                         .singleBtnDialog(
                             "Failure",
-                            "Failed to load messages with error : $errorMessage",
+                            "Failed to load messages with error: $errorMessage",
                             "Okay"
                         ) {
                             requireActivity().finish()
@@ -140,15 +165,16 @@ class TaskChatFragment : Fragment() {
 
                 is ServerResult.Progress -> {
                     binding.progress.visible()
+                    recyclerView.gone()
                 }
-
             }
 
         }
-
     }
 
+
     fun postMessage(message: Message) {
+        val recyclerView=binding.chatRecyclerview
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postMessage(
@@ -160,17 +186,21 @@ class TaskChatFragment : Fragment() {
                 when (result) {
 
                     is ServerResult.Failure -> {
-                        binding.progress.gone()
+                        binding.inputBox.btnSend.visible()
+                        binding.inputBox.progressBarSendMsg.gone()
                     }
 
                     ServerResult.Progress -> {
-                        binding.progress.visible()
-
+                        binding.inputBox.btnSend.gone()
+                        binding.inputBox.progressBarSendMsg.visible()
                     }
 
                     is ServerResult.Success -> {
-                        binding.progress.gone()
+                        binding.inputBox.btnSend.visible()
+                        binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text.clear()
+                        recyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+
 
                     }
 
@@ -224,5 +254,32 @@ class TaskChatFragment : Fragment() {
 
         }
     }
+    private fun setUpMarkwonMarkdown() {
+
+        val activity = requireActivity()
+        markwon = Markwon.builder(activity)
+            .usePlugin(ImagesPlugin.create())
+            .usePlugin(GlideImagesPlugin.create(activity))
+            .usePlugin(TablePlugin.create(activity))
+            .usePlugin(TaskListPlugin.create(activity))
+            .usePlugin(HtmlPlugin.create())
+            .usePlugin(StrikethroughPlugin.create())
+            .usePlugin(object : AbstractMarkwonPlugin() {
+                override fun configure(registry: MarkwonPlugin.Registry) {
+                    registry.require(ImagesPlugin::class.java) { imagesPlugin ->
+                        imagesPlugin.addSchemeHandler(DataUriSchemeHandler.create())
+                    }
+                }
+            })
+            .build()
+
+        mdEditor = MarkwonEditor.create(markwon)
+
+    }
+
+    override fun onDoubleClickListner(msg: Message, senderName:String) {
+        binding.inputBox.editboxMessage.setText("> ${msg.content} \n\n @$senderName \n\n")
+    }
+
 
 }
