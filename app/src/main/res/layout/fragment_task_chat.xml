@@ -8,19 +8,7 @@
     android:weightSum="10">
 
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="171dp"
-        android:layout_marginTop="292dp"
-        android:layout_marginEnd="170dp"
-        android:layout_marginBottom="297dp"
-        android:indeterminateTint="@color/colorAccent" />
+
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btn_scrolldown"
@@ -38,12 +26,37 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="171dp"
+        android:layout_marginTop="292dp"
+        android:visibility="gone"
+        android:layout_marginEnd="170dp"
+        android:layout_marginBottom="297dp"
+        android:indeterminateTint="@color/colorAccent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="70dp"
+        android:gravity="center"
+        android:id="@+id/placeholder"
+        android:visibility="gone"
+        android:text="No Messages here..."
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:textColor="@color/better_white"/>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
@@ -146,7 +159,7 @@
             android:id="@+id/input_box"
             layout="@layout/inputbox"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/input_box_size"
+            android:layout_height="wrap_content"
             android:layout_marginStart="0dp" />
 
 

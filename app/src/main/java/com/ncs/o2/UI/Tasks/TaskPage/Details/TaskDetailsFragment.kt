@@ -70,6 +70,7 @@ import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.editor.MarkwonEditor
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -139,7 +140,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         } else {
             throw ClassCastException("$context must implement DataPassListener")
         }
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -707,9 +707,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private fun setCreator(task: Task) {
 
-
         val timeAgo = DateTimeUtils.getTimeAgo(task.time_STAMP!!.seconds)
-
         fetchUserbyId(task.assigner) {
             val fullText = "${it?.username} created this task $timeAgo"
             val spannableString = SpannableString(fullText)

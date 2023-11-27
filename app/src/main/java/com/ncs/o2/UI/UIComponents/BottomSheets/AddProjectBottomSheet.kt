@@ -1,14 +1,10 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.text.toLowerCase
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -18,13 +14,8 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.UI.CreateProject
-import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
-import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
+import com.ncs.o2.UI.createProject.CreateProject
 import com.ncs.o2.databinding.ProjectAddBottomSheetBinding
-import com.ncs.versa.Constants.Endpoints
-import org.json.JSONArray
-import org.json.JSONException
 
 class AddProjectBottomSheet : BottomSheetDialogFragment(){
 
@@ -60,7 +51,7 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
         }
 
         binding.addProject.setOnClickThrottleBounceListener {
-            startActivity(Intent(requireContext(),CreateProject::class.java))
+            startActivity(Intent(requireContext(), CreateProject::class.java))
             dismiss()
         }
         binding.submitLink.setOnClickThrottleBounceListener {

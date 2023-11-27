@@ -5,6 +5,7 @@ object Endpoints {
     const val USERS = "Users"
     const val PROJECTS = "Projects"
     const val USERID = "userid1"
+    const val new_changes_des = "Certainly! In order to provide you with a more personalized description, could you please specify what kind of description you are looking for? Are you interested in a description of a person, a place, an event, or something else? Additionally, if you have any specific details or preferences in mind, feel free to share them, so I can tailor the description to your needs.```xml    <application>        <meta-data          android:name=\"firebase_performance_logcat_enabled\"          android:value=\"true\" />    </application>```"
 
 
     object SharedPref {
@@ -20,6 +21,7 @@ object Endpoints {
 
     object Storage {
         const val DP_PATH = "/DP/dp"
+        const val IMAGE_PATH = "/icon/img"
     }
 
     object TaskDetails{
