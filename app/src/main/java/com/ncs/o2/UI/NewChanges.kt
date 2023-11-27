@@ -30,7 +30,7 @@ class NewChanges : AppCompatActivity() {
         setUpTaskDescription(Endpoints.new_changes_des)
 
         binding.gioActionbar.btnClose.setOnClickThrottleBounceListener{
-            startActivity(Intent(this@NewChanges,MainActivity::class.java))
+            onBackPressed()
         }
         setContentView(binding.root)
     }
@@ -112,66 +112,6 @@ class NewChanges : AppCompatActivity() {
             }
 
 
-
-//            override fun shouldInterceptRequest(
-//                view: WebView?,
-//                request: WebResourceRequest?
-//            ): WebResourceResponse? {
-//
-//                val url = request?.url.toString()
-//
-//                if (url == null) {
-//                    return super.shouldInterceptRequest(view, url as String)
-//                }
-//                return if (url.toLowerCase(Locale.ROOT)
-//                        .contains(".jpg") || url.toLowerCase(Locale.ROOT).contains(".jpeg")
-//                ) {
-//                    val bitmap =
-//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .load(url).submit().get()
-//                    WebResourceResponse(
-//                        "image/jpg", "UTF-8", getBitmapInputStream(
-//                            bitmap,
-//                            Bitmap.CompressFormat.JPEG
-//                        )
-//                    )
-//                } else if (url.toLowerCase(Locale.ROOT).contains(".png")) {
-//                    val bitmap =
-//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .load(url).submit().get()
-//                    WebResourceResponse(
-//                        "image/png", "UTF-8", getBitmapInputStream(
-//                            bitmap,
-//                            Bitmap.CompressFormat.PNG
-//                        )
-//                    )
-//                } else if (url.toLowerCase(Locale.ROOT).contains(".webp")) {
-//                    val bitmap =
-//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .load(url).submit().get()
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//                        WebResourceResponse(
-//                            "image/webp", "UTF-8", getBitmapInputStream(
-//                                bitmap,
-//                                Bitmap.CompressFormat.WEBP_LOSSY
-//                            )
-//                        )
-//                    } else {
-//                        WebResourceResponse(
-//                            "image/webp", "UTF-8", getBitmapInputStream(
-//                                bitmap,
-//                                Bitmap.CompressFormat.PNG
-//                            )
-//                        )
-//                    }
-//                } else {
-//                    super.shouldInterceptRequest(view, url)
-//                }
-//
-//
-//            }
-
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
                 request: WebResourceRequest?
@@ -226,5 +166,10 @@ class NewChanges : AppCompatActivity() {
 //            }
 //        }
 
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+        finish()
     }
 }
