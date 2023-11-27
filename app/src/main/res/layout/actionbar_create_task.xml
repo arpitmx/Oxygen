@@ -48,6 +48,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/baseline_close_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+
 
         <TextView
             android:id="@+id/done_item"
