@@ -16,7 +16,6 @@ import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
-import kotlin.time.Duration.Companion.seconds
 
 
 /*
