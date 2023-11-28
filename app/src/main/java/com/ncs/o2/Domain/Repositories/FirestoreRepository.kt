@@ -1089,6 +1089,7 @@ class FirestoreRepository @Inject constructor(
             .document(taskId)
             .collection(Endpoints.Project.MESSAGES)
             .addSnapshotListener { querySnapshot, exception ->
+
                 if (exception != null) {
                     result(ServerResult.Failure(exception))
                     return@addSnapshotListener
@@ -1097,7 +1098,10 @@ class FirestoreRepository @Inject constructor(
                 val messageList = mutableListOf<Message>()
 
                 querySnapshot?.let { snapshot ->
-                    for (document in snapshot.documents) {
+                    for (newDocs in snapshot.documentChanges) {
+
+                        val document = newDocs.document
+
                         val messageId=document.getString("messageId")
                         val senderId=document.getString("senderId")
                         val content=document.getString("content")
@@ -1113,6 +1117,7 @@ class FirestoreRepository @Inject constructor(
                             com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!,
                             additionalData
                         )
+                        Timber.tag(TAG).d("NM123 : $messageData")
 
                         messageData.let { messageList.add(it) }
                     }

@@ -127,27 +127,56 @@
         />
 
 
-     <EditText
-         android:id="@+id/editbox_message"
-         style="@style/body_regular"
-         android:layout_width="0dp"
-         android:layout_weight="9"
-         android:layout_height="wrap_content"
-         android:minHeight="55dp"
-         android:maxHeight="200dp"
-         android:hint="Message"
-         android:paddingTop="10dp"
-         android:paddingBottom="10dp"
-         android:visibility="visible"
-         android:gravity="center_vertical"
-         android:paddingStart="10dp"
-         android:paddingEnd="10dp"
-         android:background="@null"
-         android:textColor="@color/better_white"
-         android:textSize="16dp"
-         android:textColorHint="@color/account"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutMessage"
+                android:layout_width="0dp"
+                android:layout_weight="9"
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="none"
+                app:hintEnabled="false"
+                app:endIconMode="clear_text"
+                app:endIconTint="@color/better_white"
+                >
 
-         />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editboxMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Message goes here..."
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:textCursorDrawable="@drawable/oxygen_curson"
+                    android:textColorHint="@color/account"
+                    android:visibility="visible"
+                    android:maxHeight="200dp"
+                    android:padding="20dp"
+                    android:gravity="top"
+                    android:textColor="@color/better_white"
+                    android:textSize="17sp"
+                    android:inputType="textMultiLine" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+<!--     <EditText-->
+<!--         android:id="@+id/editbox_message"-->
+<!--         style="@style/body_regular"-->
+<!--         android:layout_width="0dp"-->
+<!--         android:layout_weight="9"-->
+<!--         android:layout_height="wrap_content"-->
+<!--         android:minHeight="55dp"-->
+<!--         android:maxHeight="200dp"-->
+<!--         android:hint="Message"-->
+<!--         android:paddingTop="10dp"-->
+<!--         android:paddingBottom="10dp"-->
+<!--         android:visibility="visible"-->
+<!--         android:gravity="center_vertical"-->
+<!--         android:paddingStart="10dp"-->
+<!--         android:paddingEnd="10dp"-->
+<!--         android:background="@null"-->
+<!--         android:textColor="@color/better_white"-->
+<!--         android:textSize="18dp"-->
+<!--         android:textColorHint="@color/account"-->
+<!--         />-->
 
 
 
@@ -179,7 +208,7 @@
             android:layout_marginEnd="5dp"
             android:visibility="gone"
             android:layout_marginStart="8dp"
-            android:indeterminateTint="@color/light_blue_600"/>
+            android:indeterminateTint="@color/darkbg_main"/>
         <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btn_send"
                 android:layout_width="0dp"
@@ -191,7 +220,7 @@
                 android:src="@drawable/arrow_circle_right"
                 android:scaleX="2"
                 android:scaleY="2"
-                android:tint="@color/light_blue_600"
+                android:tint="@color/primary"
                 />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,12 +1,12 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat
 
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
-import androidx.fragment.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +30,7 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters.ChatAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
@@ -41,7 +42,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.MarkwonPlugin
+import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.editor.MarkwonEditor
+import io.noties.markwon.editor.MarkwonEditorTextWatcher
+import io.noties.markwon.editor.PersistedSpans
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
@@ -49,25 +53,36 @@ import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.data.DataUriSchemeHandler
 import io.noties.markwon.image.glide.GlideImagesPlugin
+import io.noties.markwon.syntax.Prism4jSyntaxHighlight
+import io.noties.markwon.syntax.Prism4jThemeDarkula
+import io.noties.markwon.syntax.SyntaxHighlightPlugin
+import io.noties.prism4j.GrammarLocator
+import io.noties.prism4j.Prism4j
+import io.noties.prism4j.annotations.PrismBundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
+
+
 @AndroidEntryPoint
-class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
+class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
+
+    @Inject
+    lateinit var utils: GlobalUtils.EasyElements
     lateinit var binding: FragmentTaskChatBinding
     lateinit var messageDatabase: MessageDatabase
     lateinit var db: UsersDao
     private val viewModel: TaskDetailViewModel by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
     lateinit var task: Task
-    private lateinit var markwon: Markwon
     private lateinit var mdEditor: MarkwonEditor
     lateinit var chatAdapter: ChatAdapter
     private val activityBinding: TaskDetailActivity by lazy {
@@ -90,43 +105,56 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setdetails(activityBinding.taskId)
-        setUpMarkwonMarkdown()
-        messageDatabase = Room.databaseBuilder(requireContext(), MessageDatabase::class.java, Endpoints.ROOM.MESSAGES.USERLIST_DB).build()
-        db=messageDatabase.usersDao()
-        messageDatabase = Room.databaseBuilder(
-            requireContext(),
-            MessageDatabase::class.java,
-            Endpoints.ROOM.MESSAGES.USERLIST_DB
-        ).build()
-        db = messageDatabase.usersDao()
+
+//        messageDatabase = Room.databaseBuilder(
+//            requireContext(),
+//            MessageDatabase::class.java,
+//            Endpoints.ROOM.MESSAGES.USERLIST_DB
+//        ).build()
+//
+//        db = messageDatabase.usersDao()
+
+
+        setUpChatbox()
 
         binding.inputBox.btnSend.setOnClickThrottleBounceListener {
 
-            if (binding.inputBox.editboxMessage.text.toString().isNotEmpty()) {
+            if (binding.inputBox.editboxMessage.text.toString().trim().isNotEmpty()) {
 
                 val message = Message(
                     messageId = RandomIDGenerator.generateRandomId(),
                     senderId = PrefManager.getcurrentUserdetails().EMAIL,
-                    content = binding.inputBox.editboxMessage.text.trim().toString(),
+                    content = binding.inputBox.editboxMessage.text?.trim().toString(),
                     messageType = MessageType.NORMAL_MSG,
                     timestamp = Timestamp.now()
                 )
                 postMessage(message)
-                binding.inputBox.editboxMessage.text.clear()
-            }
-            else{
+                binding.inputBox.editboxMessage.text?.clear()
+            } else {
                 toast("Message can't be empty")
             }
         }
 
     }
 
+    private fun setUpChatbox() {
+        val markdownEditor = MarkwonEditor.builder(markwon).build()
+        binding.inputBox.editboxMessage.addTextChangedListener(
+            MarkwonEditorTextWatcher.withPreRender(
+                markdownEditor,
+                Executors.newCachedThreadPool(),
+                binding.inputBox.editboxMessage)
+            )
+
+    }
+
     private fun setMessages() {
         val recyclerView = binding.chatRecyclerview
-        chatAdapter = ChatAdapter(firestoreRepository, mutableListOf(), requireContext(), this)
+        chatAdapter =
+            ChatAdapter(firestoreRepository, mutableListOf(), requireContext(), this, markwon)
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         layoutManager.reverseLayout = false
-        layoutManager.stackFromEnd=true
+        layoutManager.stackFromEnd = true
 
         with(recyclerView) {
             this.layoutManager = layoutManager
@@ -137,11 +165,11 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
         chatViewModel.getMessages(PrefManager.getcurrentProject(), task.id) { result ->
             when (result) {
                 is ServerResult.Success -> {
-                    if (result.data.isEmpty()){
+                    if (result.data.isEmpty()) {
                         binding.progress.gone()
                         recyclerView.gone()
                         binding.placeholder.visible()
-                    }else {
+                    } else {
                         chatAdapter.appendMessages(result.data)
                         binding.progress.gone()
                         recyclerView.visible()
@@ -174,7 +202,7 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
 
 
     fun postMessage(message: Message) {
-        val recyclerView=binding.chatRecyclerview
+        val recyclerView = binding.chatRecyclerview
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postMessage(
@@ -198,9 +226,8 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                     is ServerResult.Success -> {
                         binding.inputBox.btnSend.visible()
                         binding.inputBox.progressBarSendMsg.gone()
-                        binding.inputBox.editboxMessage.text.clear()
+                        binding.inputBox.editboxMessage.text?.clear()
                         recyclerView.scrollToPosition(chatAdapter.itemCount - 1)
-
 
                     }
 
@@ -244,26 +271,36 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                 Timber.tag(TaskDetailsFragment.TAG).e(e)
                 binding.progress.gone()
 
-//                utils.singleBtnDialog(
-//                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
-//                ) {
-//                    requireActivity().finish()
-//                }
-
+                utils.singleBtnDialog(
+                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
+                ) {
+                    requireActivity().finish()
+                }
             }
 
         }
     }
-    private fun setUpMarkwonMarkdown() {
+
+
+    private val markwon: Markwon by lazy {
+
+        // *NOTE @O2 team : If ExampleGrammarLocator class is not found after pull, // just hit run, this class is built at compile time*
+
+        val prism4j = Prism4j(ExampleGrammarLocator())
+
+        // *NOTE*
 
         val activity = requireActivity()
-        markwon = Markwon.builder(activity)
+
+         Markwon.builder(activity)
             .usePlugin(ImagesPlugin.create())
             .usePlugin(GlideImagesPlugin.create(activity))
             .usePlugin(TablePlugin.create(activity))
             .usePlugin(TaskListPlugin.create(activity))
             .usePlugin(HtmlPlugin.create())
             .usePlugin(StrikethroughPlugin.create())
+            .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
+
             .usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configure(registry: MarkwonPlugin.Registry) {
                     registry.require(ImagesPlugin::class.java) { imagesPlugin ->
@@ -271,14 +308,29 @@ class TaskChatFragment : Fragment(),ChatAdapter.onChatDoubleClickListner {
                     }
                 }
             })
+            .usePlugin(object : AbstractMarkwonPlugin() {
+                override fun configureTheme(builder: MarkwonTheme.Builder) {
+                    builder
+                        .blockQuoteColor(requireContext().getColor(R.color.primary))
+                        .linkColor(requireContext().getColor(R.color.primary))
+                        .codeBlockTextSize(30)
+                }
+            })
+
             .build()
-
-        mdEditor = MarkwonEditor.create(markwon)
-
     }
 
-    override fun onDoubleClickListner(msg: Message, senderName:String) {
-        binding.inputBox.editboxMessage.setText("> ${msg.content} \n\n @$senderName \n\n")
+
+    override fun onDoubleClickListner(msg: Message, senderName: String) {
+        val replyFormat =
+            """
+            >${msg.content}
+           
+          
+            **@${senderName}**
+            
+            """.trimIndent()
+        binding.inputBox.editboxMessage.setText(replyFormat)
     }
 
 
