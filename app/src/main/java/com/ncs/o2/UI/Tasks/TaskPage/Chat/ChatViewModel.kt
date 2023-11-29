@@ -27,4 +27,7 @@ class ChatViewModel @Inject constructor(
     ) {
         repository.getMessageUserInfobyId(id = user_id,resultCallback)
     }
+
+
+
 }

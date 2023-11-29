@@ -24,12 +24,15 @@ Tasks FUTURE ADDITION :
 @Later("Add name")
 data class User (
         val firebaseID : String ,
-        val profileDPUrl : String? = "",
-        val username : String?="",
-        val role:Long?=null,
-        val post: String= "",
-        val profileIDUrl : String="",
-        val timestamp:Timestamp? = null,
-        val designation:String="",
+
+        val profileDPUrl : String,
+        val profileIDUrl : String?= null,
+
+        val post: String? = null,
+        val username : String,
+        val role:Int,
+        val timestamp:Long =Timestamp.now().seconds,
+        val designation:String,
+        val fcmToken: String?= null,
         @Exclude var isChecked : Boolean = false,
         )

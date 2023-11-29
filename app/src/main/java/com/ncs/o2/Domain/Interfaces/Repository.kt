@@ -11,6 +11,7 @@ import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.UserInfo
@@ -106,6 +107,13 @@ interface Repository {
 
 
     fun maintenanceCheck(): LiveData<maintainceCheck>
+
+   suspend fun getTasksItem(
+        projectName: String,
+        segmentName: String,
+        sectionName: String,
+        result: (ServerResult<List<TaskItem>>) -> Unit
+    )
 
     fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>>
     fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>

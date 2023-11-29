@@ -15,6 +15,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
@@ -39,6 +40,7 @@ import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -73,7 +75,8 @@ class FirestoreRepository @Inject constructor(
 ) : Repository {
 
     private val storageReference = FirebaseStorage.getInstance().reference
-    private val TAG: String = com.ncs.o2.Domain.Repositories.FirestoreRepository::class.java.simpleName
+    private val TAG: String =
+        com.ncs.o2.Domain.Repositories.FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback: ServerErrorCallback
 //    private val editor : SharedPreferences.Editor by lazy {
 //        pref.edit()
@@ -232,7 +235,10 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    override fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>> {
+    override fun uploadProjectIcon(
+        bitmap: Bitmap,
+        projectId: String
+    ): LiveData<ServerResult<StorageReference>> {
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
         val imageFileName =
@@ -288,7 +294,10 @@ class FirestoreRepository @Inject constructor(
         return liveData
     }
 
-    override fun addProjectImageUrlToFirestore(IconUrl: String, projectName: String): LiveData<Boolean> {
+    override fun addProjectImageUrlToFirestore(
+        IconUrl: String,
+        projectName: String
+    ): LiveData<Boolean> {
 
         val liveData = MutableLiveData<Boolean>()
         firestore.collection("Projects")
@@ -778,38 +787,40 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    fun getTasksItem(
+    override suspend fun getTasksItem(
         projectName: String,
         segmentName: String,
         sectionName: String,
         result: (ServerResult<List<TaskItem>>) -> Unit
-    ) {
+    ): Unit {
 
-        firestore.collection(Endpoints.PROJECTS)
-            .document(projectName)
-            .collection(Endpoints.Project.TASKS)
-            .whereEqualTo("section", sectionName)
-            .whereEqualTo("segment", segmentName)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val sectionList = mutableListOf<TaskItem>()
-                var assignerID: String
-                for (document in querySnapshot.documents) {
+        try {
+            val snapshots = firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .collection(Endpoints.Project.TASKS)
+                .whereEqualTo("section", sectionName)
+                .whereEqualTo("segment", segmentName)
+                .get().await()
+
+
+            val sectionList = mutableListOf<TaskItem>()
+            var assignerID: String
+
+            val finalList = CoroutineScope(Dispatchers.IO).async {
+
+                for (document in snapshots.documents) {
 
                     val title = document.getString("title")
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
-                    var time = document.get("time_STAMP") as Timestamp
-
-                    if (time == null) {
-                        time = Timestamp.now()
-                    }
+                    val time: Timestamp =
+                        (document.get("time_STAMP") ?: Timestamp.now()) as Timestamp
 
                     val completed = document.getBoolean("completed")
-                    if (document.getString("assigner_email") != null) {
-                        assignerID = document.getString("assigner_email")!!
+                    assignerID = if (document.getString("assigner_email") != null) {
+                        document.getString("assigner_email")!!
                     } else {
-                        assignerID = "mohit@mail.com"
+                        "mohit@mail.com"
                     }
 
                     val taskItem = TaskItem(
@@ -820,14 +831,20 @@ class FirestoreRepository @Inject constructor(
                         completed = completed.toString().toBoolean(),
                         assignee_id = assignerID,
                     )
+
                     sectionList.add(taskItem)
                 }
-                result(ServerResult.Success(sectionList))
+                sectionList
             }
-            .addOnFailureListener { exception ->
-                result(ServerResult.Failure(exception))
-            }
+
+
+            result(ServerResult.Success(finalList.await()))
+
+        } catch (e: Exception) {
+            result(ServerResult.Failure(e))
+        }
     }
+
 
     override suspend fun fetchProjectTags(
         projectName: String,
@@ -872,25 +889,28 @@ class FirestoreRepository @Inject constructor(
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
-                    val document = querySnapshot.documents[0]
-                    val firebaseID = document.getString("EMAIL")
-                    val profileDPUrl = document.getString("DP_URL")
-                    val name = document.getString("USERNAME")!!
-                    var time = document.get("TIMESTAMP") as Timestamp?
-                    var role=document.get("ROLE")
-                    if (time.isNull) {
-                        time = Timestamp.now()
-                    }
 
-                    val designation = document.getString("DESIGNATION")
+                    val document = querySnapshot.documents[0]
+                    val firebaseID = document.getString(Endpoints.User.EMAIL) ?: "mohit@mail"
+                    val profileDPUrl = document.getString(Endpoints.User.DP_URL) ?: ""
+                    val name = document.getString(Endpoints.User.USERNAME) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
+                    val time = document.get(Endpoints.User.NOTIFICATION_TIME_STAMP) as Long? ?: Timestamp.now().seconds
+                    val role : Int = document.get(Endpoints.User.ROLE)?.toString()?.toInt() ?: 1
+                    val designation = document.getString(Endpoints.User.DESIGNATION) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
+                    val fcmToken  = document.getString(Endpoints.User.FCM_TOKEN)
+
+
+
                     val user = User(
-                        firebaseID = firebaseID!!,
+                        firebaseID = firebaseID,
                         profileDPUrl = profileDPUrl,
                         username = name,
                         timestamp = time,
-                        designation = designation!!,
-                        role = role.toString().toLong()
+                        designation = designation,
+                        role = role,
+                        fcmToken = fcmToken,
                     )
+
                     serverResult(ServerResult.Success(user))
                 } else {
                     serverResult(ServerResult.Failure(Exception("Document not found for title: $id")))
@@ -915,8 +935,8 @@ class FirestoreRepository @Inject constructor(
                 val workspaceTaskItemList = mutableListOf<WorkspaceTaskItem>()
 
                 for (document in querySnapshot.documents) {
-                    val id=document.getString(Endpoints.Workspace.ID)
-                    val status=document.getString(Endpoints.Workspace.STATUS)
+                    val id = document.getString(Endpoints.Workspace.ID)
+                    val status = document.getString(Endpoints.Workspace.STATUS)
                     val workspaceTaskItem = WorkspaceTaskItem(ID = id!!, STATUS = status!!)
                     workspaceTaskItemList.add(workspaceTaskItem)
                 }
@@ -939,10 +959,13 @@ class FirestoreRepository @Inject constructor(
         return try {
 
             serverResult(ServerResult.Progress)
+
             firestore.collection(Endpoints.PROJECTS)
                 .document(projectName).collection(Endpoints.Project.TAGS).document(tag.tagID!!)
                 .set(tag)
                 .await()
+
+
 
             serverResult(ServerResult.Success(200))
 
@@ -1050,14 +1073,19 @@ class FirestoreRepository @Inject constructor(
                     result(ServerResult.Success(taskItem))
                 }
 
-             }
+            }
 
             .addOnFailureListener { exception ->
                 result(ServerResult.Failure(exception))
             }
     }
 
-    override suspend fun postMessage(projectName: String,taskId:String,message: Message ,serverResult: (ServerResult<Int>) -> Unit) {
+    override suspend fun postMessage(
+        projectName: String,
+        taskId: String,
+        message: Message,
+        serverResult: (ServerResult<Int>) -> Unit
+    ) {
 
 
         return try {
@@ -1078,9 +1106,10 @@ class FirestoreRepository @Inject constructor(
             serverResult(ServerResult.Failure(exception))
         }
     }
+
     override fun getMessages(
         projectName: String,
-        taskId:String,
+        taskId: String,
         result: (ServerResult<List<Message>>) -> Unit
     ) {
         firestore.collection(Endpoints.PROJECTS)
@@ -1102,14 +1131,14 @@ class FirestoreRepository @Inject constructor(
 
                         val document = newDocs.document
 
-                        val messageId=document.getString("messageId")
-                        val senderId=document.getString("senderId")
-                        val content=document.getString("content")
-                        val timestamp= document.getTimestamp("timestamp")
-                        val messageType=document.getString("messageType")
-                        val additionalData=document.get("additionalData") as HashMap<String,Any>
+                        val messageId = document.getString("messageId")
+                        val senderId = document.getString("senderId")
+                        val content = document.getString("content")
+                        val timestamp = document.getTimestamp("timestamp")
+                        val messageType = document.getString("messageType")
+                        val additionalData = document.get("additionalData") as HashMap<String, Any>
 
-                        val messageData=Message(
+                        val messageData = Message(
                             messageId!!,
                             senderId!!,
                             content!!,
@@ -1127,7 +1156,10 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
-    override fun getMessageUserInfobyId(id: String, serverResult: (ServerResult<UserInMessage>) -> Unit) {
+    override fun getMessageUserInfobyId(
+        id: String,
+        serverResult: (ServerResult<UserInMessage>) -> Unit
+    ) {
 
         firestore.collection(Endpoints.USERS)
             .whereEqualTo("EMAIL", id)
@@ -1150,7 +1182,6 @@ class FirestoreRepository @Inject constructor(
                 serverResult(ServerResult.Failure(exception))
             }
     }
-
 
 
 }

@@ -33,6 +33,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -717,7 +718,13 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             if (!contriAdapter.isUserAdded(contributor)) {
                 contriAdapter.addUser(contributor)
                 contributorList.add(contributor.firebaseID)
-                contributorDpList.add(contributor.profileIDUrl)
+
+                if (contributor.profileIDUrl == null){
+                    contributorDpList.add("")
+                }else {
+                    contributorDpList.add(contributor.profileIDUrl)
+
+                }
             }
         } else {
             contriAdapter.removeUser(contributor)

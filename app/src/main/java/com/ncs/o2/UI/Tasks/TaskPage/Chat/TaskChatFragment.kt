@@ -1,8 +1,6 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
@@ -28,6 +25,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
@@ -36,7 +34,6 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.databinding.FragmentTaskChatBinding
-import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.AbstractMarkwonPlugin
@@ -45,7 +42,6 @@ import io.noties.markwon.MarkwonPlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.editor.MarkwonEditor
 import io.noties.markwon.editor.MarkwonEditorTextWatcher
-import io.noties.markwon.editor.PersistedSpans
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
@@ -53,12 +49,9 @@ import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.data.DataUriSchemeHandler
 import io.noties.markwon.image.glide.GlideImagesPlugin
-import io.noties.markwon.syntax.Prism4jSyntaxHighlight
 import io.noties.markwon.syntax.Prism4jThemeDarkula
 import io.noties.markwon.syntax.SyntaxHighlightPlugin
-import io.noties.prism4j.GrammarLocator
 import io.noties.prism4j.Prism4j
-import io.noties.prism4j.annotations.PrismBundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -85,6 +78,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
     lateinit var task: Task
     private lateinit var mdEditor: MarkwonEditor
     lateinit var chatAdapter: ChatAdapter
+
+
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
@@ -104,7 +99,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setdetails(activityBinding.taskId)
+        setDetails(activityBinding.taskId)
 
 //        messageDatabase = Room.databaseBuilder(
 //            requireContext(),
@@ -121,20 +116,26 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
 
             if (binding.inputBox.editboxMessage.text.toString().trim().isNotEmpty()) {
 
-                val message = Message(
-                    messageId = RandomIDGenerator.generateRandomId(),
-                    senderId = PrefManager.getcurrentUserdetails().EMAIL,
-                    content = binding.inputBox.editboxMessage.text?.trim().toString(),
-                    messageType = MessageType.NORMAL_MSG,
-                    timestamp = Timestamp.now()
-                )
-                postMessage(message)
+                sendMessageProcess()
+
                 binding.inputBox.editboxMessage.text?.clear()
             } else {
                 toast("Message can't be empty")
             }
         }
 
+    }
+
+    private fun sendMessageProcess() {
+
+        val message = Message(
+            messageId = RandomIDGenerator.generateRandomId(),
+            senderId = PrefManager.getcurrentUserdetails().EMAIL,
+            content = binding.inputBox.editboxMessage.text?.trim().toString(),
+            messageType = MessageType.NORMAL_MSG,
+            timestamp = Timestamp.now()
+        )
+        postMessage(message)
     }
 
     private fun setUpChatbox() {
@@ -202,6 +203,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
 
 
     fun postMessage(message: Message) {
+
         val recyclerView = binding.chatRecyclerview
         CoroutineScope(Dispatchers.Main).launch {
 
@@ -229,6 +231,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
                         binding.inputBox.editboxMessage.text?.clear()
                         recyclerView.scrollToPosition(chatAdapter.itemCount - 1)
 
+
+                       // sendNotification(receiverStack)
+
                     }
 
                 }
@@ -236,7 +241,25 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
         }
     }
 
-    private fun setdetails(id: String) {
+    private fun sendNotification(receiverList : Set<String>) {
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                for (receiverToken in receiverList){
+                    NotificationsUtils.sendFCMNotification(receiverToken)
+                }
+
+            }
+
+
+        }catch (exception : Exception){
+            Timber.tag("")
+            utils.showSnackbar(binding.root,"Failure in sending notifications",5000)
+        }
+
+    }
+
+    private fun setDetails(id: String) {
 
         viewLifecycleOwner.lifecycleScope.launch {
 
@@ -325,7 +348,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner {
         val replyFormat =
             """
             >${msg.content}
-           
           
             **@${senderName}**
             

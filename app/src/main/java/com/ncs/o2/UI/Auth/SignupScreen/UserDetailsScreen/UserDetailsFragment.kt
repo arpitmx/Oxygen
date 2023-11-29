@@ -16,12 +16,17 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.databinding.ChooseDesignationBottomSheetBinding
 import com.ncs.o2.databinding.FragmentUserDetailsBinding
 import com.ncs.versa.Constants.Endpoints
+import timber.log.Timber
 import javax.inject.Inject
 
 @Suppress("DEPRECATION")
@@ -52,18 +57,30 @@ class UserDetailsFragment : Fragment() {
             val designation=binding.etDesignation.text.toString()
             val bio=binding.etBio.text.toString()
 
-            val userData = mapOf(
+            val userData = mutableMapOf(
                 Endpoints.User.USERNAME to name,
                 Endpoints.User.DESIGNATION to designation,
                 Endpoints.User.BIO to bio,
                 Endpoints.User.ROLE to 1,
                 Endpoints.User.DETAILS_ADDED to true,
                 Endpoints.User.PHOTO_ADDED to false,
-                Endpoints.User.NOTIFICATION_TIME_STAMP to 0
+                Endpoints.User.NOTIFICATION_TIME_STAMP to 0,
             )
 
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Timber.tag(SignUpScreenFragment.TAG)
+                        .w(task.exception, "Fetching FCM registration token failed")
+                    userData[Endpoints.User.FCM_TOKEN] = Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
+                    return@addOnCompleteListener
+                }
+
+                val token = task.result
+                userData[Endpoints.User.FCM_TOKEN] = token
+            }
+
             FirebaseFirestore.getInstance().collection(Endpoints.USERS).document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .update(userData)
+                .update(userData.toMap())
                 .addOnSuccessListener {
                     findNavController().navigate(R.id.action_userDetailsFragment_to_profilePictureSelectionFragment)
                 }

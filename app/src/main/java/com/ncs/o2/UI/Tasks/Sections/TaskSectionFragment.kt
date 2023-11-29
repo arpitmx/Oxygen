@@ -143,7 +143,6 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     private fun setupRecyclerView() {
 
         taskList = ArrayList()
-
         viewModel.getTasksItemsForSegment(projectName, segmentName, sectionName) { result ->
             when (result) {
                 is ServerResult.Success -> {
@@ -165,12 +164,8 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
                         recyclerView = binding.recyclerView
                         taskListAdapter = TaskListAdapter(firestoreRepository,requireContext())
-                        taskListAdapter.setTaskList(taskList)
-                        taskListAdapter.notifyDataSetChanged()
-
                         taskListAdapter.setOnClickListener(this)
-                        val layoutManager =
-                            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                         layoutManager.reverseLayout = false
                         with(recyclerView) {
                             this.layoutManager = layoutManager
@@ -197,7 +192,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                             }
                         })
 
+                        taskListAdapter.setTaskList(taskList)
+                        taskListAdapter.notifyDataSetChanged()
                         showLoader(0)
+
 
                     }
 

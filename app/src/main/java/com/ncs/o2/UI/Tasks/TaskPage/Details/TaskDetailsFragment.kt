@@ -3,9 +3,7 @@ package com.ncs.o2.UI.Tasks.TaskPage.Details
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,29 +16,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
+import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
@@ -50,6 +40,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -70,7 +61,6 @@ import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.editor.MarkwonEditor
-import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,7 +70,6 @@ import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.util.Locale
 import javax.inject.Inject
 
 
@@ -148,7 +137,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         setUpViews()
 
         runDelayed(100) {
-            setdetails(activityBinding.taskId)
+            setDetails(activityBinding.taskId)
         }
 
         binding.activity.setOnClickThrottleBounceListener {
@@ -168,28 +157,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-    private fun setUpMarkwonMarkdown() {
-
-//        val activity = requireActivity()
-//        markwon = Markwon.builder(activity)
-//            .usePlugin(ImagesPlugin.create())
-//            .usePlugin(GlideImagesPlugin.create(activity))
-//            .usePlugin(TablePlugin.create(activity))
-//            .usePlugin(TaskListPlugin.create(activity))
-//            .usePlugin(HtmlPlugin.create())
-//            .usePlugin(StrikethroughPlugin.create())
-//            .usePlugin(object : AbstractMarkwonPlugin() {
-//                override fun configure(registry: MarkwonPlugin.Registry) {
-//                    registry.require(ImagesPlugin::class.java) { imagesPlugin ->
-//                        imagesPlugin.addSchemeHandler(DataUriSchemeHandler.create())
-//                    }
-//                }
-//            })
-//            .build()
-//
-//        mdEditor = MarkwonEditor.create(markwon)
-
-    }
 
     override fun onPause() {
         super.onPause()
@@ -204,22 +171,18 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private fun setUpViews() {
 
         binding.progressBar.visible()
-        setUpMarkwonMarkdown()
 
         activityBinding.binding.gioActionbar.btnRequestWork.setOnClickSingleTimeBounceListener {
             activityBinding.binding.gioActionbar.btnRequestWork.animFadein(requireContext())
             sendRequestNotification()
         }
 
-
-
-
         handleRequestNotificationResult()
     }
 
     private fun setDefaultViews(task: Task) {
         binding.projectNameET.text = task.project_ID
-        viewModel.task=task
+        viewModel.task = task
         val priority = when (task.priority) {
             1 -> "Low"
             2 -> "Medium"
@@ -263,78 +226,27 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         // Assigner
         fetchUserbyId(task.assigner) {
-            Glide.with(requireContext())
-                .load(it?.profileDPUrl)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-                })
-                .encodeQuality(80)
-                .override(40, 40)
-                .apply(
-                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-
-                )
-                .error(R.drawable.profile_pic_placeholder)
-                .into(binding.asigneerDp)
+            binding.asigneerDp.loadProfileImg(it?.profileDPUrl.toString())
         }
 
         // Assignee
         if (task.assignee != Endpoints.TaskDetails.EMPTY_MODERATORS) {
 
             fetchUserbyId(task.assignee) { user ->
-                Glide.with(requireContext())
-                    .load(user?.profileDPUrl)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
 
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
-                    .encodeQuality(80)
-                    .override(40, 40)
-                    .apply(
-                        RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-                    )
-                    .error(R.drawable.profile_pic_placeholder)
-                    .into(binding.assigneeInclude.tagIcon)
-
+                binding.assigneeInclude.tagIcon.loadProfileImg(user?.profileDPUrl.toString())
                 binding.assigneeInclude.normalET.text = user?.username
+
+                //Add assignee to Notification receiving list
+                user?.let {
+                    pushToReceiver(user)
+                }
             }
+
         } else {
 
             binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
-            binding.assigneeInclude.normalET.text = "No Assignee"
+            binding.assigneeInclude.normalET.text = "Unassigned"
 
         }
 
@@ -430,6 +342,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
     private fun setContributors(list: MutableList<User>) {
+
         val contriRecyclerView = binding.contributorsRecyclerView
         val layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
@@ -437,6 +350,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         contriRecyclerView.layoutManager = layoutManager
         val adapter = ContributorAdapter(list, this, false)
         contriRecyclerView.adapter = adapter
+
     }
 
     private fun setTagsView(list: MutableList<Tag>) {
@@ -491,7 +405,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         taskDetails = task
         setTags()
-        fetchUsers()
+        fetchModerators()
 
         binding.titleTv.text = task.title
 
@@ -576,66 +490,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 activityViewListner.showProgressbar(false)
             }
 
-
-//            override fun shouldInterceptRequest(
-//                view: WebView?,
-//                request: WebResourceRequest?
-//            ): WebResourceResponse? {
-//
-//                val url = request?.url.toString()
-//
-//                if (url == null) {
-//                    return super.shouldInterceptRequest(view, url as String)
-//                }
-//                return if (url.toLowerCase(Locale.ROOT)
-//                        .contains(".jpg") || url.toLowerCase(Locale.ROOT).contains(".jpeg")
-//                ) {
-//                    val bitmap =
-//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .load(url).submit().get()
-//                    WebResourceResponse(
-//                        "image/jpg", "UTF-8", getBitmapInputStream(
-//                            bitmap,
-//                            Bitmap.CompressFormat.JPEG
-//                        )
-//                    )
-//                } else if (url.toLowerCase(Locale.ROOT).contains(".png")) {
-//                    val bitmap =
-//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .load(url).submit().get()
-//                    WebResourceResponse(
-//                        "image/png", "UTF-8", getBitmapInputStream(
-//                            bitmap,
-//                            Bitmap.CompressFormat.PNG
-//                        )
-//                    )
-//                } else if (url.toLowerCase(Locale.ROOT).contains(".webp")) {
-//                    val bitmap =
-//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .load(url).submit().get()
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//                        WebResourceResponse(
-//                            "image/webp", "UTF-8", getBitmapInputStream(
-//                                bitmap,
-//                                Bitmap.CompressFormat.WEBP_LOSSY
-//                            )
-//                        )
-//                    } else {
-//                        WebResourceResponse(
-//                            "image/webp", "UTF-8", getBitmapInputStream(
-//                                bitmap,
-//                                Bitmap.CompressFormat.PNG
-//                            )
-//                        )
-//                    }
-//                } else {
-//                    super.shouldInterceptRequest(view, url)
-//                }
-//
-//
-//            }
-
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
                 request: WebResourceRequest?
@@ -709,9 +563,9 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         val timeAgo = DateTimeUtils.getTimeAgo(task.time_STAMP!!.seconds)
         fetchUserbyId(task.assigner) {
-            val fullText = "${it?.username} created this task $timeAgo"
-            val spannableString = SpannableString(fullText)
 
+            val fullText = "${it?.username} opened this $timeAgo"
+            val spannableString = SpannableString(fullText)
             val startIndex = 0
             val endIndex = startIndex + it?.username?.length!!
 
@@ -728,10 +582,22 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 //                StyleSpan(Typeface.BOLD), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
 //            )
             binding.openedBy.text = spannableString
+
+            //Adding to NotificationReceiverList
+            pushToReceiver(it)
+
         }
     }
 
-    private fun setdetails(id: String) {
+    private fun pushToReceiver(user: User) {
+        user.fcmToken?.let{ token  ->
+            if (token!=Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code){
+                activityBinding.sharedViewModel.pushReceiver(token)
+            }
+        }
+    }
+
+    private fun setDetails(id: String) {
 
         viewLifecycleOwner.lifecycleScope.launch {
 
@@ -789,19 +655,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-    private fun typingAnimation(view: TextView, text: String, length: Int) {
-        var delay = 200L
-        if (Character.isWhitespace(text.elementAt(length - 1))) {
-            delay = 600L
-        }
-        view.text = text.substring(0, length)
-        when (length) {
-            text.length -> return
-            else -> Handler(Looper.getMainLooper()).postDelayed({
-                typingAnimation(view, text, length + 1)
-            }, delay)
-        }
-    }
 
     private fun setTags() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -824,6 +677,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
                             is ServerResult.Failure -> {
                                 val errorMessage = result.exception.message
+                                utils.showSnackbar(binding.root,"Failure in loading tags",5000)
                                 binding.progressBar.gone()
                             }
 
@@ -838,7 +692,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-    private fun fetchUsers() {
+    private fun fetchModerators() {
 
         Timber.d("Moderators list : ${taskDetails.moderators}")
 
@@ -846,47 +700,55 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             //toast("Contributor empty")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
+            return
 
         } else if (taskDetails.moderators[0] == Endpoints.TaskDetails.EMPTY_MODERATORS) {
             // toast("Contributor not empty None")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
+            return
 
-        } else {
+        }
 
-            binding.contributorsRecyclerView.visible()
-            binding.noContributors.gone()
+        binding.contributorsRecyclerView.visible()
+        binding.noContributors.gone()
 
-            for (contributors in taskDetails.moderators) {
+        for (contributors in taskDetails.moderators) {
 
-                viewModel.getUserbyId(contributors) { result ->
+            viewModel.getUserbyId(contributors) { result ->
 
-                    when (result) {
+                when (result) {
 
-                        is ServerResult.Success -> {
-                            binding.progressBar.gone()
-                            binding.parentScrollview.visible()
+                    is ServerResult.Success -> {
 
-                            val user = result.data
-                            users.add(user!!)
+                        binding.progressBar.gone()
+                        binding.parentScrollview.visible()
+
+                        val user = result.data
+                        user?.let {
+
+                            users.add(user)
+
+                            //Adding user to notification list
+                            pushToReceiver(user)
                             setContributors(users)
                         }
+                    }
 
-                        is ServerResult.Failure -> {
+                    is ServerResult.Failure -> {
 
-                            utils.singleBtnDialog(
-                                "Failure",
-                                "Failure in fetching Moderators : ${result.exception.message}",
-                                "Okay"
-                            ) {
-                                requireActivity().finish()
-                            }
-                            binding.progressBar.gone()
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in fetching Moderators : ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
                         }
+                        binding.progressBar.gone()
+                    }
 
-                        is ServerResult.Progress -> {
-                            binding.progressBar.visible()
-                        }
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
                     }
                 }
             }
@@ -894,53 +756,54 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-    private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
-        viewModel.getUserbyId(id) { result ->
+private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
-            when (result) {
-                is ServerResult.Success -> {
-                    binding.progressBar.gone()
-                    binding.parentScrollview.visible()
-                    val user = result.data!!
-                    callback(user)
-                }
+    viewModel.getUserbyId(id) { result ->
 
-                is ServerResult.Failure -> {
-                    utils.singleBtnDialog(
-                        "Failure",
-                        "Failure in fetching User object : ${result.exception.message}",
-                        "Okay"
-                    ) {
-                        requireActivity().finish()
-                    }
-                    binding.progressBar.gone()
-                    callback(null)
-                }
-
-                is ServerResult.Progress -> {
-                    binding.progressBar.visible()
-                }
+        when (result) {
+            is ServerResult.Success -> {
+                binding.progressBar.gone()
+                binding.parentScrollview.visible()
+                val user = result.data!!
+                callback(user)
             }
 
+            is ServerResult.Failure -> {
+                utils.singleBtnDialog(
+                    "Failure",
+                    "Failure in fetching User object : ${result.exception.message}",
+                    "Okay"
+                ) {
+                    requireActivity().finish()
+                }
+                binding.progressBar.gone()
+                callback(null)
+            }
 
+            is ServerResult.Progress -> {
+                binding.progressBar.visible()
+            }
         }
-    }
 
-
-    override fun onImageClicked(position: Int, imageList: MutableList<String>) {
-        val imageViewerIntent = Intent(requireActivity(), ImageViewerActivity::class.java)
-        imageViewerIntent.putExtra("position", position)
-        imageViewerIntent.putStringArrayListExtra("images", ArrayList(imageList))
-        startActivity(
-            ImageViewerActivity.createIntent(
-                requireContext(),
-                ArrayList(imageList),
-                position
-            ),
-        )
 
     }
+}
+
+
+override fun onImageClicked(position: Int, imageList: MutableList<String>) {
+    val imageViewerIntent = Intent(requireActivity(), ImageViewerActivity::class.java)
+    imageViewerIntent.putExtra("position", position)
+    imageViewerIntent.putStringArrayListExtra("images", ArrayList(imageList))
+    startActivity(
+        ImageViewerActivity.createIntent(
+            requireContext(),
+            ArrayList(imageList),
+            position
+        ),
+    )
+
+}
 
 
 }
@@ -953,3 +816,64 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 //                    Timber.tag("HTML").d(html!!)
 //
 //                }
+
+
+
+//            override fun shouldInterceptRequest(
+//                view: WebView?,
+//                request: WebResourceRequest?
+//            ): WebResourceResponse? {
+//
+//                val url = request?.url.toString()
+//
+//                if (url == null) {
+//                    return super.shouldInterceptRequest(view, url as String)
+//                }
+//                return if (url.toLowerCase(Locale.ROOT)
+//                        .contains(".jpg") || url.toLowerCase(Locale.ROOT).contains(".jpeg")
+//                ) {
+//                    val bitmap =
+//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
+//                            .load(url).submit().get()
+//                    WebResourceResponse(
+//                        "image/jpg", "UTF-8", getBitmapInputStream(
+//                            bitmap,
+//                            Bitmap.CompressFormat.JPEG
+//                        )
+//                    )
+//                } else if (url.toLowerCase(Locale.ROOT).contains(".png")) {
+//                    val bitmap =
+//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
+//                            .load(url).submit().get()
+//                    WebResourceResponse(
+//                        "image/png", "UTF-8", getBitmapInputStream(
+//                            bitmap,
+//                            Bitmap.CompressFormat.PNG
+//                        )
+//                    )
+//                } else if (url.toLowerCase(Locale.ROOT).contains(".webp")) {
+//                    val bitmap =
+//                        Glide.with(view!!.rootView).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
+//                            .load(url).submit().get()
+//
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                        WebResourceResponse(
+//                            "image/webp", "UTF-8", getBitmapInputStream(
+//                                bitmap,
+//                                Bitmap.CompressFormat.WEBP_LOSSY
+//                            )
+//                        )
+//                    } else {
+//                        WebResourceResponse(
+//                            "image/webp", "UTF-8", getBitmapInputStream(
+//                                bitmap,
+//                                Bitmap.CompressFormat.PNG
+//                            )
+//                        )
+//                    }
+//                } else {
+//                    super.shouldInterceptRequest(view, url)
+//                }
+//
+//
+//            }

@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Tasks.TaskPage
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -21,6 +22,8 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         ActivityTaskDetailBinding.inflate(layoutInflater)
     }
     lateinit var taskId:String
+    val sharedViewModel: SharedViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
