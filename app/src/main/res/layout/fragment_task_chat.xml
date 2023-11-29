@@ -62,7 +62,6 @@
         android:layout_alignParentTop="true"
         android:layout_above="@+id/input_box_container"
         android:layoutAnimation="@anim/layout_animation_fadein"
-        android:nestedScrollingEnabled="false"
         android:scrollbarSize="3dp"
         android:scrollbarThumbVertical="@color/secondaryBlue"
         android:scrollbars="vertical"
@@ -87,9 +86,11 @@
             android:visibility="visible">
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/btn_select_pdf_from_storage"
+                android:id="@+id/btn_select_image_from_storage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxHeight="250dp"
+                android:maxWidth="250dp"
                 android:orientation="horizontal"
                 android:visibility="gone"
                 android:weightSum="10">
@@ -101,34 +102,25 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp"
-                    android:background="@drawable/suggestion_box_bg"
                     android:padding="2dp"
 
                     >
 
                     <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:visibility="visible">
 
                         <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="10dp"
-                            android:src="@drawable/baseline_picture_as_pdf_24"
-                            app:tint="@color/colorPrimary" />
+                            android:id="@+id/imagePreview"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/tasknull_placeholder"
+                            />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:fontFamily="@font/sfregular"
-                            android:gravity="center_vertical"
-                            android:text="Analyse pdf"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="12dp" />
+
 
 
                     </androidx.appcompat.widget.LinearLayoutCompat>

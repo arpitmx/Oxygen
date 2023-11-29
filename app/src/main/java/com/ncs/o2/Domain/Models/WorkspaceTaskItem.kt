@@ -1,7 +1,7 @@
 package com.ncs.o2.Domain.Models
 
 data class WorkspaceTaskItem (
-    val ID:String="",
-    val STATUS:String=""
+    val id:String="",
+    val status:String=""
 ){
 }

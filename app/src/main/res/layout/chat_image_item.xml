@@ -40,7 +40,7 @@
             android:gravity="center"
             android:src="@color/s3bg"
             android:textColor="@color/darkTheme_bg"
-             />
+            />
 
         <TextView
             android:id="@+id/tv_name"
@@ -81,36 +81,22 @@
         android:layout_marginEnd="@dimen/chat_margin"
         android:orientation="vertical"
         >
-        <br.tiagohm.markdownview.MarkdownView
-            android:id="@+id/markdown_view"
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="true"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
             android:visibility="gone"
-            app:escapeHtml="false"
-            android:focusable="false"
-            android:fontFamily="@font/sf_pro_display_medium"
-            android:text="*This is a test message*, I wanted to talk about yesterday's match, but let's see what the heck is going on..."
-            android:textColor="@color/better_white"
-            android:textSize="16dp"
-            android:textAlignment="textStart"
-            />
+            android:layout_marginBottom="30dp"
+            android:id="@+id/imagePreview"
+            android:src="@drawable/placeholder_image"/>
 
-        <TextView
-            android:id="@+id/btn_copy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Copy"
-            android:textSize="12dp"
-            android:background="@drawable/curvedbggraybg_umssg"
-            android:layout_gravity="end"
-            android:padding="5dp"
-            android:visibility="gone"
-            android:src="@drawable/document_normal"
-            android:tint="@color/card_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="30dp"
+            android:visibility="visible"
+            android:indeterminateTint="@color/colorAccent"
+            android:id="@+id/imageProgressBar"/>
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

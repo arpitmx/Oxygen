@@ -136,6 +136,21 @@ constructor(val notificationApiService: NotificationApiService,
         firestoreRepository.getUserInfobyId(id,resultCallback)
     }
 
+    suspend fun updateTask(taskID:String,projectName: String,NewAssignee:String,OldAssignee:String):ServerResult<Boolean>{
+        return firestoreRepository.updateTask(id = taskID, projectName = projectName, newAssignee = NewAssignee, oldAssignee =  OldAssignee)
+    }
+
+    suspend fun updateState(taskID:String,userID:String,newState:String):ServerResult<Boolean>{
+        return firestoreRepository.updateState(id = taskID, userID = userID,newState=newState)
+    }
+
+    suspend fun updateModerators(taskID:String,projectName: String,moderator:String):ServerResult<Boolean>{
+        return firestoreRepository.updateModerator(id = taskID, projectName = projectName,moderator=moderator)
+    }
+
+    suspend fun addNewModerators(taskID:String,projectName: String,moderator:MutableList<String>,unselected:MutableList<String>):ServerResult<Boolean>{
+        return firestoreRepository.addNewModerator(id = taskID, projectName = projectName, newModerators =moderator,unselected=unselected)
+    }
 
 
 

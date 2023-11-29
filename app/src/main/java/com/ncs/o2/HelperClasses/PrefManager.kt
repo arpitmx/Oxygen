@@ -10,6 +10,7 @@ import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.versa.Constants.Endpoints
+import java.util.Date
 
 /*
 File : SharedPrefHelper -> com.ncs.o2.HelperClasses
@@ -137,6 +138,16 @@ object PrefManager {
         val designation = sharedPreferences.getString(Endpoints.User.DESIGNATION, "")
         val role = sharedPreferences.getLong(Endpoints.User.ROLE, 0)
         return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role)
+    }
+
+    fun setCurrentUserTimeStamp(timestamp: Timestamp){
+        val timestampInMillis = timestamp.toDate().time
+        editor.putLong(Endpoints.User.TIMESTAMP, timestampInMillis)
+        editor.apply()
+    }
+
+    fun getCurrentUserTimeStamp():Timestamp {
+        return Timestamp(Date(sharedPreferences.getLong(Endpoints.User.TIMESTAMP, 0L)))
     }
 
 

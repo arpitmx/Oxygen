@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
+    android:id="@+id/parent"
     android:layout_height="match_parent"
     android:background="@color/darkbg_main_a80"
     tools:context=".UI.Tasks.TaskPage.Details.ImageViewerActivity">
@@ -14,8 +15,9 @@
         android:layout_height="30dp"
         android:src="@drawable/ic_back_arrow"
         android:visibility="visible"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/primary" />
@@ -23,5 +25,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/view_pager"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:id="@+id/cont"
+        android:layout_height="wrap_content">
+    <ImageView
+        android:layout_width="match_parent"
+        android:visibility="visible"
+        android:layout_height="match_parent"
+        android:id="@+id/image"/>
+    </LinearLayout>
 
 </LinearLayout>
