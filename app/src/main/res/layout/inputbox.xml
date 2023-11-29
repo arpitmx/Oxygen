@@ -29,7 +29,7 @@
 
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/selected_pdf_view"
+            android:id="@+id/selected_image_view"
             android:layout_width="0dp"
             android:layout_weight="9"
             android:layout_height="match_parent"
@@ -57,19 +57,19 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent"
-                        android:src="@drawable/baseline_picture_as_pdf_24"
+                        android:src="@drawable/baseline_image_24"
                         app:tint="@color/orange"
                         android:layout_marginStart="10dp"
                         />
 
                     <TextView
-                        android:id="@+id/tv_selected_pdf_name"
+                        android:id="@+id/tv_selected_image_name"
                         android:layout_width="0dp"
                         android:layout_weight="8"
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
-                        android:text="Selected.pdf"
+                        android:text="Image is here!"
                         android:textSize="14dp"
                         android:singleLine="true"
                         android:ellipsize="end"
@@ -79,7 +79,7 @@
                         />
 
                     <ImageButton
-                        android:id="@+id/cross_btn_selected_pdf"
+                        android:id="@+id/cross_btn_selected_image"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -113,13 +113,13 @@
             >
 
      <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btn_attach"
+        android:id="@+id/btn_attach_image"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:layout_marginStart="10dp"
         android:background="@null"
-        android:src="@drawable/baseline_attach_file_24"
+        android:src="@drawable/baseline_image_24"
         android:scaleX="1"
         android:scaleY="1"
         android:tint="@color/better_white"

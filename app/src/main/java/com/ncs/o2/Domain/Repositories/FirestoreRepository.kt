@@ -10,6 +10,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
@@ -539,12 +540,15 @@ class FirestoreRepository @Inject constructor(
         val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
 
         return try {
-
+            val workspaceTaskItem=WorkspaceTaskItem(id = task.id, status = "Assigned")
             serverResult(ServerResult.Progress)
-            //firestore.document(getTaskPath(task)).set(task).await()
             getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task)
                 .await()
-
+            if (task.assignee!="None") {
+                firestore.collection(Endpoints.USERS).document(task.assignee)
+                    .collection(Endpoints.Workspace.WORKSPACE)
+                    .document(task.id).set(workspaceTaskItem).await()
+            }
             serverResult(ServerResult.Success(200))
 
         } catch (exception: Exception) {
@@ -917,7 +921,7 @@ class FirestoreRepository @Inject constructor(
                 for (document in querySnapshot.documents) {
                     val id=document.getString(Endpoints.Workspace.ID)
                     val status=document.getString(Endpoints.Workspace.STATUS)
-                    val workspaceTaskItem = WorkspaceTaskItem(ID = id!!, STATUS = status!!)
+                    val workspaceTaskItem = WorkspaceTaskItem(id = id!!, status = status!!)
                     workspaceTaskItemList.add(workspaceTaskItem)
                 }
 
@@ -1146,6 +1150,175 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    override fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>> {
+
+        val liveData = MutableLiveData<ServerResult<StorageReference>>()
+        val imageFileName = generateRandomID(IDType.SegmentID)
+        val imageRef = storageReference.child(projectId).child("TASKS").child(taskId).child(imageFileName)
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+        val data = baos.toByteArray()
+        val uploadTask = imageRef.putBytes(data)
+
+        uploadTask.addOnSuccessListener {
+            liveData.postValue(ServerResult.Success(imageRef))
+
+        }.addOnFailureListener { exception ->
+            liveData.postValue(ServerResult.Failure(exception))
+
+        }
+
+        return liveData
+    }
+    override suspend fun updateTask(
+        id: String,
+        projectName: String,
+        newAssignee: String,
+        oldAssignee:String,
+    ): ServerResult<Boolean> {
+        try {
+
+            val documentRef = firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .collection(Endpoints.Project.TASKS)
+                .document(id)
+
+            val documentSnapshot = documentRef.get().await()
+            if (documentSnapshot.exists()) {
+                if (oldAssignee!="None") {
+                    firestore.collection(Endpoints.USERS).document(oldAssignee)
+                        .collection(Endpoints.Workspace.WORKSPACE).document(id).delete().await()
+                }
+                documentRef.update("assignee", newAssignee).await()
+                documentRef.update("status", 2)
+                val workspaceItem=WorkspaceTaskItem(id = id, status ="Assigned")
+                if (newAssignee!="None") {
+                    firestore.collection(Endpoints.USERS).document(newAssignee)
+                        .collection(Endpoints.Workspace.WORKSPACE).document(id).set(workspaceItem)
+                        .await()
+                }
+                return ServerResult.Success(true)
+            } else {
+                return ServerResult.Failure(Exception("Document not found for title: $id"))
+            }
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun updateModerator(
+        id: String,
+        projectName: String,
+        moderator: String
+    ): ServerResult<Boolean> {
+        try {
+            val documentRef = firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .collection(Endpoints.Project.TASKS)
+                .document(id)
+
+            val updateData = mapOf<String, Any>(
+                "moderators" to FieldValue.arrayUnion(moderator)
+            )
+
+            documentRef.update(updateData).await()
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun addNewModerator(
+        id: String,
+        projectName: String,
+        newModerators: MutableList<String>,
+        unselected:MutableList<String>
+    ): ServerResult<Boolean> {
+        try {
+            val documentRef = firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .collection(Endpoints.Project.TASKS)
+                .document(id)
+
+            val list:MutableList<String> = mutableListOf()
+            firestore.collection(Endpoints.PROJECTS).document(projectName).collection(Endpoints.Project.TASKS).whereEqualTo("id",id).get()
+                .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    val moderators = document.get("moderators") as MutableList<String>
+                    list.addAll(moderators)
+                }
+            }
+            list.removeAll(unselected)
+            list.addAll(newModerators)
+            val finalList=list.distinct()
+//            val updatedModeratorslist=(list+newModerators)
+
+//            val updateData = mapOf<String, Any>(
+//                "moderators" to FieldValue.arrayUnion(*newModerators.toTypedArray())
+//            )
+//
+//            documentRef.update(updateData).await()
+
+            documentRef.update("moderators",finalList)
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+
+    override suspend fun updateState(
+        id: String,
+        userID:String,
+        newState: String,
+    ): ServerResult<Boolean> {
+        try {
+            val documentRef = firestore.collection(Endpoints.USERS)
+                .document(userID)
+                .collection(Endpoints.Workspace.WORKSPACE)
+                .document(id)
+            val documentSnapshot = documentRef.get().await()
+            if (documentSnapshot.exists()) {
+                documentRef.update("status", newState).await()
+                val status= when(newState){
+                    "Submitted" -> 1
+                    "Open" -> 2
+                    "Working" -> 3
+                    "Review" -> 4
+                    "Completed" -> 5
+                    "Assigned" -> 2
+                    else -> -1
+                }
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+                    .update("status",status)
+
+                return ServerResult.Success(true)
+            } else {
+                val status= when(newState){
+                    "Submitted" -> 1
+                    "Open" -> 2
+                    "Working" -> 3
+                    "Review" -> 4
+                    "Completed" -> 5
+                    else -> -1
+                }
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+                    .update("status",status)
+                return ServerResult.Success(true)
+            }
+
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
 
 
 }

@@ -5,10 +5,14 @@ import android.app.SharedElementCallback
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +29,7 @@ import com.igreenwood.loupe.extensions.setOnViewTranslateListener
 import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityImageViewerBinding
 import com.ncs.o2.databinding.ViewpagerImageItemBinding
@@ -34,6 +39,7 @@ class ImageViewerActivity : AppCompatActivity() {
     companion object {
         private const val ARGS_IMAGE_URLS = "ARGS_IMAGE_URLS"
         private const val ARGS_INITIAL_POSITION = "ARGS_INITIAL_POSITION"
+
 
         fun createIntent(context: Context, urls: ArrayList<String>, initialPos: Int): Intent {
             return Intent(context, ImageViewerActivity::class.java).apply {
@@ -68,6 +74,8 @@ class ImageViewerActivity : AppCompatActivity() {
         }
 
         initViewPager()
+
+
     }
 
     override fun onBackPressed() {
@@ -81,6 +89,8 @@ class ImageViewerActivity : AppCompatActivity() {
     }
 
     private fun initViewPager() {
+        binding.viewPager.visible()
+        binding.cont.gone()
         adapter = ImageAdapter(this, urls)
         binding.viewPager.adapter = adapter
         binding.viewPager.currentItem = initialPos
@@ -135,77 +145,78 @@ class ImageViewerActivity : AppCompatActivity() {
         private fun loadImage(image: ImageView, container: ViewGroup, position: Int,progressBar: ProgressBar) {
             if (Pref.useSharedElements) {
                 // shared elements
-                Glide.with(image.context)
-                    .load(urls[position])
-                    .onlyRetrieveFromCache(true)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: com.bumptech.glide.request.target.Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            startPostponedEnterTransition()
-                            progressBar.gone()
-                            return false
-                        }
 
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: com.bumptech.glide.request.target.Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            progressBar.gone()
-                            image.transitionName =
-                                context.getString(R.string.shared_image_transition, position)
-
-                            val loupe = createLoupe(image, container) {
-                                useFlingToDismissGesture = !Pref.useSharedElements
-                                maxZoom = Pref.maxZoom
-                                flingAnimationDuration = Pref.flingAnimationDuration
-                                scaleAnimationDuration = Pref.scaleAnimationDuration
-                                overScaleAnimationDuration = Pref.overScaleAnimationDuration
-                                overScrollAnimationDuration = Pref.overScrollAnimationDuration
-                                dismissAnimationDuration = Pref.dismissAnimationDuration
-                                restoreAnimationDuration = Pref.restoreAnimationDuration
-                                viewDragFriction = Pref.viewDragFriction
-
-                                setOnViewTranslateListener(
-                                    onStart = {  },
-                                    onRestore = { },
-                                    onDismiss = { finishAfterTransition() }
-                                )
-                            }
-
-                            loupeMap[position] = loupe
-
-                            if (position == initialPos) {
-                                setEnterSharedElementCallback(object : SharedElementCallback() {
-                                    override fun onMapSharedElements(
-                                        names: MutableList<String>?,
-                                        sharedElements: MutableMap<String, View>?
-                                    ) {
-                                        names ?: return
-                                        val view = views[currentPos] ?: return
-                                        val currentPosition: Int = currentPos
-                                        view.transitionName = context.getString(
-                                            R.string.shared_image_transition,
-                                            currentPosition
-                                        )
-                                        sharedElements?.clear()
-                                        sharedElements?.put(view.transitionName, view)
-                                    }
-                                })
+                    Glide.with(image.context)
+                        .load(urls[position])
+                        .onlyRetrieveFromCache(true)
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: com.bumptech.glide.request.target.Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ): Boolean {
                                 startPostponedEnterTransition()
+                                progressBar.gone()
+                                return false
                             }
-                            return false
-                        }
 
-                    })
-                    .error(R.drawable.placeholder_image)
-                    .into(image)
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: com.bumptech.glide.request.target.Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                progressBar.gone()
+                                image.transitionName =
+                                    context.getString(R.string.shared_image_transition, position)
+
+                                val loupe = createLoupe(image, container) {
+                                    useFlingToDismissGesture = !Pref.useSharedElements
+                                    maxZoom = Pref.maxZoom
+                                    flingAnimationDuration = Pref.flingAnimationDuration
+                                    scaleAnimationDuration = Pref.scaleAnimationDuration
+                                    overScaleAnimationDuration = Pref.overScaleAnimationDuration
+                                    overScrollAnimationDuration = Pref.overScrollAnimationDuration
+                                    dismissAnimationDuration = Pref.dismissAnimationDuration
+                                    restoreAnimationDuration = Pref.restoreAnimationDuration
+                                    viewDragFriction = Pref.viewDragFriction
+
+                                    setOnViewTranslateListener(
+                                        onStart = { },
+                                        onRestore = { },
+                                        onDismiss = { finishAfterTransition() }
+                                    )
+                                }
+
+                                loupeMap[position] = loupe
+
+                                if (position == initialPos) {
+                                    setEnterSharedElementCallback(object : SharedElementCallback() {
+                                        override fun onMapSharedElements(
+                                            names: MutableList<String>?,
+                                            sharedElements: MutableMap<String, View>?
+                                        ) {
+                                            names ?: return
+                                            val view = views[currentPos] ?: return
+                                            val currentPosition: Int = currentPos
+                                            view.transitionName = context.getString(
+                                                R.string.shared_image_transition,
+                                                currentPosition
+                                            )
+                                            sharedElements?.clear()
+                                            sharedElements?.put(view.transitionName, view)
+                                        }
+                                    })
+                                    startPostponedEnterTransition()
+                                }
+                                return false
+                            }
+
+                        })
+                        .error(R.drawable.placeholder_image)
+                        .into(image)
             } else {
                 // swipe to dismiss
                 Glide.with(image.context).load(urls[position])

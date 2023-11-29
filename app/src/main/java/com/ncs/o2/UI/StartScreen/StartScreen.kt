@@ -344,8 +344,9 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
                 val role=document.get(Endpoints.User.ROLE)
+                val timestamp=document.getTimestamp(Endpoints.User.TIMESTAMP)
                 PrefManager.setUserRole(role.toString().toLong())
-
+                PrefManager.setCurrentUserTimeStamp(timestamp!!)
                 val dp_url = document.getString(Endpoints.User.DP_URL)
                 val dp_url_pref = PrefManager.getDpUrl()
 

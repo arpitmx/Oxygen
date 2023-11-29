@@ -31,7 +31,7 @@
         android:paddingEnd="@dimen/padding_start_task_create"
         android:maxLength="10"
         android:maxLines="1"
-        android:text="Select"
+        android:text="Unassigned"
         android:ellipsize="end"
         android:textColor="@color/better_white"
         android:textSize="15dp"
