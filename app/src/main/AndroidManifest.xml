@@ -13,13 +13,19 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/O2SplashTheme"
-        android:hardwareAccelerated="true"
         tools:targetApi="31">
+        <activity
+            android:name=".UI.Setting.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.NewChanges"
+            android:exported="false" />
         <activity
             android:name=".UI.CreateTask.DescriptionEditorActivity"
             android:exported="false" />
@@ -58,7 +64,7 @@
             android:name=".UI.CreateTask.CreateTaskActivity"
             android:exported="false" />
         <activity
-            android:name=".UI.CreateProject"
+            android:name=".UI.createProject.CreateProject"
             android:exported="false" />
         <activity
             android:name=".UI.Notifications.Requests.RequestActivity"
