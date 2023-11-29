@@ -158,7 +158,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         } else {
             throw ClassCastException("$context must implement DataPassListener")
         }
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

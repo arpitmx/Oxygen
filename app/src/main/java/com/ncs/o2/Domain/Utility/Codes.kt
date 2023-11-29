@@ -14,6 +14,7 @@ object Codes {
         var isMaintaining = ""
         var maintaninDesc = ""
         var segmentText = ""
+        var clickedSetting = ""
     }
 
     object Status {
