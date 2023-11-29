@@ -18,6 +18,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistViewModel
+import com.ncs.o2.databinding.AssigneeListBottomSheetBinding
 import com.ncs.o2.databinding.ContributorListBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -31,19 +32,19 @@ import javax.inject.Inject
 class AssigneeListBottomSheet(
     private var OList: MutableList<User>,
     private var selectedAssignee: MutableList<User>,
-    private val callbacks: getassigneesCallback
+    private val callbacks: getassigneesCallback,
+    private val updateCallabck:updateAssigneeCallback?
 ) : BottomSheetDialogFragment(),AssigneeListAdpater.OnAssigneeClickCallback {
 
     private val UserListviewModel: UserlistViewModel by viewModels()
     private lateinit var jsonString: String
     private var TList: MutableList<User> = mutableListOf()
-
+    var currentSelectedAssignee:User?=null
     @Inject
     lateinit var firestoreRepository: FirestoreRepository
 
-
-    val binding: ContributorListBottomSheetBinding by lazy {
-        ContributorListBottomSheetBinding.inflate(layoutInflater)
+    val binding: AssigneeListBottomSheetBinding by lazy {
+        AssigneeListBottomSheetBinding.inflate(layoutInflater)
     }
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewDevelopers
@@ -99,6 +100,12 @@ class AssigneeListBottomSheet(
 
 
         binding.submitBtn.setOnClickThrottleBounceListener {
+            if (selectedAssignee.isEmpty() || OList.isEmpty()){
+                updateCallabck?.updateAssignee(User(firebaseID = ""))
+            }
+            else{
+                updateCallabck?.updateAssignee(currentSelectedAssignee!!)
+            }
             dismiss()
         }
     }
@@ -131,13 +138,16 @@ class AssigneeListBottomSheet(
         }
         callbacks.sendassignee(contributor,isChecked,position)
         callbacks.onAssigneeTListUpdated(TList)
+        currentSelectedAssignee=contributor
     }
 
     interface getassigneesCallback {
 
         fun sendassignee(assignee:User,isChecked: Boolean,position: Int)
         fun onAssigneeTListUpdated(TList: MutableList<User>)
-
+    }
+    interface updateAssigneeCallback{
+        fun updateAssignee(assignee:User)
     }
     private fun fetchContributors(projectName: String){
         firestoreRepository.getContributors(projectName) { serverResult ->

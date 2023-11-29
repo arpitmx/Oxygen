@@ -32,16 +32,16 @@
 
 
         <TextView
-            android:id="@+id/sheet_title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_toStartOf="@+id/submit_btn"
             android:layout_toEndOf="@+id/close_btn"
-            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
-            android:text="Select Members"
+            android:id="@+id/sheet_title"
             android:textColor="@color/better_white"
-            android:textSize="16dp" />
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:textSize="16dp"
+            android:text="Select Members" />
 
 
         <ImageButton
@@ -53,7 +53,7 @@
             android:layout_marginEnd="10dp"
             app:tint="@color/green"
             app:srcCompat ="@drawable/baseline_done_24"
-             />
+            />
 
     </RelativeLayout>
 
@@ -106,6 +106,55 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:visibility="gone"
+        android:id="@+id/unassign_layout"
+        android:background="@color/primarybg">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/better_white"
+                android:text="Unassigned"
+                android:fontFamily="@font/sf_pro_display_medium"
+                />
+
+
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/unassign_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:foregroundTint="@color/purple"
+            android:buttonTint="@color/primary"
+            />
+
+    </LinearLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView

@@ -53,6 +53,7 @@ interface Repository {
         taskId:String,
         result: (ServerResult<List<Message>>) -> Unit
     )
+    fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>>
 
     suspend fun addTask(task: Task)
     suspend fun postTags(tag: Tag, projectName: String, serverResult: (ServerResult<Int>) -> Unit)
@@ -76,7 +77,30 @@ interface Repository {
         projectName: String,
     ): ServerResult<Task>
 
+    suspend fun updateTask(
+        id: String,
+        projectName: String,
+        newAssignee:String,
+        oldAssignee:String,
+    ): ServerResult<Boolean>
 
+    suspend fun updateModerator(
+        id: String,
+        projectName: String,
+        moderator:String,
+    ): ServerResult<Boolean>
+
+    suspend fun addNewModerator(
+        id: String,
+        projectName: String,
+        newModerators: MutableList<String>,
+        unselected:MutableList<String>
+    ): ServerResult<Boolean>
+     suspend fun updateState(
+        id: String,
+        userID:String,
+        newState: String,
+    ): ServerResult<Boolean>
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
 
@@ -129,4 +153,5 @@ interface Repository {
         projectID: String,
         result: (ServerResult<Boolean>) -> Unit
     )
+
 }

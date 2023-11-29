@@ -80,7 +80,12 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
 
 
     private fun getTaskIdsList(){
-        viewModel.getUserTasksId(sectionName) { result ->
+        val _sectionName=when(sectionName){
+            "Working On" -> "Working"
+            "Reviewing" -> "Review"
+            else -> sectionName
+        }
+        viewModel.getUserTasksId(_sectionName) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     binding.lottieProgressInclude.progressbarBlock.gone()
@@ -120,7 +125,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
         CoroutineScope(Dispatchers.IO).launch {
             for (i in 0 until taskIdsList.size) {
                 viewModel.getTasksItembyId(
-                    id = taskIdsList[i].ID,
+                    id = taskIdsList[i].id,
                     projectName = projectName
                 ) { result ->
                     when (result) {

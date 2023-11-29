@@ -69,7 +69,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     SegmentSelectionBottomSheet.SegmentSelectionListener,
     SegmentSelectionBottomSheet.sendSectionsListListner,
     setDurationBottomSheet.DurationAddedListener,
-    sectionDisplayBottomSheet.SectionSelectionListener ,BottomSheet.SendText,AssigneeListBottomSheet.getassigneesCallback{
+    sectionDisplayBottomSheet.SectionSelectionListener ,BottomSheet.SendText,AssigneeListBottomSheet.getassigneesCallback,AssigneeListBottomSheet.updateAssigneeCallback{
     private var contriList: MutableList<User> = mutableListOf()
     @Inject
     lateinit var firestoreRepository:FirestoreRepository
@@ -81,6 +81,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private var contributorDpList: MutableList<String> = mutableListOf()
     private val viewModel: CreateTaskViewModel by viewModels()
     private var TagList: MutableList<Tag> = mutableListOf()
+    private var Unassigned:Boolean=false
     private var tagIdList: ArrayList<String> = ArrayList()
     private var list:MutableList<String> = mutableListOf()
     private var OList: MutableList<User> = mutableListOf()
@@ -305,7 +306,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         }
 
         if (PrefManager.getcurrentUserdetails().ROLE<2){
-            binding.addContributorsBtn.isEnabled=false
+            binding.addContributorsBtn.setOnClickThrottleBounceListener {
+                toast("You can't select moderators")
+            }
         }
         if (PrefManager.getcurrentUserdetails().ROLE>=2) {
             binding.addContributorsBtn.isEnabled=true
@@ -360,7 +363,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         binding.status.setOnClickThrottleBounceListener {
             list.clear()
-            list.addAll(listOf("Unassigned","Ongoing","Open","Review","Testing"))
+            list.addAll(listOf("Submitted","Open","Working","Review","Completed"))
             val priorityBottomSheet =
                 BottomSheet(list,"STATE",this)
             priorityBottomSheet.show(supportFragmentManager, "STATE")
@@ -392,12 +395,14 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         }
 
         if (PrefManager.getcurrentUserdetails().ROLE<2){
-            binding.assignee.isEnabled=false
+            binding.assignee.setOnClickThrottleBounceListener {
+                toast("You can't select an assignee")
+            }
         }
         if (PrefManager.getcurrentUserdetails().ROLE>=2) {
             binding.assignee.isEnabled=true
             binding.assignee.setOnClickThrottleBounceListener {
-                val assigneeListBottomSheet = AssigneeListBottomSheet(OList, selectedAssignee,this@CreateTaskActivity)
+                val assigneeListBottomSheet = AssigneeListBottomSheet(OList, selectedAssignee,this@CreateTaskActivity,this)
                 assigneeListBottomSheet.show(supportFragmentManager, "assigneelist")
             }
         }
@@ -440,11 +445,11 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     else -> -1
                 }
                 val status= when(binding.stateInclude.tagText.text){
-                    "Unassigned" -> 1
-                    "Ongoing" -> 2
-                    "Open" -> 3
+                    "Submitted" -> 1
+                    "Open" -> 2
+                    "Working" -> 3
                     "Review" -> 4
-                    "Testing" -> 5
+                    "Completed" -> 5
                     else -> -1
                 }
 
@@ -572,8 +577,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         binding.typeInclude.tagIcon.text="T"
         binding.typeInclude.tagText.text="Task"
 
-        binding.stateInclude.tagIcon.text="O"
-        binding.stateInclude.tagText.text="Open"
+        binding.stateInclude.tagIcon.text="S"
+        binding.stateInclude.tagText.text="Submitted"
 
         binding.difficultyInclude.tagIcon.text="E"
         binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_green)
@@ -769,11 +774,11 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     .error(R.drawable.profile_pic_placeholder)
                     .into(binding.assigneeInclude.tagIcon)
 
-        } else {
+        }
+        else{
             selectedAssignee.remove(assignee)
-            binding.assigneeInclude.normalET.text="Select"
+            binding.assigneeInclude.normalET.text="Unassigned"
             binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
-
         }
 
     }
@@ -849,6 +854,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 binding.difficultyInclude.tagText.text=text
             }
         }
+    }
+
+    override fun updateAssignee(assignee: User) {
     }
 
 

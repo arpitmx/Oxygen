@@ -19,6 +19,8 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
+import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
+import com.ncs.o2.databinding.ChatImageItemBinding
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
@@ -174,6 +176,16 @@ class ChatAdapter(
                 )
             }
 
+            IMAGE_MSG -> {
+                ImageMessage_ViewHolder(
+                    ChatImageItemBinding.inflate(
+                        LayoutInflater.from(context),
+                        parent,
+                        false
+                    )
+                )
+            }
+
             else -> {
                 throw IllegalArgumentException("Invalid view type")
             }
@@ -192,8 +204,16 @@ class ChatAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (msgList[position].messageType == MessageType.NORMAL_MSG) {
+            (holder as UserMessage_ViewHolder).bind(position)
+        } else if (msgList[position].messageType == MessageType.IMAGE_MSG) {
+            (holder as ImageMessage_ViewHolder).bind(position)
+        }
 
-        (holder as UserMessage_ViewHolder).bind(position)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return msgList[position].messageType.ordinal
     }
 
     fun appendMessages(newMessages: List<Message>) {
@@ -236,5 +256,20 @@ class ChatAdapter(
 
     interface onChatDoubleClickListner {
         fun onDoubleClickListner(msg: Message, senderName: String)
+    }
+    interface onImageClicked{
+        fun onImageClick(position: Int,imageUrls: List<String>)
+    }
+    fun onImageClick(position: Int, imageUrls: List<String>) {
+        val imageViewerIntent = Intent(context, ImageViewerActivity::class.java)
+        imageViewerIntent.putExtra("position", position)
+        imageViewerIntent.putStringArrayListExtra("images", ArrayList(imageUrls))
+        context.startActivity(
+            ImageViewerActivity.createIntent(
+                context,
+                ArrayList(imageUrls),
+                position,
+            ),
+        )
     }
 }
