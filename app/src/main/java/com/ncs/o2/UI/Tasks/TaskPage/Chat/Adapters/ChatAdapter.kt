@@ -2,27 +2,12 @@ package com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.net.Uri
-import android.os.Handler
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
-import br.tiagohm.markdownview.css.InternalStyleSheet
-import br.tiagohm.markdownview.css.styles.Github
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.MessageRepository.UsersDao
 import com.ncs.o2.Domain.Models.Enums.MessageType
@@ -30,16 +15,19 @@ import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.DateTimeUtils
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.databinding.ChatImageItemBinding
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
+import io.noties.markwon.Markwon
+import timber.log.Timber
 import java.util.Date
 
 
@@ -61,10 +49,17 @@ Tasks FUTURE ADDITION :
 
 */
 
-class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<Message>, val context : Context,private val onchatDoubleClickListner: onChatDoubleClickListner,private val OnImageClicked: onImageClicked,var users:MutableList<UserInMessage>) :
+class ChatAdapter(
+    val repository: FirestoreRepository,
+    var msgList: MutableList<Message>,
+    val context: Context,
+    private val onchatDoubleClickListner: onChatDoubleClickListner,
+    private val markwon: Markwon
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var messageDatabase: MessageDatabase
     var db: UsersDao
+    var users: MutableList<UserInMessage> = mutableListOf()
     private var lastTimestamp: Date? = null
 
 
@@ -106,28 +101,26 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
                 }
             }
 
-            var doubleClick: Boolean? = false
-            binding.root.setOnClickThrottleBounceListener {
-                if (doubleClick!!) {
-                    if (localUser != null) {
+            binding.descriptionTv.setOnDoubleClickListener {
+
+                if (localUser != null) {
+                    onchatDoubleClickListner.onDoubleClickListner(
+                        msgList[position],
+                        localUser.USERNAME!!
+                    )
+                } else {
+                    fetchUser(senderId) {
                         onchatDoubleClickListner.onDoubleClickListner(
                             msgList[position],
-                            localUser.USERNAME!!
+                            it.USERNAME!!
                         )
-                    } else {
-                        fetchUser(senderId) {
-                            onchatDoubleClickListner.onDoubleClickListner(
-                                msgList[position],
-                                it.USERNAME!!
-                            )
-                        }
                     }
                 }
-                doubleClick = true
-                Handler().postDelayed({ doubleClick = false }, 2000)
+
             }
         }
     }
+
 
     private inner class ImageMessage_ViewHolder(val binding: ChatImageItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -139,86 +132,28 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
 
             if (localUser != null) {
                 setImageItem(localUser, binding, position)
-                Log.d("DB", "fetching from local")
+                Timber.tag("DB").d("fetching from local")
             } else {
                 fetchUser(senderId) { newUser ->
                     users.add(newUser)
-                    Log.d("DB", "fetching from db")
+                    Timber.tag("DB").d("fetching from db")
                     setImageItem(newUser, binding, position)
                 }
             }
-
-            var doubleClick: Boolean? = false
-            binding.parent.setOnClickThrottleBounceListener {
-                if (doubleClick!!) {
-                    if (localUser != null) {
-                        onchatDoubleClickListner.onDoubleClickListner(
-                            msgList[position],
-                            localUser.USERNAME!!
-                        )
-                    } else {
-                        fetchUser(senderId) {
-                            onchatDoubleClickListner.onDoubleClickListner(
-                                msgList[position],
-                                it.USERNAME!!
-                            )
-                        }
-                    }
-                }
-                doubleClick = true
-                Handler().postDelayed({ doubleClick = false }, 2000)
-            }
         }
-    }
+
+        }
+
 
     fun setImageItem(user: UserInMessage, binding: ChatImageItemBinding, position: Int) {
         val url = msgList.get(position).content
-        val timeDifference = Date().time - msgList[position].timestamp!!.toDate().time
-        val minutes = (timeDifference / (1000 * 60)).toInt()
-        val hours = minutes / 60
-        val days = hours / 24
-        val weeks = days / 7
-        val months = days / 30
-        val years = days / 365
-        val time = msgList.get(position).timestamp!!
+        val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.imgDp.loadProfileImg(user.DP_URL.toString())
         binding.tvName.text = user.USERNAME
-        Glide.with(context)
-            .load(url)
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    binding.imagePreview.visible()
-                    binding.imageProgressBar.gone()
-                    return false
-                }
+        binding.imagePreview.loadProfileImg(url)
 
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    binding.imagePreview.visible()
-                    binding.imageProgressBar.gone()
-                    return false
-                }
 
-            })
-            .encodeQuality(80)
-            .override(80,80)
-            .apply(
-                RequestOptions().
-                diskCacheStrategy(DiskCacheStrategy.ALL)
-            )
-            .error(R.drawable.placeholder_image)
-            .into(binding.imagePreview)
         binding.imagePreview.setOnClickThrottleBounceListener {
 //            OnImageClicked.onImageClick(0, listOf(url))
             onImageClick(0, listOf(url))
@@ -229,31 +164,48 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
         }
     }
 
-
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
-        val msg = msgList.get(position).content
         setMessageView(msgList[position], binding)
-        val timeDifference = Date().time - msgList[position].timestamp!!.toDate().time
-        val minutes = (timeDifference / (1000 * 60)).toInt()
-        val hours = minutes / 60
-        val days = hours / 24
-        val weeks = days / 7
-        val months = days / 30
-        val years = days / 365
-
-        val timeAgo: String = when {
-            years > 0 -> "about $years ${if (years == 1) "year" else "years"} ago"
-            months > 0 -> "about $months ${if (months == 1) "month" else "months"} ago"
-            weeks > 0 -> "about $weeks ${if (weeks == 1) "week" else "weeks"} ago"
-            days > 0 -> "about $days ${if (days == 1) "day" else "days"} ago"
-            hours > 0 -> "about $hours ${if (hours == 1) "hour" else "hours"} ago"
-            minutes > 0 -> "about $minutes ${if (minutes == 1) "minute" else "minutes"} ago"
-            else -> "just now"
-        }
-        val time = msgList.get(position).timestamp!!
+        val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
-        binding.imgDp.loadProfileImg(user.DP_URL.toString())
         binding.tvName.text = user.USERNAME
+
+        setDP(position, binding, user)
+
+
+    }
+
+    private fun setDP(position: Int, binding: ChatMessageItemBinding, user: UserInMessage) {
+
+        // No changes for the first item
+        if (position == 0) {
+            binding.msgSeperator.gone()
+            binding.imgDp.visible()
+            binding.tvName.visible()
+            binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
+            binding.imgDp.loadProfileImg(user.DP_URL.toString())
+            return
+        }
+
+        // Removing dp and changing some layout if the previous message is sent from same user
+        if (msgList[position - 1].senderId == msgList[position].senderId) {
+            binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
+            binding.tvName.gone()
+            binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
+            binding.msgSeperator.alpha = 0.5f
+
+            return
+        }
+
+        // All the other items
+        binding.msgSeperator.visible()
+        binding.imgDp.visible()
+        binding.tvName.visible()
+        binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
+        binding.msgSeperator.alpha = 1f
+        binding.imgDp.loadProfileImg(user.DP_URL.toString())
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -285,60 +237,16 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
         }
     }
 
-        private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
+    private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
 
-            val css: InternalStyleSheet = Github()
+        markwon.setMarkdown(binding.descriptionTv, message.content)
+        binding.descriptionTv.visible()
 
-            with(css) {
-                addFontFace(
-                    "o2font",
-                    "normal",
-                    "normal",
-                    "normal",
-                    "url('file:///android_res/font/sfregular.ttf')"
-                )
-                addRule("body", "font-family:o2font")
-                addRule("body", "font-size:16px")
-                addRule("body", "line-height:21px")
-                addRule("body", "background-color: #131313")
-                addRule("body", "color: #fff")
-                addRule("body", "padding: 0px 0px 0px 0px")
-                addRule("a", "color: #86ff7c")
-                addRule("pre", "border: 1px solid #000;")
-                addRule("pre", "border-radius: 4px;")
-                addRule("pre", "max-height: 400px;")
-                addRule("pre", "overflow:auto")
-                addRule("pre", "white-space: pre-line")
+    }
 
-            }
-
-            binding.markdownView.settings.javaScriptEnabled = true
-            binding.markdownView.addStyleSheet(css)
-
-            binding.markdownView.webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
-
-                }
-
-                override fun shouldOverrideUrlLoading(
-                    view: WebView?,
-                    request: WebResourceRequest?
-                ): Boolean {
-                    val intent = Intent(Intent.ACTION_VIEW, request?.url)
-                    context.startActivity(intent)
-                    return true
-                }
-
-            }
-            binding.markdownView.loadMarkdown(message.content)
-            binding.markdownView.visible()
-
-
-        }
-
-        override fun getItemCount(): Int {
-            return msgList.size
-        }
+    override fun getItemCount(): Int {
+        return msgList.size
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (msgList[position].messageType == MessageType.NORMAL_MSG) {
@@ -358,6 +266,8 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
             !msgList.any { it.messageId == message.messageId }
         }
 
+        Timber.tag("ChatAdapter").d("New messages : $newMessages")
+
         if (uniqueNewMessages.isNotEmpty()) {
             msgList.addAll(uniqueNewMessages)
             msgList.sortBy { it.timestamp!!.seconds }
@@ -368,29 +278,29 @@ class ChatAdapter(val repository: FirestoreRepository, var msgList: MutableList<
     }
 
 
-
     private fun fetchUser(user_id: String, onUserFetched: (UserInMessage) -> Unit) {
-            repository.getMessageUserInfobyId(user_id) { result ->
-                when (result) {
-                    is ServerResult.Success -> {
-                        val user = result.data
-                        if (user != null) {
-                            onUserFetched(user)
-                        }
-                    }
-
-                    is ServerResult.Failure -> {
-
-                    }
-
-                    is ServerResult.Progress -> {
-
+        repository.getMessageUserInfobyId(user_id) { result ->
+            when (result) {
+                is ServerResult.Success -> {
+                    val user = result.data
+                    if (user != null) {
+                        onUserFetched(user)
                     }
                 }
+
+                is ServerResult.Failure -> {
+
+                }
+
+                is ServerResult.Progress -> {
+
+                }
             }
+        }
     }
-    interface onChatDoubleClickListner{
-        fun onDoubleClickListner(msg: Message,senderName:String)
+
+    interface onChatDoubleClickListner {
+        fun onDoubleClickListner(msg: Message, senderName: String)
     }
     interface onImageClicked{
         fun onImageClick(position: Int,imageUrls: List<String>)

@@ -9,6 +9,10 @@ import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /*
@@ -40,7 +44,9 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
         sectionName: String,
         resultCallback: (ServerResult<List<TaskItem>>) -> Unit
     ) {
-        firestoreRepository.getTasksItem(projectName, segmentName, sectionName, resultCallback)
+       CoroutineScope(Dispatchers.Main).launch {
+           firestoreRepository.getTasksItem(projectName, segmentName, sectionName, resultCallback)
+       }
     }
     fun getTasksForSegment(
         projectName: String,

@@ -30,7 +30,7 @@ class AssigneeListAdpater constructor(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position:Int) {
-        var contributor = contriList[position]
+        val contributor = contriList[position]
 
         Glide.with(holder.itemView.context)
             .load(contributor.profileDPUrl)

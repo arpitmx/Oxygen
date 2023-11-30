@@ -17,7 +17,10 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
 import com.ncs.o2.databinding.TaskItemBinding
@@ -31,66 +34,26 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context) 
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: TaskItem,user: User) {
-            Glide.with(binding.root)
-                .load(user.profileDPUrl)
-                .listener(object : RequestListener<Drawable> {
 
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        binding.progressBar.gone()
-                        return false
-                    }
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        binding.progressBar.gone()
-                        return false
-                    }
-                })
-                .encodeQuality(80)
-                .override(40,40)
-                .apply(
-                    RequestOptions().
-                    diskCacheStrategy(DiskCacheStrategy.ALL)
-                )
-                .error(R.drawable.profile_pic_placeholder)
-                .into(binding.asigneeDp)
 
-            if (task.completed!!){
+            binding.asigneeDp.loadProfileImg(user.profileDPUrl.toString())
+
+            if (task.completed){
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.taskTitle.paintFlags=binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
-            val timeDifference = Date().time - task.timestamp!!.toDate().time
-            val minutes = (timeDifference / (1000 * 60)).toInt()
-            val hours = minutes / 60
-            val days = hours / 24
 
-            val timeAgo: String = when {
-                days > 0 -> "about $days days ago"
-                hours > 0 -> "about $hours hours ago"
-                minutes > 0 -> "about $minutes minutes ago"
-                else -> "just now"
-            }
-
-            binding.taskDuration.text = "$timeAgo"
+            binding.taskDuration.text = DateTimeUtils.getTimeAgo(task.timestamp!!.seconds)
             binding.taskId.text = task.id
             binding.taskTitle.text = task.title
             binding.difficulty.text = task.getDifficultyString()
+
             when (task.difficulty){
                 1 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_green)
                 2 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_yellow)
                 3 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_red)
-
-
             }
+
         }
     }
 

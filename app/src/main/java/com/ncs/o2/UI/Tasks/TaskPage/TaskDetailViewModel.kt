@@ -85,6 +85,7 @@ constructor(val notificationApiService: NotificationApiService,
     }
 
     fun sendFCMNotification(fcmToken : String){
+
         val payloadJsonObject = buildNotificationPayload(fcmToken)
 
         val payloadInputData = Data.Builder()

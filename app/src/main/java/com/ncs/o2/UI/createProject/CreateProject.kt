@@ -53,6 +53,9 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     private lateinit var viewModel: createProjectViewModel
 
     lateinit var moderatorAdapter: ContributorAdapter
+//    private val moderatorsrecycler: RecyclerView by lazy {
+//        binding.moderatorsRecyclerView
+//    }
     val binding: ActivityCreateProjectBinding by lazy {
         ActivityCreateProjectBinding.inflate(layoutInflater)
     }
@@ -84,6 +87,10 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 //            User("https://picsum.photos/450","aditi","design","url6"),
         )
 
+//        binding.addModeratorsBtn.setOnClickThrottleBounceListener {
+//            val userListBottomSheet = UserlistBottomSheet(this)
+//            userListBottomSheet.show(supportFragmentManager, "OList")
+//        }
 
         binding.gioActionbar.btnNext.setOnClickThrottleBounceListener {
             val _title = binding.projectTitle.text.toString()
@@ -156,6 +163,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 
 
         }
+       // setUpViews()
 
     }
 
@@ -237,6 +245,9 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         }
     }
 
+//    private fun setUpViews() {
+//        setupSelectedMembersRecyclerView()
+//    }
 
 
     fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
@@ -253,6 +264,16 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         return bitmap
     }
 
+//    private fun setupSelectedMembersRecyclerView() {
+//        val layoutManager = FlexboxLayoutManager(this)
+//        layoutManager.flexDirection = FlexDirection.ROW
+//        layoutManager.flexWrap = FlexWrap.WRAP
+//        moderatorsrecycler.layoutManager = layoutManager
+//        moderatorAdapter = ContributorAdapter(mutableListOf(), this)
+//        moderatorsrecycler.adapter = moderatorAdapter
+//        moderatorsrecycler.visible()
+//
+//    }
 
 
     override fun onProfileClick(user: User, position: Int) {

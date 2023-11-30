@@ -80,6 +80,8 @@ android {
 
 dependencies {
 
+
+
     //Markdown view
     implementation 'com.github.tiagohm.MarkdownView:library:0.19.0'
 
@@ -99,6 +101,11 @@ dependencies {
     implementation"io.noties.markwon:syntax-highlight:$markwon_version"
     implementation"io.noties.markwon:ext-tasklist:$markwon_version"
     implementation"io.noties.markwon:ext-strikethrough:$markwon_version"
+
+    //Prism 4j
+    implementation "io.noties:prism4j:2.0.0"
+    kapt 'io.noties:prism4j-bundler:2.0.0'
+
 
     //Cloudnary
     implementation 'com.cloudinary:kotlin-url-gen:1.6.0'

@@ -467,12 +467,35 @@ object ExtensionsUtil {
 
             private var lastClickTime: Long = 0
             override fun onClick(v: View) {
-                v.bounce(context)
-                if (SystemClock.elapsedRealtime() - lastClickTime < throttleTime) return
-                else onClick()
-                lastClickTime = SystemClock.elapsedRealtime()
+                context?.let {
+                    v.bounce(context)
+                    if (SystemClock.elapsedRealtime() - lastClickTime < throttleTime) return
+                    else onClick()
+                    lastClickTime = SystemClock.elapsedRealtime()
+                }
+
             }
         })
+    }
+
+    fun View.setOnDoubleClickListener(listener: () -> Unit) {
+        val doubleClickInterval = 500 // Adjust this value as needed (in milliseconds)
+        var lastClickTime: Long = 0
+
+        this.setOnClickListener { view->
+            view.bounce(context)
+            val clickTime = SystemClock.uptimeMillis()
+            if (clickTime - lastClickTime < doubleClickInterval) {
+                // Double click detected
+                context?.let {
+                    context.performHapticFeedback()
+                    listener.invoke()
+                }
+
+            }
+
+            lastClickTime = clickTime
+        }
     }
 
 

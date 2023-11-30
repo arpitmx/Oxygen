@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.DocumentSnapshot
@@ -346,7 +347,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 val role=document.get(Endpoints.User.ROLE)
                 val timestamp=document.getTimestamp(Endpoints.User.TIMESTAMP)
                 PrefManager.setUserRole(role.toString().toLong())
-                PrefManager.setCurrentUserTimeStamp(timestamp!!)
+                PrefManager.setCurrentUserTimeStamp(Timestamp.now())
                 val dp_url = document.getString(Endpoints.User.DP_URL)
                 val dp_url_pref = PrefManager.getDpUrl()
 

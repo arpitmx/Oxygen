@@ -14,6 +14,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.Domain.Workers.FCMWorker
 import com.ncs.o2.HelperClasses.PrefManager
@@ -69,6 +70,7 @@ class O2Application : Application(), Configuration.Provider{
 
         //PrefManager
         PrefManager.initialize(this@O2Application)
+        NotificationsUtils.initialize(this@O2Application)
 
 
         //CodeViewer
