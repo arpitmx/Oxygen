@@ -3,10 +3,9 @@ package com.ncs.o2.UI.Tasks.TaskPage.Details
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -20,8 +19,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -40,8 +37,6 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.Errors
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.Exclude
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
@@ -51,7 +46,6 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
@@ -92,19 +86,23 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback,
-    ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,AssigneeListBottomSheet.updateAssigneeCallback,BottomSheet.SendText,ModeratorsBottomSheet.getContributorsCallback{
+    ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
+    AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
+    ModeratorsBottomSheet.getContributorsCallback {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
 
     private var _binding: FragmentTaskDetailsFrgamentBinding? = null
     private val binding get() = _binding!!
-    private var moderators:MutableList<User> = mutableListOf()
-    var moderatorsList:MutableList<String> = mutableListOf()
+    private var moderators: MutableList<User> = mutableListOf()
+    var moderatorsList: MutableList<String> = mutableListOf()
 
     private var OList: MutableList<User> = mutableListOf()
-    private val selectedAssignee:MutableList<User> = mutableListOf()
+    private val selectedAssignee: MutableList<User> = mutableListOf()
+
     lateinit var adapter: ContributorAdapter
+
     private var contributorList: MutableList<String> = mutableListOf()
     private var contributorDpList: MutableList<String> = mutableListOf()
     private val activityBinding: TaskDetailActivity by lazy {
@@ -115,9 +113,9 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         (requireParentFragment() as TasksDetailsHolderFragment)
     }
 
-    private var isModerator:Boolean=false
+    private var isModerator: Boolean = false
 
-    private var list:MutableList<String> = mutableListOf()
+    private var list: MutableList<String> = mutableListOf()
 
     private val viewModel: TaskDetailViewModel by viewModels()
     private lateinit var taskDetails: Task
@@ -164,7 +162,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         runDelayed(100) {
             setDetails(activityBinding.taskId)
         }
-        binding.assignee.isEnabled=false
+        binding.assignee.isEnabled = false
         binding.activity.setOnClickThrottleBounceListener {
             val viewpager = tasksHolderBinding.binding.viewPager2
             val next = viewpager.currentItem + 1
@@ -181,7 +179,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-
     override fun onPause() {
         super.onPause()
     }
@@ -193,7 +190,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     @Later("1. Check if the request has already made, if made then set text and clickability on the button accordingly")
     private fun setUpViews() {
-        val currentUser=PrefManager.getcurrentUserdetails()
+        val currentUser = PrefManager.getcurrentUserdetails()
 
         binding.progressBar.visible()
 
@@ -208,18 +205,19 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             toast("You are a moderator, can edit this task")
         }
         binding.assignee.setOnClickThrottleBounceListener {
-            Log.d("assigne","passing this list ${selectedAssignee.toString()}")
-            val assigneeListBottomSheet = AssigneeListBottomSheet(OList, selectedAssignee,this,this)
+            Log.d("assigne", "passing this list ${selectedAssignee.toString()}")
+            val assigneeListBottomSheet =
+                AssigneeListBottomSheet(OList, selectedAssignee, this, this)
             assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
         }
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
-            for (i in 0 until moderators.size){
-                if (moderatorsList.contains(moderators[i].firebaseID)){
-                    moderators[i].isChecked=true
+            for (i in 0 until moderators.size) {
+                if (moderatorsList.contains(moderators[i].firebaseID)) {
+                    moderators[i].isChecked = true
                 }
             }
-            val moderatorsListBottomSheet = ModeratorsBottomSheet(moderators,this)
+            val moderatorsListBottomSheet = ModeratorsBottomSheet(moderators, this)
             moderatorsListBottomSheet.show(requireFragmentManager(), "contributer list")
         }
 
@@ -228,7 +226,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             viewLifecycleOwner.lifecycleScope.launch {
                 try {
                     val result = withContext(Dispatchers.IO) {
-                        viewModel.updateModerators(taskID = activityBinding.taskId, projectName = PrefManager.getcurrentProject(), moderator = currentUser.EMAIL)
+                        viewModel.updateModerators(
+                            taskID = activityBinding.taskId,
+                            projectName = PrefManager.getcurrentProject(),
+                            moderator = currentUser.EMAIL
+                        )
 
                     }
 
@@ -277,9 +279,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private fun setDefaultViews(task: Task) {
 
 
-
         binding.projectNameET.text = task.project_ID
-        viewModel.task=task
+        viewModel.task = task
         val priority = when (task.priority) {
             1 -> "Low"
             2 -> "Medium"
@@ -330,36 +331,28 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         if (task.assignee != Endpoints.TaskDetails.EMPTY_MODERATORS) {
 
             fetchUserbyId(task.assignee) { user ->
-                user?.isChecked=true
+                user?.isChecked = true
                 selectedAssignee.add(user!!)
-                Log.d("assigne",selectedAssignee.toString())
-                Glide.with(requireContext())
-                    .load(user?.profileDPUrl)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
+                Timber.tag("assigne").d(selectedAssignee.toString())
 
-                binding.assigneeInclude.tagIcon.loadProfileImg(user?.profileDPUrl.toString())
-                binding.assigneeInclude.normalET.text = user?.username
+                binding.assigneeInclude.tagIcon.loadProfileImg(user.profileDPUrl.toString())
+
+
+
+                binding.assigneeInclude.tagIcon.loadProfileImg(user.profileDPUrl.toString())
+                binding.assigneeInclude.normalET.text = user.username
 
                 //Add assignee to Notification receiving list
-                user?.let {
-                    pushToReceiver(user)
-                }
+                pushToReceiver(user)
+
+            }
         } else {
 
             binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
             binding.assigneeInclude.normalET.text = "Unassigned"
-
         }
-        //State
 
+        //State
         binding.stateInclude.tagIcon.text = status.substring(0, 1)
         binding.stateInclude.tagText.text = status
 
@@ -382,39 +375,42 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         binding.taskDurationET.text = task.duration
     }
 
+
     private fun sendRequestNotification() {
 
         val requestNotification: Notification = createRequestNotification()
         val receiverFCMToken: String = getReceiverFCMToken()
 
         CoroutineScope(Dispatchers.Main).launch {
-            viewModel.sendNotificationToReceiverFirebase(requestNotification, receiverFCMToken)
+            viewModel.sendNotificationToReceiverFirebase(
+                requestNotification,
+                receiverFCMToken
+            )
         }
     }
 
-    private fun manageState(task: Task){
-        if (PrefManager.getcurrentUserdetails().EMAIL==task.assignee){
+    private fun manageState(task: Task) {
+        if (PrefManager.getcurrentUserdetails().EMAIL == task.assignee) {
             binding.status.setOnClickThrottleBounceListener {
                 list.clear()
-                list.addAll(listOf("Assigned","Working","Review"))
+                list.addAll(listOf("Assigned", "Working", "Review"))
                 val priorityBottomSheet =
-                    BottomSheet(list,"STATE",this)
+                    BottomSheet(list, "STATE", this)
                 priorityBottomSheet.show(requireFragmentManager(), "STATE")
             }
-        }
-        else if (isModerator){
+        } else if (isModerator) {
             binding.status.setOnClickThrottleBounceListener {
                 list.clear()
-                list.addAll(listOf("Submitted","Open","Working","Review","Completed"))
+                list.addAll(listOf("Submitted", "Open", "Working", "Review", "Completed"))
                 val priorityBottomSheet =
-                    BottomSheet(list,"STATE",this)
+                    BottomSheet(list, "STATE", this)
                 priorityBottomSheet.show(requireFragmentManager(), "STATE")
             }
         }
     }
 
-    private fun manageAddModeratorsView(isModerator:Boolean){
-        if (isModerator){
+    private fun manageAddModeratorsView(isModerator: Boolean) {
+        if (isModerator) {
             binding.addContributorsBtn.visible()
         }
     }
@@ -479,10 +475,10 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private fun setContributors(list: MutableList<User>) {
 
-        for (moderator in list){
-            if (moderator.firebaseID==PrefManager.getcurrentUserdetails().EMAIL){
-                isModerator=true
-                binding.assignee.isEnabled=true
+        for (moderator in list) {
+            if (moderator.firebaseID == PrefManager.getcurrentUserdetails().EMAIL) {
+                isModerator = true
+                binding.assignee.isEnabled = true
                 activityBinding.binding.gioActionbar.btnModerator.visible()
             }
             manageState(taskDetails)
@@ -494,7 +490,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         contriRecyclerView.layoutManager = layoutManager
-        val adapter = ContributorAdapter(list, this, false)
+
+        adapter = ContributorAdapter(list, this, false)
         contriRecyclerView.adapter = adapter
 
     }
@@ -590,6 +587,67 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     send.sendImages(imgArray);
 
 """
+
+
+    private fun fetchUsers() {
+
+        Timber.d("Moderators list : ${taskDetails.moderators}")
+
+        if (taskDetails.moderators.isEmpty()) {
+            //toast("Contributor empty")
+            binding.contributorsRecyclerView.gone()
+            binding.noContributors.visible()
+
+        } else if (taskDetails.moderators[0] == Endpoints.TaskDetails.EMPTY_MODERATORS) {
+            // toast("Contributor not empty None")
+            binding.contributorsRecyclerView.gone()
+            binding.noContributors.visible()
+
+        } else {
+
+            binding.contributorsRecyclerView.visible()
+            binding.noContributors.gone()
+
+            for (contributors in taskDetails.moderators) {
+
+                viewModel.getUserbyId(contributors) { result ->
+
+                    when (result) {
+
+                        is ServerResult.Success -> {
+                            binding.progressBar.gone()
+                            binding.parentScrollview.visible()
+
+                            val user = result.data
+                            users.add(user!!)
+                            moderators.add(user)
+                            moderatorsList.add(user.firebaseID!!)
+                            setContributors(users)
+                        }
+
+                        is ServerResult.Failure -> {
+
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in fetching Moderators : ${result.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
+                            }
+                            binding.progressBar.gone()
+                        }
+
+                        is ServerResult.Progress -> {
+                            binding.progressBar.visible()
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+
 
 
     interface ViewVisibilityListner {
@@ -731,9 +789,16 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         fun sendCode(codeText: String, language: String?) {
             requireActivity().runOnUiThread {
 
-                val codeViewerIntent = Intent(requireActivity(), CodeViewerActivity::class.java)
-                codeViewerIntent.putExtra(Endpoints.CodeViewer.CODE, codeText.trimIndent().trim())
-                codeViewerIntent.putExtra(Endpoints.CodeViewer.LANG, language?.trimIndent()?.trim())
+                val codeViewerIntent =
+                    Intent(requireActivity(), CodeViewerActivity::class.java)
+                codeViewerIntent.putExtra(
+                    Endpoints.CodeViewer.CODE,
+                    codeText.trimIndent().trim()
+                )
+                codeViewerIntent.putExtra(
+                    Endpoints.CodeViewer.LANG,
+                    language?.trimIndent()?.trim()
+                )
 
                 startActivity(codeViewerIntent)
                 requireActivity().overridePendingTransition(
@@ -748,9 +813,14 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             requireActivity().runOnUiThread {
                 val recyclerView = binding.imageRecyclerView
                 recyclerView.layoutManager =
-                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                    LinearLayoutManager(
+                        requireContext(),
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
                 Log.d("list", imageUrls.toMutableList().toString())
-                val adapter = ImageAdapter(imageUrls.toMutableList(), this@TaskDetailsFragment)
+                val adapter =
+                    ImageAdapter(imageUrls.toMutableList(), this@TaskDetailsFragment)
                 recyclerView.adapter = adapter
             }
         }
@@ -796,15 +866,15 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         }
     }
 
-    private fun pushToReceiver(user: User) {
-        user.fcmToken?.let{ token  ->
-            if (token!=Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code){
+    fun pushToReceiver(user: User) {
+        user.fcmToken?.let { token ->
+            if (token != Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code) {
                 activityBinding.sharedViewModel.pushReceiver(token)
             }
         }
     }
 
-    private fun setdetails(id: String) {
+    private fun setDetails(id: String) {
 
         viewLifecycleOwner.lifecycleScope.launch {
 
@@ -842,9 +912,9 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                         setDefaultViews(taskResult.data)
                         setTaskDetails(taskResult.data)
 
-                        val currentUser=PrefManager.getcurrentUserdetails()
+                        val currentUser = PrefManager.getcurrentUserdetails()
 
-                        if (!taskResult.data.moderators.contains(currentUser.EMAIL) && currentUser.ROLE>=2 && taskResult.data.moderators.isEmpty()){
+                        if (!taskResult.data.moderators.contains(currentUser.EMAIL) && currentUser.ROLE >= 2 && taskResult.data.moderators.isEmpty()) {
                             binding.becomeModerator.visible()
                         }
 
@@ -869,7 +939,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
 
-
     private fun setTags() {
         CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.Main) {
@@ -891,7 +960,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
                             is ServerResult.Failure -> {
                                 val errorMessage = result.exception.message
-                                utils.showSnackbar(binding.root,"Failure in loading tags",5000)
+                                utils.showSnackbar(
+                                    binding.root,
+                                    "Failure in loading tags",
+                                    5000
+                                )
                                 binding.progressBar.gone()
                             }
 
@@ -930,66 +1003,67 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         for (contributors in taskDetails.moderators) {
 
             viewModel.getUserbyId(contributors) { result ->
-            binding.contributorsRecyclerView.visible()
-            binding.noContributors.gone()
-            for (contributors in taskDetails.moderators) {
-                viewModel.getUserbyId(contributors) { result ->
+                binding.contributorsRecyclerView.visible()
+                binding.noContributors.gone()
+                for (contributors in taskDetails.moderators) {
+                    viewModel.getUserbyId(contributors) { result ->
 
-                    when (result) {
+                        when (result) {
 
-                        is ServerResult.Success -> {
-                            binding.progressBar.gone()
-                            binding.parentScrollview.visible()
+                            is ServerResult.Success -> {
+                                binding.progressBar.gone()
+                                binding.parentScrollview.visible()
 
-                        val user = result.data
-                        user?.let {
+                                val user = result.data
+                                user?.let {
 
-                            users.add(user)
+                                    users.add(user)
 
-                            //Adding user to notification list
-                            pushToReceiver(user)
-                            val user = result.data
-                            users.add(user!!)
-                            moderators.add(user)
-                            moderatorsList.add(user.firebaseID)
-                            setContributors(users)
-                        }
-                    }
-
-                    is ServerResult.Failure -> {
-
-                            utils.singleBtnDialog(
-                                "Failure",
-                                "Failure in fetching Moderators : ${result.exception.message}",
-                                "Okay"
-                            ) {
-                                requireActivity().finish()
+                                    //Adding user to notification list
+                                    pushToReceiver(user)
+                                    val user = result.data
+                                    users.add(user!!)
+                                    moderators.add(user)
+                                    moderatorsList.add(user.firebaseID!!)
+                                    setContributors(users)
+                                }
                             }
-                            binding.progressBar.gone()
-                        }
 
-                        is ServerResult.Progress -> {
-                            binding.progressBar.visible()
+                            is ServerResult.Failure -> {
+
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in fetching Moderators : ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+                                binding.progressBar.gone()
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
                         }
                     }
                 }
-            }
 
+            }
         }
     }
 
 
-private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
+    private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
-    viewModel.getUserbyId(id) { result ->
+        viewModel.getUserbyId(id) { result ->
 
-        when (result) {
-            is ServerResult.Success -> {
-                binding.progressBar.gone()
-                binding.parentScrollview.visible()
-                val user = result.data!!
-                callback(user)
-            }
+            when (result) {
+                is ServerResult.Success -> {
+                    binding.progressBar.gone()
+                    binding.parentScrollview.visible()
+                    val user = result.data!!
+                    callback(user)
+                }
 
                 is ServerResult.Failure -> {
                     utils.singleBtnDialog(
@@ -1014,7 +1088,8 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
 
     override fun onImageClicked(position: Int, imageList: MutableList<String>) {
-        val imageViewerIntent = Intent(requireActivity(), ImageViewerActivity::class.java)
+        val imageViewerIntent =
+            Intent(requireActivity(), ImageViewerActivity::class.java)
         imageViewerIntent.putExtra("position", position)
         imageViewerIntent.putStringArrayListExtra("images", ArrayList(imageList))
         startActivity(
@@ -1027,10 +1102,10 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
     }
 
-    override fun sendassignee(assignee: User, isChecked: Boolean,position: Int) {
+    override fun sendassignee(assignee: User, isChecked: Boolean, position: Int) {
         if (isChecked) {
             selectedAssignee.add(assignee)
-            binding.assigneeInclude.normalET.text=assignee.username
+            binding.assigneeInclude.normalET.text = assignee.username
             Glide.with(this)
                 .load(assignee.profileDPUrl)
                 .listener(object : RequestListener<Drawable> {
@@ -1065,12 +1140,13 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
         } else {
             selectedAssignee.remove(assignee)
-            binding.assigneeInclude.normalET.text="Unassigned"
+            binding.assigneeInclude.normalET.text = "Unassigned"
             binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
 
         }
 
     }
+
 
     override fun onAssigneeTListUpdated(TList: MutableList<User>) {
 
@@ -1081,8 +1157,12 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
             try {
                 val result = withContext(Dispatchers.IO) {
-                    viewModel.updateTask(taskID = activityBinding.taskId, projectName = PrefManager.getcurrentProject(),
-                        NewAssignee = if (assignee.firebaseID=="") "None" else assignee.firebaseID, OldAssignee = if (taskDetails.assignee=="None") "None" else taskDetails.assignee)
+                    viewModel.updateTask(
+                        taskID = activityBinding.taskId,
+                        projectName = PrefManager.getcurrentProject(),
+                        NewAssignee = if (assignee.firebaseID == "") "None" else assignee.firebaseID!!,
+                        OldAssignee = if (taskDetails.assignee == "None") "None" else taskDetails.assignee
+                    )
                 }
 
                 when (result) {
@@ -1112,7 +1192,7 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
 
                     }
 
-}
+                }
 
             } catch (e: Exception) {
 
@@ -1124,13 +1204,17 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
     }
 
     override fun stringtext(text: String, type: String) {
-        binding.stateInclude.tagText.text=text
-        binding.stateInclude.tagIcon.text=text.substring(0,1)
+        binding.stateInclude.tagText.text = text
+        binding.stateInclude.tagIcon.text = text.substring(0, 1)
         viewLifecycleOwner.lifecycleScope.launch {
 
             try {
                 val result = withContext(Dispatchers.IO) {
-                    viewModel.updateState(taskID = activityBinding.taskId, userID = taskDetails.assignee, newState = text)
+                    viewModel.updateState(
+                        taskID = activityBinding.taskId,
+                        userID = taskDetails.assignee,
+                        newState = text
+                    )
                 }
                 when (result) {
 
@@ -1176,8 +1260,8 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
     override fun onSelectedContributors(contributor: User, isChecked: Boolean) {
         if (isChecked) {
             if (!adapter.isUserAdded(contributor)) {
-                contributorList.add(contributor.firebaseID)
-                contributorDpList.add(contributor.profileIDUrl)
+                contributorList.add(contributor.firebaseID!!)
+                contributorDpList.add(contributor.profileIDUrl.toString())
             }
         } else {
             contributorList.remove(contributor.firebaseID)
@@ -1190,12 +1274,20 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
         UserlistBottomSheet.DataHolder.users = TList
     }
 
-    override fun savenewModerators(selected:MutableList<String>,unselected:MutableList<String>) {
+    override fun savenewModerators(
+        selected: MutableList<String>,
+        unselected: MutableList<String>
+    ) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = withContext(Dispatchers.IO) {
-                    viewModel.addNewModerators(taskID = activityBinding.taskId, projectName = PrefManager.getcurrentProject(), moderator = selected, unselected = unselected)
+                    viewModel.addNewModerators(
+                        taskID = activityBinding.taskId,
+                        projectName = PrefManager.getcurrentProject(),
+                        moderator = selected,
+                        unselected = unselected
+                    )
 
                 }
 
@@ -1238,6 +1330,7 @@ private fun fetchUserbyId(id: String, callback: (User?) -> Unit) {
         }
     }
 }
+
 
 //Code for getting html
 //                view?.evaluateJavascript(

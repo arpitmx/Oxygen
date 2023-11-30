@@ -105,10 +105,10 @@ class ModeratorsBottomSheet(
             val unselectedList:MutableList<String> = mutableListOf()
             for (i in 0 until DataHolder.users.size){
                 if (DataHolder.users[i].isChecked){
-                    list.add(DataHolder.users[i].firebaseID)
+                    list.add(DataHolder.users[i].firebaseID!!)
                 }
                 else{
-                    unselectedList.add(DataHolder.users[i].firebaseID)
+                    unselectedList.add(DataHolder.users[i].firebaseID!!)
                 }
             }
             callback.savenewModerators(list,unselectedList)

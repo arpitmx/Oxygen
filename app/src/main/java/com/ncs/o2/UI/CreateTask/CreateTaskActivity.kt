@@ -472,7 +472,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     else -> -1
                 }
                 if (PrefManager.getcurrentUserdetails().ROLE>=2){
-                    val assignee=selectedAssignee[0].firebaseID
+                    val assignee=selectedAssignee[0].firebaseID!!
                     val task= Task(
                         title = title.toString(),
                         description = desc3,
@@ -722,7 +722,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         if (isChecked) {
             if (!contriAdapter.isUserAdded(contributor)) {
                 contriAdapter.addUser(contributor)
-                contributorList.add(contributor.firebaseID)
+                contributorList.add(contributor.firebaseID!!)
 
                 if (contributor.profileIDUrl == null){
                     contributorDpList.add("")

@@ -940,7 +940,7 @@ class FirestoreRepository @Inject constructor(
                 for (document in querySnapshot.documents) {
                     val id = document.getString(Endpoints.Workspace.ID)
                     val status = document.getString(Endpoints.Workspace.STATUS)
-                    val workspaceTaskItem = WorkspaceTaskItem(ID = id!!, STATUS = status!!)
+                    val workspaceTaskItem = WorkspaceTaskItem(id = id!!, status = status!!)
                     workspaceTaskItemList.add(workspaceTaskItem)
                 }
 

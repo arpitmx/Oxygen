@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.MessageRepository.UsersDao
+import com.ncs.o2.Domain.Models.Enums.MessageType
 import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInMessage
@@ -16,6 +18,7 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
@@ -118,6 +121,48 @@ class ChatAdapter(
         }
     }
 
+
+    private inner class ImageMessage_ViewHolder(val binding: ChatImageItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+
+        fun bind(position: Int) {
+            val senderId = msgList[position].senderId
+            val localUser = users.find { it.EMAIL == senderId }
+
+            if (localUser != null) {
+                setImageItem(localUser, binding, position)
+                Timber.tag("DB").d("fetching from local")
+            } else {
+                fetchUser(senderId) { newUser ->
+                    users.add(newUser)
+                    Timber.tag("DB").d("fetching from db")
+                    setImageItem(newUser, binding, position)
+                }
+            }
+        }
+
+        }
+
+
+    fun setImageItem(user: UserInMessage, binding: ChatImageItemBinding, position: Int) {
+        val url = msgList.get(position).content
+        val time = msgList[position].timestamp!!
+        binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
+        binding.imgDp.loadProfileImg(user.DP_URL.toString())
+        binding.tvName.text = user.USERNAME
+        binding.imagePreview.loadProfileImg(url)
+
+
+        binding.imagePreview.setOnClickThrottleBounceListener {
+//            OnImageClicked.onImageClick(0, listOf(url))
+            onImageClick(0, listOf(url))
+        }
+        binding.parent.setOnClickThrottleBounceListener {
+//            OnImageClicked.onImageClick(0, listOf(url))
+            onImageClick(0, listOf(url))
+        }
+    }
 
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
         setMessageView(msgList[position], binding)
