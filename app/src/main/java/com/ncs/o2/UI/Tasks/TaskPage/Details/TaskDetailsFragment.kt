@@ -89,8 +89,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
     ModeratorsBottomSheet.getContributorsCallback {
-    ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
-    AssigneeListBottomSheet.updateAssigneeCallback,BottomSheet.SendText, ModeratorsBottomSheet.getContributorsCallback{
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements

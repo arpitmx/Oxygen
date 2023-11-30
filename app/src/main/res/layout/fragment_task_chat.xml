@@ -63,7 +63,6 @@
         android:clipToPadding="false"
         android:layout_above="@+id/input_box_container"
         android:layoutAnimation="@anim/layout_animation_fadein"
-        android:nestedScrollingEnabled="false"
         android:paddingBottom="20dp"
         android:scrollbarSize="3dp"
         android:scrollbarThumbVertical="@color/primary"
