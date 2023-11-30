@@ -53,19 +53,17 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     private lateinit var viewModel: createProjectViewModel
 
     lateinit var moderatorAdapter: ContributorAdapter
-    private val moderatorsrecycler: RecyclerView by lazy {
-        binding.moderatorsRecyclerView
-    }
     val binding: ActivityCreateProjectBinding by lazy {
         ActivityCreateProjectBinding.inflate(layoutInflater)
     }
+
+
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         viewModel = ViewModelProvider(this).get(createProjectViewModel::class.java)
 
         val desc = binding.projectDesc.text
@@ -85,10 +83,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 //            User("https://picsum.photos/350","yogita","design","url5"),
 //            User("https://picsum.photos/450","aditi","design","url6"),
         )
-        binding.addModeratorsBtn.setOnClickThrottleBounceListener {
-            val userListBottomSheet = UserlistBottomSheet(this)
-            userListBottomSheet.show(supportFragmentManager, "OList")
-        }
+
 
         binding.gioActionbar.btnNext.setOnClickThrottleBounceListener {
             val _title = binding.projectTitle.text.toString()
@@ -161,7 +156,6 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 
 
         }
-        setUpViews()
 
     }
 
@@ -243,9 +237,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         }
     }
 
-    private fun setUpViews() {
-        setupSelectedMembersRecyclerView()
-    }
+
 
     fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
         var bitmap: Bitmap? = null
@@ -261,16 +253,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         return bitmap
     }
 
-    private fun setupSelectedMembersRecyclerView() {
-        val layoutManager = FlexboxLayoutManager(this)
-        layoutManager.flexDirection = FlexDirection.ROW
-        layoutManager.flexWrap = FlexWrap.WRAP
-        moderatorsrecycler.layoutManager = layoutManager
-        moderatorAdapter = ContributorAdapter(mutableListOf(), this)
-        moderatorsrecycler.adapter = moderatorAdapter
-        moderatorsrecycler.visible()
 
-    }
 
     override fun onProfileClick(user: User, position: Int) {
         TODO("Not yet implemented")

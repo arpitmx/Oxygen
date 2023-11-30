@@ -1,6 +1,8 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets.Userlist
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -60,6 +62,7 @@ class UserlistBottomSheet(
     private val viewModel: UserlistViewModel by viewModels()
 
     private lateinit var jsonString: String
+    lateinit var adapter:UserListAdapter
 
     @Inject
     lateinit var firestoreRepository: FirestoreRepository
@@ -98,8 +101,21 @@ class UserlistBottomSheet(
         }
         setViews()
 
-    }
+        binding.searchBox.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                filterList(s.toString())
+            }
+        })
+
+    }
+    private fun filterList(query: String) {
+        val filteredList = DataHolder.users.filter { it.username!!.contains(query, ignoreCase = true) }
+        adapter.updateList(filteredList)
+    }
     private fun setViews() {
         setBottomSheetConfig()
         val job = CoroutineScope(Dispatchers.IO).launch {
@@ -195,7 +211,7 @@ class UserlistBottomSheet(
 
     private fun setRecyclerView(userList: MutableList<User>) {
 
-            val adapter = UserListAdapter(userList, this@UserlistBottomSheet)
+            adapter = UserListAdapter(userList, this@UserlistBottomSheet)
             val linearLayoutManager = LinearLayoutManager(requireContext())
             linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
             recyclerView.layoutManager = linearLayoutManager

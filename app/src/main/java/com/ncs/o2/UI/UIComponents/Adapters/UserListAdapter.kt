@@ -34,7 +34,7 @@ Tasks FUTURE ADDITION :
 
 */
 class UserListAdapter constructor(
-    private val contriList: MutableList<User>,
+    private var contriList: MutableList<User>,
     private val onClickCallback: OnClickCallback
 ) : RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
 
@@ -108,7 +108,10 @@ class UserListAdapter constructor(
 
 
     }
-
+    fun updateList(newList: List<User>) {
+        contriList = newList.toMutableList()
+        notifyDataSetChanged()
+    }
     override fun getItemCount(): Int {
         return contriList.size
     }
