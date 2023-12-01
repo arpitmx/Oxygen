@@ -1361,6 +1361,51 @@ class FirestoreRepository @Inject constructor(
             return ServerResult.Failure(e)
         }
     }
+    override fun getCheckList(
+        projectName: String,
+        taskId: String,
+        result: (ServerResult<List<CheckList>>) -> Unit
+    ) {
+
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+            .get()
+            .addOnSuccessListener {
+                val CheckListArray = mutableListOf<CheckList>()
+                for (document in it.documents) {
+                    val id=document.getString("id")
+                    val title=document.getString("title")
+                    val desc=document.getString("desc")
+                    val done=document.getBoolean("done")
+                    val checkList=CheckList(id = id!!, title = title!!, desc = desc!!, done = done!!)
+                    CheckListArray.add(checkList)
+                }
+                result(ServerResult.Success(CheckListArray))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
+    override suspend fun updateCheckListCompletion(
+        taskId: String,
+        projectName: String,
+        id:String,
+        done:Boolean,
+        ): ServerResult<Boolean> {
+        try {
+            val documentRef = firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+                .document(id)
+            val updateData = mapOf<String, Any>(
+                "done" to done
+            )
+            documentRef.update(updateData).await()
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
 
 }
 

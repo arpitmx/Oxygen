@@ -158,4 +158,8 @@ class ChecklistActivity() : AppCompatActivity(),CheckListBottomSheet.checkListIt
         val checkListBottomSheet = CheckListBottomSheet(count = number,this, checkList = list[position])
         checkListBottomSheet.show(supportFragmentManager, "checkList")
     }
+
+    override fun onCheckBoxClick(id: String, isChecked: Boolean, position: Int) {
+
+    }
 }

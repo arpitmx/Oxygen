@@ -126,6 +126,12 @@ interface Repository {
         notification: Notification,
         serverResult: (ServerResult<Int>) -> Unit
     )
+    suspend fun updateCheckListCompletion(
+        taskId: String,
+        projectName: String,
+        id: String,
+        done:Boolean,
+    ): ServerResult<Boolean>
 
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
@@ -153,6 +159,11 @@ interface Repository {
         fieldName: String,
         projectID: String,
         result: (ServerResult<Boolean>) -> Unit
+    )
+    fun getCheckList(
+        projectName: String,
+        taskId: String,
+        result: (ServerResult<List<CheckList>>) -> Unit
     )
 
 }

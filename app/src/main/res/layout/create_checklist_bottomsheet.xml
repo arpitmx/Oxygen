@@ -62,7 +62,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/desc_editor"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:hint="Description"
         android:layout_marginBottom="20dp"
         android:layout_marginStart="10dp"
@@ -75,10 +75,10 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:id="@+id/desc"
-            android:layout_height="150dp"
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
             android:background="@drawable/card_view_white"
             android:fontFamily="@font/sf_pro_display_regular"
-            android:maxLength="200"
             android:gravity="top|start"
             android:textColor="@color/darkbg_main"
             android:textSize="18dp" />

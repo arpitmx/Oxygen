@@ -31,9 +31,27 @@ class CheckListAdapter constructor(private val list: MutableList<CheckList>,priv
         if (!isCheckListCreation){
             holder.binding.clear.gone()
             holder.binding.checkbox.visible()
+            holder.binding.checkbox.isChecked=list[position].done
+            val isChecked=holder.binding.checkbox.isChecked
+            if (isChecked) {
+                holder.binding.completed.visible()
+            }
+            if(!isChecked) {
+                holder.binding.completed.gone()
 
+            }
+            holder.binding.checkbox.setOnCheckedChangeListener{
+                btn,isChecked->
+                if (isChecked) {
+                    holder.binding.completed.visible()
+                }
+                if(!isChecked) {
+                    holder.binding.completed.gone()
+
+                }
+                checkListItemListener.onCheckBoxClick(list[position].id, isChecked,position)
+            }
         }
-
         holder.binding.parent.setOnClickThrottleBounceListener {
             checkListItemListener.onClick(position)
         }
@@ -49,5 +67,6 @@ class CheckListAdapter constructor(private val list: MutableList<CheckList>,priv
     interface CheckListItemListener{
         fun removeCheckList(position: Int)
         fun onClick(position: Int)
+        fun onCheckBoxClick(id:String,isChecked:Boolean,position: Int)
     }
 }
