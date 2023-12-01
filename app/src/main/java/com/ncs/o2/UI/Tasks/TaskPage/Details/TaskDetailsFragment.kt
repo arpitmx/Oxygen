@@ -390,7 +390,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
     private fun manageState(task: Task) {
-        if (PrefManager.getcurrentUserdetails().EMAIL == task.assignee) {
+        if (PrefManager.getcurrentUserdetails().EMAIL == task.assignee && !isModerator) {
             binding.status.setOnClickThrottleBounceListener {
                 list.clear()
                 list.addAll(listOf("Assigned", "Working", "Review"))
@@ -399,6 +399,15 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 priorityBottomSheet.show(requireFragmentManager(), "STATE")
             }
         } else if (isModerator) {
+            binding.status.setOnClickThrottleBounceListener {
+                list.clear()
+                list.addAll(listOf("Submitted", "Open", "Working", "Review", "Completed"))
+                val priorityBottomSheet =
+                    BottomSheet(list, "STATE", this)
+                priorityBottomSheet.show(requireFragmentManager(), "STATE")
+            }
+        }
+        else if (isModerator && task.assignee==PrefManager.getcurrentUserdetails().EMAIL){
             binding.status.setOnClickThrottleBounceListener {
                 list.clear()
                 list.addAll(listOf("Submitted", "Open", "Working", "Review", "Completed"))
