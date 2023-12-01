@@ -459,6 +459,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
+                android:background="@drawable/horizontal_scrollview_bg"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -472,7 +473,8 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_display_medium"
                         android:gravity="start"
-                        android:paddingStart="5dp"
+                        android:paddingStart="15dp"
+                        android:layout_marginTop="10dp"
                         android:text="@string/moderators"
                         android:textColor="@color/account"
                         android:textSize="16dp"
@@ -493,6 +495,7 @@
                             android:text="No Moderators here..."
                             android:textColor="@color/better_white"
                             android:textSize="16dp"
+                            android:layout_margin="10dp"
                             android:visibility="gone" />
 
 
@@ -508,12 +511,13 @@
                             android:layoutAnimation="@anim/layout_animation_popscale"
                             android:nestedScrollingEnabled="false" />
                     </RelativeLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/becomeModerator"
-                        android:layout_marginTop="20dp"
-                        android:visibility="gone"
+                        android:layout_margin="10dp"
+                        android:visibility="visible"
                         android:orientation="horizontal"
                         >
                         <TextView
@@ -521,30 +525,32 @@
                             android:layout_height="match_parent"
                             android:layout_weight="0.9"
                             android:fontFamily="@font/sf_pro_display_medium"
-                            android:gravity="start"
+                            android:gravity="start|center_vertical"
                             android:paddingStart="@dimen/_5dp"
                             android:text="Become a moderator"
                             android:textColor="@color/better_white"
-                            android:textSize="20dp"
+                            android:textSize="17dp"
                             />
                         <ImageView
                             android:layout_width="0dp"
                             android:layout_height="30dp"
                             android:layout_weight=".1"
                             android:src="@drawable/outline_add_24"
-                            app:tint="@color/better_white" />
+                            app:tint="@color/primary" />
                     </LinearLayout>
+
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/add_contributors_btn"
                         android:layout_width="match_parent"
                         android:visibility="gone"
+                        android:layout_margin="10dp"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:weightSum="10">
 
                         <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
                             android:layout_weight="1"
                             android:paddingStart="0dp"
                             android:src="@drawable/baseline_assignment_ind_24"
@@ -559,10 +565,10 @@
                             android:fontFamily="@font/sf_pro_display_regular"
                             android:gravity="start|center_vertical"
                             android:orientation="vertical"
-                            android:text="Add Moderators"
+                            android:text="Add Moderators + "
                             android:textAllCaps="false"
                             android:textColor="@color/white"
-                            android:textSize="18dp"
+                            android:textSize="16dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent" />
@@ -572,10 +578,11 @@
 
 
                 <View
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="15dp"
                     android:background="#56838383" />
 
@@ -592,15 +599,6 @@
                     android:textSize="16dp"
                     android:visibility="gone" />
 
-                <LinearLayout
-                    android:id="@+id/links_cont"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:orientation="vertical">
-
-                </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/linksRecyclerView"

@@ -36,6 +36,7 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
@@ -52,6 +53,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListen
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.FirebaseUtils
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
@@ -202,7 +204,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         handleRequestNotificationResult()
 
         activityBinding.binding.gioActionbar.btnModerator.setOnClickThrottleBounceListener {
-            toast("You are a moderator, can edit this task")
+            //toast("You are a moderator, can edit this task")
+            utils.showSnackbar(binding.root,"You are a moderator and can edit this task",5000)
         }
         binding.assignee.setOnClickThrottleBounceListener {
             Log.d("assigne", "passing this list ${selectedAssignee.toString()}")
@@ -484,8 +487,10 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             manageState(taskDetails)
             manageAddModeratorsView(isModerator)
         }
+
         val contriRecyclerView = binding.contributorsRecyclerView
         contriRecyclerView.visible()
+
         val layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
@@ -506,29 +511,29 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         tagsRecyclerView.adapter = adapter
     }
 
-    private fun setLinksView(list: MutableList<String>) {
-        val num = list.size
-        val parentLayout = binding.linksCont
-        val inflater = LayoutInflater.from(requireContext())
-        TextViewList.clear()
-
-        for (i in 0 until num) {
-            val text = inflater.inflate(
-                R.layout.links_item, parentLayout, false
-            ) as TextView
-            TextViewList.add(text)
-            parentLayout.addView(text)
-            text.text = list[i]
-        }
-
-        for (i in 0 until num) {
-
-            TextViewList[i].setOnClickThrottleBounceListener {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
-                startActivity(intent)
-            }
-        }
-    }
+//    private fun setLinksView(list: MutableList<String>) {
+//        val num = list.size
+//        //val parentLayout = binding.linksCont
+//        val inflater = LayoutInflater.from(requireContext())
+//        TextViewList.clear()
+//
+//        for (i in 0 until num) {
+//            val text = inflater.inflate(
+//                R.layout.links_item, parentLayout, false
+//            ) as TextView
+//            TextViewList.add(text)
+//            parentLayout.addView(text)
+//            text.text = list[i]
+//        }
+//
+//        for (i in 0 until num) {
+//
+//            TextViewList[i].setOnClickThrottleBounceListener {
+//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
+//                startActivity(intent)
+//            }
+//        }
+//    }
 
 
     override fun onProfileClick(user: User, position: Int) {
@@ -593,16 +598,10 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         Timber.d("Moderators list : ${taskDetails.moderators}")
 
-        if (taskDetails.moderators.isEmpty()) {
+        if (taskDetails.moderators.size == 0) {
             //toast("Contributor empty")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
-
-        } else if (taskDetails.moderators[0] == Endpoints.TaskDetails.EMPTY_MODERATORS) {
-            // toast("Contributor not empty None")
-            binding.contributorsRecyclerView.gone()
-            binding.noContributors.visible()
-
         } else {
 
             binding.contributorsRecyclerView.visible()
@@ -876,6 +875,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private fun setDetails(id: String) {
 
+        binding.becomeModerator.gone()
+
         viewLifecycleOwner.lifecycleScope.launch {
 
             try {
@@ -908,15 +909,23 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
                     is ServerResult.Success -> {
 
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        val localUserObj = PrefManager.getcurrentUserdetails()
+
+                        currentUser?.let { userObj ->
+
+                            if (taskResult.data.moderators.size==0 && localUserObj.ROLE >= 2) {
+                                binding.becomeModerator.visible()
+                            }
+                        }
+
                         binding.progressBar.gone()
+
                         setDefaultViews(taskResult.data)
                         setTaskDetails(taskResult.data)
 
-                        val currentUser = PrefManager.getcurrentUserdetails()
 
-                        if (!taskResult.data.moderators.contains(currentUser.EMAIL) && currentUser.ROLE >= 2 && taskResult.data.moderators.isEmpty()) {
-                            binding.becomeModerator.visible()
-                        }
+
 
                     }
 
@@ -1106,37 +1115,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         if (isChecked) {
             selectedAssignee.add(assignee)
             binding.assigneeInclude.normalET.text = assignee.username
-            Glide.with(this)
-                .load(assignee.profileDPUrl)
-                .listener(object : RequestListener<Drawable> {
-
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-                })
-                .encodeQuality(80)
-                .override(40, 40)
-                .apply(
-                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-
-                )
-                .error(R.drawable.profile_pic_placeholder)
-                .into(binding.assigneeInclude.tagIcon)
+            binding.assigneeInclude.tagIcon.loadProfileImg(assignee.profileDPUrl.toString())
 
         } else {
             selectedAssignee.remove(assignee)
