@@ -496,11 +496,72 @@
                     android:layout_margin="10dp"
                     android:orientation="vertical">
 
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="5dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="#65686B"
+
+                        />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/add_checkList_btn"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="@dimen/_5dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="10">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_weight="1"
+                            android:paddingStart="0dp"
+                            android:src="@drawable/round_task_alt_24"
+                            app:tint="@color/better_white" />
+
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="8"
+                            android:fontFamily="@font/sf_pro_display_regular"
+                            android:gravity="start|center_vertical"
+                            android:orientation="vertical"
+                            android:text="Checklist"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="18dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:id="@+id/checkListCount"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:visibility="gone"
+                            android:fontFamily="@font/sf_pro_display_regular"
+                            android:gravity="start|center_vertical"
+                            android:orientation="vertical"
+                            android:text="(1)"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="18dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="15dp"
                         android:layout_marginBottom="8dp"
                         android:background="#65686B"
 

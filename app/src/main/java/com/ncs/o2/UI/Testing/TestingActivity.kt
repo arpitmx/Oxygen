@@ -1182,7 +1182,7 @@ See [`LICENSE`](LICENSE) for full of the license text.
 
             CoroutineScope(Dispatchers.Main).launch {
 
-                repository.postTask(task) { result ->
+                repository.postTask(task, mutableListOf()) { result ->
 
                     when (result) {
 

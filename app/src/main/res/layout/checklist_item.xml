@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:id="@+id/parent"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/dark_bg_rounded_corner"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:minHeight="30dp"
+        android:minWidth="30dp"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/label_cardview_yellow"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:gravity="center"
+        android:text="....."
+        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/darkbg_main"
+        android:textSize="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+        <ImageView
+            android:id="@+id/clear"
+            android:layout_width="25dp"
+            android:background="@drawable/horizontal_scrollview_bg"
+            android:layout_height="25dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/baseline_close_24"
+            app:tint="@color/better_white"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <CheckBox
+            android:layout_width="25dp"
+            android:id="@+id/checkbox"
+            android:visibility="gone"
+            android:layout_height="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:buttonTint="@color/primary"
+            android:layout_marginEnd="10dp"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/title"
+        android:background="@drawable/horizontal_scrollview_bg"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/titleTV"
+            android:fontFamily="@font/sfbold"
+            android:gravity="top|start"
+            android:text="Loading..."
+            android:maxHeight="100dp"
+            android:layout_margin="16dp"
+            android:maxLength="200"
+            android:textColor="@color/better_white"
+            android:textSize="20dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/description"
+        android:background="@drawable/horizontal_scrollview_bg"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_height="100dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:gravity="top|start"
+            android:id="@+id/descTV"
+            android:text="Loading..."
+            android:maxHeight="300dp"
+            android:layout_margin="16dp"
+            android:maxLength="200"
+            android:minHeight="100dp"
+            android:textColor="@color/better_white"
+            android:textSize="20dp"/>
+    </LinearLayout>
+
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -20,6 +20,7 @@ import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
+import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.Notification
@@ -543,7 +544,7 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    override suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit) {
+    override suspend fun postTask(task: Task, checkList: MutableList<CheckList>, serverResult: (ServerResult<Int>) -> Unit) {
 
         val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
 
@@ -552,11 +553,16 @@ class FirestoreRepository @Inject constructor(
             serverResult(ServerResult.Progress)
             getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task)
                 .await()
-            if (task.assignee!="None") {
-                firestore.collection(Endpoints.USERS).document(task.assignee)
-                    .collection(Endpoints.Workspace.WORKSPACE)
-                    .document(task.id).set(workspaceTaskItem).await()
+            for (i in 0 until checkList.size){
+                getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id)
+                    .collection(Endpoints.Project.CHECKLIST).document(checkList[i].id).set(checkList[i])
+                    .await()
             }
+//            if (task.assignee!="None") {
+//                firestore.collection(Endpoints.USERS).document(task.assignee)
+//                    .collection(Endpoints.Workspace.WORKSPACE)
+//                    .document(task.id).set(workspaceTaskItem).await()
+//            }
             serverResult(ServerResult.Success(200))
 
         } catch (exception: Exception) {

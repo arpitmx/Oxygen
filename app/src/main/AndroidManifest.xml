@@ -21,6 +21,12 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.CreateTask.CreateCheckListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.CreateTask.ChecklistActivity"
+            android:exported="false" />
+        <activity
             android:name=".UI.Setting.SettingsActivity"
             android:exported="false" />
         <activity

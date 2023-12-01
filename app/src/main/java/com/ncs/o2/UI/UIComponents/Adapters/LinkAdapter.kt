@@ -15,6 +15,10 @@ class LinkAdapter constructor(private val linksList: List<String>) : RecyclerVie
         return ViewHolder(binding)
     }
 
+
+
+
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val linkItem = linksList[position]
         with(holder.binding.linksTv) {

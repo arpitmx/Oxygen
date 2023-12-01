@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/darkbg_main_a80"
+    android:layout_height="match_parent">
+    <include
+        android:id="@+id/gio_actionbar"
+        layout="@layout/actionbar_create_checklist"
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
+        android:visibility="visible"
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:minHeight="35dp"
+        android:minWidth="35dp"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/label_cardview_yellow"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:gravity="center"
+        android:text="99"
+        android:layout_margin="10dp"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/darkbg_main_a80"
+        android:textSize="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/title_editor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:hint="Title"
+        app:endIconMode="clear_text"
+        app:hintEnabled="true"
+        app:hintTextColor="@color/darkTheme_bg">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:id="@+id/title"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_view_white"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:maxLines="2"
+            android:maxLength="100"
+            android:textAlignment="textStart"
+            android:textColor="@color/darkbg_main"
+            android:textSize="18dp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/desc_editor"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:hint="Description"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
+        android:gravity="top|start"
+        android:layout_marginEnd="10dp"
+        app:endIconMode="clear_text"
+        app:hintEnabled="true"
+        app:hintTextColor="@color/darkTheme_bg">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:id="@+id/desc"
+            android:layout_height="150dp"
+            android:background="@drawable/card_view_white"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:maxLength="200"
+            android:gravity="top|start"
+            android:textColor="@color/darkbg_main"
+            android:textSize="18dp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

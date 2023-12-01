@@ -63,7 +63,7 @@ class O2Bot @Inject constructor(@FirebaseRepository val repository: Repository):
         CoroutineScope(Dispatchers.Main).launch {
 
 
-            repository.postTask(task) { result ->
+            repository.postTask(task, mutableListOf()) { result ->
 
                 when (result) {
 
