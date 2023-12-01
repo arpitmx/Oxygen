@@ -17,6 +17,7 @@ import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
@@ -149,11 +150,11 @@ class ChatAdapter(
         val url = msgList.get(position).content
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
-        binding.imgDp.loadProfileImg(user.DP_URL.toString())
         binding.tvName.text = user.USERNAME
-        binding.imagePreview.loadProfileImg(url)
-
-
+        setDPImageItem(position, binding, user)
+        binding.imagePreview.load(url,R.drawable.placeholder_image,"")
+        binding.imagePreview.visible()
+        binding.imageProgressBar.gone()
         binding.imagePreview.setOnClickThrottleBounceListener {
 //            OnImageClicked.onImageClick(0, listOf(url))
             onImageClick(0, listOf(url))
@@ -171,6 +172,39 @@ class ChatAdapter(
         binding.tvName.text = user.USERNAME
 
         setDP(position, binding, user)
+
+
+    }
+
+    private fun setDPImageItem(position: Int, binding: ChatImageItemBinding, user: UserInMessage) {
+
+        // No changes for the first item
+        if (position == 0) {
+            binding.msgSeperator.gone()
+            binding.imgDp.visible()
+            binding.tvName.visible()
+            binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
+            binding.imgDp.loadProfileImg(user.DP_URL.toString())
+            return
+        }
+
+        // Removing dp and changing some layout if the previous message is sent from same user
+        if (msgList[position - 1].senderId == msgList[position].senderId) {
+            binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
+            binding.tvName.gone()
+            binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
+            binding.msgSeperator.alpha = 0.5f
+
+            return
+        }
+
+        // All the other items
+        binding.msgSeperator.visible()
+        binding.imgDp.visible()
+        binding.tvName.visible()
+        binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
+        binding.msgSeperator.alpha = 1f
+        binding.imgDp.loadProfileImg(user.DP_URL.toString())
 
 
     }

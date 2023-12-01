@@ -1,10 +1,11 @@
-package com.ncs.o2.UI.UIComponents.Adapters
+package com.ncs.o2.UI.UIComponents.BottomSheets
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,12 +15,12 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.UI.UIComponents.Adapters.AssigneeListAdpater
+import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistViewModel
 import com.ncs.o2.databinding.AssigneeListBottomSheetBinding
-import com.ncs.o2.databinding.ContributorListBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +34,8 @@ class AssigneeListBottomSheet(
     private var OList: MutableList<User>,
     private var selectedAssignee: MutableList<User>,
     private val callbacks: getassigneesCallback,
-    private val updateCallabck:updateAssigneeCallback?
-) : BottomSheetDialogFragment(),AssigneeListAdpater.OnAssigneeClickCallback {
+    private val updateCallabck: updateAssigneeCallback?
+) : BottomSheetDialogFragment(), AssigneeListAdpater.OnAssigneeClickCallback {
 
     private val UserListviewModel: UserlistViewModel by viewModels()
     private lateinit var jsonString: String
@@ -49,9 +50,9 @@ class AssigneeListBottomSheet(
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewDevelopers
     }
+    lateinit var adapter: AssigneeListAdpater
 
     private val faker: Faker by lazy { Faker() }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,8 +71,21 @@ class AssigneeListBottomSheet(
         binding.sheetTitle.text="Assignee"
         initView()
 
-    }
+        binding.searchBox.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                filterList(s.toString())
+            }
+        })
+
+    }
+    private fun filterList(query: String) {
+        val filteredList = OList.filter { it.username!!.contains(query, ignoreCase = true) }
+        adapter.updateList(filteredList)
+    }
     private fun setViews() {
         setBottomSheetConfig()
         val job = CoroutineScope(Dispatchers.IO).launch {
@@ -119,7 +133,7 @@ class AssigneeListBottomSheet(
     }
 
     private fun setRecyclerView(userList: MutableList<User>) {
-        val adapter = AssigneeListAdpater(userList, this@AssigneeListBottomSheet)
+        adapter = AssigneeListAdpater(userList, this@AssigneeListBottomSheet)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         recyclerView.layoutManager = linearLayoutManager

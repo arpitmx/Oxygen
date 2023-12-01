@@ -59,13 +59,14 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     val binding: ActivityCreateProjectBinding by lazy {
         ActivityCreateProjectBinding.inflate(layoutInflater)
     }
+
+
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         viewModel = ViewModelProvider(this).get(createProjectViewModel::class.java)
 
         val desc = binding.projectDesc.text
@@ -85,6 +86,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 //            User("https://picsum.photos/350","yogita","design","url5"),
 //            User("https://picsum.photos/450","aditi","design","url6"),
         )
+
 //        binding.addModeratorsBtn.setOnClickThrottleBounceListener {
 //            val userListBottomSheet = UserlistBottomSheet(this)
 //            userListBottomSheet.show(supportFragmentManager, "OList")
@@ -247,6 +249,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 //        setupSelectedMembersRecyclerView()
 //    }
 
+
     fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
         var bitmap: Bitmap? = null
         try {
@@ -271,6 +274,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 //        moderatorsrecycler.visible()
 //
 //    }
+
 
     override fun onProfileClick(user: User, position: Int) {
         TODO("Not yet implemented")
