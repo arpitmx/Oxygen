@@ -129,6 +129,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     private fun initViews() {
+        binding.inputBox.progressBarSendMsg.gone()
 
         binding.inputBox.btnSend.setOnClickThrottleBounceListener {
 
@@ -138,6 +139,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 binding.inputBox.editboxMessage.text?.clear()
 
             } else if (bitmap != null) {
+                binding.inputBox.progressBarSendMsg.visible()
                 uploadImageToFirebaseStorage(bitmap!!, PrefManager.getcurrentProject(), task.id)
             } else {
                 toast("Message can't be empty")
@@ -197,6 +199,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
 
+
     private fun uploadImageToFirebaseStorage(bitmap: Bitmap, projectId: String, taskId: String) {
 
         chatViewModel.uploadImage(bitmap, projectId, taskId).observe(viewLifecycleOwner) { result ->
@@ -218,6 +221,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 }
 
                 is ServerResult.Success -> {
+                    binding.inputBox.progressBarSendMsg.gone()
                     val imgStorageReference = result.data
                     getImageDownloadUrl(imgStorageReference)
                 }
@@ -248,6 +252,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 }
 
                 is ServerResult.Success -> {
+                    binding.inputBox.progressBarSendMsg.gone()
                     addImageUrlToFirestore(result.data)
 
                 }
@@ -372,7 +377,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         )
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        layoutManager.reverseLayout = false
         layoutManager.stackFromEnd = true
 
         with(recyclerView) {
@@ -393,8 +397,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         binding.progress.gone()
                         recyclerView.visible()
                         binding.placeholder.gone()
-                        recyclerView.scrollToPosition(result.data.size - 1)
+                        recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+
                     }
+
                 }
 
                 is ServerResult.Failure -> {
@@ -434,23 +440,19 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 when (result) {
 
                     is ServerResult.Failure -> {
-                        binding.inputBox.btnSend.visible()
                         binding.inputBox.progressBarSendMsg.gone()
                     }
 
                     ServerResult.Progress -> {
-                        binding.inputBox.btnSend.gone()
                         binding.inputBox.progressBarSendMsg.visible()
                     }
 
                     is ServerResult.Success -> {
 
-                        binding.inputBox.btnSend.visible()
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
 
                         if (message.messageType == MessageType.NORMAL_MSG) {
-                            binding.inputBox.btnSend.visible()
                             binding.inputBox.progressBarSendMsg.gone()
                             binding.inputBox.editboxMessage.text?.clear()
                         }
@@ -459,17 +461,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             binding.btnSelectImageFromStorage.gone()
                             binding.inputBox.selectedImageView.gone()
                             binding.inputBox.msgBox.visible()
-                            binding.inputBox.btnSend.visible()
                             binding.inputBox.progressBarSendMsg.gone()
                             binding.inputBox.editboxMessage.text?.clear()
                         }
-                        recyclerView.scrollToPosition(chatAdapter.itemCount - 1)
-
-
+                        recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                         // sendNotification(receiverStack)
-
                     }
-
                 }
             }
         }

@@ -62,13 +62,13 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment
-import com.ncs.o2.UI.UIComponents.Adapters.AssigneeListBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.AssigneeListBottomSheet
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
-import com.ncs.o2.UI.UIComponents.ModeratorsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -393,7 +393,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     }
 
     private fun manageState(task: Task) {
-        if (PrefManager.getcurrentUserdetails().EMAIL == task.assignee) {
+        if (PrefManager.getcurrentUserdetails().EMAIL == task.assignee && !isModerator) {
             binding.status.setOnClickThrottleBounceListener {
                 list.clear()
                 list.addAll(listOf("Assigned", "Working", "Review"))
@@ -402,6 +402,15 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                 priorityBottomSheet.show(requireFragmentManager(), "STATE")
             }
         } else if (isModerator) {
+            binding.status.setOnClickThrottleBounceListener {
+                list.clear()
+                list.addAll(listOf("Submitted", "Open", "Working", "Review", "Completed"))
+                val priorityBottomSheet =
+                    BottomSheet(list, "STATE", this)
+                priorityBottomSheet.show(requireFragmentManager(), "STATE")
+            }
+        }
+        else if (isModerator && task.assignee==PrefManager.getcurrentUserdetails().EMAIL){
             binding.status.setOnClickThrottleBounceListener {
                 list.clear()
                 list.addAll(listOf("Submitted", "Open", "Working", "Review", "Completed"))

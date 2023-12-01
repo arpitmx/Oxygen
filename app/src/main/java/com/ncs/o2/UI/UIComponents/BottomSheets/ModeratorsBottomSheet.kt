@@ -1,10 +1,11 @@
-package com.ncs.o2.UI.UIComponents
+package com.ncs.o2.UI.UIComponents.BottomSheets
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.UIComponents.Adapters.UserListAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistViewModel
 import com.ncs.o2.databinding.ContributorListBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,6 +43,7 @@ class ModeratorsBottomSheet(
 
     private lateinit var jsonString: String
 
+    lateinit var adapter:UserListAdapter
     @Inject
     lateinit var firestoreRepository: FirestoreRepository
 
@@ -80,6 +83,21 @@ class ModeratorsBottomSheet(
         }
         setViews()
 
+        binding.searchBox.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                filterList(s.toString())
+            }
+        })
+    }
+
+    private fun filterList(query: String) {
+        val list=(selected+DataHolder.users).distinctBy { it.firebaseID }
+        val filteredList = list.filter { it.username!!.contains(query, ignoreCase = true) }
+        adapter.updateList(filteredList)
     }
 
     private fun setViews() {
@@ -189,7 +207,7 @@ class ModeratorsBottomSheet(
 
     private fun setRecyclerView(userList: MutableList<User>) {
         val list=userList.distinctBy { it.firebaseID }
-        val adapter = UserListAdapter(list.toMutableList(), this@ModeratorsBottomSheet)
+        adapter = UserListAdapter(list.toMutableList(), this@ModeratorsBottomSheet)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         recyclerView.layoutManager = linearLayoutManager

@@ -18,7 +18,7 @@ import com.ncs.o2.R
 import com.ncs.o2.databinding.ContributorListItemBinding
 
 class AssigneeListAdpater constructor(
-    private val contriList: MutableList<User>,
+    private var contriList: MutableList<User>,
     private val onClickCallback: OnAssigneeClickCallback
 ) : RecyclerView.Adapter<AssigneeListAdpater.ViewHolder>() {
 
@@ -106,6 +106,10 @@ class AssigneeListAdpater constructor(
         return contriList.size
     }
 
+    fun updateList(newList: List<User>) {
+        contriList = newList.toMutableList()
+        notifyDataSetChanged()
+    }
     inner class ViewHolder(val binding: ContributorListItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
