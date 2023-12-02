@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
+import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.Notification
@@ -44,7 +45,7 @@ interface Repository {
     fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit)
 
     //Task related
-    suspend fun postTask(task: Task, serverResult: (ServerResult<Int>) -> Unit)
+    suspend fun postTask(task: Task,checkList: MutableList<CheckList>, serverResult: (ServerResult<Int>) -> Unit)
 
     suspend fun postMessage(projectName: String, taskId:String, message: Message, serverResult: (ServerResult<Int>) -> Unit)
 
@@ -125,6 +126,12 @@ interface Repository {
         notification: Notification,
         serverResult: (ServerResult<Int>) -> Unit
     )
+    suspend fun updateCheckListCompletion(
+        taskId: String,
+        projectName: String,
+        id: String,
+        done:Boolean,
+    ): ServerResult<Boolean>
 
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
@@ -152,6 +159,11 @@ interface Repository {
         fieldName: String,
         projectID: String,
         result: (ServerResult<Boolean>) -> Unit
+    )
+    fun getCheckList(
+        projectName: String,
+        taskId: String,
+        result: (ServerResult<List<CheckList>>) -> Unit
     )
 
 }

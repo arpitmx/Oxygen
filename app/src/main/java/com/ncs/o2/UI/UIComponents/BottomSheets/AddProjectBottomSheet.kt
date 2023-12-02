@@ -16,6 +16,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.createProject.CreateProject
 import com.ncs.o2.databinding.ProjectAddBottomSheetBinding
+import com.ncs.versa.Constants.Endpoints
 
 class AddProjectBottomSheet : BottomSheetDialogFragment(){
 
@@ -93,6 +94,13 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                                         } else {
                                             userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData))
                                                 .addOnSuccessListener {
+                                                    val addCont=mapOf<String, Any>(
+                                                        "contributors" to FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.email)
+                                                    )
+                                                    FirebaseFirestore.getInstance().collection(
+                                                        Endpoints.PROJECTS).document(projectData!!).update(addCont)
+
+
                                                     PrefManager.lastaddedproject(projectData!!)
                                                     userProjects?.add(projectData!!.trim())
                                                     sendcallBack(userProjects!!)
