@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
@@ -40,6 +41,7 @@ import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentProfilePictureSelectionBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.io.InputStream
 import javax.inject.Inject
@@ -271,6 +273,10 @@ class ProfilePictureSelectionFragment : Fragment() {
                 FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                     .update(userData)
                     .addOnSuccessListener {
+                        val addCont=mapOf<String, Any>(
+                            "contributors" to FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.email)
+                        )
+                        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document("NCSOxygen").update(addCont)
                         FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                             .get(Source.SERVER)
                             .addOnCompleteListener { task ->
