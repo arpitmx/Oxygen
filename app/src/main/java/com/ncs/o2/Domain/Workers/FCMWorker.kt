@@ -9,7 +9,7 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.ncs.o2.Constants.NotificationType
-import com.ncs.o2.HelperClasses.LocalNotificationUtil
+import com.ncs.o2.HelperClasses.NotificationBuilderUtil
 import com.ncs.o2.Domain.Models.FCMNotification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Services.NotificationApiService
@@ -93,7 +93,7 @@ class FCMWorker @AssistedInject constructor(
                  NotificationType.REQUEST_FAILED_NOTIFICATION,
                  "Request Sending Failed for #12345","Click here for resending request",
                  "Cause due to -> ${e.message}")
-            LocalNotificationUtil.showNotification(notification = failedNotif, context = applicationContext)
+            NotificationBuilderUtil.showNotification(notification = failedNotif, context = applicationContext)
             Result.failure()
         }
     }

@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.FCMNotification
-import com.ncs.o2.HelperClasses.LocalNotificationUtil.showNotification
+import com.ncs.o2.HelperClasses.NotificationBuilderUtil.showNotification
 import com.ncs.versa.Constants.Endpoints.Notifications as N
 import timber.log.Timber
 
@@ -46,13 +46,15 @@ class FCMessagingService : FirebaseMessagingService() {
         val type = receivedNotification.data[N.TYPE]
         val title = receivedNotification.data[N.TITLE]
         val body = receivedNotification.data[N.BODY]
+        val taskID = receivedNotification.data[N.TASKID]
 
         type?.let {
             if (type == NotificationType.TASK_COMMENT_NOTIFICATION.name){
                 val notif = FCMNotification(
                     notificationType = NotificationType.TASK_COMMENT_NOTIFICATION,
                     title =  title.orEmpty(),
-                    message = body.orEmpty()
+                    message = body.orEmpty(),
+                    taskID =  taskID.orEmpty(),
                 )
                 showNotification(notification = notif, context = applicationContext)
             }

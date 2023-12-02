@@ -8,6 +8,7 @@ import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonObject
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
@@ -42,27 +43,28 @@ object NotificationsUtils {
 
     fun sendFCMNotification(fcmToken: String, notification: Notification) {
 
-        val payloadJsonObject = buildNotificationPayload(fcmToken, notification)
+        FirebaseAuth.getInstance().currentUser?.let {
 
-        payloadJsonObject?.let {
-            val payloadInputData = Data.Builder()
-                .putString(FCMWorker.PAYLOAD_DATA, payloadJsonObject.toString())
-                .build()
+            val payloadJsonObject = buildNotificationPayload(fcmToken, notification)
+            payloadJsonObject?.let {
+                val payloadInputData = Data.Builder()
+                    .putString(FCMWorker.PAYLOAD_DATA, payloadJsonObject.toString())
+                    .build()
 
-            val contraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
+                val contraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
 
-            val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
-                .setConstraints(contraints)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 500L, TimeUnit.MICROSECONDS)
-                .setInputData(payloadInputData)
-                .build()
+                val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
+                    .setConstraints(contraints)
+                    .setBackoffCriteria(BackoffPolicy.LINEAR, 500L, TimeUnit.MICROSECONDS)
+                    .setInputData(payloadInputData)
+                    .build()
 
-            workManager.enqueue(workRequest)
+                workManager.enqueue(workRequest)
+
+            }
         }
-
-
     }
 
 
@@ -79,6 +81,8 @@ object NotificationsUtils {
             data.addProperty(N.TITLE, notification.title)
             data.addProperty(N.BODY, notification.message)
             data.addProperty(N.TYPE, notification.notificationType)
+            data.addProperty(N.TASKID, notification.taskID)
+
             payload.add(N.DATA, data)
 
             return payload

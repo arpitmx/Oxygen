@@ -465,10 +465,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             binding.inputBox.progressBarSendMsg.gone()
                             binding.inputBox.editboxMessage.text?.clear()
 
-                            val trimmedMsg = message.content.substring(
+                            var trimmedMsg = message.content.substring(
                                 0,
                                 message.content.length.coerceAtMost(150)
-                            ) + "..."
+                            )
+
+                            if (trimmedMsg.length==150) trimmedMsg = "$trimmedMsg..."
+
                             val notification = composeNotification(
                                 NotificationType.TASK_COMMENT_NOTIFICATION,
                                 message = trimmedMsg
