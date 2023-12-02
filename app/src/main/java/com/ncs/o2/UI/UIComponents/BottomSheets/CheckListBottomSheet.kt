@@ -48,9 +48,11 @@ class CheckListBottomSheet (private val count:Int,private val listener: checkLis
                 setupFullHeight(it)
                 behaviour.state = BottomSheetBehavior.STATE_EXPANDED
             }
+            bottomSheetDialog.getBehavior().setDraggable(false);
         }
         return dialog
     }
+
 
     private fun setupFullHeight(bottomSheet: View) {
         val layoutParams = bottomSheet.layoutParams
@@ -63,6 +65,12 @@ class CheckListBottomSheet (private val count:Int,private val listener: checkLis
         binding.title.setText(checkList.title)
         binding.desc.setText(checkList.desc)
         binding.number.text=count.toString()
+        if (checkList.id!=""){
+            binding.gioActionbar.sheetTitle.text="Update CheckList"
+        }
+        else{
+            binding.gioActionbar.sheetTitle.text="Create a checkList"
+        }
         binding.gioActionbar.btnCross.setOnClickThrottleBounceListener{
             dismiss()
         }
@@ -74,11 +82,11 @@ class CheckListBottomSheet (private val count:Int,private val listener: checkLis
             }
             else{
                 if (checkList.id!=""){
-                    listener.checkListItem(CheckList(id = checkList.id, title = title, desc = desc, done = false), isEdited = true)
+                    listener.checkListItem(CheckList(id = checkList.id, title = title, desc = desc, done = checkList.done, index = count-1), isEdited = true)
                     toast("Updated Successfully")
                 }
                 else{
-                    listener.checkListItem(CheckList(id = RandomIDGenerator.generateRandomTaskId(5), title = title, desc = desc, done = false))
+                    listener.checkListItem(CheckList(id = RandomIDGenerator.generateRandomTaskId(5), title = title, desc = desc, done = false, index = count-1))
                 }
                 binding.title.text?.clear()
                 binding.desc.text?.clear()
