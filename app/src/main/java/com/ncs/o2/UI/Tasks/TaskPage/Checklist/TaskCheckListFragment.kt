@@ -93,11 +93,11 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         }
 
         if (isModerator || isAssignee) {
-            Log.d("mohittt", "running initviews when true ${isModerator.toString()} ${isAssignee.toString()}")
+            Log.d("tag", "running initviews when true ${isModerator.toString()} ${isAssignee.toString()}")
             initViews()
         }
         if (!isModerator && !isAssignee){
-            Log.d("mohittt", "running initviews when false ${isModerator.toString()} ${isAssignee.toString()}")
+            Log.d("tag", "running initviews when false ${isModerator.toString()} ${isAssignee.toString()}")
             initViews()
         }
 
