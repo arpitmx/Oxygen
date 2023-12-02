@@ -193,7 +193,7 @@ class ChatAdapter(
             binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
             binding.tvName.gone()
             binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
-            binding.msgSeperator.alpha = 0.5f
+            binding.msgSeperator.gone()
 
             return
         }

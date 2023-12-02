@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkbg_main"
+    android:background="@color/darkbg_main_a80"
     tools:context=".UI.Tasks.TaskPage.Chat.TaskChatFragment">
 
     <ProgressBar
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:id="@+id/progressbar"
+        android:visibility="visible"
         android:indeterminateTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

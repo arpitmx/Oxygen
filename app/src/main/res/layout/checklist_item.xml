@@ -3,9 +3,8 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="10dp"
     android:id="@+id/parent"
-    android:layout_marginBottom="10dp"
+    android:layout_margin="5dp"
     android:background="@drawable/dark_bg_rounded_corner"
     android:layout_height="wrap_content">
 
@@ -17,52 +16,22 @@
         android:id="@+id/number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:minHeight="30dp"
-        android:minWidth="30dp"
+        android:minHeight="25dp"
+        android:minWidth="25dp"
         android:layout_alignParentStart="true"
         android:background="@drawable/label_cardview_yellow"
         android:fontFamily="@font/sf_pro_display_semibold"
         android:gravity="center"
-        android:text="....."
+        android:text="..."
         android:layout_margin="10dp"
         android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
         android:textColor="@color/darkbg_main"
-        android:textSize="17dp"
+        android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/completed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:visibility="gone"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:minHeight="30dp"
-            android:minWidth="30dp"
-            android:layout_alignParentStart="true"
-            android:background="@drawable/label_cardview_green"
-            android:fontFamily="@font/sf_pro_display_semibold"
-            android:gravity="center"
-            android:text="Completed"
-            android:drawableEnd="@drawable/baseline_check_24"
-            android:drawableTint="@color/darkbg_main"
-            android:drawablePadding="5dp"
-            android:layout_margin="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_alignParentTop="true"
-            android:textColor="@color/darkbg_main"
-            android:textSize="17dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/number"
-            app:layout_constraintTop_toTopOf="parent"
-            />
 
         <ImageView
             android:id="@+id/clear"
@@ -91,50 +60,84 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/title"
         android:background="@drawable/horizontal_scrollview_bg"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_height="wrap_content">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/titleTV"
-            android:fontFamily="@font/sfbold"
+            android:fontFamily="@font/sf_pro_display_semibold"
             android:gravity="top|start"
             android:text="Loading..."
             android:maxHeight="100dp"
-            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:maxLength="200"
             android:textColor="@color/better_white"
-            android:textSize="20dp"/>
+            android:textSize="18dp"/>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/description"
         android:background="@drawable/horizontal_scrollview_bg"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_height="wrap_content">
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fontFamily="@font/sf_pro_display_regular"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="top|start"
             android:id="@+id/descTV"
             android:text="Loading..."
-            android:layout_margin="16dp"
-            android:minHeight="100dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:textColor="@color/better_white"
-            android:textSize="20dp"/>
+            android:textSize="16dp"/>
     </LinearLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
 
+        >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/completed"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/label_cardview_green"
+            android:drawableEnd="@drawable/baseline_check_24"
+            android:drawablePadding="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:drawableTint="@color/darkbg_main"
+            android:fontFamily="@font/sf_pro_display_semibold"
+            android:gravity="center"
+            android:minWidth="25dp"
+            android:minHeight="25dp"
+            android:padding="3dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Completed"
+            android:textColor="@color/darkbg_main"
+            android:textSize="14dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

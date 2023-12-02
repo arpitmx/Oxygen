@@ -522,7 +522,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         section = section.toString(),
                         completed = false,
                         type = type,
-                        moderators = listOf("None")
+                        moderators = emptyList()
                     )
                     postTask(task,checkListArray)
                 }
