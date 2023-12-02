@@ -25,6 +25,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.firebase.Timestamp
 import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
@@ -32,7 +33,6 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -67,7 +67,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     SegmentSelectionBottomSheet.sendSectionsListListner,
     setDurationBottomSheet.DurationAddedListener,
     sectionDisplayBottomSheet.SectionSelectionListener ,BottomSheet.SendText,
-    AssigneeListBottomSheet.getassigneesCallback, AssigneeListBottomSheet.updateAssigneeCallback{
+    AssigneeListBottomSheet.getassigneesCallback, AssigneeListBottomSheet.updateAssigneeCallback,ChecklistActivity.checkListListener{
     private var contriList: MutableList<User> = mutableListOf()
     @Inject
     lateinit var firestoreRepository:FirestoreRepository
@@ -85,6 +85,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private var OList: MutableList<User> = mutableListOf()
     private val selectedTags = mutableListOf<Tag>()
     private var showsheet = false
+    private var checkListArray : MutableList<CheckList> = mutableListOf()
     private val binding: ActivityCreateTaskBinding by lazy {
         ActivityCreateTaskBinding.inflate(layoutInflater)
     }
@@ -294,7 +295,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         setContentView(binding.root)
 
         Codes.STRINGS.segmentText = ""
-
         binding.duration.setOnClickThrottleBounceListener {
 //            viewmodel.createTask(testTask)
 
@@ -318,7 +318,13 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             }
 
         }
+        binding.addCheckListBtn.setOnClickThrottleBounceListener {
+            ChecklistActivity.ListenerHolder.checkListListener = this
+            val intent = Intent(this, ChecklistActivity::class.java)
+            intent.putExtra("checkListArray", ArrayList(checkListArray))
 
+            this.startActivity(intent)
+        }
 
 
         binding.segment.setOnClickThrottleBounceListener {
@@ -470,7 +476,13 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     else -> -1
                 }
                 if (PrefManager.getcurrentUserdetails().ROLE>=2){
-                    val assignee=selectedAssignee[0].firebaseID!!
+                    val assignee:String
+                    if (selectedAssignee.isNotEmpty()) {
+                        assignee = selectedAssignee[0].firebaseID!!
+                    }
+                    else{
+                        assignee="None"
+                    }
                     val task= Task(
                         title = title.toString(),
                         description = desc3,
@@ -490,7 +502,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         type = type,
                         moderators = contributorList
                     )
-                    postTask(task)
+                    postTask(task,checkListArray)
                 }
                 else{
                     val task= Task(
@@ -512,7 +524,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         type = type,
                         moderators = emptyList()
                     )
-                    postTask(task)
+                    postTask(task,checkListArray)
                 }
             }
 
@@ -524,10 +536,18 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     }
 
-    private fun postTask(task: Task){
+    private fun postTask(task: Task,checkList: MutableList<CheckList>){
+        val list:MutableList<CheckList> = mutableListOf()
+        if (checkList.isNotEmpty()){
+            list.addAll(checkList)
+        }
+        if(checkList.isEmpty()){
+            list.add(CheckList(id = RandomIDGenerator.generateRandomTaskId(5),
+                title = task.title, desc = task.description.substring(0,200), done = false))
+        }
         CoroutineScope(Dispatchers.Main).launch {
 
-            repository.postTask(task) { result ->
+            repository.postTask(task,list) { result ->
 
                 when (result) {
 
@@ -855,6 +875,18 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     }
 
     override fun updateAssignee(assignee: User) {
+    }
+
+    override fun sendcheckListarray(list: MutableList<CheckList>) {
+        checkListArray.clear()
+        checkListArray.addAll(list)
+        Log.d("checkListArray",checkListArray.toString())
+        if (list.size>0) {
+            binding.checkListCount.visible()
+            binding.checkListCount.text = "(${(list.size).toString()})"
+        }else{
+            binding.checkListCount.gone()
+        }
     }
 
 

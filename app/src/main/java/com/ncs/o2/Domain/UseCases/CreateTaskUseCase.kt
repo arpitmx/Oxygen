@@ -39,17 +39,17 @@ class CreateTaskUseCase @Inject constructor(
 
     fun publishTask(task: Task, result: (ServerResult<Int>) -> Unit) {
 
-        repository.createUniqueID(idType = IDType.TaskID, task.project_ID) { taskID ->
-
-            CoroutineScope(Dispatchers.IO).launch {
-                task.id = taskID
-                repository.postTask(task) { repoResult ->
-                    Timber.tag(TAG).d(repoResult.toString())
-                    result(repoResult)
-                }
-
-            }
-        }
+//        repository.createUniqueID(idType = IDType.TaskID, task.project_ID) { taskID ->
+//
+//            CoroutineScope(Dispatchers.IO).launch {
+//                task.id = taskID
+//                repository.postTask(task) { repoResult ->
+//                    Timber.tag(TAG).d(repoResult.toString())
+//                    result(repoResult)
+//                }
+//
+//            }
+//        }
 
 
     }
