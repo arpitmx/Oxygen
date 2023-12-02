@@ -1,12 +1,16 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Checklist
 
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
@@ -20,6 +24,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.Adapters.CheckListAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.CheckListBottomSheet
 import com.ncs.o2.databinding.FragmentTaskChecklistBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +51,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener{
+class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener,CheckListBottomSheet.checkListItemListener{
 
     lateinit var binding: FragmentTaskChecklistBinding
     @Inject
@@ -61,6 +66,8 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     private val checkList_rv: RecyclerView by lazy {
         binding.checkListRecyclerview
     }
+    var isModerator:Boolean=false
+    var isAssignee:Boolean=false
 
 
     override fun onCreateView(
@@ -68,21 +75,52 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTaskChecklistBinding.inflate(inflater, container, false)
+
         return binding.root
 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initViews()
+        val list= activityBinding.moderatorsList
+        val assignee = activityBinding.assignee
+        val currentUser=FirebaseAuth.getInstance().currentUser?.email
+        if (list.contains(currentUser)){
+            isModerator=true
+        }
+        if (assignee == currentUser) {
+            isAssignee = true
+        }
+
+        if (isModerator || isAssignee) {
+            Log.d("mohittt", "running initviews when true ${isModerator.toString()} ${isAssignee.toString()}")
+            initViews()
+        }
+        if (!isModerator && !isAssignee){
+            Log.d("mohittt", "running initviews when false ${isModerator.toString()} ${isAssignee.toString()}")
+            initViews()
+        }
+
     }
 
     private fun initViews(){
         getCheckList()
     }
 
-    private fun setCheckListRecyclerView(list: MutableList<CheckList>) {
-        checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false)
+    private fun setCheckListRecyclerView(_list: MutableList<CheckList>) {
+        val  list = _list.sortedBy { it.index }.toMutableList()
+        if (isAssignee && !isModerator){
+            checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,true)
+        }
+        if (isModerator && !isAssignee){
+            checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,true,false)
+        }
+        if (isModerator && isAssignee){
+            checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,true,true)
+        }
+        if (!isModerator && !isAssignee){
+            checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,false)
+        }
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         checkList_rv.visible()
         with(checkList_rv) {
@@ -128,6 +166,10 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     }
 
     override fun onClick(position: Int) {
+        val number=position+1
+        val list=checkListArray.sortedBy { it.index }
+        val checkListBottomSheet = CheckListBottomSheet(count = number,this, checkList = list[position])
+        checkListBottomSheet.show(requireFragmentManager(), "checkList")
     }
 
     override fun onCheckBoxClick(id: String, isChecked: Boolean,position: Int) {
@@ -137,7 +179,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                     firestoreRepository.updateCheckListCompletion(
                         taskId = activityBinding.taskId,
                         projectName = PrefManager.getcurrentProject(),
-                        id = checkListArray[position].id, done = isChecked)
+                        id = id, done = isChecked)
 
                 }
                 when (result) {
@@ -159,15 +201,21 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                     }
 
                     is ServerResult.Success -> {
+                        var item=CheckList()
+                        for (i in 0 until checkListArray.size){
+                            if (checkListArray[i].id==id){
+                                item=checkListArray[i]
+                            }
+                        }
+                        val index=checkListArray.indexOf(item)
+                        checkListArray[index].done=isChecked
                         binding.progressbar.gone()
                         if (isChecked){
                             toast("Marked as completed")
                         }
                         if (!isChecked){
                             toast("Marked as not completed")
-
                         }
-
                     }
 
                 }
@@ -211,5 +259,54 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
             .build()
     }
+
+    override fun checkListItem(checkList: CheckList, isEdited: Boolean) {
+        if (isEdited){
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val result = withContext(Dispatchers.IO) {
+                        firestoreRepository.updateCheckList(
+                            taskId = activityBinding.taskId,
+                            projectName = PrefManager.getcurrentProject(),
+                            id = checkList.id, checkList)
+
+                    }
+                    when (result) {
+                        is ServerResult.Failure -> {
+
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in Updating: ${result.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
+                            }
+                            binding.progressbar.gone()
+
+                        }
+
+                        is ServerResult.Progress -> {
+                            binding.progressbar.visible()
+                        }
+
+                        is ServerResult.Success -> {
+                            binding.progressbar.gone()
+                            toast("Updated Successfully")
+                            isModerator=true
+                            initViews()
+                        }
+
+                    }
+
+                } catch (e: Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+                    binding.progressbar.gone()
+
+                }
+            }
+        }
+    }
+
 
 }
