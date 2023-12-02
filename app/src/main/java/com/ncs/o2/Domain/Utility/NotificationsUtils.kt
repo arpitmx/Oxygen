@@ -9,8 +9,10 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.gson.JsonObject
+import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Workers.FCMWorker
-import net.datafaker.Faker
+import com.ncs.versa.Constants.Endpoints.Notifications as N
 import java.util.concurrent.TimeUnit
 
 /*
@@ -34,46 +36,55 @@ Tasks FUTURE ADDITION :
 object NotificationsUtils {
 
     lateinit var workManager: WorkManager
-    fun initialize( context: Context){
+    fun initialize(context: Context) {
         workManager = WorkManager.getInstance(context)
     }
 
-    fun sendFCMNotification(fcmToken : String){
+    fun sendFCMNotification(fcmToken: String, notification: Notification) {
 
-        val payloadJsonObject = buildNotificationPayload(fcmToken)
+        val payloadJsonObject = buildNotificationPayload(fcmToken, notification)
 
-        val payloadInputData = Data.Builder()
-            .putString(FCMWorker.PAYLOAD_DATA,payloadJsonObject.toString())
-            .build()
+        payloadJsonObject?.let {
+            val payloadInputData = Data.Builder()
+                .putString(FCMWorker.PAYLOAD_DATA, payloadJsonObject.toString())
+                .build()
 
-        val contraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+            val contraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
-            .setConstraints(contraints)
-            .setBackoffCriteria(BackoffPolicy.LINEAR,500L, TimeUnit.MICROSECONDS)
-            .setInputData(payloadInputData)
-            .build()
+            val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
+                .setConstraints(contraints)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 500L, TimeUnit.MICROSECONDS)
+                .setInputData(payloadInputData)
+                .build()
 
-        workManager.enqueue(workRequest)
+            workManager.enqueue(workRequest)
+        }
+
 
     }
 
 
-    private fun buildNotificationPayload(token: String): JsonObject {
-        val payload = JsonObject()
-        val data = JsonObject()
 
 
-        payload.addProperty("to", token)
+    private fun buildNotificationPayload(token: String, notification: Notification): JsonObject? {
 
-        data.addProperty("title", "Work request")
-        data.addProperty("body", Faker().bigBangTheory().quote().toString())
+        if (notification.notificationType == NotificationType.TASK_COMMENT_NOTIFICATION.name) {
 
-        payload.add("data", data)
+            val payload = JsonObject()
+            val data = JsonObject()
 
-        return payload
+            payload.addProperty(N.TO, token)
+            data.addProperty(N.TITLE, notification.title)
+            data.addProperty(N.BODY, notification.message)
+            data.addProperty(N.TYPE, notification.notificationType)
+            payload.add(N.DATA, data)
+
+            return payload
+        }
+
+        return null
     }
 
 }

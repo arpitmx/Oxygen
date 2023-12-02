@@ -68,6 +68,8 @@ object Endpoints {
 
     }
 
+
+
     object Notifications {
         const val NOTIFICATION_LAST_SEEN = "NOTIFICATION_LAST_SEEN"
         const val NOTIFICATION_COUNT = "NOTIFICATION_COUNT"
@@ -86,6 +88,14 @@ object Endpoints {
         const val fromUser: String = "fromUser"
         const val toUser: String = "toUser"
         const val timeStamp: String = "timeStamp"
+
+        const val TO: String = "to"
+        const val TITLE: String = "title"
+        const val BODY: String = "body"
+        const val DATA: String = "data"
+        const val TYPE: String = "type"
+
+
 
         object Types {
             const val REQUEST_FAILED_NOTIFICATION = 1

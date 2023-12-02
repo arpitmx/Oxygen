@@ -627,10 +627,18 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                             binding.parentScrollview.visible()
 
                             val user = result.data
-                            users.add(user!!)
-                            moderators.add(user)
-                            moderatorsList.add(user.firebaseID!!)
-                            setContributors(users)
+
+                            user?.let {
+
+                                users.add(user)
+                                moderators.add(user)
+                                moderatorsList.add(user.firebaseID!!)
+                                setContributors(users)
+                                pushToReceiver(user)
+                            }
+
+
+
                         }
 
                         is ServerResult.Failure -> {
@@ -932,9 +940,6 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
                         setDefaultViews(taskResult.data)
                         setTaskDetails(taskResult.data)
-
-
-
 
                     }
 

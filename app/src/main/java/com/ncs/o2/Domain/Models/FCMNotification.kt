@@ -20,9 +20,9 @@ Tasks FUTURE ADDITION :
 
 */
 
-data class FCNotification constructor(
+data class FCMNotification constructor(
     val notificationType: NotificationType,
     val title: String = "",
+    val desc: String = "",
     val message: String = "",
-    val longDesc: String = "",
 )

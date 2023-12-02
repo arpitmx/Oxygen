@@ -23,15 +23,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.MessageRepository.UsersDao
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Enums.MessageType
 import com.ncs.o2.Domain.Models.Message
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Repositories.FirebaseAuthRepository
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -95,7 +99,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private lateinit var mdEditor: MarkwonEditor
     lateinit var chatAdapter: ChatAdapter
 
-
+    lateinit var recyclerView: RecyclerView
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
     private val CAMERA_PERMISSION_REQUEST = 100
@@ -125,7 +129,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setDetails(activityBinding.taskId)
         setUpChatbox()
+        setUpRecyclerview()
         initViews()
+    }
+
+    private fun setUpRecyclerview() {
+        recyclerView = binding.chatRecyclerview
+
     }
 
     private fun initViews() {
@@ -197,7 +207,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             binding.inputBox.msgBox.visible()
         }
     }
-
 
 
     private fun uploadImageToFirebaseStorage(bitmap: Bitmap, projectId: String, taskId: String) {
@@ -367,13 +376,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     private fun setMessages() {
-        val recyclerView = binding.chatRecyclerview
         chatAdapter = ChatAdapter(
             repository = firestoreRepository,
             msgList = mutableListOf(),
             context = requireContext(),
             onchatDoubleClickListner = this,
-            markwon= markwon,
+            markwon = markwon,
         )
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -428,7 +436,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     fun postMessage(message: Message) {
 
-        val recyclerView = binding.chatRecyclerview
+        recyclerView = binding.chatRecyclerview
+
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postMessage(
@@ -455,33 +464,92 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         if (message.messageType == MessageType.NORMAL_MSG) {
                             binding.inputBox.progressBarSendMsg.gone()
                             binding.inputBox.editboxMessage.text?.clear()
+
+                            val trimmedMsg = message.content.substring(
+                                0,
+                                message.content.length.coerceAtMost(150)
+                            ) + "..."
+                            val notification = composeNotification(
+                                NotificationType.TASK_COMMENT_NOTIFICATION,
+                                message = trimmedMsg
+                            )
+
+                            notification?.let {
+                                sendNotification(
+                                    activityBinding.sharedViewModel.getList(),
+                                    notification
+                                )
+                            }
+
                         }
                         if (message.messageType == MessageType.IMAGE_MSG) {
+
                             bitmap = null
                             binding.btnSelectImageFromStorage.gone()
                             binding.inputBox.selectedImageView.gone()
                             binding.inputBox.msgBox.visible()
                             binding.inputBox.progressBarSendMsg.gone()
                             binding.inputBox.editboxMessage.text?.clear()
+
+                            val trimmedMsg = "Shared a pic \uD83C\uDF01"
+                            val notification = composeNotification(
+                                NotificationType.TASK_COMMENT_NOTIFICATION,
+                                message = trimmedMsg
+                            )
+
+                            val filteredList = {
+                                val list = activityBinding.sharedViewModel.getList()
+                                if (list.contains(PrefManager.getCurrentUserEmail())) list-(PrefManager.getCurrentUserEmail())
+                                list
+                            }
+
+                            notification?.let {
+                                sendNotification(
+                                    filteredList.invoke(),
+                                    notification
+                                )
+                            }
                         }
+
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                        // sendNotification(receiverStack)
+
                     }
                 }
             }
         }
     }
 
-    private fun sendNotification(receiverList: Set<String>) {
+    private fun composeNotification(type: NotificationType, message: String): Notification? {
+
+        if (type == NotificationType.TASK_COMMENT_NOTIFICATION) {
+
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.TASK_COMMENT_NOTIFICATION.name,
+                taskID = task.id,
+                message = message,
+                title = "@${PrefManager.getcurrentUserdetails().USERNAME} commented ${task.id}",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = "None",
+                timeStamp = Timestamp.now().seconds,
+            )
+        }
+
+        return null
+    }
+
+    private fun sendNotification(receiverList: Set<String>, notification: Notification) {
 
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 for (receiverToken in receiverList) {
-                    NotificationsUtils.sendFCMNotification(receiverToken)
+                    NotificationsUtils.sendFCMNotification(
+                        receiverToken,
+                        notification = notification
+                    )
                 }
 
             }
-
 
         } catch (exception: Exception) {
             Timber.tag("")
@@ -508,7 +576,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         binding.progress.gone()
 
                         utils.singleBtnDialog(
-                            "Failure", "Failure in Task exception : ${taskResult.exception.message}", "Okay"
+                            "Failure",
+                            "Failure in Task exception : ${taskResult.exception.message}",
+                            "Okay"
                         ) {
                             requireActivity().finish()
                         }

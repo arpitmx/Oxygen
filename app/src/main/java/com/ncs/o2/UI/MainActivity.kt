@@ -284,9 +284,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         Glide.with(this)
             .load(PrefManager.getDpUrl())
             .placeholder(R.drawable.profile_pic_placeholder)
-            .error(R.drawable.logogradhd)
+            .error(R.drawable.profile_pic_placeholder)
             .override(200,200)
-            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
             .into(binding.drawerheaderfile.userDp)
 
 //        viewModel.showprogressLD.observe(this) { show ->

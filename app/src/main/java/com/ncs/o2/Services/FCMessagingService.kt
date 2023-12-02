@@ -3,8 +3,9 @@ package com.ncs.o2.Services
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Domain.Models.FCMNotification
 import com.ncs.o2.HelperClasses.LocalNotificationUtil.showNotification
-import com.ncs.o2.Domain.Models.FCNotification
+import com.ncs.versa.Constants.Endpoints.Notifications as N
 import timber.log.Timber
 
 /*
@@ -38,11 +39,24 @@ class FCMessagingService : FirebaseMessagingService() {
         // TODO : send token to tour server
     }
 
-    override fun onMessageReceived(message: RemoteMessage) {
-        super.onMessageReceived(message)
-        Timber.tag("SellerFirebaseService ").i("Message :: %s", message.data["body"])
-        val notif = FCNotification(NotificationType.TASK_REQUEST_RECIEVED_NOTIFICATION, message.data.get("title").toString(), message.data.get("body").toString())
-        showNotification(notification = notif, context = applicationContext)
+    override fun onMessageReceived(receivedNotification: RemoteMessage) {
+        super.onMessageReceived(receivedNotification)
+        Timber.tag("SellerFirebaseService ").i("Message :: %s", receivedNotification.data)
+
+        val type = receivedNotification.data[N.TYPE]
+        val title = receivedNotification.data[N.TITLE]
+        val body = receivedNotification.data[N.BODY]
+
+        type?.let {
+            if (type == NotificationType.TASK_COMMENT_NOTIFICATION.name){
+                val notif = FCMNotification(
+                    notificationType = NotificationType.TASK_COMMENT_NOTIFICATION,
+                    title =  title.orEmpty(),
+                    message = body.orEmpty()
+                )
+                showNotification(notification = notif, context = applicationContext)
+            }
+        }
 
     }
 

@@ -396,7 +396,6 @@
                 android:orientation="vertical"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
                 android:minHeight="200dp"
                 android:background="@drawable/horizontal_scrollview_bg"
                 >
@@ -436,24 +435,15 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/imageRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
+                android:visibility="gone"
                 android:clipToPadding="false"
                 android:layoutAnimation="@anim/layout_animation_popscale"
                 android:nestedScrollingEnabled="false" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="15dp"
-                android:background="#56838383" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
