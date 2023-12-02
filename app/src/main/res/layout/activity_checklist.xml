@@ -71,7 +71,7 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:src="@drawable/outline_add_24"
-                    app:tint="@color/better_white" />
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
