@@ -1377,7 +1377,8 @@ class FirestoreRepository @Inject constructor(
                     val title=document.getString("title")
                     val desc=document.getString("desc")
                     val done=document.getBoolean("done")
-                    val checkList=CheckList(id = id!!, title = title!!, desc = desc!!, done = done!!)
+                    val index=document.getLong("index")
+                    val checkList=CheckList(id = id!!, title = title!!, desc = desc!!, done = done!!, index = index!!.toInt())
                     CheckListArray.add(checkList)
                 }
                 result(ServerResult.Success(CheckListArray))
@@ -1401,6 +1402,22 @@ class FirestoreRepository @Inject constructor(
                 "done" to done
             )
             documentRef.update(updateData).await()
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun updateCheckList(
+        taskId: String,
+        projectName: String,
+        id:String,
+        checkList: CheckList
+        ): ServerResult<Boolean> {
+        try {
+            firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+                .document(id).set(checkList).await()
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)

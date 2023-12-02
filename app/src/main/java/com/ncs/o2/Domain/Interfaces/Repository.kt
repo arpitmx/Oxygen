@@ -133,6 +133,13 @@ interface Repository {
         done:Boolean,
     ): ServerResult<Boolean>
 
+    suspend fun updateCheckList(
+        taskId: String,
+        projectName: String,
+        id:String,
+        checkList: CheckList
+    ): ServerResult<Boolean>
+
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
 

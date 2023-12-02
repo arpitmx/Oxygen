@@ -332,7 +332,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         // Assignee
         if (task.assignee != Endpoints.TaskDetails.EMPTY_MODERATORS) {
-
+            activityBinding.assignee=task.assignee
             fetchUserbyId(task.assignee) { user ->
                 user?.isChecked = true
                 selectedAssignee.add(user!!)
@@ -561,6 +561,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         binding.parentScrollview.visible()
 
         taskDetails = task
+        activityBinding.moderatorsList.addAll(taskDetails.moderators)
         setTags()
         fetchUsers()
 
@@ -1047,7 +1048,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                                     val user = result.data
                                     users.add(user!!)
                                     moderators.add(user)
-                                    moderatorsList.add(user.firebaseID!!)
+                                    activityBinding.moderatorsList.add(user.firebaseID!!)
+
                                     setContributors(users)
                                 }
                             }

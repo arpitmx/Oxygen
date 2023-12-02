@@ -543,7 +543,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         }
         if(checkList.isEmpty()){
             list.add(CheckList(id = RandomIDGenerator.generateRandomTaskId(5),
-                title = task.title, desc = task.description.substring(0,200), done = false))
+                title = task.title, desc = task.description.substring(0,200), done = false, index = 0))
         }
         CoroutineScope(Dispatchers.Main).launch {
 
