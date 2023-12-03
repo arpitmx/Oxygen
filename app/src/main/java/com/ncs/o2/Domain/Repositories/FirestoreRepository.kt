@@ -1373,13 +1373,10 @@ class FirestoreRepository @Inject constructor(
             .addOnSuccessListener {
                 val CheckListArray = mutableListOf<CheckList>()
                 for (document in it.documents) {
-                    val id=document.getString("id")
-                    val title=document.getString("title")
-                    val desc=document.getString("desc")
-                    val done=document.getBoolean("done")
-                    val index=document.getLong("index")
-                    val checkList=CheckList(id = id!!, title = title!!, desc = desc!!, done = done!!, index = index!!.toInt())
-                    CheckListArray.add(checkList)
+                    val checkList = document.toObject(CheckList::class.java)
+                    checkList?.let {
+                        CheckListArray.add(checkList)
+                    }
                 }
                 result(ServerResult.Success(CheckListArray))
             }
