@@ -903,7 +903,7 @@ class FirestoreRepository @Inject constructor(
                     val firebaseID = document.getString(Endpoints.User.EMAIL) ?: "mohit@mail"
                     val profileDPUrl = document.getString(Endpoints.User.DP_URL) ?: ""
                     val name = document.getString(Endpoints.User.USERNAME) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
-                    val time = document.get(Endpoints.User.NOTIFICATION_TIME_STAMP) as Long? ?: Timestamp.now().seconds
+                    val time = document.get(Endpoints.User.TIMESTAMP) as Timestamp
                     val role : Int = document.get(Endpoints.User.ROLE)?.toString()?.toInt() ?: 1
                     val designation = document.getString(Endpoints.User.DESIGNATION) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
                     val fcmToken  = document.getString(Endpoints.User.FCM_TOKEN)
