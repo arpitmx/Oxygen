@@ -31,10 +31,11 @@ import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.noties.markwon.syntax.Prism4jThemeDarkula
 import io.noties.markwon.syntax.SyntaxHighlightPlugin
 import io.noties.prism4j.Prism4j
+import timber.log.Timber
 
 
 @AndroidEntryPoint
-class ChecklistActivity() : AppCompatActivity(),CheckListBottomSheet.checkListItemListener,CheckListAdapter.CheckListItemListener {
+class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItemListener,CheckListAdapter.CheckListItemListener {
 
     private val binding: ActivityChecklistBinding by lazy {
         ActivityChecklistBinding.inflate(layoutInflater)
@@ -45,7 +46,7 @@ class ChecklistActivity() : AppCompatActivity(),CheckListBottomSheet.checkListIt
     private lateinit var listener: checkListListener
 
     private var list:MutableList<CheckList> = mutableListOf()
-    lateinit var checkListAdapter:CheckListAdapter
+    private lateinit var checkListAdapter:CheckListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,18 +57,22 @@ class ChecklistActivity() : AppCompatActivity(),CheckListBottomSheet.checkListIt
         initViews()
     }
     private fun initViews(){
+
         list.distinctBy { it.id }
-        if (list?.isEmpty()!!){
+
+        if (list.isEmpty()){
             binding.checkListRecyclerview.gone()
             binding.noCheckList.visible()
             binding.addText.text="Add a new checkList"
         }
+
         if (list.isNotEmpty()){
             binding.checkListRecyclerview.visible()
             binding.noCheckList.gone()
             binding.addText.text="Add More"
             setCheckListRecyclerView(list)
         }
+
         binding.addCheckList.setOnClickThrottleBounceListener{
             val number=list.size+1
             val checkListBottomSheet = CheckListBottomSheet(count = number,this, CheckList(id = ""))
@@ -77,12 +82,14 @@ class ChecklistActivity() : AppCompatActivity(),CheckListBottomSheet.checkListIt
             listener.sendcheckListarray(list)
             finish()
         }
+
         binding.gioActionbar.btnCross.setOnClickListener {
             finish()
         }
     }
 
     private fun setCheckListRecyclerView(list: MutableList<CheckList>) {
+
         checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,true)
         val layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         with(checkList_rv) {

@@ -48,6 +48,7 @@ object GlobalUtils {
                     builder.setIcon(com.google.android.material.R.drawable.mtrl_ic_error)
                     builder.setTitle(title)
                     builder.setMessage(msg)
+                    builder.setCancelable(false)
                     builder.setPositiveButton(btnText) { dialog, which ->
                         positive()
                     }
@@ -73,9 +74,11 @@ object GlobalUtils {
                     builder.setIcon(R.drawable.logogradhd)
                     builder.setTitle(title)
                     builder.setMessage(msg)
+                    builder.setCancelable(false)
                     builder.setPositiveButton(btnText) { dialog, which ->
                         positive()
                     }
+
                     try {
                         val dialog = builder.create()
                         dialog.show()
@@ -95,6 +98,7 @@ object GlobalUtils {
                     builder.setIcon(R.drawable.logogradhd)
                     builder.setTitle(title)
                     builder.setMessage(msg)
+                    builder.setCancelable(false)
                     builder.setPositiveButton(btnText) { dialog, which ->
                         positive()
                     }

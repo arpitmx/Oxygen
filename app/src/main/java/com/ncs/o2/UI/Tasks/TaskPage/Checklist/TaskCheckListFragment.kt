@@ -1,7 +1,6 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Checklist
 
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.ServerResult
@@ -69,6 +67,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     var isModerator:Boolean=false
     var isAssignee:Boolean=false
 
+    val TAG = TaskCheckListFragment::class.java.simpleName
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,22 +81,31 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val list= activityBinding.moderatorsList
+        val moderatorList= activityBinding.moderatorsList
         val assignee = activityBinding.assignee
-        val currentUser=FirebaseAuth.getInstance().currentUser?.email
-        if (list.contains(currentUser)){
+        val currentUser= FirebaseAuth.getInstance().currentUser?.email
+
+
+        if (moderatorList.contains(currentUser)){
             isModerator=true
         }
+
         if (assignee == currentUser) {
             isAssignee = true
         }
 
         if (isModerator || isAssignee) {
-            Log.d("tag", "running initviews when true ${isModerator.toString()} ${isAssignee.toString()}")
+
+            //Current user is moderator or assignee (Make the checklist editable)
+            Timber.tag(TAG)
+                .d("running initviews when true " + isModerator.toString() + " " + isAssignee.toString())
             initViews()
         }
         if (!isModerator && !isAssignee){
-            Log.d("tag", "running initviews when false ${isModerator.toString()} ${isAssignee.toString()}")
+
+            //Current user is viewer (Checklist is only viewable)
+            Timber.tag(TAG)
+                .d("running initviews when false " + isModerator.toString() + " " + isAssignee.toString())
             initViews()
         }
 
@@ -131,6 +139,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     }
 
     private fun getCheckList(){
+
         CoroutineScope(Dispatchers.Main).launch {
 
             firestoreRepository.getCheckList(
@@ -157,6 +166,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                         setCheckListRecyclerView(result.data.toMutableList())
                         binding.progressbar.gone()
                     }
+
                 }
             }
         }
