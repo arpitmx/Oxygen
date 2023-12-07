@@ -19,19 +19,11 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -69,6 +61,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -87,10 +80,10 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback,
+class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter.OnProfileClickCallback,
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
-    ModeratorsBottomSheet.getContributorsCallback {
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
@@ -165,6 +158,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             setDetails(activityBinding.taskId)
         }
         binding.assignee.isEnabled = false
+        binding.section.isEnabled=false
         binding.activity.setOnClickThrottleBounceListener {
             val viewpager = tasksHolderBinding.binding.viewPager2
             val next = viewpager.currentItem + 1
@@ -212,6 +206,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             val assigneeListBottomSheet =
                 AssigneeListBottomSheet(OList, selectedAssignee, this, this)
             assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
+        }
+        binding.section.setOnClickThrottleBounceListener {
+            val sections = sectionDisplayBottomSheet(taskDetails.segment)
+            sections.sectionSelectionListener = this@TaskDetailsFragment
+            sections.show(requireFragmentManager(), "Section Selection")
         }
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
@@ -282,7 +281,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private fun setDefaultViews(task: Task) {
 
 
-        binding.projectNameET.text = task.project_ID
+        binding.sectionNameET.text = task.section
         viewModel.task = task
         val priority = when (task.priority) {
             1 -> "Low"
@@ -491,6 +490,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             if (moderator.firebaseID == PrefManager.getcurrentUserdetails().EMAIL) {
                 isModerator = true
                 binding.assignee.isEnabled = true
+                binding.section.isEnabled=true
                 activityBinding.binding.gioActionbar.btnModerator.visible()
             }
             manageState(taskDetails)
@@ -1310,6 +1310,56 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                         activityBinding.binding.gioActionbar.btnModerator.visible()
                         binding.progressBar.gone()
                         toast("Updated new Moderators")
+                        requireActivity().recreate()
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+
+            }
+        }
+    }
+
+    override fun onSectionSelected(sectionName: String) {
+        binding.sectionNameET.text = sectionName
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    viewModel.updateSection(
+                        taskID = activityBinding.taskId,
+                        projectName = PrefManager.getcurrentProject(),
+                        newSection = sectionName
+                    )
+
+                }
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in Updating: ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        toast("Update Section")
                         requireActivity().recreate()
 
                     }

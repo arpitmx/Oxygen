@@ -32,7 +32,6 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
-import com.ncs.o2.UI.DoneScreen.DoneFragment
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
@@ -40,6 +39,7 @@ import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
+import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
@@ -135,6 +135,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setBottomNavBar()
         setUpViewsOnClicks()
         setupProjectsList()
+
     }
 
 //    private fun makeFullScreen() {
@@ -167,7 +168,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
 
     private fun setUpActionBar() {
-
+        binding.gioActionbar.actionbar.visible()
+        binding.gioActionbar.tabLayout.visible()
+        binding.gioActionbar.searchCont.visible()
+        binding.gioActionbar.constraintLayoutsearch.gone()
         // Set up the action bar, navigation drawer, and other UI components
 
         search = binding.gioActionbar.searchCont
@@ -246,6 +250,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
             drawerLayout.closeDrawer(GravityCompat.START)
 
+        }
+        binding.gioActionbar.searchBar.setOnClickThrottleBounceListener {
+            replaceFragment(SearchFragment())
+            bottmNav.selectedItemId = R.id.bottom_search
         }
     }
 
@@ -371,8 +379,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     true
                 }
 
-                R.id.project_stats_item -> {
-                    replaceFragment(DoneFragment())
+                R.id.bottom_search -> {
+                    replaceFragment(SearchFragment())
                     true
                 }
 

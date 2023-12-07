@@ -25,10 +25,10 @@
             app:destination="@id/done_item" />
     </fragment>
     <fragment
-        android:id="@+id/project_stats_item"
+        android:id="@+id/bottom_search"
         android:name="com.ncs.o2.UI.DoneScreen.DoneFragment"
         android:label="fragment_done"
-        tools:layout="@layout/fragment_done" >
+        tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_doneFragment_to_task_item"
             app:destination="@id/task_item" />

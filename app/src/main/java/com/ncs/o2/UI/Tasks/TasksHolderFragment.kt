@@ -79,6 +79,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         setUpViewPager(sectionsList)
         activityBinding.gioActionbar.constraintLayout2.visible()
         activityBinding.gioActionbar.constraintLayoutworkspace.gone()
+        activityBinding.gioActionbar.actionbar.visible()
 
         setUpBackPress()
     }

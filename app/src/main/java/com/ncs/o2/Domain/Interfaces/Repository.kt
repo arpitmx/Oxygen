@@ -139,10 +139,22 @@ interface Repository {
         id:String,
         checkList: CheckList
     ): ServerResult<Boolean>
-
+    suspend fun updateSection(
+        taskId: String,
+        projectName: String,
+        newSection:String,
+    ): ServerResult<Boolean>
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
-
+    suspend fun getSearchedTasks(
+        assignee:String,
+        creator:String,
+        state:Int,
+        type:Int,
+        text:String,
+        projectName: String,
+        result: (ServerResult<List<TaskItem>>) -> Unit
+    )
 
     fun maintenanceCheck(): LiveData<maintainceCheck>
 

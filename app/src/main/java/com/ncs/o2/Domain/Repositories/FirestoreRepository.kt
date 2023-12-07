@@ -10,6 +10,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -903,7 +904,13 @@ class FirestoreRepository @Inject constructor(
                     val firebaseID = document.getString(Endpoints.User.EMAIL) ?: "mohit@mail"
                     val profileDPUrl = document.getString(Endpoints.User.DP_URL) ?: ""
                     val name = document.getString(Endpoints.User.USERNAME) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
-                    val time = document.get(Endpoints.User.TIMESTAMP) as Timestamp
+                    var time:Timestamp=Timestamp.now()
+                    if ( document.get(Endpoints.User.TIMESTAMP).isNull){
+                        time=Timestamp.now()
+                    }
+                    else{
+                        time=document.get(Endpoints.User.TIMESTAMP) as Timestamp
+                    }
                     val role : Int = document.get(Endpoints.User.ROLE)?.toString()?.toInt() ?: 1
                     val designation = document.getString(Endpoints.User.DESIGNATION) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
                     val fcmToken  = document.getString(Endpoints.User.FCM_TOKEN)
@@ -1423,7 +1430,70 @@ class FirestoreRepository @Inject constructor(
             return ServerResult.Failure(e)
         }
     }
+    override suspend fun updateSection(
+        taskId: String,
+        projectName: String,
+        newSection:String,
+    ): ServerResult<Boolean> {
+        try {
+            firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).update("section",newSection)
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
 
+    override suspend fun getSearchedTasks(
+        assignee: String,
+        creator: String,
+        state: Int,
+        type: Int,
+        text: String,
+        projectName: String,
+        result: (ServerResult<List<TaskItem>>) -> Unit
+    ) {
+        var query:Query= firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+        if (type != 0) {
+            query = query.whereEqualTo("type", type)
+        }
+        if (state != 0) {
+            query = query.whereEqualTo("status", state)
+        }
+        if (creator.isNotEmpty()){
+            query = query.whereEqualTo("assigner", creator)
+        }
+        if (assignee.isNotEmpty()){
+            query = query.whereEqualTo("assignee", assignee)
+        }
+        query.get()
+            .addOnSuccessListener { querySnapshot ->
+                val sectionList = mutableListOf<TaskItem>()
+                for (document in querySnapshot.documents) {
+                    val title = document.getString("title")
+                    val id = document.getString("id")
+                    val difficulty = document.get("difficulty")!!
+                    val time: Timestamp = (document.get("time_STAMP") ?: Timestamp.now()) as Timestamp
+                    val completed = document.getBoolean("completed")
+                    val assignerID = document.getString("assigner_email") ?: "mohit@mail.com"
+                    val taskItem = TaskItem(
+                        title = title!!,
+                        id = id!!,
+                        difficulty = difficulty.toString().toInt(),
+                        timestamp = time,
+                        completed = completed.toString().toBoolean(),
+                        assignee_id = assignerID,
+                    )
+                    sectionList.add(taskItem)
+                }
+                result(ServerResult.Success(sectionList))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
 }
 
 
