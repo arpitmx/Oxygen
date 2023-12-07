@@ -104,6 +104,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     }
     private fun initViews(){
         binding.searchButton.setOnClickThrottleBounceListener {
+            binding.searchPlaceholder.gone()
             binding.recyclerView.gone()
             binding.placeholder.gone()
             binding.progressBar.visible()

@@ -169,9 +169,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     private fun setUpActionBar() {
         binding.gioActionbar.actionbar.visible()
-        binding.gioActionbar.tabLayout.visible()
-        binding.gioActionbar.searchCont.visible()
-        binding.gioActionbar.constraintLayoutsearch.gone()
+
         // Set up the action bar, navigation drawer, and other UI components
 
         search = binding.gioActionbar.searchCont
