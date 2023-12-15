@@ -1,10 +1,16 @@
 package com.ncs.o2.Domain.Models
 
 import android.graphics.Color
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 import com.ncs.o2.Domain.Utility.Version
+import com.ncs.o2.HelperClasses.Convertors
+import com.ncs.versa.Constants.Endpoints
 
 /*
 File : Task.kt -> com.ncs.o2.Models
@@ -27,10 +33,13 @@ Tasks FUTURE ADDITION :
 // Todo Remove deprecated fields like assigner
 
 @Version("2")
+@Entity(tableName = Endpoints.ROOM.TASKS.TASKS_TABLE)
+@TypeConverters(Convertors::class)
 data class Task(
 
     val title: String = "",
     val description: String = "",
+    @PrimaryKey(autoGenerate = false)
     var id: String="",
     val difficulty: Int = 0,
     val priority: Int = 0,

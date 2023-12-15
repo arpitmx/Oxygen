@@ -11,6 +11,7 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.google.firebase.Timestamp
 import com.google.firebase.messaging.FirebaseMessaging
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.FirebaseRepository
@@ -54,6 +55,8 @@ class O2Application : Application(), Configuration.Provider{
     private val TAG = O2Application::class.java.simpleName
     @Inject
     lateinit var customWorkerFactory: CustomWorkerFactory
+    @Inject
+    lateinit var db: TasksDatabase
 
     @Inject
     @FirebaseRepository
@@ -81,6 +84,8 @@ class O2Application : Application(), Configuration.Provider{
         }
 
         fcmToken()
+
+
     }
 
     fun isUIThread(): Boolean {

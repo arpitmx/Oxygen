@@ -796,6 +796,41 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    override suspend fun getTasksinProject(
+        projectName: String,
+    ): ServerResult<List<Task>> {
+
+        return try {
+
+            val task =
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .get().await()
+
+            val snapShot = task
+
+            if (!snapShot.isEmpty) {
+
+                val list:MutableList<Task> = mutableListOf()
+                for (document in snapShot.documents){
+                    val taskData = document.toObject(Task::class.java)
+                    list.add(taskData!!)
+                }
+
+                list?.let {
+                    return ServerResult.Success(it)
+                } ?: ServerResult.Failure(Exception("Document not found for title:"))
+
+            } else {
+                return ServerResult.Failure(Exception("Document not found for title"))
+            }
+
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+
+    }
 
     override suspend fun getTasksItem(
         projectName: String,

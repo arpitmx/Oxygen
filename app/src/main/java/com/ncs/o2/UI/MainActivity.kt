@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -20,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
@@ -44,6 +46,9 @@ import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,6 +69,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+
+    @Inject
+    lateinit var db:TasksDatabase
 
     // Navigation drawer toggle
     private lateinit var toggle: ActionBarDrawerToggle
@@ -90,6 +98,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         viewModel.currentSegment.observe(this, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
+
+        CoroutineScope(Dispatchers.Main).launch {
+            Log.d("tasksDB",db.tasksDao().getAllTasks().size.toString())
+        }
 
 
     }

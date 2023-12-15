@@ -86,7 +86,6 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         defaultButtons()
         filterButtons()
         initViews()
-
     }
 
     private fun manageviews(){

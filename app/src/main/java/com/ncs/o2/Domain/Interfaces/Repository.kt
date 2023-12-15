@@ -164,6 +164,9 @@ interface Repository {
         sectionName: String,
         result: (ServerResult<List<TaskItem>>) -> Unit
     )
+    suspend fun getTasksinProject(
+        projectName: String,
+    ): ServerResult<List<Task>>
 
     fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>>
     fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>

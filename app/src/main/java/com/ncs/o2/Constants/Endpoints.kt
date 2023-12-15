@@ -144,6 +144,10 @@ object Endpoints {
             const val USERLIST_TABLE="users_in_messages"
             const val USERLIST_DB="users_in_messages_db"
         }
+        object TASKS{
+            const val TASKS_TABLE="tasks"
+            const val TASKS_DB="tasks_db"
+        }
 
 
     }
