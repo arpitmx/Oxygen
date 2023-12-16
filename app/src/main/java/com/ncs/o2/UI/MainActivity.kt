@@ -99,11 +99,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             updateUIBasedOnSegment(newSegment)
         })
 
-        CoroutineScope(Dispatchers.Main).launch {
-            Log.d("tasksDB",db.tasksDao().getAllTasks().size.toString())
-        }
-
-
     }
     private fun manageViews(){
         if (PrefManager.getcurrentsegment()== "Select Segment") {

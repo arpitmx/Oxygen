@@ -450,8 +450,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 when (taskResult) {
 
                     is ServerResult.Failure -> {
-                        setUpNotifications()
-
                     }
 
                     is ServerResult.Progress -> {
@@ -461,7 +459,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                         val tasks=taskResult.data
                         for (task in tasks){
-                            Log.d("taskInsert",task.toString())
                             dao.insert(task)
                         }
                         setUpNotifications()

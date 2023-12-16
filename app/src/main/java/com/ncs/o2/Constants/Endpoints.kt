@@ -66,7 +66,7 @@ object Endpoints {
         const val PROJECTNAME = "PROJECT_NAME"
         const val TAGS = "TAGS"
         const val CHECKLIST="CHECKLIST"
-
+        const val LAST_UPDATED="last_updated"
     }
 
 

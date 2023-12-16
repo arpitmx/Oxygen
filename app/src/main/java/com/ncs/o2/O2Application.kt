@@ -83,7 +83,13 @@ class O2Application : Application(), Configuration.Provider{
             Timber.plant(Timber.DebugTree())
         }
 
+        PrefManager.putLastCacheUpdateTimestamp(Timestamp.now())
+
         fcmToken()
+        val projectsList=PrefManager.getProjectsList()
+        for (project in projectsList){
+            initializeListner(project)
+        }
 
 
     }
@@ -180,5 +186,30 @@ class O2Application : Application(), Configuration.Provider{
             appContext,
             workerParameters,
             notificationApiService)
+    }
+    fun initializeListner(projectName:String){
+        CoroutineScope(Dispatchers.Main).launch {
+
+
+            repository.initilizelistner(projectName = projectName) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    ServerResult.Progress -> {
+
+                    }
+
+                    is ServerResult.Success -> {
+
+
+                    }
+                }
+            }
+        }
+
     }
 }

@@ -11,6 +11,7 @@ import com.google.firebase.firestore.Exclude
 import com.ncs.o2.Domain.Utility.Version
 import com.ncs.o2.HelperClasses.Convertors
 import com.ncs.versa.Constants.Endpoints
+import java.sql.Time
 
 /*
 File : Task.kt -> com.ncs.o2.Models
@@ -57,6 +58,7 @@ data class Task(
     val section: String = "",
     val completed:Boolean=false,
     val type:Int=0,
+    val last_updated:Timestamp? = Timestamp.now()
     ) {
 
     @Exclude

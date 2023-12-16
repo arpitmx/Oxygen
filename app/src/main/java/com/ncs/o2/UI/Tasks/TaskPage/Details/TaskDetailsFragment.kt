@@ -1208,7 +1208,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     viewModel.updateState(
                         taskID = activityBinding.taskId,
                         userID = taskDetails.assignee,
-                        newState = text
+                        newState = text,
+                        projectName = PrefManager.getcurrentProject()
                     )
                 }
                 when (result) {

@@ -141,8 +141,8 @@ constructor(val notificationApiService: NotificationApiService,
         return firestoreRepository.updateTask(id = taskID, projectName = projectName, newAssignee = NewAssignee, oldAssignee =  OldAssignee)
     }
 
-    suspend fun updateState(taskID:String,userID:String,newState:String):ServerResult<Boolean>{
-        return firestoreRepository.updateState(id = taskID, userID = userID,newState=newState)
+    suspend fun updateState(taskID:String,userID:String,newState:String,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updateState(id = taskID, userID = userID,newState=newState, projectName = projectName)
     }
 
     suspend fun updateModerators(taskID:String,projectName: String,moderator:String):ServerResult<Boolean>{

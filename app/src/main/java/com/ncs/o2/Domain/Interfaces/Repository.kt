@@ -101,6 +101,7 @@ interface Repository {
         id: String,
         userID:String,
         newState: String,
+        projectName: String
     ): ServerResult<Boolean>
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
@@ -144,6 +145,8 @@ interface Repository {
         projectName: String,
         newSection:String,
     ): ServerResult<Boolean>
+
+    suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit)
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
     suspend fun getSearchedTasks(
