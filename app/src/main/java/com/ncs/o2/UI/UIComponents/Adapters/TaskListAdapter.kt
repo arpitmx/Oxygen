@@ -3,6 +3,7 @@ import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -26,17 +27,18 @@ import com.ncs.o2.R
 import com.ncs.o2.databinding.TaskItemBinding
 import java.util.Date
 
-class TaskListAdapter(val repository: FirestoreRepository,val context: Context) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
+class TaskListAdapter(val repository: FirestoreRepository,val context: Context,val taskList:MutableList<TaskItem>) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
-    private var taskList: ArrayList<TaskItem> = ArrayList()
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: TaskItem,user: User) {
-
-
-            binding.asigneeDp.loadProfileImg(user.profileDPUrl.toString())
+            if (user.profileDPUrl!=null) {
+                binding.asigneeDp.loadProfileImg(user.profileDPUrl.toString())
+            }else{
+                binding.asigneeDp.setImageDrawable(context.getDrawable(R.drawable.profile_pic_placeholder))
+            }
 
             if (task.completed){
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -63,7 +65,27 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context) 
         taskList.clear()
         taskList.addAll(newTaskList)
         diffResult.dispatchUpdatesTo(this)
+        notifyDataSetChanged()
     }
+    fun setTasks(newTaskList: List<Task>) {
+        val taskItems: List<TaskItem> = newTaskList.map { task ->
+            TaskItem(
+                title = task.title,
+                id = task.id,
+                assignee_id = task.assignee,
+                difficulty = task.difficulty,
+                timestamp = task.time_STAMP,
+                completed = task.completed
+            )
+        }
+        val diffCallback = TaskDiffCallback(taskList, taskItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        taskList.clear()
+        taskList.addAll(taskItems)
+        diffResult.dispatchUpdatesTo(this)
+        notifyDataSetChanged()
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemViewHolder {
         val binding = TaskItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -79,6 +101,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context) 
         fetchAssigneeDetails(taskList[position].assignee_id) { user ->
             holder.bind(taskList[position], user)
         }
+
         holder.itemView.setOnClickFadeInListener {
             if (onClickListener != null) {
                 onClickListener!!.onCLick(position, taskList[position])
@@ -117,21 +140,38 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context) 
         }
     }
     private fun fetchAssigneeDetails(assigneeId: String, onUserFetched: (User) -> Unit) {
-        repository.getUserInfobyId(assigneeId) { result ->
-            when (result) {
-                is ServerResult.Success -> {
-                    val user = result.data
-                    if (user != null) {
-                        onUserFetched(user)
+        if (assigneeId!="None" && assigneeId!="") {
+            repository.getUserInfobyId(assigneeId) { result ->
+                when (result) {
+                    is ServerResult.Success -> {
+                        val user = result.data
+                        if (user != null) {
+                            onUserFetched(user)
+                        }
+                    }
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    is ServerResult.Progress -> {
+
                     }
                 }
-                is ServerResult.Failure -> {
-
-                }
-                is ServerResult.Progress->{
-
-                }
             }
+        }else{
+            onUserFetched(User(
+                firebaseID = null,
+                profileDPUrl = null,
+                profileIDUrl = null,
+                post = null,
+                username = null,
+                role = null,
+                timestamp = null,
+                designation = null,
+                fcmToken = null,
+                isChecked = false
+            ))
         }
     }
 

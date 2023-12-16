@@ -22,6 +22,7 @@ import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
 import com.google.android.flexbox.FlexDirection
@@ -31,14 +32,18 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
@@ -64,6 +69,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
+import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.editor.MarkwonEditor
@@ -87,7 +93,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
-
+    @Inject
+    lateinit var db: TasksDatabase
     private var _binding: FragmentTaskDetailsFrgamentBinding? = null
     private val binding get() = _binding!!
     private var moderators: MutableList<User> = mutableListOf()
@@ -894,62 +901,64 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     private fun setDetails(id: String) {
 
         binding.becomeModerator.gone()
+        if (db.tasksDao().isNull) {
+            Log.d("detailsFetch","Fetch from firestore")
 
-        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
 
-            try {
+                try {
 
-                val taskResult = withContext(Dispatchers.IO) {
-                    viewModel.getTasksById(id, PrefManager.getcurrentProject())
-                }
-
-                Timber.tag(TAG).d("Fetched task result : ${taskResult}")
-
-                when (taskResult) {
-
-                    is ServerResult.Failure -> {
-
-                        utils.singleBtnDialog(
-                            "Failure",
-                            "Failure in task fetching : ${taskResult.exception.message}",
-                            "Okay"
-                        ) {
-                            requireActivity().finish()
-                        }
-
-                        binding.progressBar.gone()
-
+                    val taskResult = withContext(Dispatchers.IO) {
+                        viewModel.getTasksById(id, PrefManager.getcurrentProject())
                     }
 
-                    is ServerResult.Progress -> {
-                        binding.progressBar.visible()
-                    }
+                    Timber.tag(TAG).d("Fetched task result : ${taskResult}")
 
-                    is ServerResult.Success -> {
+                    when (taskResult) {
 
-                        val currentUser = FirebaseAuth.getInstance().currentUser
-                        val localUserObj = PrefManager.getcurrentUserdetails()
+                        is ServerResult.Failure -> {
 
-                        currentUser?.let { userObj ->
-
-                            if (taskResult.data.moderators.size==0 && localUserObj.ROLE >= 2) {
-                                binding.becomeModerator.visible()
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in task fetching : ${taskResult.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
                             }
+
+                            binding.progressBar.gone()
+
                         }
 
-                        binding.progressBar.gone()
+                        is ServerResult.Progress -> {
+                            binding.progressBar.visible()
+                        }
 
-                        setDefaultViews(taskResult.data)
-                        setTaskDetails(taskResult.data)
+                        is ServerResult.Success -> {
+
+                            val currentUser = FirebaseAuth.getInstance().currentUser
+                            val localUserObj = PrefManager.getcurrentUserdetails()
+
+                            currentUser?.let { userObj ->
+
+                                if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                    binding.becomeModerator.visible()
+                                }
+                            }
+
+                            binding.progressBar.gone()
+
+                            setDefaultViews(taskResult.data)
+                            setTaskDetails(taskResult.data)
+
+                        }
 
                     }
 
-                }
+                } catch (e: Exception) {
 
-            } catch (e: Exception) {
-
-                Timber.tag(TAG).e(e)
-                binding.progressBar.gone()
+                    Timber.tag(TAG).e(e)
+                    binding.progressBar.gone()
 
 //                utils.singleBtnDialog(
 //                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
@@ -957,8 +966,53 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 //                    requireActivity().finish()
 //                }
 
-            }
+                }
 
+            }
+        }
+        else{
+            Log.d("detailsFetch","Fetch from db")
+            viewModel.getTaskbyIdFromDB(
+                projectName = PrefManager.getcurrentProject(),
+                taskId = id
+                ) { result ->
+                when (result) {
+                    is DBResult.Success -> {
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        val localUserObj = PrefManager.getcurrentUserdetails()
+
+                        currentUser?.let { userObj ->
+
+                            if (result.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                binding.becomeModerator.visible()
+                            }
+                        }
+
+                        binding.progressBar.gone()
+
+                        setDefaultViews(result.data)
+                        setTaskDetails(result.data)
+
+                    }
+                    is DBResult.Failure -> {
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in task fetching : ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+
+                        binding.progressBar.gone()
+                    }
+
+                    is DBResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                }
+
+            }
         }
     }
 

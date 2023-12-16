@@ -7,6 +7,7 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,11 +20,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -41,6 +46,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet.getassigneesCallback,UserListBottomSheet.updateAssigneeCallback,
@@ -51,12 +57,16 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     private var OList2: MutableList<User> = mutableListOf()
     private val selectedAssignee:MutableList<User> = mutableListOf()
     private val selectedAssignee2:MutableList<User> = mutableListOf()
+    private var selectedSegment=""
     lateinit var binding: FragmentSearchBinding
     private  var taskList: MutableList<TaskItem> = mutableListOf()
+    private val tasks:MutableList<Task> = mutableListOf()
     private lateinit var viewModel: SearchViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
     val state = arrayOf(1)
+    @Inject
+    lateinit var db:TasksDatabase
 
     private val activityBinding: ActivityMainBinding by lazy {
         (requireActivity() as MainActivity).binding
@@ -127,6 +137,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                 }
                 var assignee=""
                 var creator=""
+                var segment=""
 
                 if (binding.assignee.text=="Assignee"){
                     assignee=""
@@ -135,69 +146,145 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                     assignee=selectedAssignee[0].firebaseID!!
                 }
 
-                if (binding.created.text=="Created by"){
+                if (binding.segment.text=="Segment"){
+                    segment=""
+                }
+                else{
+                    segment=selectedSegment
+                }
+                if (!binding.searchBar.text?.toString().isNullOrEmpty()){
+                    binding.clear.visible()
+                }
+
+
+            if (binding.created.text=="Created by"){
                     creator=""
                 }
                 else{
                     creator=selectedAssignee2[0].firebaseID!!
                 }
 
-                CoroutineScope(Dispatchers.Main).launch {
+                if (db.tasksDao().isNull) {
+                    Log.d("SearchPage","Performing search from Firestore")
 
-                    viewModel.getSearchTasked(
-                        projectName = PrefManager.getcurrentProject(),
-                        assignee =assignee,
-                        type = type,
-                        state = state,
-                        text = binding.searchBar.text?.toString()!!,
-                        creator = creator
-                    ) { result ->
-                        when (result) {
-                            is ServerResult.Success -> {
-                                binding.searchPlaceholder.gone()
-                                binding.progressBar.gone()
-                                val task = result.data
-                                taskList.clear()
-                                for (element in task) {
-                                    taskList.add(element)
+                    CoroutineScope(Dispatchers.Main).launch {
+
+                        viewModel.getSearchTasked(
+                            projectName = PrefManager.getcurrentProject(),
+                            assignee =assignee,
+                            type = type,
+                            state = state,
+                            text = binding.searchBar.text?.toString()!!,
+                            creator = creator
+                        ) { result ->
+                            when (result) {
+                                is ServerResult.Success -> {
+                                    binding.searchPlaceholder.gone()
+                                    binding.progressBar.gone()
+                                    val task = result.data
+                                    taskList.clear()
+                                    for (element in task) {
+                                        taskList.add(element)
+                                    }
+                                    if (taskList.isEmpty()){
+                                        binding.placeholder.visible()
+                                        binding.results.gone()
+                                    }
+                                    else{
+                                        binding.recyclerView.visible()
+                                        binding.placeholder.gone()
+                                        setRecyclerView()
+                                    }
                                 }
-                                if (taskList.isEmpty()){
-                                    binding.placeholder.visible()
-                                    binding.results.gone()
-                                }
-                                else{
+
+                                is ServerResult.Failure -> {
+                                    val errorMessage = result.exception.message
+                                    toast(errorMessage!!)
                                     binding.recyclerView.visible()
+                                    binding.searchPlaceholder.gone()
                                     binding.placeholder.gone()
-                                    setRecyclerView()
+                                    binding.progressBar.gone()
                                 }
-                            }
 
-                            is ServerResult.Failure -> {
-                                val errorMessage = result.exception.message
-                                toast(errorMessage!!)
-                                binding.recyclerView.visible()
-                                binding.searchPlaceholder.gone()
-                                binding.placeholder.gone()
-                                binding.progressBar.gone()
-                            }
+                                is ServerResult.Progress -> {
+                                    binding.searchPlaceholder.gone()
+                                    binding.recyclerView.gone()
+                                    binding.placeholder.gone()
+                                    binding.progressBar.visible()
+                                }
 
-                            is ServerResult.Progress -> {
-                                binding.searchPlaceholder.gone()
-                                binding.recyclerView.gone()
-                                binding.placeholder.gone()
-                                binding.progressBar.visible()
                             }
-
                         }
+                    }
+                }else{
+                    Log.d("SearchPage","Performing search from DB")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        viewModel.getSearchTasksFromDB(
+                            projectName = PrefManager.getcurrentProject(),
+                            assignee =assignee,
+                            type = type,
+                            state = state,
+                            text = binding.searchBar.text?.toString()!!,
+                            creator = creator,
+                            segment = segment
+                        ) { result ->
+                            when (result) {
+                                is DBResult.Success -> {
+                                    binding.searchPlaceholder.gone()
+                                    binding.progressBar.gone()
+                                    val task = result.data
+                                    tasks.clear()
+                                    for (element in task) {
+                                        tasks.add(element)
+                                    }
+                                    if (tasks.isEmpty()){
+                                        binding.placeholder.visible()
+                                        binding.results.gone()
+                                    }
+                                    else{
+                                        taskList = tasks.map { task ->
+                                            TaskItem(
+                                                title = task.title,
+                                                id = task.id,
+                                                assignee_id = task.assignee,
+                                                difficulty = task.difficulty,
+                                                timestamp = task.time_STAMP,
+                                                completed = task.completed
+                                            )
+                                        }.toMutableList()
+                                        binding.recyclerView.visible()
+                                        binding.placeholder.gone()
+                                        setRecyclerView()
+                                    }
+                                }
+
+                                is DBResult.Failure -> {
+                                    val errorMessage = result.exception.message
+                                    toast(errorMessage!!)
+                                    binding.recyclerView.visible()
+                                    binding.searchPlaceholder.gone()
+                                    binding.placeholder.gone()
+                                    binding.progressBar.gone()
+                                }
+
+                                is DBResult.Progress -> {
+                                    binding.searchPlaceholder.gone()
+                                    binding.recyclerView.gone()
+                                    binding.placeholder.gone()
+                                    binding.progressBar.visible()
+                                }
+
+                            }
+                        }
+                    }
                 }
-            }
         }
     }
     private fun setRecyclerView(){
         binding.results.visible()
         binding.results.text="Matches ${taskList.size.toString()} tasks"
         recyclerView = binding.recyclerView
-        taskListAdapter = TaskListAdapter(firestoreRepository,requireContext())
+        taskListAdapter = TaskListAdapter(firestoreRepository,requireContext(),taskList)
         taskListAdapter.setOnClickListener(this)
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         layoutManager.reverseLayout = false
@@ -224,7 +311,6 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                 }
             }
         })
-        taskListAdapter.setTaskList(taskList)
         taskListAdapter.notifyDataSetChanged()
     }
     private fun defaultButtons(){
@@ -232,6 +318,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             binding.clear.gone()
             taskList.clear()
             requireActivity().recreate()
+            binding.searchBar.text?.clear()
             selectedAssignee.clear()
             selectedAssignee2.clear()
             binding.state.text="State"
@@ -374,7 +461,9 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     }
 
     override fun onSegmentSelected(segmentName: String) {
+        binding.clear.visible()
         binding.segment.text=segmentName
+        selectedSegment=segmentName
         setSelectedButtonColor(binding.segment)
     }
 

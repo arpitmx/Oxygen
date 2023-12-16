@@ -12,16 +12,21 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.gson.JsonObject
 import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Repositories.TaskRepository
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Services.NotificationApiService
 import com.ncs.o2.Domain.Workers.FCMWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.datafaker.Faker
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -48,7 +53,8 @@ Tasks FUTURE ADDITION :
 @HiltViewModel
 class TaskDetailViewModel @Inject
 constructor(val notificationApiService: NotificationApiService,
-            @FirebaseRepository val repository: Repository, val app: Application,private val firestoreRepository: FirestoreRepository
+            @FirebaseRepository val repository: Repository, val app: Application,private val firestoreRepository: FirestoreRepository,
+    val taskRepository: TaskRepository
 ) : AndroidViewModel(app) {
 
     companion object{
@@ -155,7 +161,15 @@ constructor(val notificationApiService: NotificationApiService,
     suspend fun addNewModerators(taskID:String,projectName: String,moderator:MutableList<String>,unselected:MutableList<String>):ServerResult<Boolean>{
         return firestoreRepository.addNewModerator(id = taskID, projectName = projectName, newModerators =moderator,unselected=unselected)
     }
-
+    fun getTaskbyIdFromDB(
+        projectName: String,
+        taskId:String,
+        resultCallback: (DBResult<Task>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTaskbyID(projectName,taskId,resultCallback)
+        }
+    }
 
 
 }
