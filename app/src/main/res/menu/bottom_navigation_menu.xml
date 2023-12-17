@@ -14,10 +14,10 @@
         android:title="@string/bottom_nav_item_assigned" />
 
     <item
-        android:id="@+id/project_stats_item"
+        android:id="@+id/bottom_search"
         android:enabled="true"
-        android:icon="@drawable/baseline_project_stats_24"
-        android:title="@string/bottom_nav_item_project_stats" />
+        android:icon="@drawable/ic_searchico"
+        android:title="@string/bottom_nav_search" />
 
 
 </menu>

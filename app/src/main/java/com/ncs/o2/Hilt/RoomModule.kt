@@ -3,6 +3,7 @@ package com.ncs.versa.Hilt
 import android.content.Context
 import androidx.room.Room
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.versa.Constants.Endpoints
 import dagger.Module
 import dagger.Provides
@@ -44,6 +45,16 @@ object RoomModule {
             .build()
     }
 
+    @Singleton
+    @Provides
+    fun providesTaksDatabase(@ApplicationContext context : Context) : TasksDatabase {
+        return Room.databaseBuilder(context,
+            TasksDatabase::class.java,
+            Endpoints.ROOM.TASKS.TASKS_DB
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+    }
 
 
 

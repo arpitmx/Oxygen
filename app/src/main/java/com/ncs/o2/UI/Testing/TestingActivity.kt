@@ -1167,11 +1167,13 @@ See [`LICENSE`](LICENSE) for full of the license text.
             val task = Task(
                 title = Faker().howIMetYourMother().quote().toString(),
                 description = desc7,
-                id = "#T${i}${Random(System.currentTimeMillis()).nextInt(1000, 9999)}",
+                id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                 difficulty = Random(System.currentTimeMillis()).nextInt(1, 4),
                 priority = Random(System.currentTimeMillis()).nextInt(1, 4),
-                status = Random(System.currentTimeMillis()).nextInt(0, 3),
-                assigner = Faker().funnyName().name().toString(),
+                status = Random(System.currentTimeMillis()).nextInt(1, 4),
+                assigner = "m@gamil.com",
+                assignee = "",
+                moderators = listOf("None"),
                 project_ID = "NCSOxygen",
                 segment = "Backend", //change segments here //like Design
                 section = "CI/CD\uD83C\uDF4D",  //Testing // Completed //Ready //Ongoing

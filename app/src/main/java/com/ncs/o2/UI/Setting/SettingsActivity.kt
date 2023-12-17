@@ -53,7 +53,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
         recyclerView.adapter = adapter
     }
     private fun setUpViews(){
-        binding.gioActionbar.titleTv.text = "Setting"
+        binding.gioActionbar.titleTv.text = "Settings"
         binding.gioActionbar.btnFav.gone()
         binding.gioActionbar.btnRequestWork.gone()
 
@@ -79,7 +79,9 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
         else if (Codes.STRINGS.clickedSetting == "Log Out"){
             try {
                 auth.signOut()
-                startActivity(Intent(this, AuthScreenActivity::class.java))
+                val intent = Intent(this, AuthScreenActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 Toast.makeText(applicationContext, "LogOut", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {

@@ -92,8 +92,8 @@ class ProfileBottomSheet (
             .into(binding.roomDp)
         binding.roomNameBs.text=user.username
         binding.hostNameBs.text=user.firebaseID
-        val timestamp = user.timestamp
-        binding.time.text= "Joined ${DateTimeUtils.getTimeAgo(timestamp)}"
+        val timestamp = user.timestamp?.seconds
+        binding.time.text= "Joined ${DateTimeUtils.getTimeAgo(timestamp!!)}"
         binding.totalMembersBs.text=user.designation
     }
 }

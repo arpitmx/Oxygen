@@ -500,7 +500,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         section = section.toString(),
                         completed = false,
                         type = type,
-                        moderators = contributorList
+                        moderators = contributorList,
+                        last_updated = Timestamp.now()
                     )
                     postTask(task,checkListArray)
                 }
@@ -522,7 +523,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         section = section.toString(),
                         completed = false,
                         type = type,
-                        moderators = emptyList()
+                        moderators = emptyList(),
+                        last_updated = Timestamp.now()
                     )
                     postTask(task,checkListArray)
                 }
@@ -834,6 +836,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     override fun onSegmentSelected(segmentName: String) {
         binding.segment.text = segmentName
+
         Codes.STRINGS.segmentText = segmentName
     }
 

@@ -112,6 +112,20 @@ sealed class Errors {
         // Add more error cases as needed.
     }
 
+    sealed class TasksErrors : Errors() {
+
+
+        object TASKS_FETCH_FAILED : TasksErrors() {
+            override val code: String = "TASK-001"
+            override val description: String = "Failed to fetch the tasks."
+            override val solution: String = "Check network connectivity and try again."
+            override val actionText: String = "Retry"
+        }
+
+
+    }
+
+
 
     sealed class AccountErrors : Errors() {
         object ACCOUNT_FIELDS_NULL : AccountErrors() {
