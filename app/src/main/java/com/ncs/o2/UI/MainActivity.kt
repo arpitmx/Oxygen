@@ -536,6 +536,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 is ServerResult.Success -> {
                     projects.clear()
                     projects.addAll(result.data)
+                    Log.d("result",result.data.toString())
                     PrefManager.putProjectsList(result.data)
                     projectListAdapter.notifyDataSetChanged()
                     easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)

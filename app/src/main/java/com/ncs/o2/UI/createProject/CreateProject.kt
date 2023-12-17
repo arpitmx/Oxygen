@@ -123,7 +123,6 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                             "PROJECT_DEEPLINK" to "https://oxy2.page.link/join/${title.toLowerCase().trim()}",
                             "PROJECT_DESC" to desc.toString().trim(),
                             "last_updated" to Timestamp.now(),
-                            "contributors" to listOf(FirebaseAuth.getInstance().currentUser?.email)
                         )
                         Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
 
