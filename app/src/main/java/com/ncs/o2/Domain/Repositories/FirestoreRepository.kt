@@ -1,23 +1,31 @@
 package com.ncs.o2.Domain.Repositories
 
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.text.format.Time
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
+import com.google.firebase.firestore.Transaction
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.BuildConfig
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.CheckList
@@ -82,6 +90,8 @@ class FirestoreRepository @Inject constructor(
 //    private val editor : SharedPreferences.Editor by lazy {
 //        pref.edit()
 //    }
+    @Inject
+    lateinit var db:TasksDatabase
 
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
@@ -240,40 +250,39 @@ class FirestoreRepository @Inject constructor(
         bitmap: Bitmap,
         projectId: String
     ): LiveData<ServerResult<StorageReference>> {
-
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
-        val imageFileName =
-            "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
-//            "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
+        val imageFileName = "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
         val data = baos.toByteArray()
         val uploadTask = imageRef.putBytes(data)
 
-
-        uploadTask.addOnSuccessListener {
-            val userData = mapOf(
-                "PHOTO_ADDED" to true,
-            )
-
-            firestore.collection("Users")
-                .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .update(userData)
-                .addOnSuccessListener {
+        uploadTask.addOnSuccessListener { _ ->
+            try {
+                firestore.runTransaction { transaction ->
+                    val userDocRef = firestore.collection("Users")
+                        .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                    val userUserData = mapOf("PHOTO_ADDED" to true)
+                    transaction.update(userDocRef, userUserData)
+                    val lastUpdate=Timestamp.now()
+                    updateLastUpdated(projectId,transaction)
+                    null
+                }.addOnSuccessListener {
                     liveData.postValue(ServerResult.Success(imageRef))
-                }
-                .addOnFailureListener { e ->
+                }.addOnFailureListener { e ->
                     liveData.postValue(ServerResult.Failure(e))
                 }
-
+            } catch (exception: Exception) {
+                liveData.postValue(ServerResult.Failure(exception))
+            }
         }.addOnFailureListener { exception ->
             liveData.postValue(ServerResult.Failure(exception))
-
         }
 
         return liveData
     }
+
 
     override fun getProjectIcon(reference: StorageReference): LiveData<ServerResult<StorageReference>> {
         TODO("Not yet implemented")
@@ -544,31 +553,43 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    override suspend fun postTask(task: Task, checkList: MutableList<CheckList>, serverResult: (ServerResult<Int>) -> Unit) {
-
+    override suspend fun postTask(
+        task: Task,
+        checkList: MutableList<CheckList>,
+        serverResult: (ServerResult<Int>) -> Unit
+    ) {
         val appendTaskID = hashMapOf<String, Any>("TASKS.${task.id}" to "${task.segment}.TASKS")
 
-        return try {
-            val workspaceTaskItem=WorkspaceTaskItem(id = task.id, status = "Assigned")
-            serverResult(ServerResult.Progress)
-            getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id).set(task)
-                .await()
-            for (i in 0 until checkList.size){
-                getSegmentRef(task).collection(Endpoints.Project.TASKS).document(task.id)
-                    .collection(Endpoints.Project.CHECKLIST).document(checkList[i].id).set(checkList[i])
-                    .await()
-            }
-//            if (task.assignee!="None") {
-//                firestore.collection(Endpoints.USERS).document(task.assignee)
-//                    .collection(Endpoints.Workspace.WORKSPACE)
-//                    .document(task.id).set(workspaceTaskItem).await()
-//            }
-            serverResult(ServerResult.Success(200))
+        try {
+            val workspaceTaskItem = WorkspaceTaskItem(id = task.id, status = "Assigned")
 
+            firestore.runTransaction { transaction ->
+                val segmentRef = getSegmentRef(task)
+                val newLastUpdated = Timestamp.now()
+
+                transaction.update(segmentRef, Endpoints.Project.LAST_UPDATED, newLastUpdated)
+                PrefManager.putLastCacheUpdateTimestamp(newLastUpdated)
+                val taskDocRef = segmentRef.collection(Endpoints.Project.TASKS).document(task.id)
+                transaction.set(taskDocRef, task)
+                for (i in 0 until checkList.size) {
+                    val checklistDocRef =
+                        taskDocRef.collection(Endpoints.Project.CHECKLIST).document(checkList[i].id)
+                    transaction.set(checklistDocRef, checkList[i])
+                }
+
+            }.addOnSuccessListener {
+                CoroutineScope(Dispatchers.IO).launch {
+                    db.tasksDao().insert(task)
+                }
+                serverResult(ServerResult.Success(200))
+            }.addOnFailureListener { exception ->
+                serverResult(ServerResult.Failure(exception))
+            }
         } catch (exception: Exception) {
             serverResult(ServerResult.Failure(exception))
         }
     }
+
 
 
     override suspend fun addTask(task: Task) {
@@ -795,6 +816,41 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    override suspend fun getTasksinProject(
+        projectName: String,
+    ): ServerResult<List<Task>> {
+
+        return try {
+
+            val task =
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .get().await()
+
+            val snapShot = task
+
+            if (!snapShot.isEmpty) {
+
+                val list:MutableList<Task> = mutableListOf()
+                for (document in snapShot.documents){
+                    val taskData = document.toObject(Task::class.java)
+                    list.add(taskData!!)
+                }
+
+                list?.let {
+                    return ServerResult.Success(it)
+                } ?: ServerResult.Failure(Exception("Document not found for title:"))
+
+            } else {
+                return ServerResult.Failure(Exception("Document not found for title"))
+            }
+
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+
+    }
 
     override suspend fun getTasksItem(
         projectName: String,
@@ -903,7 +959,13 @@ class FirestoreRepository @Inject constructor(
                     val firebaseID = document.getString(Endpoints.User.EMAIL) ?: "mohit@mail"
                     val profileDPUrl = document.getString(Endpoints.User.DP_URL) ?: ""
                     val name = document.getString(Endpoints.User.USERNAME) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
-                    val time = document.get(Endpoints.User.NOTIFICATION_TIME_STAMP) as Long? ?: Timestamp.now().seconds
+                    var time:Timestamp=Timestamp.now()
+                    if ( document.get(Endpoints.User.TIMESTAMP).isNull){
+                        time=Timestamp.now()
+                    }
+                    else{
+                        time=document.get(Endpoints.User.TIMESTAMP) as Timestamp
+                    }
                     val role : Int = document.get(Endpoints.User.ROLE)?.toString()?.toInt() ?: 1
                     val designation = document.getString(Endpoints.User.DESIGNATION) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
                     val fcmToken  = document.getString(Endpoints.User.FCM_TOKEN)
@@ -1216,33 +1278,46 @@ class FirestoreRepository @Inject constructor(
         id: String,
         projectName: String,
         newAssignee: String,
-        oldAssignee:String,
+        oldAssignee: String,
     ): ServerResult<Boolean> {
         try {
+            firestore.runTransaction { transaction ->
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
 
-            val documentRef = firestore.collection(Endpoints.PROJECTS)
-                .document(projectName)
-                .collection(Endpoints.Project.TASKS)
-                .document(id)
+                val documentSnapshot = transaction.get(documentRef)
 
-            val documentSnapshot = documentRef.get().await()
-            if (documentSnapshot.exists()) {
-                if (oldAssignee!="None") {
-                    firestore.collection(Endpoints.USERS).document(oldAssignee)
-                        .collection(Endpoints.Workspace.WORKSPACE).document(id).delete().await()
+                if (documentSnapshot.exists()) {
+                    if (oldAssignee != "None") {
+                        val oldAssigneeWorkspaceRef =
+                            firestore.collection(Endpoints.USERS).document(oldAssignee)
+                                .collection(Endpoints.Workspace.WORKSPACE).document(id)
+                        transaction.delete(oldAssigneeWorkspaceRef)
+                    }
+
+                    transaction.update(documentRef, "assignee", newAssignee)
+                    transaction.update(documentRef, "status", 2)
+
+                    val workspaceItem = WorkspaceTaskItem(id = id, status = "Assigned")
+
+                    if (newAssignee != "None") {
+                        val newAssigneeWorkspaceRef =
+                            firestore.collection(Endpoints.USERS).document(newAssignee)
+                                .collection(Endpoints.Workspace.WORKSPACE).document(id)
+                        transaction.set(newAssigneeWorkspaceRef, workspaceItem)
+                    }
+
+                    updateLastUpdated(projectName, transaction)
+                    updateTaskLastUpdated(projectName,transaction,id)
+                    true
+                } else {
+                    false
                 }
-                documentRef.update("assignee", newAssignee).await()
-                documentRef.update("status", 2)
-                val workspaceItem=WorkspaceTaskItem(id = id, status ="Assigned")
-                if (newAssignee!="None") {
-                    firestore.collection(Endpoints.USERS).document(newAssignee)
-                        .collection(Endpoints.Workspace.WORKSPACE).document(id).set(workspaceItem)
-                        .await()
-                }
-                return ServerResult.Success(true)
-            } else {
-                return ServerResult.Failure(Exception("Document not found for title: $id"))
             }
+
+            return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
@@ -1254,56 +1329,59 @@ class FirestoreRepository @Inject constructor(
         moderator: String
     ): ServerResult<Boolean> {
         try {
-            val documentRef = firestore.collection(Endpoints.PROJECTS)
-                .document(projectName)
-                .collection(Endpoints.Project.TASKS)
-                .document(id)
+            firestore.runTransaction { transaction ->
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
 
-            val updateData = mapOf<String, Any>(
-                "moderators" to FieldValue.arrayUnion(moderator)
-            )
+                val updateData = mapOf(
+                    "moderators" to FieldValue.arrayUnion(moderator)
+                )
 
-            documentRef.update(updateData).await()
+                transaction.update(documentRef, updateData)
+
+                updateLastUpdated(projectName, transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+                true
+            }
 
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
     }
+
 
     override suspend fun addNewModerator(
         id: String,
         projectName: String,
         newModerators: MutableList<String>,
-        unselected:MutableList<String>
+        unselected: MutableList<String>
     ): ServerResult<Boolean> {
         try {
-            val documentRef = firestore.collection(Endpoints.PROJECTS)
-                .document(projectName)
-                .collection(Endpoints.Project.TASKS)
-                .document(id)
+            firestore.runTransaction { transaction ->
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
 
-            val list:MutableList<String> = mutableListOf()
-            firestore.collection(Endpoints.PROJECTS).document(projectName).collection(Endpoints.Project.TASKS).whereEqualTo("id",id).get()
-                .addOnSuccessListener { querySnapshot ->
-                if (!querySnapshot.isEmpty) {
-                    val document = querySnapshot.documents[0]
-                    val moderators = document.get("moderators") as MutableList<String>
-                    list.addAll(moderators)
-                }
+                val existingModeratorsList = transaction.get(documentRef).get("moderators") as? MutableList<String>
+                    ?: mutableListOf()
+
+                existingModeratorsList.removeAll(unselected)
+
+                existingModeratorsList.addAll(newModerators)
+
+                val finalModeratorsList = existingModeratorsList.distinct()
+
+                transaction.update(documentRef, "moderators", finalModeratorsList)
+
+                updateLastUpdated(projectName,transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+                true
             }
-            list.removeAll(unselected)
-            list.addAll(newModerators)
-            val finalList=list.distinct()
-//            val updatedModeratorslist=(list+newModerators)
 
-//            val updateData = mapOf<String, Any>(
-//                "moderators" to FieldValue.arrayUnion(*newModerators.toTypedArray())
-//            )
-//
-//            documentRef.update(updateData).await()
-
-            documentRef.update("moderators",finalList)
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
@@ -1311,56 +1389,69 @@ class FirestoreRepository @Inject constructor(
     }
 
 
+
     override suspend fun updateState(
         id: String,
-        userID:String,
+        userID: String,
         newState: String,
+        projectName: String
     ): ServerResult<Boolean> {
         try {
-            val documentRef = firestore.collection(Endpoints.USERS)
-                .document(userID)
-                .collection(Endpoints.Workspace.WORKSPACE)
-                .document(id)
-            val documentSnapshot = documentRef.get().await()
-            if (documentSnapshot.exists()) {
-                documentRef.update("status", newState).await()
-                val status= when(newState){
-                    "Submitted" -> 1
-                    "Open" -> 2
-                    "Working" -> 3
-                    "Review" -> 4
-                    "Completed" -> 5
-                    "Assigned" -> 2
-                    else -> -1
-                }
-                firestore.collection(Endpoints.PROJECTS)
-                    .document(PrefManager.getcurrentProject())
-                    .collection(Endpoints.Project.TASKS)
+            firestore.runTransaction { transaction ->
+                val userDocumentRef = firestore.collection(Endpoints.USERS)
+                    .document(userID)
+                    .collection(Endpoints.Workspace.WORKSPACE)
                     .document(id)
-                    .update("status",status)
 
-                return ServerResult.Success(true)
-            } else {
-                val status= when(newState){
-                    "Submitted" -> 1
-                    "Open" -> 2
-                    "Working" -> 3
-                    "Review" -> 4
-                    "Completed" -> 5
-                    else -> -1
-                }
-                firestore.collection(Endpoints.PROJECTS)
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
                     .document(PrefManager.getcurrentProject())
                     .collection(Endpoints.Project.TASKS)
                     .document(id)
-                    .update("status",status)
-                return ServerResult.Success(true)
+
+                val userDocumentSnapshot = transaction.get(userDocumentRef)
+
+                if (userDocumentSnapshot.exists()) {
+                    val status = when (newState) {
+                        "Submitted" -> 1
+                        "Open" -> 2
+                        "Working" -> 3
+                        "Review" -> 4
+                        "Completed" -> 5
+                        "Assigned" -> 2
+                        else -> -1
+                    }
+
+                    transaction.update(userDocumentRef, "status", newState)
+                    transaction.update(projectDocumentRef, "status", status)
+                    updateLastUpdated(projectName,transaction)
+                    updateTaskLastUpdated(projectName,transaction,id)
+
+                } else {
+                    val status = when (newState) {
+                        "Submitted" -> 1
+                        "Open" -> 2
+                        "Working" -> 3
+                        "Review" -> 4
+                        "Completed" -> 5
+                        else -> -1
+                    }
+
+                    transaction.update(projectDocumentRef, "status", status)
+
+                    updateLastUpdated(projectName,transaction)
+                    updateTaskLastUpdated(projectName,transaction,id)
+
+                }
+
+                true
             }
 
+            return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
     }
+
     override fun getCheckList(
         projectName: String,
         taskId: String,
@@ -1388,37 +1479,188 @@ class FirestoreRepository @Inject constructor(
     override suspend fun updateCheckListCompletion(
         taskId: String,
         projectName: String,
-        id:String,
-        done:Boolean,
-        ): ServerResult<Boolean> {
+        id: String,
+        done: Boolean,
+    ): ServerResult<Boolean> {
         try {
-            val documentRef = firestore.collection(Endpoints.PROJECTS).document(projectName)
-                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
-                .document(id)
-            val updateData = mapOf<String, Any>(
-                "done" to done
-            )
-            documentRef.update(updateData).await()
+            firestore.runTransaction { transaction ->
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(taskId)
+                    .collection(Endpoints.Project.CHECKLIST)
+                    .document(id)
+
+                transaction.update(documentRef, "done", done)
+
+                updateLastUpdated(projectName, transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+
+                true
+            }
+
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
     }
 
+
     override suspend fun updateCheckList(
         taskId: String,
         projectName: String,
-        id:String,
+        id: String,
         checkList: CheckList
-        ): ServerResult<Boolean> {
+    ): ServerResult<Boolean> {
         try {
-            firestore.collection(Endpoints.PROJECTS).document(projectName)
-                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
-                .document(id).set(checkList).await()
+            firestore.runTransaction { transaction ->
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(taskId)
+                    .collection(Endpoints.Project.CHECKLIST)
+                    .document(id)
+
+                transaction.set(documentRef, checkList)
+
+                updateLastUpdated(projectName, transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+
+                true
+            }
+
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
+    }
+
+    override suspend fun updateSection(
+        taskId: String,
+        projectName: String,
+        newSection: String,
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(taskId)
+
+                transaction.update(documentRef, "section", newSection)
+
+                updateLastUpdated(projectName, transaction)
+                updateTaskLastUpdated(projectName,transaction,taskId)
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+    override suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit) {
+        val projectDocument = FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName)
+        val listenerRegistration = projectDocument.addSnapshotListener { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->
+            if (exception != null) {
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.Project.LAST_UPDATED)) {
+                val lastUpdatedValue = snapshot.get(Endpoints.Project.LAST_UPDATED)
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .whereGreaterThan(Endpoints.Project.LAST_UPDATED, PrefManager.getLastCacheUpdateTimestamp())
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val sectionList = mutableListOf<Task>()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            for (document in querySnapshot.documents) {
+                                val sectionData = document.toObject(Task::class.java)
+                                PrefManager.putLastCacheUpdateTimestamp(Timestamp.now())
+                                Log.d("update","old task by:  ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                                db.tasksDao().update(task = sectionData!!)
+                                Log.d("update","updated task by: ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                            }
+                        }
+
+                        result(ServerResult.Success(1))
+
+                    }
+                    .addOnFailureListener { exception ->
+                        result(ServerResult.Failure(exception))
+                    }
+            }
+        }
+    }
+    override suspend fun getSearchedTasks(
+        assignee: String,
+        creator: String,
+        state: Int,
+        type: Int,
+        text: String,
+        projectName: String,
+        result: (ServerResult<List<TaskItem>>) -> Unit
+    ) {
+        var query:Query= firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+        if (type != 0) {
+            query = query.whereEqualTo("type", type)
+        }
+        if (state != 0) {
+            query = query.whereEqualTo("status", state)
+        }
+        if (creator.isNotEmpty()){
+            query = query.whereEqualTo("assigner", creator)
+        }
+        if (assignee.isNotEmpty()){
+            query = query.whereEqualTo("assignee", assignee)
+        }
+        query.get()
+            .addOnSuccessListener { querySnapshot ->
+                val sectionList = mutableListOf<TaskItem>()
+                for (document in querySnapshot.documents) {
+                    val title = document.getString("title")
+                    val id = document.getString("id")
+                    val difficulty = document.get("difficulty")!!
+                    val time: Timestamp = (document.get("time_STAMP") ?: Timestamp.now()) as Timestamp
+                    val completed = document.getBoolean("completed")
+                    val assignerID = document.getString("assigner_email") ?: "mohit@mail.com"
+                    val taskItem = TaskItem(
+                        title = title!!,
+                        id = id!!,
+                        difficulty = difficulty.toString().toInt(),
+                        timestamp = time,
+                        completed = completed.toString().toBoolean(),
+                        assignee_id = assignerID,
+                    )
+                    sectionList.add(taskItem)
+                }
+                result(ServerResult.Success(sectionList))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+    fun updateLastUpdated(projectName: String,transaction:Transaction){
+        val projectDocRef = firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+        val last_updated=Timestamp.now()
+        val projectData = mapOf(
+            Endpoints.Project.LAST_UPDATED to last_updated
+        )
+        transaction.update(projectDocRef, projectData)
+    }
+    fun updateTaskLastUpdated(projectName: String,transaction:Transaction,taskId: String){
+        val projectDocRef = firestore.collection(Endpoints.PROJECTS)
+            .document(projectName).collection(Endpoints.Project.TASKS).document(taskId)
+        val last_updated=Timestamp.now()
+        val projectData = mapOf(
+            Endpoints.Project.LAST_UPDATED to last_updated
+        )
+        transaction.update(projectDocRef, projectData)
     }
 
 }

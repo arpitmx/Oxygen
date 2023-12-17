@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -51,6 +52,7 @@ class CreateProject : AppCompatActivity() {
                 "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12).trim()}",
                 "PROJECT_LINK" to "${title.toLowerCase().trim()}.ncs.in",
                 "PROJECT_DESC" to desc.toString().trim(),
+                "last_updated" to Timestamp.now(),
             )
             if (title.isNotEmpty()) {
                 binding.progressBar.visible()

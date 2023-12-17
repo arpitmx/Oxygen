@@ -1,11 +1,17 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Checklist
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -118,7 +124,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     private fun setCheckListRecyclerView(_list: MutableList<CheckList>) {
         val  list = _list.sortedBy { it.index }.toMutableList()
         if (isAssignee && !isModerator){
-            checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,true)
+            checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,true, )
         }
         if (isModerator && !isAssignee){
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,true,false)
@@ -183,61 +189,121 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     }
 
     override fun onCheckBoxClick(id: String, isChecked: Boolean,position: Int) {
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val result = withContext(Dispatchers.IO) {
-                    firestoreRepository.updateCheckListCompletion(
-                        taskId = activityBinding.taskId,
-                        projectName = PrefManager.getcurrentProject(),
-                        id = id, done = isChecked)
+        if (isChecked) {
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val result = withContext(Dispatchers.IO) {
+                        firestoreRepository.updateCheckListCompletion(
+                            taskId = activityBinding.taskId,
+                            projectName = PrefManager.getcurrentProject(),
+                            id = id, done = isChecked
+                        )
 
-                }
-                when (result) {
-                    is ServerResult.Failure -> {
+                    }
+                    when (result) {
+                        is ServerResult.Failure -> {
 
-                        utils.singleBtnDialog(
-                            "Failure",
-                            "Failure in Updating: ${result.exception.message}",
-                            "Okay"
-                        ) {
-                            requireActivity().finish()
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in Updating: ${result.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
+                            }
+                            binding.progressbar.gone()
+
                         }
-                        binding.progressbar.gone()
 
-                    }
+                        is ServerResult.Progress -> {
+                            binding.progressbar.visible()
+                        }
 
-                    is ServerResult.Progress -> {
-                        binding.progressbar.visible()
-                    }
-
-                    is ServerResult.Success -> {
-                        var item=CheckList()
-                        for (i in 0 until checkListArray.size){
-                            if (checkListArray[i].id==id){
-                                item=checkListArray[i]
+                        is ServerResult.Success -> {
+                            var item = CheckList()
+                            for (i in 0 until checkListArray.size) {
+                                if (checkListArray[i].id == id) {
+                                    item = checkListArray[i]
+                                }
+                            }
+                            val index = checkListArray.indexOf(item)
+                            checkListArray[index].done = isChecked
+                            binding.progressbar.gone()
+                            if (isChecked) {
+                                checkListDialog()
+                                toast("Marked as completed")
                             }
                         }
-                        val index=checkListArray.indexOf(item)
-                        checkListArray[index].done=isChecked
-                        binding.progressbar.gone()
-                        if (isChecked){
-                            toast("Marked as completed")
-                        }
-                        if (!isChecked){
-                            toast("Marked as not completed")
-                        }
+
                     }
 
+                } catch (e: Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+                    binding.progressbar.gone()
+
                 }
-
-            } catch (e: Exception) {
-
-                Timber.tag(TaskDetailsFragment.TAG).e(e)
-                binding.progressbar.gone()
-
             }
         }
+        if (!isChecked) {
+            unCheckDialog(requireContext(), onOkClicked = {
+                CoroutineScope(Dispatchers.Main).launch {
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            firestoreRepository.updateCheckListCompletion(
+                                taskId = activityBinding.taskId,
+                                projectName = PrefManager.getcurrentProject(),
+                                id = id, done = isChecked
+                            )
+
+                        }
+                        when (result) {
+                            is ServerResult.Failure -> {
+
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in Updating: ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+                                binding.progressbar.gone()
+
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressbar.visible()
+                            }
+
+                            is ServerResult.Success -> {
+                                var item = CheckList()
+                                for (i in 0 until checkListArray.size) {
+                                    if (checkListArray[i].id == id) {
+                                        item = checkListArray[i]
+                                    }
+                                }
+                                val index = checkListArray.indexOf(item)
+                                checkListArray[index].done = isChecked
+                                binding.progressbar.gone()
+                                toast("Marked as not completed")
+                            }
+
+                        }
+
+                    } catch (e: Exception) {
+
+                        Timber.tag(TaskDetailsFragment.TAG).e(e)
+                        binding.progressbar.gone()
+
+                    }
+                }
+            }, onCancelClicked = {
+                checkListAdapter.updateCheckBoxState(id, true)
+
+            })
+
+        }
     }
+
 
     private val markwon: Markwon by lazy {
         val prism4j = Prism4j(ExampleGrammarLocator())
@@ -317,6 +383,34 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             }
         }
     }
-
+    private fun checkListDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_checklist_done)
+        val window: Window? = dialog.window
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialog.show()
+        Handler().postDelayed({
+            dialog.dismiss()
+        }, 2000)
+    }
+    fun unCheckDialog(context: Context, onOkClicked: () -> Unit, onCancelClicked:()->Unit) {
+        val inflater = LayoutInflater.from(context)
+        val view = inflater.inflate(R.layout.dialog_checklist_uncheck, null)
+        val btnCancel = view.findViewById<Button>(R.id.cancel_button)
+        val btnOk = view.findViewById<Button>(R.id.okButton)
+        val builder = AlertDialog.Builder(context)
+        builder.setView(view)
+        val dialog = builder.create()
+        btnCancel.setOnClickListener {
+            onCancelClicked.invoke()
+            dialog.dismiss()
+        }
+        btnOk.setOnClickListener {
+            onOkClicked.invoke()
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
 
 }

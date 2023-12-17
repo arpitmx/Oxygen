@@ -12,6 +12,8 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -164,5 +166,12 @@ constructor(
 
     fun checkMaintenanceThroughRepository(): LiveData<maintainceCheck> {
         return repository.maintenanceCheck()
+    }
+    suspend fun getTasksinProject(
+        projectName: String,
+    ) : ServerResult<List<Task>>{
+
+        return repository.getTasksinProject(projectName)
+
     }
 }

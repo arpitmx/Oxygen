@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,5 +27,13 @@ class ProfilePictureSelectionViewModel @Inject constructor(@FirebaseRepository v
 
     fun storeDPUrlToFirestore(imageUrl: String): LiveData<Boolean>{
         return repository.addImageUrlToFirestore(imageUrl)
+    }
+
+    suspend fun getTasksinProject(
+        projectName: String,
+    ) : ServerResult<List<Task>>{
+
+        return repository.getTasksinProject(projectName)
+
     }
 }

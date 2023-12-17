@@ -69,6 +69,8 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+
+
     fun updateCurrentSegment(newSegment: String) {
         _currentSegment.value = newSegment
     }

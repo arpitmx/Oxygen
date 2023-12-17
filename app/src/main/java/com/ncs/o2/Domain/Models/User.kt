@@ -31,7 +31,7 @@ data class User (
         val post: String? = null,
         val username : String? = null,
         val role:Int? = null,
-        val timestamp:Long =Timestamp.now().seconds,
+        val timestamp:Timestamp? =null,
         val designation:String?= null,
         val fcmToken: String?= null,
         @Exclude var isChecked : Boolean = false,

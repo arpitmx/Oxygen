@@ -19,19 +19,12 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -39,14 +32,18 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
@@ -69,8 +66,10 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
+import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.editor.MarkwonEditor
@@ -87,14 +86,15 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback,
+class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter.OnProfileClickCallback,
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
-    ModeratorsBottomSheet.getContributorsCallback {
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
-
+    @Inject
+    lateinit var db: TasksDatabase
     private var _binding: FragmentTaskDetailsFrgamentBinding? = null
     private val binding get() = _binding!!
     private var moderators: MutableList<User> = mutableListOf()
@@ -165,6 +165,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             setDetails(activityBinding.taskId)
         }
         binding.assignee.isEnabled = false
+        binding.section.isEnabled=false
         binding.activity.setOnClickThrottleBounceListener {
             val viewpager = tasksHolderBinding.binding.viewPager2
             val next = viewpager.currentItem + 1
@@ -212,6 +213,11 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             val assigneeListBottomSheet =
                 AssigneeListBottomSheet(OList, selectedAssignee, this, this)
             assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
+        }
+        binding.section.setOnClickThrottleBounceListener {
+            val sections = sectionDisplayBottomSheet(taskDetails.segment)
+            sections.sectionSelectionListener = this@TaskDetailsFragment
+            sections.show(requireFragmentManager(), "Section Selection")
         }
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
@@ -282,7 +288,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private fun setDefaultViews(task: Task) {
 
 
-        binding.projectNameET.text = task.project_ID
+        binding.sectionNameET.text = task.section
         viewModel.task = task
         val priority = when (task.priority) {
             1 -> "Low"
@@ -491,6 +497,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             if (moderator.firebaseID == PrefManager.getcurrentUserdetails().EMAIL) {
                 isModerator = true
                 binding.assignee.isEnabled = true
+                binding.section.isEnabled=true
                 activityBinding.binding.gioActionbar.btnModerator.visible()
             }
             manageState(taskDetails)
@@ -894,62 +901,64 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private fun setDetails(id: String) {
 
         binding.becomeModerator.gone()
+        if (db.tasksDao().isNull) {
+            Log.d("detailsFetch","Fetch from firestore")
 
-        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
 
-            try {
+                try {
 
-                val taskResult = withContext(Dispatchers.IO) {
-                    viewModel.getTasksById(id, PrefManager.getcurrentProject())
-                }
-
-                Timber.tag(TAG).d("Fetched task result : ${taskResult}")
-
-                when (taskResult) {
-
-                    is ServerResult.Failure -> {
-
-                        utils.singleBtnDialog(
-                            "Failure",
-                            "Failure in task fetching : ${taskResult.exception.message}",
-                            "Okay"
-                        ) {
-                            requireActivity().finish()
-                        }
-
-                        binding.progressBar.gone()
-
+                    val taskResult = withContext(Dispatchers.IO) {
+                        viewModel.getTasksById(id, PrefManager.getcurrentProject())
                     }
 
-                    is ServerResult.Progress -> {
-                        binding.progressBar.visible()
-                    }
+                    Timber.tag(TAG).d("Fetched task result : ${taskResult}")
 
-                    is ServerResult.Success -> {
+                    when (taskResult) {
 
-                        val currentUser = FirebaseAuth.getInstance().currentUser
-                        val localUserObj = PrefManager.getcurrentUserdetails()
+                        is ServerResult.Failure -> {
 
-                        currentUser?.let { userObj ->
-
-                            if (taskResult.data.moderators.size==0 && localUserObj.ROLE >= 2) {
-                                binding.becomeModerator.visible()
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in task fetching : ${taskResult.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
                             }
+
+                            binding.progressBar.gone()
+
                         }
 
-                        binding.progressBar.gone()
+                        is ServerResult.Progress -> {
+                            binding.progressBar.visible()
+                        }
 
-                        setDefaultViews(taskResult.data)
-                        setTaskDetails(taskResult.data)
+                        is ServerResult.Success -> {
+
+                            val currentUser = FirebaseAuth.getInstance().currentUser
+                            val localUserObj = PrefManager.getcurrentUserdetails()
+
+                            currentUser?.let { userObj ->
+
+                                if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                    binding.becomeModerator.visible()
+                                }
+                            }
+
+                            binding.progressBar.gone()
+
+                            setDefaultViews(taskResult.data)
+                            setTaskDetails(taskResult.data)
+
+                        }
 
                     }
 
-                }
+                } catch (e: Exception) {
 
-            } catch (e: Exception) {
-
-                Timber.tag(TAG).e(e)
-                binding.progressBar.gone()
+                    Timber.tag(TAG).e(e)
+                    binding.progressBar.gone()
 
 //                utils.singleBtnDialog(
 //                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
@@ -957,8 +966,53 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 //                    requireActivity().finish()
 //                }
 
-            }
+                }
 
+            }
+        }
+        else{
+            Log.d("detailsFetch","Fetch from db")
+            viewModel.getTaskbyIdFromDB(
+                projectName = PrefManager.getcurrentProject(),
+                taskId = id
+                ) { result ->
+                when (result) {
+                    is DBResult.Success -> {
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        val localUserObj = PrefManager.getcurrentUserdetails()
+
+                        currentUser?.let { userObj ->
+
+                            if (result.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                binding.becomeModerator.visible()
+                            }
+                        }
+
+                        binding.progressBar.gone()
+
+                        setDefaultViews(result.data)
+                        setTaskDetails(result.data)
+
+                    }
+                    is DBResult.Failure -> {
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in task fetching : ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+
+                        binding.progressBar.gone()
+                    }
+
+                    is DBResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                }
+
+            }
         }
     }
 
@@ -1208,7 +1262,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                     viewModel.updateState(
                         taskID = activityBinding.taskId,
                         userID = taskDetails.assignee,
-                        newState = text
+                        newState = text,
+                        projectName = PrefManager.getcurrentProject()
                     )
                 }
                 when (result) {
@@ -1310,6 +1365,56 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                         activityBinding.binding.gioActionbar.btnModerator.visible()
                         binding.progressBar.gone()
                         toast("Updated new Moderators")
+                        requireActivity().recreate()
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+
+            }
+        }
+    }
+
+    override fun onSectionSelected(sectionName: String) {
+        binding.sectionNameET.text = sectionName
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    viewModel.updateSection(
+                        taskID = activityBinding.taskId,
+                        projectName = PrefManager.getcurrentProject(),
+                        newSection = sectionName
+                    )
+
+                }
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in Updating: ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        toast("Update Section")
                         requireActivity().recreate()
 
                     }

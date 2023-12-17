@@ -1,12 +1,20 @@
 package com.ncs.o2.UI.UIComponents.Adapters
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.R
 import com.ncs.o2.databinding.ChecklistItemBinding
 import io.noties.markwon.Markwon
 
@@ -141,5 +149,10 @@ class CheckListAdapter constructor(
         fun removeCheckList(position: Int)
         fun onClick(position: Int)
         fun onCheckBoxClick(id: String, isChecked: Boolean, position: Int)
+    }
+    fun updateCheckBoxState(id: String, isChecked: Boolean) {
+        val item = list.firstOrNull { it.id == id }
+        item?.done = isChecked
+        notifyItemChanged(list.indexOf(item))
     }
 }
