@@ -9,6 +9,7 @@ import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
@@ -66,6 +67,7 @@ class O2Application : Application(), Configuration.Provider{
     //Todo : Check if initiations taking too long, before production
     override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(this)
 
 
 
@@ -82,6 +84,8 @@ class O2Application : Application(), Configuration.Provider{
         if (BuildConfig.DEBUG)  {
             Timber.plant(Timber.DebugTree())
         }
+
+
 
         PrefManager.putLastCacheUpdateTimestamp(Timestamp.now())
 
@@ -207,6 +211,8 @@ class O2Application : Application(), Configuration.Provider{
 
 
                     }
+
+                    else -> {}
                 }
             }
         }

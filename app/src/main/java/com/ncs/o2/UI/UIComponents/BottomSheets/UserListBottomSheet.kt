@@ -68,7 +68,12 @@ class UserListBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fetchContributors(PrefManager.getcurrentProject())
-        binding.sheetTitle.text="Assignee"
+        if (type=="ASSIGNEE") {
+            binding.sheetTitle.text = "Assignee"
+        }
+        else{
+            binding.sheetTitle.text = "Created By"
+        }
         initView()
 
         binding.searchBox.addTextChangedListener(object : TextWatcher {

@@ -1,0 +1,129 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/darkbg_main"
+    android:minHeight="200dp"
+    >
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/purple"
+        />
+
+    <RelativeLayout
+        android:background="@color/secondary_bg_black"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        >
+
+        <ImageButton
+            android:id="@+id/close_btn"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:src="@drawable/baseline_close_24"
+            app:tint="@color/red" />
+
+
+        <TextView
+            android:id="@+id/sheet_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@+id/submit_btn"
+            android:layout_toEndOf="@+id/close_btn"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:gravity="center"
+            android:text="Add Project"
+            android:textColor="@color/better_white"
+            android:textSize="16dp" />
+
+
+        <ImageButton
+            android:id="@+id/submit_btn"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:background="@null"
+            android:visibility="invisible"
+            android:layout_marginEnd="10dp"
+            app:tint="@color/green"
+            app:srcCompat ="@drawable/baseline_done_24"
+            />
+
+    </RelativeLayout>
+
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/card_bg"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:gravity="center"
+        android:paddingStart="@dimen/_5dp"
+        android:layout_marginTop="20dp"
+        android:text="Confirm to add this project"
+        android:textColor="@color/better_white"
+        android:textSize="17dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:gravity="center"
+        android:id="@+id/projectName"
+        android:paddingStart="@dimen/_5dp"
+        android:layout_marginTop="20dp"
+        android:text="NCSOxygen"
+        android:textColor="@color/better_white"
+        android:textSize="20dp"
+        />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="40dp"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        >
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:background="@drawable/label_cardview_green"
+            android:text="Yes"
+            android:layout_marginStart="10dp"
+            android:textAllCaps="false"
+            android:id="@+id/btnYes"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_height="40dp"
+            android:background="@drawable/label_cardview_red"
+            android:text="No"
+            android:textColor="@color/better_white"
+            android:textAllCaps="false"
+            android:id="@+id/btnNo"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+
+
+</LinearLayout>

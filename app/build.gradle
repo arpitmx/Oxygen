@@ -89,6 +89,7 @@ dependencies {
 
     //Codeviewer
     implementation 'com.github.kbiakov:CodeView-Android:1.3.2'
+    implementation 'com.google.firebase:firebase-dynamic-links-ktx:21.2.0'
 
 
     final def markwon_version = '4.6.2'
@@ -241,6 +242,8 @@ dependencies {
     implementation 'io.github.igreenwood.loupe:loupe:1.2.2'
     implementation 'io.github.igreenwood.loupe:extensions:1.0.1'
 
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation 'com.google.firebase:firebase-dynamic-links-ktx'
 
 
 

@@ -4,6 +4,7 @@ package com.ncs.o2.UI
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -14,6 +15,8 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.dynamiclinks.DynamicLink
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.User
@@ -47,10 +50,22 @@ class CreateProject : AppCompatActivity() {
             val _title=binding.projectTitle.text.toString()
             val __title = _title.replace(" ", "")
             val title = __title.toLowerCase().capitalize()
+            val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://hackncs.in/${title.toLowerCase().trim()}"))
+                .setDomainUriPrefix("https://hackncs.page.link")
+                .setAndroidParameters(
+                    DynamicLink.AndroidParameters.Builder("com.ncs.o2")
+                        .setMinimumVersion(1)
+                        .build()
+                )
+                .buildDynamicLink()
+
+            val dynamicLinkUri = dynamicLink.uri
+
             val projectData = hashMapOf(
                 "PROJECT_NAME" to title.trim(),
                 "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12).trim()}",
-                "PROJECT_LINK" to "${title.toLowerCase().trim()}.ncs.in",
+                "PROJECT_LINK" to dynamicLinkUri,
                 "PROJECT_DESC" to desc.toString().trim(),
                 "last_updated" to Timestamp.now(),
             )

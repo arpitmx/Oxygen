@@ -1,27 +1,40 @@
 package com.ncs.o2.UI
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.tasks.Tasks
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
@@ -33,6 +46,7 @@ import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
+import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
@@ -46,9 +60,11 @@ import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,6 +85,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+
+
 
     @Inject
     lateinit var db:TasksDatabase
@@ -87,7 +106,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        if (FirebaseAuth.getInstance().currentUser!=null) {
+            handleDynamicLink(intent)
+        }
+        else{
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, AuthScreenActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            Toast.makeText(this, "Please log in first", Toast.LENGTH_LONG).show()
+        }
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         setContentView(binding.root)
@@ -98,6 +127,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         viewModel.currentSegment.observe(this, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
+
+
+
+
 
     }
     private fun manageViews(){
@@ -406,5 +439,108 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         fragmentTransaction.commit()
 
     }
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleDynamicLink(intent)
+    }
 
+    private fun handleDynamicLink(intent: Intent?) {
+        val dynamicLinkTask = FirebaseDynamicLinks.getInstance().getDynamicLink(intent!!)
+        dynamicLinkTask.addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                val dynamicLink = task.result
+                if (dynamicLink != null) {
+                    handleDeepLink(dynamicLink.link!!)
+                }
+            } else {
+                Log.e("DynamicLink", "Error getting dynamic link", task.exception)
+            }
+        }
+    }
+
+
+    private fun handleDeepLink(uri: Uri) {
+        val pathSegments = uri.pathSegments
+        if (pathSegments.size >= 2) {
+            val operationType = pathSegments[0]
+            val id = pathSegments[1]
+
+
+            when(operationType){
+                "join" -> {
+                    if (PrefManager.getProjectsList().any { it.equals(id, ignoreCase = true) }) {
+                        easyElements.showSnackbar(binding.root,"You have already joined this project",2000)
+                    }else{
+                        lifecycleScope.launch {
+                            val isValidLink = isValidProjectLink(uri.toString())
+                            if (isValidLink) {
+                                showBottomSheetForJoinConfirmation(uri.toString(),id)
+                            } else {
+                                easyElements.showSnackbar(binding.root,"Invalid project link",2000)
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+    private suspend fun isValidProjectLink(projectLink: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val querySnapshot = FirebaseFirestore.getInstance().collection("Projects")
+                    .whereEqualTo("PROJECT_DEEPLINK", projectLink.toLowerCase())
+                    .limit(1)
+                    .get()
+                    .await()
+
+                return@withContext querySnapshot.documents.isNotEmpty()
+            } catch (e: Exception) {
+                return@withContext false
+            }
+        }
+    }
+
+    private fun showBottomSheetForJoinConfirmation(projectLink: String,id:String) {
+        val bottomSheetDialog = BottomSheetDialog(this)
+        val view = LayoutInflater.from(this).inflate(R.layout.deeplink_project_add_sheet, null)
+
+        view.findViewById<Button>(R.id.btnYes).setOnClickThrottleBounceListener {
+            addProjectToUser(projectLink)
+            bottomSheetDialog.dismiss()
+        }
+
+        view.findViewById<TextView>(R.id.projectName).text=id
+
+        view.findViewById<Button>(R.id.btnNo).setOnClickThrottleBounceListener {
+            bottomSheetDialog.dismiss()
+        }
+        view.findViewById<AppCompatImageButton>(R.id.close_btn).setOnClickThrottleBounceListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.setContentView(view)
+        bottomSheetDialog.show()
+    }
+
+    private fun addProjectToUser(projectLink: String) {
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val result = firestoreRepository.addProjectToUser(projectLink)
+            when (result) {
+                is ServerResult.Success -> {
+                    projects.clear()
+                    projects.addAll(result.data)
+                    PrefManager.putProjectsList(result.data)
+                    projectListAdapter.notifyDataSetChanged()
+                    easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)
+                }
+                is ServerResult.Failure -> {
+                    Toast.makeText(this@MainActivity, "Failed to add project: ${result.exception.message}", Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+    }
 }

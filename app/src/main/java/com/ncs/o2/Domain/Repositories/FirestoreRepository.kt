@@ -1,14 +1,11 @@
 package com.ncs.o2.Domain.Repositories
 
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.text.format.Time
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -22,7 +19,6 @@ import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.Transaction
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.ncs.o2.BuildConfig
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
@@ -50,7 +46,6 @@ import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -83,7 +78,7 @@ Tasks FUTURE ADDITION :
 class FirestoreRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : Repository {
-
+    private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val storageReference = FirebaseStorage.getInstance().reference
     private val TAG: String = com.ncs.o2.Domain.Repositories.FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback: ServerErrorCallback
@@ -250,39 +245,40 @@ class FirestoreRepository @Inject constructor(
         bitmap: Bitmap,
         projectId: String
     ): LiveData<ServerResult<StorageReference>> {
+
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
-        val imageFileName = "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
+        val imageFileName =
+            "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
+//            "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
         val data = baos.toByteArray()
         val uploadTask = imageRef.putBytes(data)
 
-        uploadTask.addOnSuccessListener { _ ->
-            try {
-                firestore.runTransaction { transaction ->
-                    val userDocRef = firestore.collection("Users")
-                        .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                    val userUserData = mapOf("PHOTO_ADDED" to true)
-                    transaction.update(userDocRef, userUserData)
-                    val lastUpdate=Timestamp.now()
-                    updateLastUpdated(projectId,transaction)
-                    null
-                }.addOnSuccessListener {
+
+        uploadTask.addOnSuccessListener {
+            val userData = mapOf(
+                "PHOTO_ADDED" to true,
+            )
+
+            firestore.collection("Users")
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                .update(userData)
+                .addOnSuccessListener {
                     liveData.postValue(ServerResult.Success(imageRef))
-                }.addOnFailureListener { e ->
+                }
+                .addOnFailureListener { e ->
                     liveData.postValue(ServerResult.Failure(e))
                 }
-            } catch (exception: Exception) {
-                liveData.postValue(ServerResult.Failure(exception))
-            }
+
         }.addOnFailureListener { exception ->
             liveData.postValue(ServerResult.Failure(exception))
+
         }
 
         return liveData
     }
-
 
     override fun getProjectIcon(reference: StorageReference): LiveData<ServerResult<StorageReference>> {
         TODO("Not yet implemented")
@@ -608,24 +604,32 @@ class FirestoreRepository @Inject constructor(
         serverResult(ServerResult.Progress)
         Handler(Looper.getMainLooper()).postDelayed({
             var currentUser: CurrentUser?
-            firestore.collection(Endpoints.USERS)
-                .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .get(Source.SERVER)
-                .addOnSuccessListener { snap ->
-                    if (snap.exists()) {
-                        currentUser = snap.toObject(CurrentUser::class.java)
+            val user=FirebaseAuth.getInstance().currentUser
+            if (!user.isNull) {
+                firestore.collection(Endpoints.USERS)
+                    .document(user?.email!!)
+                    .get(Source.SERVER)
+                    .addOnSuccessListener { snap ->
+                        if (snap != null && snap.exists()) {
+                            currentUser = snap.toObject(CurrentUser::class.java)
 
-                        Timber.tag(TAG).d(currentUser?.USERNAME)
-                        Timber.tag(TAG).d(currentUser?.EMAIL)
-                        Timber.tag(TAG).d(currentUser?.PROJECTS.toString())
+                            if (currentUser != null) {
+                                Timber.tag(TAG).d(currentUser?.USERNAME)
+                                Timber.tag(TAG).d(currentUser?.EMAIL)
+                                Timber.tag(TAG).d(currentUser?.PROJECTS.toString())
+                                serverResult(ServerResult.Success(currentUser))
+                            }
 
-                        serverResult(ServerResult.Success(currentUser))
+                            serverResult(ServerResult.Success(currentUser))
+                        } else {
+                            serverResult(ServerResult.Failure(Exception("User Not Found")))
+                        }
                     }
-                }
-                .addOnFailureListener { error ->
-                    Timber.tag(TAG).d("failed %s", error.stackTrace)
-                    serverResult(ServerResult.Failure(error))
-                }
+                    .addOnFailureListener { error ->
+                        Timber.tag(TAG).e(error, "Failed to retrieve user information")
+                        serverResult(ServerResult.Failure(error))
+                    }
+            }
         }, 1000)
     }
 
@@ -1597,6 +1601,7 @@ class FirestoreRepository @Inject constructor(
             }
         }
     }
+
     override suspend fun getSearchedTasks(
         assignee: String,
         creator: String,
@@ -1665,7 +1670,81 @@ class FirestoreRepository @Inject constructor(
         )
         transaction.update(projectDocRef, projectData)
     }
+    suspend fun addProjectToUser(projectLink: String): ServerResult<ArrayList<String>> {
+        return try {
+            if (projectLink.isNotBlank()) {
+                val userDocument = getUserDocument()
 
+                val projectData = getProjectData(projectLink)
+
+                if (projectData != null) {
+                    val isProjectAlreadyAdded = checkIfProjectAlreadyAdded(userDocument, projectData)
+                    if (isProjectAlreadyAdded) {
+                        return ServerResult.Success(ArrayList())
+                    }
+
+                    userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData))
+                        .await()
+
+                    updateProjectContributors(projectData)
+                    PrefManager.lastaddedproject(projectData)
+
+                    val updatedUserProjects = getUserProjects(userDocument)
+
+                    return ServerResult.Success(updatedUserProjects)
+                } else {
+                    return ServerResult.Failure(Exception("Project not found, please check the link"))
+                }
+            } else {
+                return ServerResult.Failure(Exception("Project Link can't be empty"))
+            }
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    private suspend fun getUserDocument(): DocumentReference {
+        return firebaseFirestore.collection("Users")
+            .document(FirebaseAuth.getInstance().currentUser?.email!!)
+    }
+
+    private suspend fun getProjectData(projectLink: String): String? {
+        Log.d("projectcheck",projectLink.toString())
+        val documents = firebaseFirestore.collection("Projects")
+            .whereEqualTo("PROJECT_DEEPLINK", projectLink.toLowerCase())
+            .get()
+            .await()
+
+        return if (!documents.isEmpty) {
+            documents.documents.firstOrNull()?.getString("PROJECT_NAME")
+        } else {
+            null
+        }
+    }
+
+    private suspend fun checkIfProjectAlreadyAdded(
+        userDocument: DocumentReference,
+        projectData: String
+    ): Boolean {
+        val userSnapshot = userDocument.get().await()
+        val userProjects = userSnapshot.get("PROJECTS") as ArrayList<String>?
+        return userProjects != null && userProjects.contains(projectData)
+    }
+
+    private fun updateProjectContributors(projectData: String) {
+        val addContributors = mapOf(
+            "contributors" to FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.email)
+        )
+
+        firebaseFirestore.collection(Endpoints.PROJECTS)
+            .document(projectData)
+            .update(addContributors)
+    }
+
+    private suspend fun getUserProjects(userDocument: DocumentReference): ArrayList<String> {
+        val userSnapshot = userDocument.get().await()
+        return userSnapshot.get("PROJECTS") as ArrayList<String>? ?: ArrayList()
+    }
 }
 
 
