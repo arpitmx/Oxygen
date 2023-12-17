@@ -20,11 +20,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ncs.o2.Domain.Delegates.firestoreDelegate
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.Navigator
@@ -73,6 +75,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    //Delegation
+    var userRole : Int by firestoreDelegate("slowfast@hackncs.in", this)
+
     // Dependency Injection
     @Inject
     lateinit var navigator: Navigator
@@ -87,11 +92,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         PrefManager.initialize(this)
         setUpViews()
 
+
+
+
+
         viewModel.currentSegment.observe(this, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
-
-
     }
     private fun manageViews(){
         if (PrefManager.getcurrentsegment()== "Select Segment") {

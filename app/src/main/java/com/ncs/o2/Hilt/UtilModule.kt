@@ -47,7 +47,7 @@ Tasks FUTURE ADDITION :
 object UtilModule {
 
     @Provides
-    fun providesEasyElements( context : Activity):
+    fun providesEasyElements(@ApplicationContext context : Context):
             GlobalUtils.EasyElements{
         return GlobalUtils.EasyElements(context)
     }

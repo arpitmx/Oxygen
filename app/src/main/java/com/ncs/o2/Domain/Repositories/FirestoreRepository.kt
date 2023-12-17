@@ -109,7 +109,7 @@ class FirestoreRepository @Inject constructor(
     override suspend fun updateNotificationTimeStampPath(serverResult: (ServerResult<Long>) -> Unit) {
 
         val currentTimeStamp = HashMap<String, Any>()
-        val currentTime = com.google.firebase.Timestamp.now().seconds
+        val currentTime = Timestamp.now().seconds
         currentTimeStamp[Endpoints.Notifications.NOTIFICATION_LAST_SEEN] = currentTime
 
         return try {
