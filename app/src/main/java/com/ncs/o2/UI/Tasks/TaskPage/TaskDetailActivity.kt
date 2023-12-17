@@ -3,6 +3,7 @@ package com.ncs.o2.UI.Tasks.TaskPage
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -26,7 +27,8 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     lateinit var isworkspace:String
     var users:MutableList<UserInMessage> = mutableListOf()
     val sharedViewModel: SharedViewModel by viewModels()
-
+    var moderatorsList: MutableList<String> = mutableListOf()
+    var assignee:String=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

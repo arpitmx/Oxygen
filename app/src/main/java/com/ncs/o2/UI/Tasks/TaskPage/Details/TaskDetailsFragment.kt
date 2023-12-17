@@ -19,39 +19,38 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.FirebaseUtils
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
@@ -67,8 +66,10 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
+import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.editor.MarkwonEditor
@@ -85,14 +86,15 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallback,
+class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter.OnProfileClickCallback,
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
-    ModeratorsBottomSheet.getContributorsCallback {
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
-
+    @Inject
+    lateinit var db: TasksDatabase
     private var _binding: FragmentTaskDetailsFrgamentBinding? = null
     private val binding get() = _binding!!
     private var moderators: MutableList<User> = mutableListOf()
@@ -163,6 +165,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             setDetails(activityBinding.taskId)
         }
         binding.assignee.isEnabled = false
+        binding.section.isEnabled=false
         binding.activity.setOnClickThrottleBounceListener {
             val viewpager = tasksHolderBinding.binding.viewPager2
             val next = viewpager.currentItem + 1
@@ -202,13 +205,19 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         handleRequestNotificationResult()
 
         activityBinding.binding.gioActionbar.btnModerator.setOnClickThrottleBounceListener {
-            toast("You are a moderator, can edit this task")
+            //toast("You are a moderator, can edit this task")
+            utils.showSnackbar(binding.root,"You are a moderator and can edit this task",5000)
         }
         binding.assignee.setOnClickThrottleBounceListener {
             Log.d("assigne", "passing this list ${selectedAssignee.toString()}")
             val assigneeListBottomSheet =
                 AssigneeListBottomSheet(OList, selectedAssignee, this, this)
             assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
+        }
+        binding.section.setOnClickThrottleBounceListener {
+            val sections = sectionDisplayBottomSheet(taskDetails.segment)
+            sections.sectionSelectionListener = this@TaskDetailsFragment
+            sections.show(requireFragmentManager(), "Section Selection")
         }
 
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
@@ -279,7 +288,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
     private fun setDefaultViews(task: Task) {
 
 
-        binding.projectNameET.text = task.project_ID
+        binding.sectionNameET.text = task.section
         viewModel.task = task
         val priority = when (task.priority) {
             1 -> "Low"
@@ -329,7 +338,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         // Assignee
         if (task.assignee != Endpoints.TaskDetails.EMPTY_MODERATORS) {
-
+            activityBinding.assignee=task.assignee
             fetchUserbyId(task.assignee) { user ->
                 user?.isChecked = true
                 selectedAssignee.add(user!!)
@@ -488,13 +497,16 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
             if (moderator.firebaseID == PrefManager.getcurrentUserdetails().EMAIL) {
                 isModerator = true
                 binding.assignee.isEnabled = true
+                binding.section.isEnabled=true
                 activityBinding.binding.gioActionbar.btnModerator.visible()
             }
             manageState(taskDetails)
             manageAddModeratorsView(isModerator)
         }
+
         val contriRecyclerView = binding.contributorsRecyclerView
         contriRecyclerView.visible()
+
         val layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
@@ -515,29 +527,29 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         tagsRecyclerView.adapter = adapter
     }
 
-    private fun setLinksView(list: MutableList<String>) {
-        val num = list.size
-        val parentLayout = binding.linksCont
-        val inflater = LayoutInflater.from(requireContext())
-        TextViewList.clear()
-
-        for (i in 0 until num) {
-            val text = inflater.inflate(
-                R.layout.links_item, parentLayout, false
-            ) as TextView
-            TextViewList.add(text)
-            parentLayout.addView(text)
-            text.text = list[i]
-        }
-
-        for (i in 0 until num) {
-
-            TextViewList[i].setOnClickThrottleBounceListener {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
-                startActivity(intent)
-            }
-        }
-    }
+//    private fun setLinksView(list: MutableList<String>) {
+//        val num = list.size
+//        //val parentLayout = binding.linksCont
+//        val inflater = LayoutInflater.from(requireContext())
+//        TextViewList.clear()
+//
+//        for (i in 0 until num) {
+//            val text = inflater.inflate(
+//                R.layout.links_item, parentLayout, false
+//            ) as TextView
+//            TextViewList.add(text)
+//            parentLayout.addView(text)
+//            text.text = list[i]
+//        }
+//
+//        for (i in 0 until num) {
+//
+//            TextViewList[i].setOnClickThrottleBounceListener {
+//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TextViewList[i].text.toString()))
+//                startActivity(intent)
+//            }
+//        }
+//    }
 
 
     override fun onProfileClick(user: User, position: Int) {
@@ -556,6 +568,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         binding.parentScrollview.visible()
 
         taskDetails = task
+        activityBinding.moderatorsList.addAll(taskDetails.moderators)
         setTags()
         fetchUsers()
 
@@ -602,16 +615,10 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
         Timber.d("Moderators list : ${taskDetails.moderators}")
 
-        if (taskDetails.moderators.isEmpty()) {
+        if (taskDetails.moderators.size == 0) {
             //toast("Contributor empty")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
-
-        } else if (taskDetails.moderators[0] == Endpoints.TaskDetails.EMPTY_MODERATORS) {
-            // toast("Contributor not empty None")
-            binding.contributorsRecyclerView.gone()
-            binding.noContributors.visible()
-
         } else {
 
             binding.contributorsRecyclerView.visible()
@@ -628,10 +635,18 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                             binding.parentScrollview.visible()
 
                             val user = result.data
-                            users.add(user!!)
-                            moderators.add(user)
-                            moderatorsList.add(user.firebaseID!!)
-                            setContributors(users)
+
+                            user?.let {
+
+                                users.add(user)
+                                moderators.add(user)
+                                moderatorsList.add(user.firebaseID!!)
+                                setContributors(users)
+                                pushToReceiver(user)
+                            }
+
+
+
                         }
 
                         is ServerResult.Failure -> {
@@ -885,56 +900,65 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 
     private fun setDetails(id: String) {
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        binding.becomeModerator.gone()
+        if (db.tasksDao().isNull) {
+            Log.d("detailsFetch","Fetch from firestore")
 
-            try {
+            viewLifecycleOwner.lifecycleScope.launch {
 
-                val taskResult = withContext(Dispatchers.IO) {
-                    viewModel.getTasksById(id, PrefManager.getcurrentProject())
-                }
+                try {
 
-                Timber.tag(TAG).d("Fetched task result : ${taskResult}")
+                    val taskResult = withContext(Dispatchers.IO) {
+                        viewModel.getTasksById(id, PrefManager.getcurrentProject())
+                    }
 
-                when (taskResult) {
+                    Timber.tag(TAG).d("Fetched task result : ${taskResult}")
 
-                    is ServerResult.Failure -> {
+                    when (taskResult) {
 
-                        utils.singleBtnDialog(
-                            "Failure",
-                            "Failure in task fetching : ${taskResult.exception.message}",
-                            "Okay"
-                        ) {
-                            requireActivity().finish()
+                        is ServerResult.Failure -> {
+
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in task fetching : ${taskResult.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
+                            }
+
+                            binding.progressBar.gone()
+
                         }
 
-                        binding.progressBar.gone()
+                        is ServerResult.Progress -> {
+                            binding.progressBar.visible()
+                        }
 
-                    }
+                        is ServerResult.Success -> {
 
-                    is ServerResult.Progress -> {
-                        binding.progressBar.visible()
-                    }
+                            val currentUser = FirebaseAuth.getInstance().currentUser
+                            val localUserObj = PrefManager.getcurrentUserdetails()
 
-                    is ServerResult.Success -> {
+                            currentUser?.let { userObj ->
 
-                        binding.progressBar.gone()
-                        setDefaultViews(taskResult.data)
-                        setTaskDetails(taskResult.data)
+                                if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                    binding.becomeModerator.visible()
+                                }
+                            }
 
-                        val currentUser = PrefManager.getcurrentUserdetails()
+                            binding.progressBar.gone()
 
-                        if (!taskResult.data.moderators.contains(currentUser.EMAIL) && currentUser.ROLE >= 2 && taskResult.data.moderators.isEmpty()) {
-                            binding.becomeModerator.visible()
+                            setDefaultViews(taskResult.data)
+                            setTaskDetails(taskResult.data)
+
                         }
 
                     }
 
-                }
+                } catch (e: Exception) {
 
-            } catch (e: Exception) {
-
-                Timber.tag(TAG).e(e)
-                binding.progressBar.gone()
+                    Timber.tag(TAG).e(e)
+                    binding.progressBar.gone()
 
 //                utils.singleBtnDialog(
 //                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
@@ -942,8 +966,53 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
 //                    requireActivity().finish()
 //                }
 
-            }
+                }
 
+            }
+        }
+        else{
+            Log.d("detailsFetch","Fetch from db")
+            viewModel.getTaskbyIdFromDB(
+                projectName = PrefManager.getcurrentProject(),
+                taskId = id
+                ) { result ->
+                when (result) {
+                    is DBResult.Success -> {
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        val localUserObj = PrefManager.getcurrentUserdetails()
+
+                        currentUser?.let { userObj ->
+
+                            if (result.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                binding.becomeModerator.visible()
+                            }
+                        }
+
+                        binding.progressBar.gone()
+
+                        setDefaultViews(result.data)
+                        setTaskDetails(result.data)
+
+                    }
+                    is DBResult.Failure -> {
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in task fetching : ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+
+                        binding.progressBar.gone()
+                    }
+
+                    is DBResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                }
+
+            }
         }
     }
 
@@ -1033,7 +1102,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                                     val user = result.data
                                     users.add(user!!)
                                     moderators.add(user)
-                                    moderatorsList.add(user.firebaseID!!)
+                                    activityBinding.moderatorsList.add(user.firebaseID!!)
+
                                     setContributors(users)
                                 }
                             }
@@ -1115,37 +1185,7 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
         if (isChecked) {
             selectedAssignee.add(assignee)
             binding.assigneeInclude.normalET.text = assignee.username
-            Glide.with(this)
-                .load(assignee.profileDPUrl)
-                .listener(object : RequestListener<Drawable> {
-
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-                })
-                .encodeQuality(80)
-                .override(40, 40)
-                .apply(
-                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-
-                )
-                .error(R.drawable.profile_pic_placeholder)
-                .into(binding.assigneeInclude.tagIcon)
+            binding.assigneeInclude.tagIcon.loadProfileImg(assignee.profileDPUrl.toString())
 
         } else {
             selectedAssignee.remove(assignee)
@@ -1222,7 +1262,8 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                     viewModel.updateState(
                         taskID = activityBinding.taskId,
                         userID = taskDetails.assignee,
-                        newState = text
+                        newState = text,
+                        projectName = PrefManager.getcurrentProject()
                     )
                 }
                 when (result) {
@@ -1324,6 +1365,56 @@ class TaskDetailsFragment : Fragment(), ContributorAdapter.OnProfileClickCallbac
                         activityBinding.binding.gioActionbar.btnModerator.visible()
                         binding.progressBar.gone()
                         toast("Updated new Moderators")
+                        requireActivity().recreate()
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+
+            }
+        }
+    }
+
+    override fun onSectionSelected(sectionName: String) {
+        binding.sectionNameET.text = sectionName
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    viewModel.updateSection(
+                        taskID = activityBinding.taskId,
+                        projectName = PrefManager.getcurrentProject(),
+                        newSection = sectionName
+                    )
+
+                }
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in Updating: ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        toast("Update Section")
                         requireActivity().recreate()
 
                     }

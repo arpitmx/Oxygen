@@ -66,10 +66,13 @@ object Endpoints {
         const val PROJECTNAME = "PROJECT_NAME"
         const val TAGS = "TAGS"
         const val CHECKLIST="CHECKLIST"
-
+        const val LAST_UPDATED="last_updated"
     }
 
+
+
     object Notifications {
+        val TASKID: String = "TASKID"
         const val NOTIFICATION_LAST_SEEN = "NOTIFICATION_LAST_SEEN"
         const val NOTIFICATION_COUNT = "NOTIFICATION_COUNT"
         const val LATEST_NOTIFICATION_TIME_STAMP = "LATEST_NOTIFICATION_TIME_STAMP"
@@ -87,6 +90,18 @@ object Endpoints {
         const val fromUser: String = "fromUser"
         const val toUser: String = "toUser"
         const val timeStamp: String = "timeStamp"
+
+        const val TO: String = "to"
+        const val TITLE: String = "title"
+        const val BODY: String = "body"
+        const val DATA: String = "data"
+        const val TYPE: String = "type"
+
+
+        object Groups{
+            const val COMMENT_NOTIF_GROUP: String = "Comment_Notification_Group"
+
+        }
 
         object Types {
             const val REQUEST_FAILED_NOTIFICATION = 1
@@ -128,6 +143,10 @@ object Endpoints {
         object MESSAGES{
             const val USERLIST_TABLE="users_in_messages"
             const val USERLIST_DB="users_in_messages_db"
+        }
+        object TASKS{
+            const val TASKS_TABLE="tasks"
+            const val TASKS_DB="tasks_db"
         }
 
 

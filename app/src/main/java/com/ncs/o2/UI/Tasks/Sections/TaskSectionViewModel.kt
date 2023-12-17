@@ -3,11 +3,13 @@ package com.ncs.o2.UI.Tasks.Sections
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Repositories.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +38,7 @@ Tasks FUTURE ADDITION :
 
 */
 @HiltViewModel
-class TaskSectionViewModel @Inject constructor(private val firestoreRepository: FirestoreRepository) : ViewModel(){
+class TaskSectionViewModel @Inject constructor(private val firestoreRepository: FirestoreRepository, private val taskRepository: TaskRepository) : ViewModel(){
 
     fun getTasksItemsForSegment(
         projectName: String,
@@ -48,6 +50,17 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
            firestoreRepository.getTasksItem(projectName, segmentName, sectionName, resultCallback)
        }
     }
+    fun getTasksForSegmentFromDB(
+        projectName: String,
+        segmentName: String,
+        sectionName: String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTasksItemsForSegment(projectName, segmentName, sectionName, resultCallback)
+        }
+    }
+
     fun getTasksForSegment(
         projectName: String,
         segmentName: String,

@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
@@ -33,7 +34,6 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
-import com.ncs.o2.UI.DoneScreen.DoneFragment
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
@@ -41,10 +41,14 @@ import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
+import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -65,6 +69,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+
+    @Inject
+    lateinit var db:TasksDatabase
 
     // Navigation drawer toggle
     private lateinit var toggle: ActionBarDrawerToggle
@@ -91,7 +98,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         viewModel.currentSegment.observe(this, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
-
 
     }
     private fun manageViews(){
@@ -136,6 +142,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setBottomNavBar()
         setUpViewsOnClicks()
         setupProjectsList()
+
     }
 
 //    private fun makeFullScreen() {
@@ -168,6 +175,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
 
     private fun setUpActionBar() {
+        binding.gioActionbar.actionbar.visible()
 
         // Set up the action bar, navigation drawer, and other UI components
 
@@ -248,6 +256,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             drawerLayout.closeDrawer(GravityCompat.START)
 
         }
+        binding.gioActionbar.searchBar.setOnClickThrottleBounceListener {
+            replaceFragment(SearchFragment())
+            bottmNav.selectedItemId = R.id.bottom_search
+        }
     }
 
     private fun setNotificationCountOnActionBar() {
@@ -285,9 +297,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         Glide.with(this)
             .load(PrefManager.getDpUrl())
             .placeholder(R.drawable.profile_pic_placeholder)
-            .error(R.drawable.logogradhd)
+            .error(R.drawable.profile_pic_placeholder)
             .override(200,200)
-            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
             .into(binding.drawerheaderfile.userDp)
 
 //        viewModel.showprogressLD.observe(this) { show ->
@@ -372,8 +384,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     true
                 }
 
-                R.id.project_stats_item -> {
-                    replaceFragment(DoneFragment())
+                R.id.bottom_search -> {
+                    replaceFragment(SearchFragment())
                     true
                 }
 

@@ -500,7 +500,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         section = section.toString(),
                         completed = false,
                         type = type,
-                        moderators = contributorList
+                        moderators = contributorList,
+                        last_updated = Timestamp.now()
                     )
                     postTask(task,checkListArray)
                 }
@@ -522,7 +523,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         section = section.toString(),
                         completed = false,
                         type = type,
-                        moderators = listOf("None")
+                        moderators = emptyList(),
+                        last_updated = Timestamp.now()
                     )
                     postTask(task,checkListArray)
                 }
@@ -543,7 +545,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         }
         if(checkList.isEmpty()){
             list.add(CheckList(id = RandomIDGenerator.generateRandomTaskId(5),
-                title = task.title, desc = task.description.substring(0,200), done = false))
+                title = task.title, desc = task.description.substring(0,200), done = false, index = 0))
         }
         CoroutineScope(Dispatchers.Main).launch {
 
@@ -834,6 +836,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     override fun onSegmentSelected(segmentName: String) {
         binding.segment.text = segmentName
+
         Codes.STRINGS.segmentText = segmentName
     }
 

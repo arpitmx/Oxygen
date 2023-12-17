@@ -101,6 +101,7 @@ interface Repository {
         id: String,
         userID:String,
         newState: String,
+        projectName: String
     ): ServerResult<Boolean>
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
@@ -133,9 +134,30 @@ interface Repository {
         done:Boolean,
     ): ServerResult<Boolean>
 
+    suspend fun updateCheckList(
+        taskId: String,
+        projectName: String,
+        id:String,
+        checkList: CheckList
+    ): ServerResult<Boolean>
+    suspend fun updateSection(
+        taskId: String,
+        projectName: String,
+        newSection:String,
+    ): ServerResult<Boolean>
+
+    suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit)
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
-
+    suspend fun getSearchedTasks(
+        assignee:String,
+        creator:String,
+        state:Int,
+        type:Int,
+        text:String,
+        projectName: String,
+        result: (ServerResult<List<TaskItem>>) -> Unit
+    )
 
     fun maintenanceCheck(): LiveData<maintainceCheck>
 
@@ -145,6 +167,9 @@ interface Repository {
         sectionName: String,
         result: (ServerResult<List<TaskItem>>) -> Unit
     )
+    suspend fun getTasksinProject(
+        projectName: String,
+    ): ServerResult<List<Task>>
 
     fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>>
     fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>

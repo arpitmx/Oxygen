@@ -11,6 +11,7 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.google.firebase.Timestamp
 import com.google.firebase.messaging.FirebaseMessaging
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.FirebaseRepository
@@ -54,6 +55,8 @@ class O2Application : Application(), Configuration.Provider{
     private val TAG = O2Application::class.java.simpleName
     @Inject
     lateinit var customWorkerFactory: CustomWorkerFactory
+    @Inject
+    lateinit var db: TasksDatabase
 
     @Inject
     @FirebaseRepository
@@ -80,7 +83,15 @@ class O2Application : Application(), Configuration.Provider{
             Timber.plant(Timber.DebugTree())
         }
 
+        PrefManager.putLastCacheUpdateTimestamp(Timestamp.now())
+
         fcmToken()
+        val projectsList=PrefManager.getProjectsList()
+        for (project in projectsList){
+            initializeListner(project)
+        }
+
+
     }
 
     fun isUIThread(): Boolean {
@@ -175,5 +186,30 @@ class O2Application : Application(), Configuration.Provider{
             appContext,
             workerParameters,
             notificationApiService)
+    }
+    fun initializeListner(projectName:String){
+        CoroutineScope(Dispatchers.Main).launch {
+
+
+            repository.initilizelistner(projectName = projectName) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    ServerResult.Progress -> {
+
+                    }
+
+                    is ServerResult.Success -> {
+
+
+                    }
+                }
+            }
+        }
+
     }
 }
