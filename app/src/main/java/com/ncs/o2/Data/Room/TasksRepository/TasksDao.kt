@@ -36,7 +36,7 @@ interface TasksDao {
             "AND (:state = 0 OR status = :state) " +
             "AND (:creator = '' OR assigner = :creator) " +
             "AND (:assignee = '' OR assignee = :assignee) " +
-            "AND (title LIKE '%' || :text || '%' OR description LIKE '%' || :text || '%')"+
+            "AND (title LIKE '%' || :text || '%' OR description LIKE '%' || :text || '%' OR id LIKE '%' || :text || '%' )"+
             "AND (segment LIKE '%' || :segmentName)"
     )
     suspend fun getSearchedTasks(

@@ -245,150 +245,111 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
             tasks = ArrayList()
             Log.d("fetch","fetching from DB")
-            viewModel.getTasksForSegmentFromDB(projectName, segmentName, sectionName) { result ->
-                when (result) {
-                    is DBResult.Success -> {
-
-                        showLoader(1)
-
-                        val task = result.data
-                        Log.d("fetch",task.toString())
-
-                        tasks.clear()
-
-                        for (element in task) {
-                            tasks.add(element)
-                        }
-
-                        if (tasks.isEmpty()) {
-                            showLoader(-1)
-                        } else {
-
-                            recyclerView = binding.recyclerView
-                            val taskItems: List<TaskItem> = tasks.map { task ->
-                                TaskItem(
-                                    title = task.title,
-                                    id = task.id,
-                                    assignee_id = task.assignee,
-                                    difficulty = task.difficulty,
-                                    timestamp = task.time_STAMP,
-                                    completed = task.completed
-                                )
-                            }
-                            val taskadapter = TaskListAdapter(firestoreRepository, requireContext(),taskItems.toMutableList())
-                            taskadapter.setOnClickListener(this)
-                            val layoutManager =
-                                LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-                            layoutManager.reverseLayout = false
-                            with(recyclerView) {
-                                this.layoutManager = layoutManager
-                                adapter = taskadapter
-                                edgeEffectFactory = BounceEdgeEffectFactory()
-                            }
-
-                            recyclerView.addOnScrollListener(object :
-                                RecyclerView.OnScrollListener() {
-                                override fun onScrollStateChanged(
-                                    recyclerView: RecyclerView,
-                                    newState: Int
-                                ) {
-                                    super.onScrollStateChanged(recyclerView, newState)
-                                    state[0] = newState
-                                }
-
-                                override fun onScrolled(
-                                    recyclerView: RecyclerView,
-                                    dx: Int,
-                                    dy: Int
-                                ) {
-                                    super.onScrolled(recyclerView, dx, dy)
-                                    if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                        hideSearch()
-                                    } else if (dy < -10) {
-                                        showSearch()
-                                    }
-                                }
-                            })
-                            showLoader(0)
-
-                        }
-
-                    }
-
-                    is DBResult.Failure -> {
-                        val errorMessage = result.exception.message
-                        showLoader(-1)
-                        util.singleBtnDialog(
-                            "Failure",
-                            "Failure in loading tasks, try again : ${errorMessage}", "Reload"
-                        ) {
-                            setupRecyclerView()
-                        }
-                    }
-
-                    is DBResult.Progress -> {
-                        showLoader(1)
-                    }
-
-                }
-
-            }
+            fetchfromdb()
         }
 
 
 
-        activityBinding.gioActionbar.filterBtn.setOnClickListener {
-//            val newTask=Task("New Task Added",
-//                "Have to implement that.","#0987",3, listOf("link1,link2"),2,3, listOf("mod1"),
-//                "Assigner1","31/2/22",DURATION = "3", PROJECT_ID = "Versa123", SEGMENT = "SEG1", ASSIGNEE_DP_URL = "https://picsum.photos/300", isCompleted = false
-//            )
-
-//            taskList.add(newTask)
-//            Toast.makeText(requireContext(),"New Task Added",Toast.LENGTH_SHORT).show()
-
-//            taskList.remove(task2)
-//            Toast.makeText(requireContext(),"task2 removed",Toast.LENGTH_SHORT).show()
-
-//            val update=Task("New Task Updated for id #1364",
-//                "Have to implement that.","#1364",3, listOf("link1,link2"),2,3, listOf("mod1"),
-//                "Assigner1","31/2/22",
-//                duration = "3", project_ID = "Versa123", segment = "SEG1", assignee_DP_URL = "https://picsum.photos/300", completed = false
-//            )
-
-//            val id=update.id
-//            for(i in taskList.indices){
-//                if(taskList[i].id==id){
-//                    taskList[i]=update
-//                }
-//            }
-
-//            Toast.makeText(requireContext(),"task updated",Toast.LENGTH_SHORT).show()
-//            taskListAdapter.setTaskList(taskList)
-
+        activityBinding.gioActionbar.refresh.setOnClickListener {
+            fetchfromdb()
         }
-
-//        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-//                if (dy > 100 && searchCont.visibility == View.VISIBLE) {
-//                   Handler(Looper.getMainLooper()).postDelayed({
-//                       searchCont.progressGoneSlide(requireContext(),200)
-//                   },200)
-//                } else if (dy < -20 && searchCont.visibility  != View.VISIBLE) {
-//
-//                    Handler(Looper.getMainLooper()).postDelayed({
-//                        searchCont.progressVisible(requireContext(),200)
-//                    },200)
-//                }
-//            }
-//
-//        })
 
 
     }
 
+    fun fetchfromdb(){
+        viewModel.getTasksForSegmentFromDB(projectName, segmentName, sectionName) { result ->
+            when (result) {
+                is DBResult.Success -> {
 
+                    showLoader(1)
 
+                    val task = result.data
+                    Log.d("fetch", task.toString())
 
+                    tasks.clear()
+
+                    for (element in task) {
+                        tasks.add(element)
+                    }
+
+                    if (tasks.isEmpty()) {
+                        showLoader(-1)
+                    } else {
+
+                        recyclerView = binding.recyclerView
+                        val taskItems: List<TaskItem> = tasks.map { task ->
+                            TaskItem(
+                                title = task.title,
+                                id = task.id,
+                                assignee_id = task.assignee,
+                                difficulty = task.difficulty,
+                                timestamp = task.time_STAMP,
+                                completed = task.completed
+                            )
+                        }
+                        val taskadapter = TaskListAdapter(
+                            firestoreRepository,
+                            requireContext(),
+                            taskItems.toMutableList()
+                        )
+                        taskadapter.setOnClickListener(this)
+                        val layoutManager =
+                            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                        layoutManager.reverseLayout = false
+                        with(recyclerView) {
+                            this.layoutManager = layoutManager
+                            adapter = taskadapter
+                            edgeEffectFactory = BounceEdgeEffectFactory()
+                        }
+
+                        recyclerView.addOnScrollListener(object :
+                            RecyclerView.OnScrollListener() {
+                            override fun onScrollStateChanged(
+                                recyclerView: RecyclerView,
+                                newState: Int
+                            ) {
+                                super.onScrollStateChanged(recyclerView, newState)
+                                state[0] = newState
+                            }
+
+                            override fun onScrolled(
+                                recyclerView: RecyclerView,
+                                dx: Int,
+                                dy: Int
+                            ) {
+                                super.onScrolled(recyclerView, dx, dy)
+                                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
+                                    hideSearch()
+                                } else if (dy < -10) {
+                                    showSearch()
+                                }
+                            }
+                        })
+                        showLoader(0)
+
+                    }
+
+                }
+
+                is DBResult.Failure -> {
+                    val errorMessage = result.exception.message
+                    showLoader(-1)
+                    util.singleBtnDialog(
+                        "Failure",
+                        "Failure in loading tasks, try again : ${errorMessage}", "Reload"
+                    ) {
+                        setupRecyclerView()
+                    }
+                }
+
+                is DBResult.Progress -> {
+                    showLoader(1)
+                }
+
+            }
+        }
+    }
     private fun showSearch() {
         searchCont.visible()
     }

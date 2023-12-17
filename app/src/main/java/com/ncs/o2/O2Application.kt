@@ -191,6 +191,7 @@ class O2Application : Application(), Configuration.Provider{
             workerParameters,
             notificationApiService)
     }
+
     fun initializeListner(projectName:String){
         CoroutineScope(Dispatchers.Main).launch {
 

@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
@@ -117,24 +118,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             binding.recyclerView.gone()
             binding.placeholder.gone()
             binding.progressBar.visible()
-                val state= when(binding.state.text){
-                    "Submitted" -> 1
-                    "Open" -> 2
-                    "Working" -> 3
-                    "Review" -> 4
-                    "Completed" -> 5
-                    else -> 0
-                }
-                val type= when(binding.type.text){
-                    "Bug" -> 1
-                    "Feature" -> 2
-                    "Feature request" -> 3
-                    "Task" -> 4
-                    "Exception" -> 5
-                    "Security" -> 6
-                    "Performance" -> 7
-                    else -> 0
-                }
+                val state= SwitchFunctions.getNumStateFromStringState(binding.state.text.toString())
+                val type= SwitchFunctions.getNumTypeFromStringType(binding.type.text.toString())
                 var assignee=""
                 var creator=""
                 var segment=""

@@ -82,6 +82,9 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
         PrefManager.initialize(requireContext())
         projectName = PrefManager.getcurrentProject()
         getTaskIdsList()
+        activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
+            getTaskIdsList()
+        }
     }
 
 
@@ -217,101 +220,105 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
         }
         else{
             tasks= ArrayList()
-                for (i in 0 until taskIdsList.size) {
-                    viewModel.getTasksbyIdFromDB(
-                        projectName = projectName,
-                        taskId = taskIdsList[i].id,
+            fetchfromdb()
+        }
 
-                    ) { result ->
-                        when (result) {
-                            is DBResult.Success -> {
-                                binding.lottieProgressInclude.progressbarBlock.gone()
+    }
+    fun fetchfromdb(){
+        for (i in 0 until taskIdsList.size) {
+            viewModel.getTasksbyIdFromDB(
+                projectName = projectName,
+                taskId = taskIdsList[i].id,
 
-                                tasks.add(result.data)
+                ) { result ->
+                when (result) {
+                    is DBResult.Success -> {
+                        binding.lottieProgressInclude.progressbarBlock.gone()
 
-                                if (tasks.isEmpty()) {
-                                    binding.layout.gone()
-                                    binding.placeholder.visible()
+                        tasks.add(result.data)
 
-                                } else {
-                                    val taskItems: List<TaskItem> = tasks.map { task ->
-                                        TaskItem(
-                                            title = task.title,
-                                            id = task.id,
-                                            assignee_id = task.assignee,
-                                            difficulty = task.difficulty,
-                                            timestamp = task.time_STAMP,
-                                            completed = task.completed
-                                        )
-                                    }
-                                    binding.layout.visible()
-                                    binding.lottieProgressInclude.progressbarBlock.gone()
-                                    binding.placeholder.gone()
-                                    recyclerView = binding.recyclerView
-                                    taskListAdapter = TaskListAdapter(
-                                        firestoreRepository,
-                                        requireContext(),
-                                        taskItems.toMutableList()
-                                    )
-                                    taskListAdapter.notifyDataSetChanged()
-                                    taskListAdapter.setOnClickListener(this@WorkspaceFragment)
-                                    val layoutManager =
-                                        LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-                                    layoutManager.reverseLayout = false
-                                    with(recyclerView) {
-                                        this.layoutManager = layoutManager
-                                        adapter = taskListAdapter
-                                        edgeEffectFactory = BounceEdgeEffectFactory()
-                                        visibility = View.VISIBLE
-                                    }
+                        if (tasks.isEmpty()) {
+                            binding.layout.gone()
+                            binding.placeholder.visible()
 
-                                    recyclerView.addOnScrollListener(object :
-                                        RecyclerView.OnScrollListener() {
-                                        override fun onScrollStateChanged(
-                                            recyclerView: RecyclerView,
-                                            newState: Int
-                                        ) {
-                                            super.onScrollStateChanged(recyclerView, newState)
-                                            state[0] = newState
-                                        }
-
-                                        override fun onScrolled(
-                                            recyclerView: RecyclerView,
-                                            dx: Int,
-                                            dy: Int
-                                        ) {
-                                            super.onScrolled(recyclerView, dx, dy)
-                                            if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                                hideSearch()
-                                            } else if (dy < -10) {
-                                                showSearch()
-                                            }
-                                        }
-                                    })
-                                }
+                        } else {
+                            val taskItems: List<TaskItem> = tasks.map { task ->
+                                TaskItem(
+                                    title = task.title,
+                                    id = task.id,
+                                    assignee_id = task.assignee,
+                                    difficulty = task.difficulty,
+                                    timestamp = task.time_STAMP,
+                                    completed = task.completed
+                                )
+                            }
+                            binding.layout.visible()
+                            binding.lottieProgressInclude.progressbarBlock.gone()
+                            binding.placeholder.gone()
+                            recyclerView = binding.recyclerView
+                            taskListAdapter = TaskListAdapter(
+                                firestoreRepository,
+                                requireContext(),
+                                taskItems.toMutableList()
+                            )
+                            taskListAdapter.notifyDataSetChanged()
+                            taskListAdapter.setOnClickListener(this@WorkspaceFragment)
+                            val layoutManager =
+                                LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                            layoutManager.reverseLayout = false
+                            with(recyclerView) {
+                                this.layoutManager = layoutManager
+                                adapter = taskListAdapter
+                                edgeEffectFactory = BounceEdgeEffectFactory()
+                                visibility = View.VISIBLE
                             }
 
-                            is DBResult.Failure -> {
-                                val errorMessage = result.exception.message
-                                binding.lottieProgressInclude.progressbarBlock.gone()
-                                util.singleBtnDialog(
-                                    "Failure",
-                                    "Failure in loading tasks, try again", "Reload"
+                            recyclerView.addOnScrollListener(object :
+                                RecyclerView.OnScrollListener() {
+                                override fun onScrollStateChanged(
+                                    recyclerView: RecyclerView,
+                                    newState: Int
                                 ) {
-                                    setupRecyclerView()
+                                    super.onScrollStateChanged(recyclerView, newState)
+                                    state[0] = newState
                                 }
 
-                            }
+                                override fun onScrolled(
+                                    recyclerView: RecyclerView,
+                                    dx: Int,
+                                    dy: Int
+                                ) {
+                                    super.onScrolled(recyclerView, dx, dy)
+                                    if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
+                                        hideSearch()
+                                    } else if (dy < -10) {
+                                        showSearch()
+                                    }
+                                }
+                            })
+                        }
+                    }
 
-                            is DBResult.Progress -> {
-                                binding.lottieProgressInclude.progressbarBlock.visible()
-                            }
-
+                    is DBResult.Failure -> {
+                        val errorMessage = result.exception.message
+                        binding.lottieProgressInclude.progressbarBlock.gone()
+                        util.singleBtnDialog(
+                            "Failure",
+                            "Failure in loading tasks, try again", "Reload"
+                        ) {
+                            setupRecyclerView()
                         }
 
                     }
 
+                    is DBResult.Progress -> {
+                        binding.lottieProgressInclude.progressbarBlock.visible()
+                    }
+
+                }
+
             }
+
         }
     }
     private fun setupRecyclerView(){

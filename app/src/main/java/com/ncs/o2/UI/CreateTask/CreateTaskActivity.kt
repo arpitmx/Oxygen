@@ -24,6 +24,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.firebase.Timestamp
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.ServerResult
@@ -435,27 +436,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             }
             if (validate){
                 val title=binding.title.text
-                val difficulty= when(binding.difficultyInclude.tagText.text){
-                    "Easy" -> 1
-                    "Medium" -> 2
-                    "Hard" -> 3
-                    else -> -1
-                }
-                val priority= when(binding.priorityInclude.tagText.text){
-                    "Low" -> 1
-                    "Medium" -> 2
-                    "High" -> 3
-                    "Critical" -> 4
-                    else -> -1
-                }
-                val status= when(binding.stateInclude.tagText.text){
-                    "Submitted" -> 1
-                    "Open" -> 2
-                    "Working" -> 3
-                    "Review" -> 4
-                    "Completed" -> 5
-                    else -> -1
-                }
+                val difficulty= SwitchFunctions.getNumDifficultyFromStringDifficulty(binding.difficultyInclude.tagText.text.toString())
+                val priority= SwitchFunctions.getNumPriorityFromStringPriority(binding.priorityInclude.tagText.text.toString())
+                val status= SwitchFunctions.getNumStateFromStringState(binding.stateInclude.tagText.text.toString())
 
                 val assigner=PrefManager.getcurrentUserdetails()
                 val duration=binding.taskDurationET
@@ -465,16 +448,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 }
                 val segment=binding.segment.text
                 val section=binding.section.text
-                val type= when(binding.typeInclude.tagText.text){
-                    "Bug" -> 1
-                    "Feature" -> 2
-                    "Feature request" -> 3
-                    "Task" -> 4
-                    "Exception" -> 5
-                    "Security" -> 6
-                    "Performance" -> 7
-                    else -> -1
-                }
+                val type= SwitchFunctions.getNumTypeFromStringType(binding.typeInclude.tagText.text.toString())
                 if (PrefManager.getcurrentUserdetails().ROLE>=2){
                     val assignee:String
                     if (selectedAssignee.isNotEmpty()) {

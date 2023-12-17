@@ -32,6 +32,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Notification
@@ -290,38 +291,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         binding.sectionNameET.text = task.section
         viewModel.task = task
-        val priority = when (task.priority) {
-            1 -> "Low"
-            2 -> "Medium"
-            3 -> "High"
-            4 -> "Critical"
-            else -> "Undefined"
-        }
-
-        val type = when (task.type) {
-            1 -> "Bug"
-            2 -> "Feature"
-            3 -> "Feature request"
-            4 -> "Task"
-            5 -> "Exception"
-            6 -> "Security"
-            7 -> "Performance"
-            else -> "Undefined"
-        }
-        val status = when (task.status) {
-            1 -> "Submitted"
-            2 -> "Open"
-            3 -> "Working"
-            4 -> "Review"
-            5 -> "Completed"
-            else -> "Undefined"
-        }
-        val difficulty = when (task.difficulty) {
-            1 -> "Easy"
-            2 -> "Medium"
-            3 -> "Hard"
-            else -> "Undefined"
-        }
+        val priority = SwitchFunctions.getStringPriorityFromNumPriority(task.priority)
+        val type = SwitchFunctions.getStringTypeFromNumType(task.type)
+        val status = SwitchFunctions.getStringStateFromNumState(task.status)
+        val difficulty = SwitchFunctions.getStringDifficultyFromNumDifficulty(task.difficulty)
 
         //Priority
         binding.priorityInclude.tagIcon.text = priority.substring(0, 1)

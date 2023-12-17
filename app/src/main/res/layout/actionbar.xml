@@ -322,6 +322,7 @@
         style="@style/CustomTabLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:visibility="gone"
         app:tabGravity="center"
         android:background="@color/darkbg_main"
         app:layout_constraintEnd_toEndOf="parent"
@@ -340,6 +341,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/search_cont"
+        android:visibility="gone"
         android:orientation="horizontal"
         android:layout_height="55dp">
 
@@ -392,8 +394,8 @@
             android:scaleY="0.8"
             android:layout_marginBottom="7dp"
             android:layout_height="match_parent"
-            android:src="@drawable/filter"
-            android:id="@+id/filterBtn"
+            android:src="@drawable/baseline_refresh_24"
+            android:id="@+id/refresh"
             app:tint="@color/primary" />
 
 

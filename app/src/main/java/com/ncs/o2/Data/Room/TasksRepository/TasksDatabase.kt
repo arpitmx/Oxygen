@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.HelperClasses.Convertors
 
-@Database(entities = [Task::class], version = 2)
+@Database(entities = [Task::class], version = 3)
 @TypeConverters(Convertors::class)
 abstract class TasksDatabase : RoomDatabase() {
 

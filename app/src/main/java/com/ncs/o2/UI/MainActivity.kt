@@ -120,8 +120,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         setContentView(binding.root)
-        manageViews()
         PrefManager.initialize(this)
+        manageViews()
         setUpViews()
 
         viewModel.currentSegment.observe(this, Observer { newSegment ->
@@ -140,12 +140,14 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.tabLayout.gone()
             binding.gioActionbar.searchCont.gone()
             binding.gioActionbar.line.gone()
+            binding.bottomNavParent.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
             binding.gioActionbar.tabLayout.visible()
             binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
+            binding.bottomNavParent.visible()
         }
     }
 
@@ -156,12 +158,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.tabLayout.gone()
             binding.gioActionbar.searchCont.gone()
             binding.gioActionbar.line.gone()
+            binding.bottomNavParent.gone()
+
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
             binding.gioActionbar.tabLayout.visible()
             binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
+            binding.bottomNavParent.visible()
         }
     }
 
