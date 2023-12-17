@@ -1,22 +1,21 @@
 package com.ncs.o2.UI.Setting
 
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.ncs.o2.Domain.Interfaces.AuthRepository
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
-import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.NewChanges
 import com.ncs.o2.databinding.ActivitySettingsBinding
 import timber.log.Timber
+import java.io.File
 
 class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
 
@@ -79,12 +78,40 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
         else if (Codes.STRINGS.clickedSetting == "Log Out"){
             try {
                 auth.signOut()
+
+                deleteCache(this)
+                
                 startActivity(Intent(this, AuthScreenActivity::class.java))
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 Toast.makeText(applicationContext, "LogOut", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Timber.tag("MainHostActivity").d("onClick: Exception + ${e.message}")
             }
+        }
+    }
+
+    fun deleteCache(context: Context) {
+        try {
+            val dir: File = context.getCacheDir()
+            deleteDir(dir)
+        } catch (e: java.lang.Exception) {
+        }
+    }
+
+    fun deleteDir(dir: File?): Boolean {
+        return if (dir != null && dir.isDirectory()) {
+            val children: Array<String> = dir.list()
+            for (i in children.indices) {
+                val success = deleteDir(File(dir, children[i]))
+                if (!success) {
+                    return false
+                }
+            }
+            dir.delete()
+        } else if (dir != null && dir.isFile()) {
+            dir.delete()
+        } else {
+            false
         }
     }
 }

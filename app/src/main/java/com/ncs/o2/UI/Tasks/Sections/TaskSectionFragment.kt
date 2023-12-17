@@ -78,7 +78,10 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TaskSectionViewModel::class.java)
 
-        projectName = PrefManager.getcurrentProject()
+
+        if (PrefManager.getcurrentProject() != "") {
+            projectName = PrefManager.getcurrentProject()
+        }
         segmentName = PrefManager.getcurrentsegment()
         setupViews()
 

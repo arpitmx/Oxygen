@@ -465,8 +465,8 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     }
 
     private fun setUpProjectsList(document : DocumentSnapshot) {
-        val projectsList = document.get("PROJECTS") as List<String>
-        PrefManager.putProjectsList(projectsList)
+            val projectsList = document.get("PROJECTS") as List<String>
+            PrefManager.putProjectsList(projectsList)
     }
 
 
