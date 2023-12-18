@@ -8,6 +8,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.R
 
@@ -30,16 +32,11 @@ class settingAdater(
         val textView: TextView = itemView.findViewById(R.id.setting_title)
         var icon: ImageView = itemView.findViewById(R.id.setting_icon)
         var set_ver: TextView = itemView.findViewById(R.id.set_version)
-
-//        init {
-//            itemView.setOnClickListener {
-//
-//            }
-//        }
     }
 
     class settingTitleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.settingName)
+        val Line: View = itemView.findViewById(R.id.settingLine)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -79,6 +76,9 @@ class settingAdater(
             title -> {
                 val item = items[position] as settingTitle
                 val viewHolder = holder as settingTitleViewHolder
+                if (position == 0){
+                    viewHolder.Line.gone()
+                }
                 viewHolder.textView.text = item.text
             }
         }
