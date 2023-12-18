@@ -300,9 +300,10 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     }
     private fun defaultButtons(){
         binding.clear.setOnClickThrottleBounceListener {
+            requireActivity().recreate()
+            manageviews()
             binding.clear.gone()
             taskList.clear()
-            requireActivity().recreate()
             binding.searchBar.text?.clear()
             selectedAssignee.clear()
             selectedAssignee2.clear()

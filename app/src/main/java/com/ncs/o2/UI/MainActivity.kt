@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
+    private var dynamicLinkHandled = false
 
     // ViewModels
     private val viewmodel: TaskSectionViewModel by viewModels()
@@ -106,8 +107,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (FirebaseAuth.getInstance().currentUser!=null) {
-            handleDynamicLink(intent)
+            if (savedInstanceState == null) {
+                handleDynamicLink(intent)
+                dynamicLinkHandled = true
+            }
         }
         else{
             FirebaseAuth.getInstance().signOut()
@@ -141,6 +146,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.searchCont.gone()
             binding.gioActionbar.line.gone()
             binding.bottomNavParent.gone()
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -148,6 +159,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
             binding.bottomNavParent.visible()
+            binding.gioActionbar.tabLayout.visible()
+            binding.gioActionbar.searchCont.visible()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         }
     }
 
@@ -159,7 +176,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.searchCont.gone()
             binding.gioActionbar.line.gone()
             binding.bottomNavParent.gone()
-
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -167,6 +189,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
             binding.bottomNavParent.visible()
+            binding.gioActionbar.tabLayout.visible()
+            binding.gioActionbar.searchCont.visible()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         }
     }
 
@@ -375,8 +403,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.setcurrentsegment("Select Segment")
         viewModel.updateCurrentSegment("Select Segment")
-        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
 
+        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
         PrefManager.selectedPosition.value = position
@@ -399,7 +427,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.titleTv.text = segmentName
         segmentText.value = segmentName
         viewModel.updateCurrentSegment(segmentName)
-
+        if (segmentName=="Select Segment"){
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+        }
 
     }
 
@@ -446,7 +477,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        handleDynamicLink(intent)
+        if (!dynamicLinkHandled) {
+            handleDynamicLink(intent)
+            dynamicLinkHandled = true
+        }
     }
 
     private fun handleDynamicLink(intent: Intent?) {
