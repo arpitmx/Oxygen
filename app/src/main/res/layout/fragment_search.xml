@@ -71,7 +71,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:layout_width="wrap_content"
-            android:text="State"
+            android:text="Tags"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:drawablePadding="@dimen/_5dp"
@@ -81,6 +81,21 @@
             android:textColor="@color/better_white"
             android:layout_height="40dp"
             android:layout_marginStart="15dp"
+            android:id="@+id/tags"
+            android:background="@drawable/item_bg_curve"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:text="State"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:drawablePadding="@dimen/_5dp"
+            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+            android:drawableTint="@color/better_white"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
             android:id="@+id/state"
             android:background="@drawable/item_bg_curve"/>
         <androidx.appcompat.widget.AppCompatButton
@@ -176,6 +191,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>

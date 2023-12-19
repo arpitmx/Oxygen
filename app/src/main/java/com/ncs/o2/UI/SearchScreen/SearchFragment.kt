@@ -7,6 +7,9 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -24,6 +27,7 @@ import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
@@ -37,7 +41,9 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.FilterBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.FilterTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserListBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
@@ -51,14 +57,17 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet.getassigneesCallback,UserListBottomSheet.updateAssigneeCallback,
-    TaskListAdapter.OnClickListener,SegmentSelectionBottomSheet.SegmentSelectionListener,
+    TaskListAdapter.OnClickListener,SegmentSelectionBottomSheet.SegmentSelectionListener,FilterTagsBottomSheet.getSelectedTagsCallback,
     SegmentSelectionBottomSheet.sendSectionsListListner{
     private var list:MutableList<String> = mutableListOf()
     private var OList: MutableList<User> = mutableListOf()
     private var OList2: MutableList<User> = mutableListOf()
+    private var tagIdList: ArrayList<String> = ArrayList()
     private val selectedAssignee:MutableList<User> = mutableListOf()
     private val selectedAssignee2:MutableList<User> = mutableListOf()
     private var selectedSegment=""
+    private var TagList: MutableList<Tag> = mutableListOf()
+    private val selectedTags = mutableListOf<Tag>()
     lateinit var binding: FragmentSearchBinding
     private  var taskList: MutableList<TaskItem> = mutableListOf()
     private val tasks:MutableList<Task> = mutableListOf()
@@ -66,6 +75,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
     val state = arrayOf(1)
+    private var argumentsLoaded = false
+
     @Inject
     lateinit var db:TasksDatabase
 
@@ -77,6 +88,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(
@@ -84,6 +96,24 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
+        if (!argumentsLoaded) {
+            val tagText = arguments?.getString("tagText")
+            if (tagText != null) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    val list = db.tagsDao().getAllTag()
+                    var tag: Tag
+                    for (i in 0 until list?.size!!) {
+                        if (list[i].tagID == tagText) {
+                            selectedTags.add(list[i])
+                            searchQuery("")
+                            binding.tags.text = list[i].tagText
+                            setSelectedButtonColor(binding.tags)
+                            binding.clear.visible()
+                        }
+                    }
+                }
+                argumentsLoaded = false            }
+        }
         return binding.root
     }
 
@@ -97,6 +127,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         defaultButtons()
         filterButtons()
         initViews()
+        argumentsLoaded = true
+
     }
 
     private fun manageviews(){
@@ -113,156 +145,17 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         activityBinding.gioActionbar.constraintLayoutworkspace.gone()
     }
     private fun initViews(){
+        binding.searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                searchQuery(s?.toString()!!)
+            }
+        })
         binding.searchButton.setOnClickThrottleBounceListener {
-            binding.searchPlaceholder.gone()
-            binding.recyclerView.gone()
-            binding.placeholder.gone()
-            binding.progressBar.visible()
-                val state= SwitchFunctions.getNumStateFromStringState(binding.state.text.toString())
-                val type= SwitchFunctions.getNumTypeFromStringType(binding.type.text.toString())
-                var assignee=""
-                var creator=""
-                var segment=""
-
-                if (binding.assignee.text=="Assignee"){
-                    assignee=""
-                }
-                else{
-                    assignee=selectedAssignee[0].firebaseID!!
-                }
-
-                if (binding.segment.text=="Segment"){
-                    segment=""
-                }
-                else{
-                    segment=selectedSegment
-                }
-                if (!binding.searchBar.text?.toString().isNullOrEmpty()){
-                    binding.clear.visible()
-                }
-
-
-            if (binding.created.text=="Created by"){
-                    creator=""
-                }
-                else{
-                    creator=selectedAssignee2[0].firebaseID!!
-                }
-
-                if (db.tasksDao().isNull) {
-                    Log.d("SearchPage","Performing search from Firestore")
-
-                    CoroutineScope(Dispatchers.Main).launch {
-
-                        viewModel.getSearchTasked(
-                            projectName = PrefManager.getcurrentProject(),
-                            assignee =assignee,
-                            type = type,
-                            state = state,
-                            text = binding.searchBar.text?.toString()!!,
-                            creator = creator
-                        ) { result ->
-                            when (result) {
-                                is ServerResult.Success -> {
-                                    binding.searchPlaceholder.gone()
-                                    binding.progressBar.gone()
-                                    val task = result.data
-                                    taskList.clear()
-                                    for (element in task) {
-                                        taskList.add(element)
-                                    }
-                                    if (taskList.isEmpty()){
-                                        binding.placeholder.visible()
-                                        binding.results.gone()
-                                    }
-                                    else{
-                                        binding.recyclerView.visible()
-                                        binding.placeholder.gone()
-                                        setRecyclerView()
-                                    }
-                                }
-
-                                is ServerResult.Failure -> {
-                                    val errorMessage = result.exception.message
-                                    toast(errorMessage!!)
-                                    binding.recyclerView.visible()
-                                    binding.searchPlaceholder.gone()
-                                    binding.placeholder.gone()
-                                    binding.progressBar.gone()
-                                }
-
-                                is ServerResult.Progress -> {
-                                    binding.searchPlaceholder.gone()
-                                    binding.recyclerView.gone()
-                                    binding.placeholder.gone()
-                                    binding.progressBar.visible()
-                                }
-
-                            }
-                        }
-                    }
-                }else{
-                    Log.d("SearchPage","Performing search from DB")
-                    CoroutineScope(Dispatchers.Main).launch {
-                        viewModel.getSearchTasksFromDB(
-                            projectName = PrefManager.getcurrentProject(),
-                            assignee =assignee,
-                            type = type,
-                            state = state,
-                            text = binding.searchBar.text?.toString()!!,
-                            creator = creator,
-                            segment = segment
-                        ) { result ->
-                            when (result) {
-                                is DBResult.Success -> {
-                                    binding.searchPlaceholder.gone()
-                                    binding.progressBar.gone()
-                                    val task = result.data
-                                    tasks.clear()
-                                    for (element in task) {
-                                        tasks.add(element)
-                                    }
-                                    if (tasks.isEmpty()){
-                                        binding.placeholder.visible()
-                                        binding.results.gone()
-                                    }
-                                    else{
-                                        taskList = tasks.map { task ->
-                                            TaskItem(
-                                                title = task.title,
-                                                id = task.id,
-                                                assignee_id = task.assignee,
-                                                difficulty = task.difficulty,
-                                                timestamp = task.time_STAMP,
-                                                completed = task.completed
-                                            )
-                                        }.toMutableList()
-                                        binding.recyclerView.visible()
-                                        binding.placeholder.gone()
-                                        setRecyclerView()
-                                    }
-                                }
-
-                                is DBResult.Failure -> {
-                                    val errorMessage = result.exception.message
-                                    toast(errorMessage!!)
-                                    binding.recyclerView.visible()
-                                    binding.searchPlaceholder.gone()
-                                    binding.placeholder.gone()
-                                    binding.progressBar.gone()
-                                }
-
-                                is DBResult.Progress -> {
-                                    binding.searchPlaceholder.gone()
-                                    binding.recyclerView.gone()
-                                    binding.placeholder.gone()
-                                    binding.progressBar.visible()
-                                }
-
-                            }
-                        }
-                    }
-                }
+            searchQuery(binding.searchBar.text?.toString()!!)
         }
     }
     private fun setRecyclerView(){
@@ -298,25 +191,166 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         })
         taskListAdapter.notifyDataSetChanged()
     }
+    private fun searchQuery(text:String){
+        binding.searchPlaceholder.gone()
+        binding.recyclerView.gone()
+        binding.placeholder.gone()
+        binding.progressBar.visible()
+        binding.resultsParent.visible()
+
+        val state =
+            SwitchFunctions.getNumStateFromStringState(binding.state.text.toString())
+        val type =
+            SwitchFunctions.getNumTypeFromStringType(binding.type.text.toString())
+        var assignee = ""
+        var creator = ""
+        var segment = ""
+
+        if (binding.assignee.text == "Assignee") {
+            assignee = ""
+        } else {
+            assignee = selectedAssignee[0].firebaseID!!
+        }
+
+        if (binding.segment.text == "Segment") {
+            segment = ""
+        } else {
+            segment = selectedSegment
+        }
+        if (!binding.searchBar.text?.toString().isNullOrEmpty()) {
+            binding.clear.visible()
+        }
+
+
+        if (binding.created.text == "Created by") {
+            creator = ""
+        } else {
+            creator = selectedAssignee2[0].firebaseID!!
+        }
+
+        if (db.tasksDao().isNull) {
+            Log.d("SearchPage", "Performing search from Firestore")
+
+            CoroutineScope(Dispatchers.Main).launch {
+
+                viewModel.getSearchTasked(
+                    projectName = PrefManager.getcurrentProject(),
+                    assignee = assignee,
+                    type = type,
+                    state = state,
+                    text = text,
+                    creator = creator
+                ) { result ->
+                    when (result) {
+                        is ServerResult.Success -> {
+                            binding.searchPlaceholder.gone()
+                            binding.progressBar.gone()
+                            val task = result.data
+                            taskList.clear()
+                            for (element in task) {
+                                taskList.add(element)
+                            }
+                            if (taskList.isEmpty()) {
+                                binding.placeholder.visible()
+                                binding.results.gone()
+                            } else {
+                                binding.recyclerView.visible()
+                                binding.placeholder.gone()
+                                setRecyclerView()
+                            }
+                        }
+
+                        is ServerResult.Failure -> {
+                            val errorMessage = result.exception.message
+                            toast(errorMessage!!)
+                            binding.recyclerView.visible()
+                            binding.searchPlaceholder.gone()
+                            binding.placeholder.gone()
+                            binding.progressBar.gone()
+                        }
+
+                        is ServerResult.Progress -> {
+                            binding.searchPlaceholder.gone()
+                            binding.recyclerView.gone()
+                            binding.placeholder.gone()
+                            binding.progressBar.visible()
+                        }
+
+                    }
+                }
+            }
+        } else {
+            Log.d("SearchPage", "Performing search from DB")
+            CoroutineScope(Dispatchers.Main).launch {
+                viewModel.getSearchTasksFromDB(
+                    projectName = PrefManager.getcurrentProject(),
+                    assignee = assignee,
+                    type = type,
+                    state = state,
+                    text = text,
+                    creator = creator,
+                    segment = segment,
+                ) { result ->
+                    when (result) {
+                        is DBResult.Success -> {
+                            binding.searchPlaceholder.gone()
+                            binding.progressBar.gone()
+                            val task = result.data
+                            tasks.clear()
+                            for (element in task) {
+                                if (selectedTags.isNotEmpty()) {
+                                    if (element.tags.contains(selectedTags[0].tagID)) {
+                                        tasks.add(element)
+                                    }
+                                }
+                                else{
+                                    tasks.add(element)
+                                }
+                            }
+                            if (tasks.isEmpty()) {
+                                binding.placeholder.visible()
+                                binding.results.gone()
+                            } else {
+                                taskList = tasks.map { task ->
+                                    TaskItem(
+                                        title = task.title,
+                                        id = task.id,
+                                        assignee_id = task.assignee,
+                                        difficulty = task.difficulty,
+                                        timestamp = task.time_STAMP,
+                                        completed = task.completed
+                                    )
+                                }.toMutableList()
+                                binding.recyclerView.visible()
+                                binding.placeholder.gone()
+                                setRecyclerView()
+                            }
+                        }
+
+                        is DBResult.Failure -> {
+                            val errorMessage = result.exception.message
+                            toast(errorMessage!!)
+                            binding.recyclerView.visible()
+                            binding.searchPlaceholder.gone()
+                            binding.placeholder.gone()
+                            binding.progressBar.gone()
+                        }
+
+                        is DBResult.Progress -> {
+                            binding.searchPlaceholder.gone()
+                            binding.recyclerView.gone()
+                            binding.placeholder.gone()
+                            binding.progressBar.visible()
+                        }
+
+                    }
+                }
+            }
+        }
+    }
     private fun defaultButtons(){
         binding.clear.setOnClickThrottleBounceListener {
-            requireActivity().recreate()
-            manageviews()
-            binding.clear.gone()
-            taskList.clear()
-            binding.searchBar.text?.clear()
-            selectedAssignee.clear()
-            selectedAssignee2.clear()
-            binding.state.text="State"
-            setUnSelectedButtonColor(binding.state)
-            binding.type.text="Type"
-            setUnSelectedButtonColor(binding.type)
-            binding.assignee.text="Assignee"
-            setUnSelectedButtonColor(binding.assignee)
-            binding.created.text="Created by"
-            setUnSelectedButtonColor(binding.created)
-            binding.segment.text="Segment"
-            setUnSelectedButtonColor(binding.segment)
+            movetosearch()
         }
     }
     private fun filterButtons(){
@@ -347,6 +381,11 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             segment.segmentSelectionListener = this
             segment.sectionSelectionListener = this
             segment.show(requireFragmentManager(), "Segment Selection")
+        }
+        binding.tags.setOnClickThrottleBounceListener {
+            val filterTagsBottomSheet =
+                FilterTagsBottomSheet(TagList, this@SearchFragment, selectedTags)
+            filterTagsBottomSheet.show(requireFragmentManager(), "OList")
         }
     }
 
@@ -425,6 +464,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
 
         }
     }
+
     private fun showSearch() {
         binding.searchParent.visible()
     }
@@ -455,4 +495,37 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
 
     override fun sendSectionsList(list: MutableList<String>) {
     }
+
+    override fun onSelectedTags(tag: Tag, isChecked: Boolean) {
+        binding.clear.visible()
+        if (isChecked) {
+            selectedTags.add(tag)
+            tag.tagID?.let { tagIdList.add(it) }
+            binding.tags.text=tag.tagText
+            setSelectedButtonColor(binding.tags)
+        } else {
+            selectedTags.remove(tag)
+            tag.tagID?.let { tagIdList.remove(it) }
+            binding.tags.text="Tags"
+            setUnSelectedButtonColor(binding.tags)
+
+        }
+
+    }
+
+    override fun onTagListUpdated(tagList: MutableList<Tag>) {
+        TagList.clear()
+        TagList = tagList
+    }
+    private fun movetosearch() {
+        val transaction = fragmentManager?.beginTransaction()
+        val fragment = SearchFragment()
+        transaction?.replace(R.id.nav_host_fragment_activity_main, fragment)
+        transaction?.addToBackStack(null)
+        transaction?.commit()
+
+        activityBinding.bottomNav.menu.getItem(2).isChecked = true
+        activityBinding.bottomNav.menu.getItem(2).setIcon(R.drawable.ic_searchico)
+    }
 }
+

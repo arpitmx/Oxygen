@@ -57,6 +57,7 @@ import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment
@@ -90,7 +91,7 @@ import javax.inject.Inject
 class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter.OnProfileClickCallback,
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
-    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener {
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapter.OnClick {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
@@ -496,7 +497,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         tagsRecyclerView.layoutManager = layoutManager
-        val adapter = TagAdapter(list)
+        val adapter = TagAdapter(list,this)
         tagsRecyclerView.adapter = adapter
     }
 
@@ -1401,6 +1402,13 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
             }
         }
+    }
+
+    override fun onTagClick(tag: Tag) {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.putExtra("search", "GoToSearch")
+        intent.putExtra("tagText", tag.tagID)
+        startActivity(intent)
     }
 }
 

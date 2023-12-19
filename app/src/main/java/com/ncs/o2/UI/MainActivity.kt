@@ -60,6 +60,7 @@ import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -132,8 +133,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         viewModel.currentSegment.observe(this, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
-
-
+        val searchFragment = intent.getStringExtra("search")
+        if (searchFragment != null) {
+            when (searchFragment) {
+                "GoToSearch" -> movetosearch(intent.getStringExtra("tagText"))
+            }
+        }
 
 
 
@@ -582,5 +587,19 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 else -> {}
             }
         }
+    }
+    private fun movetosearch(tagText: String?) {
+        val transaction = supportFragmentManager.beginTransaction()
+        val fragment = SearchFragment()
+        val bundle = Bundle()
+        bundle.putString("tagText", tagText)
+        fragment.arguments = bundle
+
+        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+        binding.bottomNav.menu.getItem(2).isChecked = true
+        binding.bottomNav.menu.getItem(2).setIcon(R.drawable.ic_searchico)
     }
 }

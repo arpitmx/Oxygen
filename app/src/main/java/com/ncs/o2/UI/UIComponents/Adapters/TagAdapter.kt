@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Tag
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.databinding.TagItemBinding
 
 /*
@@ -24,7 +25,7 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION : 
 
 */
-class TagAdapter constructor(private val tagList: List<Tag>) : RecyclerView.Adapter<TagAdapter.ViewHolder>() {
+class TagAdapter constructor(private val tagList: List<Tag>,private val onClick: OnClick) : RecyclerView.Adapter<TagAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
             TagItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -38,6 +39,10 @@ class TagAdapter constructor(private val tagList: List<Tag>) : RecyclerView.Adap
             this.text = tagItem.tagText
             this.setBackgroundColor(Color.parseColor(tagItem.bgColor))
             this.setTextColor(Color.parseColor(tagItem.textColor))
+
+        }
+        holder.binding.tagParent.setOnClickThrottleBounceListener {
+            onClick.onTagClick(tagList[position])
         }
     }
 
@@ -47,4 +52,8 @@ class TagAdapter constructor(private val tagList: List<Tag>) : RecyclerView.Adap
 
     inner class ViewHolder(val binding: TagItemBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    interface OnClick{
+        fun onTagClick(tag: Tag)
+    }
 }

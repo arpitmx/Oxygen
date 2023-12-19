@@ -267,6 +267,14 @@ object PrefManager {
         val timestampInSeconds = sharedPreferences.getLong("last_cache_update_timestamp", 0)
         return Timestamp(timestampInSeconds, 0)
     }
+    fun putLastTAGCacheUpdateTimestamp(timestamp: Timestamp){
+        editor.putLong("last_tag_cache_update_timestamp", timestamp.seconds)
+        editor.apply()
+    }
+    fun getLastTAGCacheUpdateTimestamp(): Timestamp {
+        val timestampInSeconds = sharedPreferences.getLong("last_tag_cache_update_timestamp", 0)
+        return Timestamp(timestampInSeconds, 0)
+    }
     fun getProjectsList():List<String> {
         val projectsJson = sharedPreferences.getString("projects", null)
         if (projectsJson != null) {

@@ -5,6 +5,7 @@ import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.TasksRepository
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 class TaskRepository @Inject constructor(private val db: TasksDatabase):TasksRepository {
     val taskDao=db.tasksDao()
+    val tagsDao=db.tagsDao()
     override suspend fun getTasksItemsForSegment(
         projectName: String,
         segmentName: String,
@@ -70,10 +72,28 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase):TasksRep
                     creator = creator,
                     assignee = assignee,
                     text = text,
-                    segmentName=segmentName
+                    segmentName=segmentName,
+
                 )
                 withContext(Dispatchers.Main) {
                     resultCallback(DBResult.Success(tasks))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
+    override suspend fun getTagsInProject(
+        projectName: String,
+        resultCallback: (DBResult<List<Tag>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val tag = tagsDao.getTagsInProject(projectName)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(tag!!))
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {

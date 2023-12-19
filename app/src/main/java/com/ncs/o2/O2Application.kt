@@ -93,6 +93,7 @@ class O2Application : Application(), Configuration.Provider{
         val projectsList=PrefManager.getProjectsList()
         for (project in projectsList){
             initializeListner(project)
+            initializeTagListner(project)
         }
 
 
@@ -197,6 +198,33 @@ class O2Application : Application(), Configuration.Provider{
 
 
             repository.initilizelistner(projectName = projectName) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    ServerResult.Progress -> {
+
+                    }
+
+                    is ServerResult.Success -> {
+
+
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+
+    }
+
+    fun initializeTagListner(projectName:String){
+        CoroutineScope(Dispatchers.Main).launch {
+
+            repository.initilizeTagslistner(projectName = projectName) { result ->
 
                 when (result) {
 

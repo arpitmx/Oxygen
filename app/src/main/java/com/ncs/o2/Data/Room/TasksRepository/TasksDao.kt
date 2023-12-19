@@ -38,6 +38,8 @@ interface TasksDao {
             "AND (:assignee = '' OR assignee = :assignee) " +
             "AND (title LIKE '%' || :text || '%' OR description LIKE '%' || :text || '%' OR id LIKE '%' || :text || '%' )"+
             "AND (segment LIKE '%' || :segmentName)"
+
+
     )
     suspend fun getSearchedTasks(
         projectName: String,
@@ -46,7 +48,7 @@ interface TasksDao {
         creator: String,
         assignee: String,
         text: String,
-        segmentName: String
+        segmentName: String,
     ): List<Task>
 
 }

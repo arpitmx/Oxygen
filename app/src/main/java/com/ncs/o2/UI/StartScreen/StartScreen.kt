@@ -402,6 +402,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 val projectsList=PrefManager.getProjectsList()
                 for (projects in projectsList){
                     setUpTasks(projects)
+                    setUpTags(projects)
                 }
 
 
@@ -478,6 +479,47 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         }
     }
 
+    private fun setUpTags(projectName:String) {
+        val dao = db.tagsDao()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val tagResult = withContext(Dispatchers.IO) {
+                    viewModel.getTagsinProject(projectName)
+                }
+
+                Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
+
+                when (tagResult) {
+
+                    is ServerResult.Failure -> {
+                    }
+
+                    is ServerResult.Progress -> {
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tags=tagResult.data
+                        for (tag in tags){
+                            dao.insert(tag)
+                        }
+                        setUpNotifications()
+
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+            }
+
+        }
+    }
     private fun setUpNotifications() {
         viewModel.setUpNewNotifications()
         viewModel.serverResultLiveData.observe(this){ result->

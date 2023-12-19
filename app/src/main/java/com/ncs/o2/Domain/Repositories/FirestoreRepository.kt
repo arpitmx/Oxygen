@@ -499,11 +499,14 @@ class FirestoreRepository @Inject constructor(
                     val tagID = document.getString("tagID")
                     val textColor = document.getString("textColor")!!
                     val bgColor = document.getString("bgColor")
+                    val projectName=document.getString("projectName")
+
                     val tag = Tag(
                         tagText = tagText!!,
-                        tagID = tagID,
+                        tagID = tagID!!,
                         textColor = textColor,
                         bgColor = bgColor!!,
+                        projectName = projectName!!
                     )
                     result(ServerResult.Success(tag))
                 } else {
@@ -856,6 +859,62 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+    override suspend fun getTagsinProject(
+        projectName: String,
+    ): ServerResult<List<Tag>> {
+
+        return try {
+
+            val task =
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TAGS)
+                    .get().await()
+
+            val snapShot = task
+
+            if (!snapShot.isEmpty) {
+
+                val list:MutableList<Tag> = mutableListOf()
+                for (document in snapShot.documents){
+                    val tagText = document.getString("tagText")
+                    val tagID = document.getString("tagID")
+                    val textColor = document.getString("textColor")!!
+                    val bgColor = document.getString("bgColor")
+                    val projectName=document.getString("projectName")
+
+                    val lastUpdate:Timestamp
+                    if (document.get(Endpoints.Project.LAST_TAG_UPDATED).isNull){
+                        lastUpdate=Timestamp.now()
+                    }
+                    else{
+                        lastUpdate=document.get(Endpoints.Project.LAST_TAG_UPDATED) as Timestamp
+                    }
+                    val tagData = Tag(
+                        tagText = tagText!!,
+                        tagID = tagID!!,
+                        textColor = textColor,
+                        bgColor = bgColor!!,
+                        last_tag_updated = lastUpdate,
+                        projectName = projectName!!
+                    )
+                    list.add(tagData)
+                }
+
+                list.let {
+                    return ServerResult.Success(it)
+                } ?: ServerResult.Failure(Exception("Document not found for title:"))
+
+            } else {
+                return ServerResult.Failure(Exception("Document not found for title"))
+            }
+
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+
+    }
+
     override suspend fun getTasksItem(
         projectName: String,
         segmentName: String,
@@ -937,13 +996,14 @@ class FirestoreRepository @Inject constructor(
     }
 
     fun getContributors(projectName: String, result: (ServerResult<List<String>>) -> Unit) {
-        firestore.collection(Endpoints.PROJECTS).document(projectName)
+        firestore.collection(Endpoints.PROJECTS)
+            .whereEqualTo("PROJECT_NAME", projectName)
             .get()
-            .addOnSuccessListener { data ->
-//                val section_list = mutableListOf<String>()
-                if (data.exists()) {
-                    val contributor_list = data.get("contributors") as List<String>
-                    result(ServerResult.Success(contributor_list))
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    val contributors=document.get("contributors") as List<String>
+                    result(ServerResult.Success(contributors))
                 }
             }
             .addOnFailureListener { exception ->
@@ -1034,14 +1094,18 @@ class FirestoreRepository @Inject constructor(
         return try {
 
             serverResult(ServerResult.Progress)
-
             firestore.collection(Endpoints.PROJECTS)
                 .document(projectName).collection(Endpoints.Project.TAGS).document(tag.tagID!!)
                 .set(tag)
                 .await()
-
-
-
+            firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .update(Endpoints.Project.LAST_TAG_UPDATED, Timestamp.now())
+                .await()
+            PrefManager.putLastTAGCacheUpdateTimestamp(Timestamp.now())
+            CoroutineScope(Dispatchers.IO).launch {
+                db.tagsDao().insert(tag)
+            }
             serverResult(ServerResult.Success(200))
 
         } catch (exception: Exception) {
@@ -1586,9 +1650,73 @@ class FirestoreRepository @Inject constructor(
                             for (document in querySnapshot.documents) {
                                 val sectionData = document.toObject(Task::class.java)
                                 PrefManager.putLastCacheUpdateTimestamp(Timestamp.now())
-                                Log.d("update","old task by:  ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
-                                db.tasksDao().update(task = sectionData!!)
-                                Log.d("update","updated task by: ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                                if (db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!).isNull){
+                                    db.tasksDao().insert(sectionData)
+                                }
+                                else{
+                                    Log.d("update","old task by:  ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                                    db.tasksDao().update(task = sectionData!!)
+                                    Log.d("update","updated task by: ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                                }
+                            }
+                        }
+
+                        result(ServerResult.Success(1))
+
+                    }
+                    .addOnFailureListener { exception ->
+                        result(ServerResult.Failure(exception))
+                    }
+            }
+        }
+    }
+
+    override suspend fun initilizeTagslistner(projectName: String,result: (ServerResult<Int>) -> Unit) {
+        val projectDocument = FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName)
+        val listenerRegistration = projectDocument.addSnapshotListener { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->
+            if (exception != null) {
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.Project.LAST_TAG_UPDATED)) {
+                val lastUpdatedValue = snapshot.get(Endpoints.Project.LAST_TAG_UPDATED)
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TAGS)
+                    .whereGreaterThan(Endpoints.Project.LAST_TAG_UPDATED, PrefManager.getLastTAGCacheUpdateTimestamp())
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val tagList = mutableListOf<Tag>()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            for (document in querySnapshot.documents) {
+                                val tagText = document.getString("tagText")
+                                val tagID = document.getString("tagID")
+                                val textColor = document.getString("textColor")!!
+                                val bgColor = document.getString("bgColor")
+                                val projectName=document.getString("projectName")
+                                val lastUpdate:Timestamp
+                                if (document.get(Endpoints.Project.LAST_TAG_UPDATED).isNull){
+                                    lastUpdate=Timestamp.now()
+                                }
+                                else{
+                                    lastUpdate=document.get(Endpoints.Project.LAST_TAG_UPDATED) as Timestamp
+                                }
+                                val tagData = Tag(
+                                    tagText = tagText!!,
+                                    tagID = tagID!!,
+                                    textColor = textColor,
+                                    bgColor = bgColor!!,
+                                    last_tag_updated = lastUpdate,
+                                    projectName = projectName!!
+                                )
+                                PrefManager.putLastTAGCacheUpdateTimestamp(Timestamp.now())
+                                if (db.tagsDao().getTagbyId(tagData?.tagID!!).isNull){
+                                    db.tagsDao().insert(tagData)
+                                }
+                                else{
+                                    Log.d("update","old tag by:  ${db.tagsDao().getTagbyId(tagData?.tagID!!)}")
+                                    db.tagsDao().update(tag = tagData)
+                                    Log.d("update","updated tag by: ${db.tagsDao().getTagbyId(tagData?.tagID!!)}")
+                                }
                             }
                         }
 

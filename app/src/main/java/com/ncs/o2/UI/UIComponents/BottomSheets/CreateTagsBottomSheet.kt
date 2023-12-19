@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
@@ -72,7 +73,7 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
 
         binding.doneButton.setOnClickThrottleBounceListener {
 
-            val tag=Tag(tagText = binding.tagTitle.text.toString(), bgColor = initialbgcolor, textColor = initialtextcolor, tagID = RandomIDGenerator.generateRandomTaskId(6) )
+            val tag=Tag(tagText = binding.tagTitle.text.toString(), bgColor = initialbgcolor, textColor = initialtextcolor, tagID = RandomIDGenerator.generateRandomTaskId(6) , projectName = PrefManager.getcurrentProject())
 
             if (tag.tagText.isNotEmpty()) {
                 binding.doneButton.animate().alpha(0f).setDuration(300).withEndAction {
