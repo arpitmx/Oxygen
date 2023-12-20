@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.databinding.TagItemBinding
 
 /*
@@ -26,6 +27,8 @@ Tasks FUTURE ADDITION :
 
 */
 class TagAdapter constructor(private val tagList: List<Tag>,private val onClick: OnClick) : RecyclerView.Adapter<TagAdapter.ViewHolder>() {
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
             TagItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)

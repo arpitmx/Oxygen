@@ -89,8 +89,13 @@ interface Repository {
         id: String,
         projectName: String,
         moderator:String,
-    ): ServerResult<Boolean>
+    ): ServerResult<Unit>
 
+    suspend fun updateTags(
+        newTags:List<String>,
+        projectName: String,
+        taskId: String,
+    ): ServerResult<Boolean>
     suspend fun addNewModerator(
         id: String,
         projectName: String,
@@ -101,6 +106,12 @@ interface Repository {
         id: String,
         userID:String,
         newState: String,
+        projectName: String
+    ): ServerResult<Boolean>
+
+    suspend fun updatePriority(
+        id: String,
+        newPriority: String,
         projectName: String
     ): ServerResult<Boolean>
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)

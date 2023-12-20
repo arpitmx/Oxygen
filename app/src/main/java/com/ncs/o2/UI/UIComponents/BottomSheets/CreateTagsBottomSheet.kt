@@ -98,7 +98,7 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
                             is ServerResult.Success -> {
                                 binding.progressBar.gone()
                                 dismiss()
-                                val addTagsBottomSheet = AddTagsBottomSheet(TagsList,callback,selectedTagsList)
+                                val addTagsBottomSheet = AddTagsBottomSheet(TagsList,callback,selectedTagsList,"create")
                                 addTagsBottomSheet.show(requireActivity().supportFragmentManager,"this")
                             }
 
@@ -145,6 +145,8 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
     private fun setBottomSheetConfig() {
         this.isCancelable = false
     }
+
+
 
 
 }

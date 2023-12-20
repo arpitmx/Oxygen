@@ -374,6 +374,7 @@
                     android:padding="@dimen/padding_start_task_details" />
 
 
+
             </androidx.appcompat.widget.LinearLayoutCompat>
 
 

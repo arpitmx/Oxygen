@@ -349,12 +349,12 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         binding.addtags.setOnClickThrottleBounceListener {
             val addTagsBottomSheet =
-                AddTagsBottomSheet(TagList, this@CreateTaskActivity, selectedTags)
+                AddTagsBottomSheet(TagList, this@CreateTaskActivity, selectedTags,"create")
             addTagsBottomSheet.show(supportFragmentManager, "OList")
         }
         if (showsheet) {
             val addTagsBottomSheet =
-                AddTagsBottomSheet(TagList, this@CreateTaskActivity, selectedTags)
+                AddTagsBottomSheet(TagList, this@CreateTaskActivity, selectedTags,"create")
             addTagsBottomSheet.show(supportFragmentManager, "OList")
         }
 
@@ -806,6 +806,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onTagListUpdated(tagList: MutableList<Tag>) {
         TagList.clear()
         TagList = tagList
+    }
+
+    override fun onSubmitClick() {
     }
 
     override fun onSegmentSelected(segmentName: String) {

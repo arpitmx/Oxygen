@@ -48,11 +48,11 @@ data class Task(
 
     val assignee: String = "",
     val assigner: String = "",
-    val moderators:List<String> = listOf(),
+    var moderators:List<String> = listOf(),
 
     var time_STAMP: Timestamp? =null,
     val duration: String = "",
-    val tags: List<String> = listOf(),
+    var tags: List<String> = listOf(),
     val project_ID: String = "",
     val segment: String = "",
     val section: String = "",

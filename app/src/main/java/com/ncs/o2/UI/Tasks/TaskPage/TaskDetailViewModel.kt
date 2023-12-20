@@ -150,8 +150,10 @@ constructor(val notificationApiService: NotificationApiService,
     suspend fun updateState(taskID:String,userID:String,newState:String,projectName: String):ServerResult<Boolean>{
         return firestoreRepository.updateState(id = taskID, userID = userID,newState=newState, projectName = projectName)
     }
-
-    suspend fun updateModerators(taskID:String,projectName: String,moderator:String):ServerResult<Boolean>{
+    suspend fun updatePriority(taskID:String,newPriority:String,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updatePriority(id = taskID, newPriority = newPriority, projectName = projectName)
+    }
+    suspend fun updateModerators(taskID:String,projectName: String,moderator:String):ServerResult<Unit>{
         return firestoreRepository.updateModerator(id = taskID, projectName = projectName,moderator=moderator)
     }
 
@@ -161,6 +163,11 @@ constructor(val notificationApiService: NotificationApiService,
     suspend fun addNewModerators(taskID:String,projectName: String,moderator:MutableList<String>,unselected:MutableList<String>):ServerResult<Boolean>{
         return firestoreRepository.addNewModerator(id = taskID, projectName = projectName, newModerators =moderator,unselected=unselected)
     }
+
+    suspend fun updateTags(newTags:List<String>,projectName: String,taskID: String):ServerResult<Boolean>{
+        return firestoreRepository.updateTags(newTags = newTags, projectName = projectName, taskId = taskID)
+    }
+
     fun getTaskbyIdFromDB(
         projectName: String,
         taskId:String,

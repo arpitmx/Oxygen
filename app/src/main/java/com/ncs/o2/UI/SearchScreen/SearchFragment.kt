@@ -104,6 +104,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                     var tag: Tag
                     for (i in 0 until list?.size!!) {
                         if (list[i].tagID == tagText) {
+                            list[i].checked=true
                             selectedTags.add(list[i])
                             searchQuery("")
                             binding.tags.text = list[i].tagText

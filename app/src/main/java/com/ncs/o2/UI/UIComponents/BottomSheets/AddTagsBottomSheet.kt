@@ -20,6 +20,7 @@ import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -38,7 +39,7 @@ import net.datafaker.Faker
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val callback : getSelectedTagsCallback?=null,private var selectedTagsList: MutableList<Tag>): BottomSheetDialogFragment(){
+class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val callback : getSelectedTagsCallback?=null,private var selectedTagsList: MutableList<Tag>,val type:String): BottomSheetDialogFragment(){
     private var tagList: MutableList<Tag> = mutableListOf()
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
     private val viewmodel: TaskSectionViewModel by viewModels()
@@ -64,6 +65,20 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (type=="edit"){
+            binding.sheettTitle.text="Add/Edit Tags"
+            binding.createSegmentBtn.gone()
+            binding.submit.visible()
+        }
+        else{
+            binding.sheettTitle.text="Add Tags"
+            binding.createSegmentBtn.visible()
+            binding.submit.gone()
+        }
+        binding.submit.setOnClickThrottleBounceListener {
+            dismiss()
+            callback!!.onSubmitClick()
+        }
         binding.progressbar.visible()
         binding.chipGroup.gone()
         if (db.tagsDao().isNull){
@@ -151,6 +166,8 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
     interface getSelectedTagsCallback{
         fun onSelectedTags(tag : Tag,isChecked:Boolean)
         fun onTagListUpdated(tagList: MutableList<Tag>)
+
+        fun onSubmitClick()
 
     }
     fun fetchfromdb(){

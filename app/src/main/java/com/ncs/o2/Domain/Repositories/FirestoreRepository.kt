@@ -21,6 +21,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
@@ -1395,8 +1396,14 @@ class FirestoreRepository @Inject constructor(
         id: String,
         projectName: String,
         moderator: String
-    ): ServerResult<Boolean> {
-        try {
+    ): ServerResult<Unit> {
+        return try {
+            val result = withContext(Dispatchers.IO) {
+                val task = db.tasksDao().getTasksbyId(id, projectName)
+                task?.moderators?.toMutableList()?.add(moderator)
+                db.tasksDao().update(task!!)
+            }
+
             firestore.runTransaction { transaction ->
                 val documentRef = firestore.collection(Endpoints.PROJECTS)
                     .document(projectName)
@@ -1408,15 +1415,39 @@ class FirestoreRepository @Inject constructor(
                 )
 
                 transaction.update(documentRef, updateData)
-
                 updateLastUpdated(projectName, transaction)
-                updateTaskLastUpdated(projectName,transaction,id)
+                updateTaskLastUpdated(projectName, transaction, id)
                 true
             }
 
-            return ServerResult.Success(true)
+            ServerResult.Success(result)
         } catch (e: Exception) {
-            return ServerResult.Failure(e)
+            ServerResult.Failure(e)
+        }
+    }
+
+
+    override suspend fun updateTags(
+        newTags:List<String>,
+        projectName: String,
+        taskId: String,
+    ): ServerResult<Boolean> {
+        return try {
+
+            firestore.runTransaction { transaction ->
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(taskId)
+                    .update("tags", newTags)
+                updateLastUpdated(projectName, transaction)
+                updateTaskLastUpdated(projectName, transaction, taskId)
+                true
+            }
+
+            ServerResult.Success(true)
+        } catch (e: Exception) {
+            ServerResult.Failure(e)
         }
     }
 
@@ -1510,6 +1541,34 @@ class FirestoreRepository @Inject constructor(
                     updateTaskLastUpdated(projectName,transaction,id)
 
                 }
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun updatePriority(
+        id: String,
+        newPriority: String,
+        projectName: String
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+
+                val priority = SwitchFunctions.getNumPriorityFromStringPriority(newPriority)
+                transaction.update(projectDocumentRef, "priority", priority)
+                updateLastUpdated(projectName,transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
 
                 true
             }
@@ -1795,6 +1854,24 @@ class FirestoreRepository @Inject constructor(
         val last_updated=Timestamp.now()
         val projectData = mapOf(
             Endpoints.Project.LAST_UPDATED to last_updated
+        )
+        transaction.update(projectDocRef, projectData)
+    }
+    fun updateLastProjectTagUpdated(projectName: String,transaction:Transaction){
+        val projectDocRef = firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+        val last_updated=Timestamp.now()
+        val projectData = mapOf(
+            Endpoints.Project.LAST_TAG_UPDATED to last_updated
+        )
+        transaction.update(projectDocRef, projectData)
+    }
+    fun updateTagLastUpdated(projectName: String,transaction:Transaction,tagId:String){
+        val projectDocRef = firestore.collection(Endpoints.PROJECTS)
+            .document(projectName).collection(Endpoints.Project.TAGS).document(tagId)
+        val last_updated=Timestamp.now()
+        val projectData = mapOf(
+            Endpoints.Project.LAST_TAG_UPDATED to last_updated
         )
         transaction.update(projectDocRef, projectData)
     }

@@ -11,7 +11,7 @@ import com.ncs.o2.Domain.Models.Tag
 @Dao
 interface TagsDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(tag: Tag)
 
     @Update
