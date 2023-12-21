@@ -1296,6 +1296,26 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    override fun getProjectLink(
+        projectName: String,
+        result: (ServerResult<String>) -> Unit
+    ) {
+        result(ServerResult.Progress)
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                val link = documentSnapshot.getString("PROJECT_LINK")
+                result(ServerResult.Success(link!!))
+            }
+            .addOnFailureListener {
+                result(ServerResult.Failure(it))
+
+            }
+
+    }
+
+
     override fun getMessageUserInfobyId(
         id: String,
         serverResult: (ServerResult<UserInMessage>) -> Unit
@@ -1950,6 +1970,7 @@ class FirestoreRepository @Inject constructor(
         val userSnapshot = userDocument.get().await()
         return userSnapshot.get("PROJECTS") as ArrayList<String>? ?: ArrayList()
     }
+
 }
 
 

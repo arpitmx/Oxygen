@@ -56,6 +56,10 @@ interface Repository {
     )
     fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>>
 
+    fun getProjectLink(
+        projectName: String,
+        result: (ServerResult<String>) -> Unit
+    )
     suspend fun addTask(task: Task)
     suspend fun postTags(tag: Tag, projectName: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun fetchProjectTags(

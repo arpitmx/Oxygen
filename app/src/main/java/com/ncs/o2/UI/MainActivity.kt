@@ -60,6 +60,8 @@ import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -249,6 +251,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     private fun setUpActionBar() {
         binding.gioActionbar.actionbar.visible()
+        binding.gioActionbar.btnMore.visible()
 
         // Set up the action bar, navigation drawer, and other UI components
 
@@ -269,7 +272,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.titleTv.animFadein(this, 500)
         binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
 
-
+        binding.gioActionbar.btnMore.setOnClickListener {
+            val moreProjetcOptionBottomSheet =
+                MoreProjectOptionsBottomSheet()
+            moreProjetcOptionBottomSheet.show(supportFragmentManager, "more")
+        }
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
 
@@ -515,7 +522,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             val id = pathSegments[1]
             Log.d("shareLinkTest",operationType.toString())
             Log.d("shareLinkTest",id.toString())
-
 
             when(operationType){
                 "join" -> {
