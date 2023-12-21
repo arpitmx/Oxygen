@@ -11,6 +11,8 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
+import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsBottomSheet
 import com.ncs.o2.databinding.ActivityTaskDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,6 +44,11 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
 
         binding.gioActionbar.btnFav.setOnClickThrottleBounceListener{
             binding.gioActionbar.btnFav.setImageDrawable(resources.getDrawable(R.drawable.star_filled))
+        }
+        binding.gioActionbar.btnMore.setOnClickListener {
+            val moreOptionBottomSheet =
+                MoreOptionsBottomSheet()
+            moreOptionBottomSheet.show(supportFragmentManager, "more")
         }
 
     }

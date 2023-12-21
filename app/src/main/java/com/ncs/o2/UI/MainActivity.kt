@@ -37,6 +37,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -57,6 +58,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -504,10 +506,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
 
     private fun handleDeepLink(uri: Uri) {
+        Log.d("shareLinkTest",uri.toString())
         val pathSegments = uri.pathSegments
+        Log.d("shareLinkTest",pathSegments.toString())
+
         if (pathSegments.size >= 2) {
             val operationType = pathSegments[0]
             val id = pathSegments[1]
+            Log.d("shareLinkTest",operationType.toString())
+            Log.d("shareLinkTest",id.toString())
 
 
             when(operationType){
@@ -522,6 +529,20 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                             } else {
                                 easyElements.showSnackbar(binding.root,"Invalid project link",2000)
                             }
+                        }
+                    }
+                }
+                "share" -> {
+                    val taskId="#T${id}"
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (db.tasksDao().getTasksbyId(taskId,PrefManager.getcurrentProject())?.isNull!!){
+                            easyElements.showSnackbar(binding.root,"No Task found, check the link",2000)
+                        }
+                        else{
+                            val intent = Intent(this@MainActivity, TaskDetailActivity::class.java)
+                            intent.putExtra("task_id", taskId)
+                            startActivity(intent)
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                         }
                     }
                 }
