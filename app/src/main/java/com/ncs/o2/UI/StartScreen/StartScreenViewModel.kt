@@ -125,10 +125,10 @@ constructor(
                             PrefManager.setLatestNotificationTimeStamp(latestNotificationTimestamp)
 
                             CoroutineScope(Dispatchers.IO).launch {
-                                val newNotificationCount = getNewNotificationCount(notificationList)
+//                                val newNotificationCount = getNewNotificationCount(notificationList)
 
                                 withContext(Dispatchers.Main) {
-                                    PrefManager.setNotificationCount(PrefManager.getNotificationCount()+newNotificationCount)
+                                    PrefManager.setNotificationCount(PrefManager.getNotificationCount())
                                     _serverResultLiveData.postValue(
                                         ServerResult.Success(
                                             notificationList

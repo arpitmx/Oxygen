@@ -1861,8 +1861,7 @@ class FirestoreRepository @Inject constructor(
                                     lastUpdated = LastUpdatedtimeStamp
                                 )
                                 PrefManager.putLastNotificationCacheUpdateTimestamp(Timestamp.now().seconds)
-                                val count=PrefManager.getNotificationCount()+1
-                                PrefManager.setNotificationCount(count)
+
                                 if (notificationDB.notificationDao().getNotificationById(
                                         notificationData.notificationID
                                     ).isNull){
@@ -1872,6 +1871,7 @@ class FirestoreRepository @Inject constructor(
                                     notificationDB.notificationDao().update(notificationData)
                                 }
                             }
+                            PrefManager.setNotificationCount(PrefManager.getNotificationCount()+querySnapshot.documents.size)
                         }
                         result(ServerResult.Success(1))
 
