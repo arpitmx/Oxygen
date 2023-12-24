@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.UIComponents.Adapters
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -67,58 +68,59 @@ interface ProjectCallback{
         return position.toLong()
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-        val view: View?
-        val vh: ListRowHolder
-        if(convertView == null) {
-            view = this.mInflator.inflate(R.layout.project_list_item, parent, false)
-            vh = ListRowHolder(view)
-            view.tag = vh
+     // Inside your ListAdapter
+     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
+         val view: View?
+         val vh: ListRowHolder
+         if (convertView == null) {
+             view = mInflator.inflate(R.layout.project_list_item, parent, false)
+             vh = ListRowHolder(view)
+             view.tag = vh
+         } else {
+             view = convertView
+             vh = view.tag as ListRowHolder
+         }
 
-        } else {
-            view = convertView
-            vh = view.tag as ListRowHolder
-        }
+         vh.label.text = sList[position]
 
-        vh.label.text = sList[position]
+         FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(sList[position]).get()
+             .addOnSuccessListener { documentSnapshot ->
+                 if (documentSnapshot.exists()) {
+                     val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                     if (imageUrl != null && !((context as? Activity)?.isDestroyed == true)) {
+                         Glide.with(context)
+                             .load(imageUrl)
+                             .error(R.drawable.placeholder_image)
+                             .into(vh.icon)
+                     }
+                 }
+             }
+             .addOnFailureListener { exception ->
+                 Log.d("failCheck", exception.toString())
+             }
 
-        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(sList[position]).get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot.exists()) {
-                    val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
-                    if (imageUrl != null) {
-                    }
-                        Glide.with(context)
-                            .load(imageUrl)
-                            .error(R.drawable.placeholder_image)
-                            .into(vh.icon)
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("failCheck", exception.toString())
-            }
+         vh.radioButton.isChecked = position == selectedPosition
+         vh.layout.setOnClickListener {
+             selectedPosition = position
+             notifyDataSetChanged()
+             callback.onClick(sList[position], position)
+         }
+         vh.radioButton.setOnClickListener {
+             selectedPosition = position
+             notifyDataSetChanged()
+             callback.onClick(sList[position], position)
+         }
 
-        vh.radioButton.isChecked = position == selectedPosition
-        vh.layout.setOnClickListener {
-            selectedPosition = position
-            notifyDataSetChanged()
-            callback.onClick(sList[position], position)
-        }
-        vh.radioButton.setOnClickListener {
-            selectedPosition = position
-            notifyDataSetChanged()
-            callback.onClick(sList[position], position)
-        }
+         vh.label.setOnClickListener {
+             selectedPosition = position
+             notifyDataSetChanged()
+             callback.onClick(sList[position], position)
+         }
 
-        vh.label.setOnClickListener{
-            selectedPosition = position
-            notifyDataSetChanged()
-            callback.onClick(sList[position], position)
-        }
+         return view
+     }
 
-        return view
-    }
-}
+ }
 
 private class ListRowHolder(row: View?) {
      var label: TextView

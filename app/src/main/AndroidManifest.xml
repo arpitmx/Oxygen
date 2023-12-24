@@ -20,6 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
+
         <activity
             android:name=".UI.CreateTask.CreateCheckListActivity"
             android:exported="false" />
@@ -83,7 +84,17 @@
             android:exported="false" />
         <activity
             android:name=".UI.MainActivity"
-            android:exported="true" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="oxy2.page.link"
+                     />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".Services.FCMessagingService"

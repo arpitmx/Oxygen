@@ -24,6 +24,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.ChatImageItemBinding
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.versa.Constants.Endpoints
@@ -51,6 +52,7 @@ Tasks FUTURE ADDITION :
 */
 
 class ChatAdapter(
+    val activitybinding:TaskDetailActivity,
     val repository: FirestoreRepository,
     var msgList: MutableList<Message>,
     val context: Context,
@@ -319,6 +321,7 @@ class ChatAdapter(
                     val user = result.data
                     if (user != null) {
                         onUserFetched(user)
+                        activitybinding.sharedViewModel.pushReceiver(user.FCM_TOKEN!!)
                     }
                 }
 

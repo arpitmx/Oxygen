@@ -9,11 +9,15 @@ import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
@@ -57,6 +61,8 @@ class O2Application : Application(), Configuration.Provider{
     lateinit var customWorkerFactory: CustomWorkerFactory
     @Inject
     lateinit var db: TasksDatabase
+    @Inject
+    lateinit var notificationDB:NotificationDatabase
 
     @Inject
     @FirebaseRepository
@@ -66,6 +72,7 @@ class O2Application : Application(), Configuration.Provider{
     //Todo : Check if initiations taking too long, before production
     override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(this)
 
 
 
@@ -83,12 +90,19 @@ class O2Application : Application(), Configuration.Provider{
             Timber.plant(Timber.DebugTree())
         }
 
+
+
         PrefManager.putLastCacheUpdateTimestamp(Timestamp.now())
 
         fcmToken()
         val projectsList=PrefManager.getProjectsList()
+        val userID=PrefManager.getCurrentUserEmail()
         for (project in projectsList){
             initializeListner(project)
+            initializeTagListner(project)
+        }
+        if (userID.isNotEmpty()){
+            initializeNotificationListner(userID)
         }
 
 
@@ -187,6 +201,7 @@ class O2Application : Application(), Configuration.Provider{
             workerParameters,
             notificationApiService)
     }
+
     fun initializeListner(projectName:String){
         CoroutineScope(Dispatchers.Main).launch {
 
@@ -207,6 +222,61 @@ class O2Application : Application(), Configuration.Provider{
 
 
                     }
+
+                    else -> {}
+                }
+            }
+        }
+
+    }
+
+    fun initializeTagListner(projectName:String){
+        CoroutineScope(Dispatchers.Main).launch {
+
+            repository.initilizeTagslistner(projectName = projectName) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    ServerResult.Progress -> {
+
+                    }
+
+                    is ServerResult.Success -> {
+
+
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+
+    }
+    fun initializeNotificationListner(userID:String){
+        CoroutineScope(Dispatchers.Main).launch {
+
+            repository.initilizeNotificationslistner(userID = userID) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    ServerResult.Progress -> {
+
+                    }
+
+                    is ServerResult.Success -> {
+
+
+                    }
+
+                    else -> {}
                 }
             }
         }

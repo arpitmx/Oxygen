@@ -1,14 +1,11 @@
 package com.ncs.o2.Domain.Repositories
 
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.text.format.Time
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -22,9 +19,10 @@ import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.Transaction
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.ncs.o2.BuildConfig
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
+import com.ncs.o2.Constants.SwitchFunctions
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
@@ -50,7 +48,6 @@ import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -83,7 +80,7 @@ Tasks FUTURE ADDITION :
 class FirestoreRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : Repository {
-
+    private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val storageReference = FirebaseStorage.getInstance().reference
     private val TAG: String = com.ncs.o2.Domain.Repositories.FirestoreRepository::class.java.simpleName
     lateinit var serverErrorCallback: ServerErrorCallback
@@ -92,6 +89,8 @@ class FirestoreRepository @Inject constructor(
 //    }
     @Inject
     lateinit var db:TasksDatabase
+    @Inject
+    lateinit var notificationDB:NotificationDatabase
 
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
@@ -208,7 +207,6 @@ class FirestoreRepository @Inject constructor(
                         documentSnapshot.getString(Endpoints.Notifications.toUser)!!
                     val timeStamp: Long =
                         documentSnapshot.getLong(Endpoints.Notifications.timeStamp)!!
-
                     Notification(
                         notificationID = notificationID,
                         notificationType = notificationType,
@@ -217,7 +215,7 @@ class FirestoreRepository @Inject constructor(
                         message = message,
                         fromUser = fromUser,
                         toUser = toUser,
-                        timeStamp = timeStamp
+                        timeStamp = timeStamp,
                     )
                 }
             }.await()
@@ -250,39 +248,40 @@ class FirestoreRepository @Inject constructor(
         bitmap: Bitmap,
         projectId: String
     ): LiveData<ServerResult<StorageReference>> {
+
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
-        val imageFileName = "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
+        val imageFileName =
+            "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
+//            "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
         val data = baos.toByteArray()
         val uploadTask = imageRef.putBytes(data)
 
-        uploadTask.addOnSuccessListener { _ ->
-            try {
-                firestore.runTransaction { transaction ->
-                    val userDocRef = firestore.collection("Users")
-                        .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                    val userUserData = mapOf("PHOTO_ADDED" to true)
-                    transaction.update(userDocRef, userUserData)
-                    val lastUpdate=Timestamp.now()
-                    updateLastUpdated(projectId,transaction)
-                    null
-                }.addOnSuccessListener {
+
+        uploadTask.addOnSuccessListener {
+            val userData = mapOf(
+                "PHOTO_ADDED" to true,
+            )
+
+            firestore.collection("Users")
+                .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                .update(userData)
+                .addOnSuccessListener {
                     liveData.postValue(ServerResult.Success(imageRef))
-                }.addOnFailureListener { e ->
+                }
+                .addOnFailureListener { e ->
                     liveData.postValue(ServerResult.Failure(e))
                 }
-            } catch (exception: Exception) {
-                liveData.postValue(ServerResult.Failure(exception))
-            }
+
         }.addOnFailureListener { exception ->
             liveData.postValue(ServerResult.Failure(exception))
+
         }
 
         return liveData
     }
-
 
     override fun getProjectIcon(reference: StorageReference): LiveData<ServerResult<StorageReference>> {
         TODO("Not yet implemented")
@@ -503,11 +502,14 @@ class FirestoreRepository @Inject constructor(
                     val tagID = document.getString("tagID")
                     val textColor = document.getString("textColor")!!
                     val bgColor = document.getString("bgColor")
+                    val projectName=document.getString("projectName")
+
                     val tag = Tag(
                         tagText = tagText!!,
-                        tagID = tagID,
+                        tagID = tagID!!,
                         textColor = textColor,
                         bgColor = bgColor!!,
+                        projectName = projectName!!
                     )
                     result(ServerResult.Success(tag))
                 } else {
@@ -608,24 +610,32 @@ class FirestoreRepository @Inject constructor(
         serverResult(ServerResult.Progress)
         Handler(Looper.getMainLooper()).postDelayed({
             var currentUser: CurrentUser?
-            firestore.collection(Endpoints.USERS)
-                .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                .get(Source.SERVER)
-                .addOnSuccessListener { snap ->
-                    if (snap.exists()) {
-                        currentUser = snap.toObject(CurrentUser::class.java)
+            val user=FirebaseAuth.getInstance().currentUser
+            if (!user.isNull) {
+                firestore.collection(Endpoints.USERS)
+                    .document(user?.email!!)
+                    .get(Source.SERVER)
+                    .addOnSuccessListener { snap ->
+                        if (snap != null && snap.exists()) {
+                            currentUser = snap.toObject(CurrentUser::class.java)
 
-                        Timber.tag(TAG).d(currentUser?.USERNAME)
-                        Timber.tag(TAG).d(currentUser?.EMAIL)
-                        Timber.tag(TAG).d(currentUser?.PROJECTS.toString())
+                            if (currentUser != null) {
+                                Timber.tag(TAG).d(currentUser?.USERNAME)
+                                Timber.tag(TAG).d(currentUser?.EMAIL)
+                                Timber.tag(TAG).d(currentUser?.PROJECTS.toString())
+                                serverResult(ServerResult.Success(currentUser))
+                            }
 
-                        serverResult(ServerResult.Success(currentUser))
+                            serverResult(ServerResult.Success(currentUser))
+                        } else {
+                            serverResult(ServerResult.Failure(Exception("User Not Found")))
+                        }
                     }
-                }
-                .addOnFailureListener { error ->
-                    Timber.tag(TAG).d("failed %s", error.stackTrace)
-                    serverResult(ServerResult.Failure(error))
-                }
+                    .addOnFailureListener { error ->
+                        Timber.tag(TAG).e(error, "Failed to retrieve user information")
+                        serverResult(ServerResult.Failure(error))
+                    }
+            }
         }, 1000)
     }
 
@@ -852,6 +862,62 @@ class FirestoreRepository @Inject constructor(
 
     }
 
+    override suspend fun getTagsinProject(
+        projectName: String,
+    ): ServerResult<List<Tag>> {
+
+        return try {
+
+            val task =
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TAGS)
+                    .get().await()
+
+            val snapShot = task
+
+            if (!snapShot.isEmpty) {
+
+                val list:MutableList<Tag> = mutableListOf()
+                for (document in snapShot.documents){
+                    val tagText = document.getString("tagText")
+                    val tagID = document.getString("tagID")
+                    val textColor = document.getString("textColor")!!
+                    val bgColor = document.getString("bgColor")
+                    val projectName=document.getString("projectName")
+
+                    val lastUpdate:Timestamp
+                    if (document.get(Endpoints.Project.LAST_TAG_UPDATED).isNull){
+                        lastUpdate=Timestamp.now()
+                    }
+                    else{
+                        lastUpdate=document.get(Endpoints.Project.LAST_TAG_UPDATED) as Timestamp
+                    }
+                    val tagData = Tag(
+                        tagText = tagText!!,
+                        tagID = tagID!!,
+                        textColor = textColor,
+                        bgColor = bgColor!!,
+                        last_tag_updated = lastUpdate,
+                        projectName = projectName!!
+                    )
+                    list.add(tagData)
+                }
+
+                list.let {
+                    return ServerResult.Success(it)
+                } ?: ServerResult.Failure(Exception("Document not found for title:"))
+
+            } else {
+                return ServerResult.Failure(Exception("Document not found for title"))
+            }
+
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+
+    }
+
     override suspend fun getTasksItem(
         projectName: String,
         segmentName: String,
@@ -933,13 +999,14 @@ class FirestoreRepository @Inject constructor(
     }
 
     fun getContributors(projectName: String, result: (ServerResult<List<String>>) -> Unit) {
-        firestore.collection(Endpoints.PROJECTS).document(projectName)
+        firestore.collection(Endpoints.PROJECTS)
+            .whereEqualTo("PROJECT_NAME", projectName)
             .get()
-            .addOnSuccessListener { data ->
-//                val section_list = mutableListOf<String>()
-                if (data.exists()) {
-                    val contributor_list = data.get("contributors") as List<String>
-                    result(ServerResult.Success(contributor_list))
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0]
+                    val contributors=document.get("contributors") as List<String>
+                    result(ServerResult.Success(contributors))
                 }
             }
             .addOnFailureListener { exception ->
@@ -1030,14 +1097,18 @@ class FirestoreRepository @Inject constructor(
         return try {
 
             serverResult(ServerResult.Progress)
-
             firestore.collection(Endpoints.PROJECTS)
                 .document(projectName).collection(Endpoints.Project.TAGS).document(tag.tagID!!)
                 .set(tag)
                 .await()
-
-
-
+            firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .update(Endpoints.Project.LAST_TAG_UPDATED, Timestamp.now())
+                .await()
+            PrefManager.putLastTAGCacheUpdateTimestamp(Timestamp.now())
+            CoroutineScope(Dispatchers.IO).launch {
+                db.tagsDao().insert(tag)
+            }
             serverResult(ServerResult.Success(200))
 
         } catch (exception: Exception) {
@@ -1227,6 +1298,26 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    override fun getProjectLink(
+        projectName: String,
+        result: (ServerResult<String>) -> Unit
+    ) {
+        result(ServerResult.Progress)
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                val link = documentSnapshot.getString("PROJECT_LINK")
+                result(ServerResult.Success(link!!))
+            }
+            .addOnFailureListener {
+                result(ServerResult.Failure(it))
+
+            }
+
+    }
+
+
     override fun getMessageUserInfobyId(
         id: String,
         serverResult: (ServerResult<UserInMessage>) -> Unit
@@ -1241,8 +1332,9 @@ class FirestoreRepository @Inject constructor(
                     val EMAIL = document.getString("EMAIL")
                     val DP_URL = document.getString("DP_URL")
                     val USERNAME = document.getString("USERNAME")!!
+                    val FCM_TOKEN=document.getString("FCM_TOKEN")
                     val user = UserInMessage(
-                        EMAIL = EMAIL!!, USERNAME = USERNAME, DP_URL = DP_URL
+                        EMAIL = EMAIL!!, USERNAME = USERNAME, DP_URL = DP_URL, FCM_TOKEN = FCM_TOKEN
                     )
                     serverResult(ServerResult.Success(user))
                 } else {
@@ -1327,8 +1419,14 @@ class FirestoreRepository @Inject constructor(
         id: String,
         projectName: String,
         moderator: String
-    ): ServerResult<Boolean> {
-        try {
+    ): ServerResult<Unit> {
+        return try {
+            val result = withContext(Dispatchers.IO) {
+                val task = db.tasksDao().getTasksbyId(id, projectName)
+                task?.moderators?.toMutableList()?.add(moderator)
+                db.tasksDao().update(task!!)
+            }
+
             firestore.runTransaction { transaction ->
                 val documentRef = firestore.collection(Endpoints.PROJECTS)
                     .document(projectName)
@@ -1340,15 +1438,39 @@ class FirestoreRepository @Inject constructor(
                 )
 
                 transaction.update(documentRef, updateData)
-
                 updateLastUpdated(projectName, transaction)
-                updateTaskLastUpdated(projectName,transaction,id)
+                updateTaskLastUpdated(projectName, transaction, id)
                 true
             }
 
-            return ServerResult.Success(true)
+            ServerResult.Success(result)
         } catch (e: Exception) {
-            return ServerResult.Failure(e)
+            ServerResult.Failure(e)
+        }
+    }
+
+
+    override suspend fun updateTags(
+        newTags:List<String>,
+        projectName: String,
+        taskId: String,
+    ): ServerResult<Boolean> {
+        return try {
+
+            firestore.runTransaction { transaction ->
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(taskId)
+                    .update("tags", newTags)
+                updateLastUpdated(projectName, transaction)
+                updateTaskLastUpdated(projectName, transaction, taskId)
+                true
+            }
+
+            ServerResult.Success(true)
+        } catch (e: Exception) {
+            ServerResult.Failure(e)
         }
     }
 
@@ -1442,6 +1564,34 @@ class FirestoreRepository @Inject constructor(
                     updateTaskLastUpdated(projectName,transaction,id)
 
                 }
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun updatePriority(
+        id: String,
+        newPriority: String,
+        projectName: String
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+
+                val priority = SwitchFunctions.getNumPriorityFromStringPriority(newPriority)
+                transaction.update(projectDocumentRef, "priority", priority)
+                updateLastUpdated(projectName,transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
 
                 true
             }
@@ -1582,9 +1732,14 @@ class FirestoreRepository @Inject constructor(
                             for (document in querySnapshot.documents) {
                                 val sectionData = document.toObject(Task::class.java)
                                 PrefManager.putLastCacheUpdateTimestamp(Timestamp.now())
-                                Log.d("update","old task by:  ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
-                                db.tasksDao().update(task = sectionData!!)
-                                Log.d("update","updated task by: ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                                if (db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!).isNull){
+                                    db.tasksDao().insert(sectionData)
+                                }
+                                else{
+                                    Log.d("update","old task by:  ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                                    db.tasksDao().update(task = sectionData!!)
+                                    Log.d("update","updated task by: ${db.tasksDao().getTasksbyId(sectionData?.id!!,sectionData?.project_ID!!)}")
+                                }
                             }
                         }
 
@@ -1597,6 +1752,137 @@ class FirestoreRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun initilizeTagslistner(projectName: String,result: (ServerResult<Int>) -> Unit) {
+        val projectDocument = FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName)
+        val listenerRegistration = projectDocument.addSnapshotListener { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->
+            if (exception != null) {
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.Project.LAST_TAG_UPDATED)) {
+                val lastUpdatedValue = snapshot.get(Endpoints.Project.LAST_TAG_UPDATED)
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TAGS)
+                    .whereGreaterThan(Endpoints.Project.LAST_TAG_UPDATED, PrefManager.getLastTAGCacheUpdateTimestamp())
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val tagList = mutableListOf<Tag>()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            for (document in querySnapshot.documents) {
+                                val tagText = document.getString("tagText")
+                                val tagID = document.getString("tagID")
+                                val textColor = document.getString("textColor")!!
+                                val bgColor = document.getString("bgColor")
+                                val projectName=document.getString("projectName")
+                                val lastUpdate:Timestamp
+                                if (document.get(Endpoints.Project.LAST_TAG_UPDATED).isNull){
+                                    lastUpdate=Timestamp.now()
+                                }
+                                else{
+                                    lastUpdate=document.get(Endpoints.Project.LAST_TAG_UPDATED) as Timestamp
+                                }
+                                val tagData = Tag(
+                                    tagText = tagText!!,
+                                    tagID = tagID!!,
+                                    textColor = textColor,
+                                    bgColor = bgColor!!,
+                                    last_tag_updated = lastUpdate,
+                                    projectName = projectName!!
+                                )
+                                PrefManager.putLastTAGCacheUpdateTimestamp(Timestamp.now())
+                                if (db.tagsDao().getTagbyId(tagData?.tagID!!).isNull){
+                                    db.tagsDao().insert(tagData)
+                                }
+                                else{
+                                    Log.d("update","old tag by:  ${db.tagsDao().getTagbyId(tagData?.tagID!!)}")
+                                    db.tagsDao().update(tag = tagData)
+                                    Log.d("update","updated tag by: ${db.tagsDao().getTagbyId(tagData?.tagID!!)}")
+                                }
+                            }
+                        }
+
+                        result(ServerResult.Success(1))
+
+                    }
+                    .addOnFailureListener { exception ->
+                        result(ServerResult.Failure(exception))
+                    }
+            }
+        }
+    }
+
+    override suspend fun initilizeNotificationslistner(userID: String,result: (ServerResult<Int>) -> Unit) {
+        val userDocument = FirebaseFirestore.getInstance().collection(Endpoints.USERS).document(userID)
+        val listenerRegistration = userDocument.addSnapshotListener { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->
+            if (exception != null) {
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.User.LAST_NOTIFICATION_UPDATED)) {
+                val lastUpdatedValue = snapshot.get(Endpoints.User.LAST_NOTIFICATION_UPDATED)
+                firestore.collection(Endpoints.USERS)
+                    .document(userID)
+                    .collection(Endpoints.Notifications.NOTIFICATIONS)
+                    .whereGreaterThan(Endpoints.Notifications.lastUpdated, PrefManager.getLastNotificationCacheUpdateTimestamp())
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val notificationsList = mutableListOf<Notification>()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            for (document in querySnapshot.documents) {
+                                val notificationID: String =
+                                    document.getString(Endpoints.Notifications.notificationID)!!
+                                val notificationType: String =
+                                    document.getString(Endpoints.Notifications.notificationType)!!
+                                val taskID: String =
+                                    document.getString(Endpoints.Notifications.taskID)!!
+                                val title: String = document.getString(Endpoints.Notifications.title)!!
+                                val message: String =
+                                    document.getString(Endpoints.Notifications.message)!!
+                                val fromUser: String =
+                                    document.getString(Endpoints.Notifications.fromUser)!!
+                                val toUser: String =
+                                    document.getString(Endpoints.Notifications.toUser)!!
+                                val timeStamp: Long =
+                                    document.getLong(Endpoints.Notifications.timeStamp)!!
+                                var LastUpdatedtimeStamp: Long? =null
+                                if (!document.getLong(Endpoints.Notifications.lastUpdated)!!.isNull){
+                                    LastUpdatedtimeStamp=document.getLong(Endpoints.Notifications.lastUpdated)!!
+                                }
+
+                                val notificationData=Notification(
+                                    notificationID = notificationID,
+                                    notificationType = notificationType,
+                                    taskID = taskID,
+                                    title = title,
+                                    message = message,
+                                    fromUser = fromUser,
+                                    toUser = toUser,
+                                    timeStamp = timeStamp,
+                                    lastUpdated = LastUpdatedtimeStamp
+                                )
+                                PrefManager.putLastNotificationCacheUpdateTimestamp(Timestamp.now().seconds)
+
+                                if (notificationDB.notificationDao().getNotificationById(
+                                        notificationData.notificationID
+                                    ).isNull){
+                                    notificationDB.notificationDao().insert(notificationData)
+                                }
+                                else{
+                                    notificationDB.notificationDao().update(notificationData)
+                                }
+                            }
+                            PrefManager.setNotificationCount(PrefManager.getNotificationCount()+querySnapshot.documents.size)
+                        }
+                        result(ServerResult.Success(1))
+
+                    }
+                    .addOnFailureListener { exception ->
+                        result(ServerResult.Failure(exception))
+                    }
+            }
+        }
+    }
+
     override suspend fun getSearchedTasks(
         assignee: String,
         creator: String,
@@ -1664,6 +1950,147 @@ class FirestoreRepository @Inject constructor(
             Endpoints.Project.LAST_UPDATED to last_updated
         )
         transaction.update(projectDocRef, projectData)
+    }
+
+    fun updateLastUserNotificationUpdated(userID: String,transaction:Transaction){
+        val userDocRef = firestore.collection(Endpoints.USERS)
+            .document(userID)
+        val last_updated=Timestamp.now().seconds
+        val userData = mapOf(
+            Endpoints.User.LAST_NOTIFICATION_UPDATED to last_updated
+        )
+        transaction.update(userDocRef, userData)
+    }
+    fun updateNotifactionLastUpdated(userID: String,transaction:Transaction,notificationID: String){
+        val userDocRef = firestore.collection(Endpoints.USERS)
+            .document(userID).collection(Endpoints.Notifications.NOTIFICATIONS).document(notificationID)
+        val last_updated=Timestamp.now().seconds
+        val userData = mapOf(
+            Endpoints.Notifications.lastUpdated to last_updated
+        )
+        transaction.update(userDocRef, userData)
+    }
+    fun updateLastProjectTagUpdated(projectName: String,transaction:Transaction){
+        val projectDocRef = firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+        val last_updated=Timestamp.now()
+        val projectData = mapOf(
+            Endpoints.Project.LAST_TAG_UPDATED to last_updated
+        )
+        transaction.update(projectDocRef, projectData)
+    }
+    fun updateTagLastUpdated(projectName: String,transaction:Transaction,tagId:String){
+        val projectDocRef = firestore.collection(Endpoints.PROJECTS)
+            .document(projectName).collection(Endpoints.Project.TAGS).document(tagId)
+        val last_updated=Timestamp.now()
+        val projectData = mapOf(
+            Endpoints.Project.LAST_TAG_UPDATED to last_updated
+        )
+        transaction.update(projectDocRef, projectData)
+    }
+    suspend fun addProjectToUser(projectLink: String): ServerResult<ArrayList<String>> {
+        return try {
+            if (projectLink.isNotBlank()) {
+                val userDocument = getUserDocument()
+
+                val projectData = getProjectData(projectLink)
+
+                if (projectData != null) {
+                    val isProjectAlreadyAdded = checkIfProjectAlreadyAdded(userDocument, projectData)
+                    if (isProjectAlreadyAdded) {
+                        return ServerResult.Success(ArrayList())
+                    }
+
+                    userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData))
+                        .await()
+
+                    updateProjectContributors(projectData)
+                    PrefManager.lastaddedproject(projectData)
+
+                    val updatedUserProjects = getUserProjects(userDocument)
+
+                    return ServerResult.Success(updatedUserProjects)
+                } else {
+                    return ServerResult.Failure(Exception("Project not found, please check the link"))
+                }
+            } else {
+                return ServerResult.Failure(Exception("Project Link can't be empty"))
+            }
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    private suspend fun getUserDocument(): DocumentReference {
+        return firebaseFirestore.collection("Users")
+            .document(FirebaseAuth.getInstance().currentUser?.email!!)
+    }
+
+    private suspend fun getProjectData(projectLink: String): String? {
+        Log.d("projectcheck",projectLink.toString())
+        val documents = firebaseFirestore.collection("Projects")
+            .whereEqualTo("PROJECT_DEEPLINK", projectLink.toLowerCase())
+            .get()
+            .await()
+
+        return if (!documents.isEmpty) {
+            documents.documents.firstOrNull()?.getString("PROJECT_NAME")
+        } else {
+            null
+        }
+    }
+
+    private suspend fun checkIfProjectAlreadyAdded(
+        userDocument: DocumentReference,
+        projectData: String
+    ): Boolean {
+        val userSnapshot = userDocument.get().await()
+        val userProjects = userSnapshot.get("PROJECTS") as ArrayList<String>?
+        return userProjects != null && userProjects.contains(projectData)
+    }
+
+    private fun updateProjectContributors(projectData: String) {
+        val addContributors = mapOf(
+            "contributors" to FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.email)
+        )
+
+        firebaseFirestore.collection(Endpoints.PROJECTS)
+            .document(projectData)
+            .update(addContributors)
+    }
+
+    private suspend fun getUserProjects(userDocument: DocumentReference): ArrayList<String> {
+        val userSnapshot = userDocument.get().await()
+        return userSnapshot.get("PROJECTS") as ArrayList<String>? ?: ArrayList()
+    }
+
+    override fun insertNotification(
+        userID: String,
+        notification: Notification,
+        result: (ServerResult<Int>) -> Unit
+    ){
+
+
+        firestore.runTransaction { transaction ->
+
+            try {
+                transaction.set(
+                    firestore.collection(Endpoints.USERS)
+                        .document(userID)
+                        .collection(Endpoints.Notifications.NOTIFICATIONS)
+                        .document(notification.notificationID),
+                    notification
+                )
+                updateLastUserNotificationUpdated(userID,transaction)
+                updateNotifactionLastUpdated(userID,transaction,notification.notificationID)
+                result(ServerResult.Success(200))
+
+            } catch (exception: Exception) {
+                result(ServerResult.Failure(exception))
+                throw FirebaseFirestoreException("Transaction failed", FirebaseFirestoreException.Code.ABORTED)
+            }
+        }
+
     }
 
 }

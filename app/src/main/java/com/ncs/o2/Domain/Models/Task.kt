@@ -33,7 +33,7 @@ Tasks FUTURE ADDITION :
 
 // Todo Remove deprecated fields like assigner
 
-@Version("2")
+@Version("3")
 @Entity(tableName = Endpoints.ROOM.TASKS.TASKS_TABLE)
 @TypeConverters(Convertors::class)
 data class Task(
@@ -48,17 +48,18 @@ data class Task(
 
     val assignee: String = "",
     val assigner: String = "",
-    val moderators:List<String> = listOf(),
+    var moderators:List<String> = listOf(),
 
     var time_STAMP: Timestamp? =null,
     val duration: String = "",
-    val tags: List<String> = listOf(),
+    var tags: List<String> = listOf(),
     val project_ID: String = "",
     val segment: String = "",
     val section: String = "",
     val completed:Boolean=false,
     val type:Int=0,
-    val last_updated:Timestamp? = Timestamp.now()
+    val last_updated:Timestamp? = Timestamp.now(),
+    val version:Int?=3
     ) {
 
     @Exclude

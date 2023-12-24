@@ -109,6 +109,39 @@ object GlobalUtils {
             }
         }
 
+        fun twoBtnDialog(
+            title: String,
+            msg: String,
+            positiveBtnText: String,
+            negativeBtnText: String,
+            positive: () -> Unit,
+            negative: () -> Unit
+        ) {
+            if (context is Activity) {
+                val activity = context
+
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setIcon(R.drawable.logogradhd)
+                    builder.setTitle(title)
+                    builder.setMessage(msg)
+                    builder.setPositiveButton(positiveBtnText) { dialog, which ->
+                        positive()
+                    }
+                    builder.setNegativeButton(negativeBtnText) { dialog, which ->
+                        negative()
+                    }
+                    try {
+                        val dialog = builder.create()
+                        dialog.show()
+                    } catch (e: WindowManager.BadTokenException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+
+
         fun singleBtnDialog_ErrorConnection(title: String, msg: String, btnText: String, positive: () -> Unit) {
             val builder = android.app.AlertDialog.Builder(context)
             builder.setIcon(R.drawable.baseline_signal_wifi_connected_no_internet_4_24)

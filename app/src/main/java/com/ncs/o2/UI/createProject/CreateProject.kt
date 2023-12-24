@@ -18,6 +18,8 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.dynamiclinks.DynamicLink
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -93,73 +95,102 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 //        }
 
         binding.gioActionbar.btnNext.setOnClickThrottleBounceListener {
-            val _title = binding.projectTitle.text.toString()
-            val __title = _title.replace(" ", "")
-            val title = __title.toLowerCase().capitalize()
             val project_id =
                 "${title}${System.currentTimeMillis().toString().substring(8, 12).trim()}"
-            val projectData = hashMapOf(
-                "PROJECT_NAME" to title.trim(),
-                "PROJECT_ID" to project_id,
-                "PROJECT_LINK" to "${title.toLowerCase().trim()}.ncs.in",
-                "PROJECT_DESC" to desc.toString().trim(),
-                "ICON_URL" to ""
-            )
+            val _title=binding.projectTitle.text.toString()
+            val __title = _title.replace(" ", "")
+            val title = __title.toLowerCase().capitalize()
+            val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://oxy2.page.link/join/${title.toLowerCase().trim()}"))
+                .setDomainUriPrefix("https://oxy2.page.link")
+                .setAndroidParameters(
+                    DynamicLink.AndroidParameters.Builder("com.ncs.o2")
+                        .setMinimumVersion(1)
+                        .build()
+                )
+                .buildDynamicLink()
+            FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLongLink(dynamicLink.uri)
+                .buildShortDynamicLink()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val shortLink = task.result?.shortLink
+                        val previewLink = task.result?.previewLink
+                        val projectData = hashMapOf(
+                            "PROJECT_NAME" to title.trim(),
+                            "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12).trim()}",
+                            "PROJECT_LINK" to shortLink,
+                            "PROJECT_DEEPLINK" to "https://oxy2.page.link/join/${title.toLowerCase().trim()}",
+                            "PROJECT_DESC" to desc.toString().trim(),
+                            "last_updated" to Timestamp.now(),
+                        )
+                        Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
 
+                        if (title.isNotEmpty()) {
 
-            Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
-
-
-
-            if (title.isNotEmpty()) {
-                if (bitmap == null) {
-                    Toast.makeText(this, "Profile Pic can't be empty", Toast.LENGTH_LONG).show()
-                    util.singleBtnDialog(
-                        "Select a photo",
-                        "Profile Picture cannot be kept empty",
-                        "Okay",
-                        {})
-                    return@setOnClickThrottleBounceListener
-                } else {
-                    binding.progressBar.visible()
-
-
-                    FirebaseFirestore.getInstance().collection("Projects").document(title)
-                        .get()
-                        .addOnSuccessListener { documentSnapshot ->
-                            if (documentSnapshot.exists()) {
-                                Toast.makeText(
-                                    this,
-                                    "Project with this title already exists",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                binding.progressBar.gone()
+                            if (bitmap == null) {
+                                util.singleBtnDialog(
+                                    "Select a photo",
+                                    "Project Photo cannot be kept empty",
+                                    "Okay",
+                                    {})
                             } else {
-                                FirebaseFirestore.getInstance().collection("Projects")
-                                    .document(title)
-                                    .set(projectData)
-                                    .addOnSuccessListener {
+                                binding.progressBar.visible()
 
-                                        uploadImageToFirebaseStorage(bitmap!!, project_id, title)
 
-                                        FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                                            .update("PROJECTS", FieldValue.arrayUnion(title))
-                                            .addOnSuccessListener {
-                                            }
-                                            .addOnFailureListener { e ->
-                                            }
+                                FirebaseFirestore.getInstance().collection("Projects").document(title)
+                                    .get()
+                                    .addOnSuccessListener { documentSnapshot ->
+                                        if (documentSnapshot.exists()) {
+                                            Toast.makeText(
+                                                this,
+                                                "Project with this title already exists",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            binding.progressBar.gone()
+                                        } else {
+                                            FirebaseFirestore.getInstance().collection("Projects")
+                                                .document(title)
+                                                .set(projectData)
+                                                .addOnSuccessListener {
+
+                                                    uploadImageToFirebaseStorage(bitmap!!, project_id, title)
+
+                                                    FirebaseFirestore.getInstance().collection("Users")
+                                                        .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                                                        .update("PROJECTS", FieldValue.arrayUnion(title))
+                                                        .addOnSuccessListener {
+                                                        }
+                                                        .addOnFailureListener { e ->
+                                                        }
+                                                }
+                                                .addOnFailureListener { e ->
+                                                }
+                                        }
                                     }
                                     .addOnFailureListener { e ->
                                     }
                             }
                         }
-                        .addOnFailureListener { e ->
+                        else {
+                            if (bitmap == null) {
+                                util.singleBtnDialog(
+                                    "Select a photo",
+                                    "Project Photo cannot be kept empty",
+                                    "Okay",
+                                    {})
+                            } else {
+                                Toast.makeText(
+                                    this,
+                                    "Project Title can't be empty",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
+                    } else {
+                        println("Error creating short link: ${task.exception}")
+                    }
                 }
-            } else {
-                Toast.makeText(this, "Project Title can't be empty", Toast.LENGTH_SHORT).show()
-            }
 
 
         }

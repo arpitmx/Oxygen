@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.ncs.o2.Domain.Models.Notification
@@ -27,7 +28,7 @@ Tasks FUTURE ADDITION :
 
 @Dao
 interface NotificationDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(notification: Notification)
 
     @Update

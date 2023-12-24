@@ -3,6 +3,7 @@ package com.ncs.o2.UI.UIComponents.BottomSheets
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,7 +48,7 @@ class ModeratorsBottomSheet(
     @Inject
     lateinit var firestoreRepository: FirestoreRepository
 
-
+    var newList:MutableList<User> = mutableListOf()
     object DataHolder {
         var users: MutableList<User> = mutableListOf()
     }
@@ -71,6 +72,8 @@ class ModeratorsBottomSheet(
         binding.submitBtn.setOnClickListener {
         }
         binding.sheetTitle.text="Moderators"
+        Log.d("moderatoresCheck","selected sent to sheet ${selected.toString()}")
+
         return binding.root
     }
 
@@ -82,7 +85,6 @@ class ModeratorsBottomSheet(
             fetchContributors(PrefManager.getcurrentProject())
         }
         setViews()
-
         binding.searchBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -206,7 +208,10 @@ class ModeratorsBottomSheet(
     }
 
     private fun setRecyclerView(userList: MutableList<User>) {
-        val list=userList.distinctBy { it.firebaseID }
+        val list = userList
+            .sortedByDescending { it.isChecked }
+            .distinctBy { it.firebaseID }
+        Log.d("moderatoresCheck",list.toString())
         adapter = UserListAdapter(list.toMutableList(), this@ModeratorsBottomSheet)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL

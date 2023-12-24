@@ -1,29 +1,43 @@
 package com.ncs.o2.UI
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.tasks.Tasks
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -33,6 +47,7 @@ import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
+import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
@@ -43,12 +58,18 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -56,6 +77,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
+    private var dynamicLinkHandled = false
 
     // ViewModels
     private val viewmodel: TaskSectionViewModel by viewModels()
@@ -69,6 +91,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+
+
 
     @Inject
     lateinit var db:TasksDatabase
@@ -88,16 +113,38 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (FirebaseAuth.getInstance().currentUser!=null) {
+            if (savedInstanceState == null) {
+                handleDynamicLink(intent)
+                dynamicLinkHandled = true
+            }
+        }
+        else{
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, AuthScreenActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            Toast.makeText(this, "Please log in first", Toast.LENGTH_LONG).show()
+        }
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         setContentView(binding.root)
-        manageViews()
         PrefManager.initialize(this)
+        manageViews()
         setUpViews()
 
         viewModel.currentSegment.observe(this, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
+        val searchFragment = intent.getStringExtra("search")
+        if (searchFragment != null) {
+            when (searchFragment) {
+                "GoToSearch" -> movetosearch(intent.getStringExtra("tagText"))
+            }
+        }
+
+
 
     }
     private fun manageViews(){
@@ -107,12 +154,26 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.tabLayout.gone()
             binding.gioActionbar.searchCont.gone()
             binding.gioActionbar.line.gone()
+            binding.bottomNavParent.gone()
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
             binding.gioActionbar.tabLayout.visible()
             binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
+            binding.bottomNavParent.visible()
+            binding.gioActionbar.tabLayout.visible()
+            binding.gioActionbar.searchCont.visible()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         }
     }
 
@@ -123,12 +184,26 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.tabLayout.gone()
             binding.gioActionbar.searchCont.gone()
             binding.gioActionbar.line.gone()
+            binding.bottomNavParent.gone()
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
             binding.gioActionbar.tabLayout.visible()
             binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
+            binding.bottomNavParent.visible()
+            binding.gioActionbar.tabLayout.visible()
+            binding.gioActionbar.searchCont.visible()
+            binding.gioActionbar.actionbar.visible()
+            binding.gioActionbar.constraintLayout2.visible()
+            binding.gioActionbar.constraintLayoutsearch.gone()
+            binding.gioActionbar.constraintLayoutworkspace.gone()
         }
     }
 
@@ -176,16 +251,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     private fun setUpActionBar() {
         binding.gioActionbar.actionbar.visible()
+        binding.gioActionbar.btnMore.visible()
 
         // Set up the action bar, navigation drawer, and other UI components
 
         search = binding.gioActionbar.searchCont
         setNotificationCountOnActionBar()
-
-        // Rotate animation for CreateTaskButton
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.gioActionbar.createTaskButton.rotate180(this)
-        }, 1000)
 
 
         val drawerLayout = binding.drawer
@@ -196,7 +267,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.titleTv.animFadein(this, 500)
         binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
 
-
+        binding.gioActionbar.btnMore.setOnClickListener {
+            val moreProjetcOptionBottomSheet =
+                MoreProjectOptionsBottomSheet()
+            moreProjetcOptionBottomSheet.show(supportFragmentManager, "more")
+        }
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
 
@@ -337,8 +412,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.setcurrentsegment("Select Segment")
         viewModel.updateCurrentSegment("Select Segment")
-        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
 
+        binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
         PrefManager.selectedPosition.value = position
@@ -361,7 +436,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.titleTv.text = segmentName
         segmentText.value = segmentName
         viewModel.updateCurrentSegment(segmentName)
-
+        if (segmentName=="Select Segment"){
+            binding.gioActionbar.tabLayout.gone()
+            binding.gioActionbar.searchCont.gone()
+        }
 
     }
 
@@ -406,5 +484,144 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         fragmentTransaction.commit()
 
     }
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (!dynamicLinkHandled) {
+            handleDynamicLink(intent)
+            dynamicLinkHandled = true
+        }
+    }
 
+    private fun handleDynamicLink(intent: Intent?) {
+        val dynamicLinkTask = FirebaseDynamicLinks.getInstance().getDynamicLink(intent!!)
+        dynamicLinkTask.addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                val dynamicLink = task.result
+                if (dynamicLink != null) {
+                    handleDeepLink(dynamicLink.link!!)
+                }
+            } else {
+                Log.e("DynamicLink", "Error getting dynamic link", task.exception)
+            }
+        }
+    }
+
+
+    private fun handleDeepLink(uri: Uri) {
+        Log.d("shareLinkTest",uri.toString())
+        val pathSegments = uri.pathSegments
+        Log.d("shareLinkTest",pathSegments.toString())
+
+        if (pathSegments.size >= 2) {
+            val operationType = pathSegments[0]
+            val id = pathSegments[1]
+            Log.d("shareLinkTest",operationType.toString())
+            Log.d("shareLinkTest",id.toString())
+
+            when(operationType){
+                "join" -> {
+                    if (PrefManager.getProjectsList().any { it.equals(id, ignoreCase = true) }) {
+                        easyElements.showSnackbar(binding.root,"You have already joined this project",2000)
+                    }else{
+                        lifecycleScope.launch {
+                            val isValidLink = isValidProjectLink(uri.toString())
+                            if (isValidLink) {
+                                showBottomSheetForJoinConfirmation(uri.toString(),id)
+                            } else {
+                                easyElements.showSnackbar(binding.root,"Invalid project link",2000)
+                            }
+                        }
+                    }
+                }
+                "share" -> {
+                    val taskId="#T${id}"
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (db.tasksDao().getTasksbyId(taskId,PrefManager.getcurrentProject())?.isNull!!){
+                            easyElements.showSnackbar(binding.root,"No Task found, check the link",2000)
+                        }
+                        else{
+                            val intent = Intent(this@MainActivity, TaskDetailActivity::class.java)
+                            intent.putExtra("task_id", taskId)
+                            startActivity(intent)
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+    private suspend fun isValidProjectLink(projectLink: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val querySnapshot = FirebaseFirestore.getInstance().collection("Projects")
+                    .whereEqualTo("PROJECT_DEEPLINK", projectLink.toLowerCase())
+                    .limit(1)
+                    .get()
+                    .await()
+
+                return@withContext querySnapshot.documents.isNotEmpty()
+            } catch (e: Exception) {
+                return@withContext false
+            }
+        }
+    }
+
+    private fun showBottomSheetForJoinConfirmation(projectLink: String,id:String) {
+        val bottomSheetDialog = BottomSheetDialog(this)
+        val view = LayoutInflater.from(this).inflate(R.layout.deeplink_project_add_sheet, null)
+
+        view.findViewById<Button>(R.id.btnYes).setOnClickThrottleBounceListener {
+            addProjectToUser(projectLink)
+            bottomSheetDialog.dismiss()
+        }
+
+        view.findViewById<TextView>(R.id.projectName).text=id
+
+        view.findViewById<Button>(R.id.btnNo).setOnClickThrottleBounceListener {
+            bottomSheetDialog.dismiss()
+        }
+        view.findViewById<AppCompatImageButton>(R.id.close_btn).setOnClickThrottleBounceListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.setContentView(view)
+        bottomSheetDialog.show()
+    }
+
+    private fun addProjectToUser(projectLink: String) {
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val result = firestoreRepository.addProjectToUser(projectLink)
+            when (result) {
+                is ServerResult.Success -> {
+                    projects.clear()
+                    projects.addAll(result.data)
+                    Log.d("result",result.data.toString())
+                    PrefManager.putProjectsList(result.data)
+                    projectListAdapter.notifyDataSetChanged()
+                    easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)
+                }
+                is ServerResult.Failure -> {
+                    Toast.makeText(this@MainActivity, "Failed to add project: ${result.exception.message}", Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+    }
+    private fun movetosearch(tagText: String?) {
+        val transaction = supportFragmentManager.beginTransaction()
+        val fragment = SearchFragment()
+        val bundle = Bundle()
+        bundle.putString("tagText", tagText)
+        fragment.arguments = bundle
+
+        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+        binding.bottomNav.menu.getItem(2).isChecked = true
+        binding.bottomNav.menu.getItem(2).setIcon(R.drawable.ic_searchico)
+    }
 }

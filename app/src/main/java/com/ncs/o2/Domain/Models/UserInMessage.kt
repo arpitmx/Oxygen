@@ -10,4 +10,5 @@ data class UserInMessage(
     @PrimaryKey
     val EMAIL:String="",
     val DP_URL:String?=null,
+    val FCM_TOKEN:String?=""
 )

@@ -69,7 +69,7 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                 var projectData: String? = null
 
                 FirebaseFirestore.getInstance().collection("Projects")
-                    .whereEqualTo("PROJECT_LINK", link.toLowerCase())
+                    .whereEqualTo("PROJECT_LINK", link)
                     .get()
                     .addOnSuccessListener { documents ->
                         if (!documents.isEmpty) {

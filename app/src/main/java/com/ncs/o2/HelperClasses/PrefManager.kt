@@ -118,7 +118,7 @@ object PrefManager {
         editor.putString(Endpoints.User.EMAIL,user.EMAIL)
         editor.putString(Endpoints.User.BIO,user.BIO)
         editor.putString(Endpoints.User.DP_URL,user.DP_URL)
-
+        editor.putString(Endpoints.User.FCM_TOKEN,user.FCM_TOKEN)
         editor.putString(Endpoints.User.DESIGNATION,user.DESIGNATION)
         editor.putLong(Endpoints.User.ROLE,user.ROLE)
         editor.apply()
@@ -137,7 +137,8 @@ object PrefManager {
         val bio = sharedPreferences.getString(Endpoints.User.BIO, "")
         val designation = sharedPreferences.getString(Endpoints.User.DESIGNATION, "")
         val role = sharedPreferences.getLong(Endpoints.User.ROLE, 0)
-        return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role)
+        val fcm= sharedPreferences.getString(Endpoints.User.FCM_TOKEN,"")
+        return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role, FCM_TOKEN = fcm!!)
     }
 
     fun setCurrentUserTimeStamp(timestamp: Timestamp){
@@ -154,6 +155,7 @@ object PrefManager {
     fun getCurrentUserEmail():String{
         return getcurrentUserdetails().EMAIL
     }
+
 
     fun getUserFCMToken(): String {
         return getcurrentUserdetails().FCM_TOKEN
@@ -266,6 +268,22 @@ object PrefManager {
     fun getLastCacheUpdateTimestamp(): Timestamp {
         val timestampInSeconds = sharedPreferences.getLong("last_cache_update_timestamp", 0)
         return Timestamp(timestampInSeconds, 0)
+    }
+    fun putLastTAGCacheUpdateTimestamp(timestamp: Timestamp){
+        editor.putLong("last_tag_cache_update_timestamp", timestamp.seconds)
+        editor.apply()
+    }
+    fun getLastTAGCacheUpdateTimestamp(): Timestamp {
+        val timestampInSeconds = sharedPreferences.getLong("last_tag_cache_update_timestamp", 0)
+        return Timestamp(timestampInSeconds, 0)
+    }
+    fun putLastNotificationCacheUpdateTimestamp(timestamp: Long){
+        editor.putLong("last_notification_cache_update_timestamp", timestamp)
+        editor.apply()
+    }
+    fun getLastNotificationCacheUpdateTimestamp(): Long {
+        val timestampInSeconds = sharedPreferences.getLong("last_notification_cache_update_timestamp", 0)
+        return timestampInSeconds
     }
     fun getProjectsList():List<String> {
         val projectsJson = sharedPreferences.getString("projects", null)
