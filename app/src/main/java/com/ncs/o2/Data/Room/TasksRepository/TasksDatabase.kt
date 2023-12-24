@@ -9,7 +9,6 @@ import com.ncs.o2.HelperClasses.Convertors
 @Database(entities = [Task::class], version = 2)
 @TypeConverters(Convertors::class)
 abstract class TasksDatabase : RoomDatabase() {
-
     abstract fun tasksDao(): TasksDao
 
 }

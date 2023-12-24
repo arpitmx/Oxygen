@@ -972,6 +972,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         }
         else{
             Log.d("detailsFetch","Fetch from db")
+
             viewModel.getTaskbyIdFromDB(
                 projectName = PrefManager.getcurrentProject(),
                 taskId = id

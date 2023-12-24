@@ -74,10 +74,6 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
 
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -146,16 +142,14 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                     assignee=selectedAssignee[0].firebaseID!!
                 }
 
-                if (binding.segment.text=="Segment"){
-                    segment=""
-                }
-                else{
-                    segment=selectedSegment
-                }
+                segment = if (binding.segment.text=="Segment"){
+                ""
+            } else{
+                selectedSegment
+            }
                 if (!binding.searchBar.text?.toString().isNullOrEmpty()){
                     binding.clear.visible()
                 }
-
 
             if (binding.created.text=="Created by"){
                     creator=""
@@ -282,10 +276,11 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     }
     private fun setRecyclerView(){
         binding.results.visible()
-        binding.results.text="Matches ${taskList.size.toString()} tasks"
+        binding.results.text= "Matches ${taskList.size} tasks"
         recyclerView = binding.recyclerView
         taskListAdapter = TaskListAdapter(firestoreRepository,requireContext(),taskList)
         taskListAdapter.setOnClickListener(this)
+
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         layoutManager.reverseLayout = false
         with(recyclerView) {
@@ -293,6 +288,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             adapter = taskListAdapter
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
+
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(
                 recyclerView: RecyclerView,

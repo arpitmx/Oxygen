@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -390,7 +392,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         val window: Window? = dialog.window
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialog.show()
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             dialog.dismiss()
         }, 2000)
     }

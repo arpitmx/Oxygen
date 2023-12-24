@@ -3,9 +3,13 @@
     <color name="white">#FFFFFFFF</color>
 <!--    <color name="primary">#FFB84D</color>-->
 <!--    <color name="primary">#7CB7FF</color>-->
-    <color name="primary">#86ff7c</color>
 <!--    <color name="primary">#86ff7c</color>-->
 <!--    <color name="primary">#FF2DDC</color>-->
+
+    <color name="primary">#9FFF76</color>
+    <color name="darkTheme_bg">#242222</color>
+    <color name="darkbg_main">#222222</color>
+    <color name="darkbg_main_a80">#131313</color>
 
     <color name="secondaryPink">#ff89b3</color>
     <color name="secondaryBlue">#0061ff</color>
@@ -13,7 +17,6 @@
     <color name="secondarybg">#2B2B2B</color>
 
 
-    <color name="darkTheme_bg">#242222</color>
 
     <color name="green">@color/primary</color>
     <color name="yello">@color/s3bg</color>
@@ -24,8 +27,7 @@
     <color name="s1bg">#A7FFA5</color>
     <color name="s2bg">#F19FFF</color>
     <color name="s3bg">#FFE871</color>
-    <color name="darkbg_main">#222222</color>
-    <color name="darkbg_main_a80">#131313</color>
+
     <color name="secondary_bg_black">#202020</color>
     <color name="item_bg_glow">#1D2930</color>
     <color name="better_white">#E3E1E1</color>

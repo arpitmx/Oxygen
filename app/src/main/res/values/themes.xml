@@ -15,7 +15,6 @@
         <item name="colorAccent">#000000</item>
         <item name="android:statusBarColor">@color/darkbg_main</item>
         <item name="android:navigationBarColor">@color/darkbg_main</item>
-
     </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">

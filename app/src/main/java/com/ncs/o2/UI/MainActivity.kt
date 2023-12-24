@@ -58,7 +58,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     lateinit var bottmNav: BottomNavigationView
 
     // ViewModels
-    private val viewmodel: TaskSectionViewModel by viewModels()
     private val viewModel: MainActivityViewModel by viewModels()
 
     // Views and data
@@ -144,19 +143,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setupProjectsList()
 
     }
-
-//    private fun makeFullScreen() {
-//        // Hide the status bar
-//        window.decorView.systemUiVisibility = (
-//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                        or View.SYSTEM_UI_FLAG_FULLSCREEN
-//                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                )
-//    }
-
 
     private fun setUpViewsOnClicks() {
 
@@ -302,27 +288,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
             .into(binding.drawerheaderfile.userDp)
 
-//        viewModel.showprogressLD.observe(this) { show ->
-//            if (show) {
-//                binding.lottieProgressInclude.progressLayout.progressVisible(this, 600)
-//            } else {
-//                binding.lottieProgressInclude.progressLayout.progressGone(this, 400)
-//            }
-//        }
 
         viewModel.showDialogLD.observe(this) { data ->
             easyElements.singleBtnDialog(data[0], data[1],"OK",{})
         }
-
-//        viewModel.projectListLiveData.observe(this) { projectList ->
-//
-//            projects=projectList!!.toMutableList()
-//            projectListAdapter = ListAdapter(this, projects)
-//            binding.drawerheaderfile.projectlistView.adapter = projectListAdapter
-//        }
-
-
-
 
     }
     private fun setupProjectsList(){
@@ -365,8 +334,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     }
 
-
-
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
         projects.addAll(userProjects)
@@ -389,9 +356,14 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     true
                 }
 
-                else -> {
+                R.id.task_item -> {
                     replaceFragment(TasksHolderFragment())
                     true
+                }
+
+                else ->{
+                    startActivity(Intent(this,CreateTaskActivity::class.java))
+                    false
                 }
             }
 

@@ -68,6 +68,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     setDurationBottomSheet.DurationAddedListener,
     sectionDisplayBottomSheet.SectionSelectionListener ,BottomSheet.SendText,
     AssigneeListBottomSheet.getassigneesCallback, AssigneeListBottomSheet.updateAssigneeCallback,ChecklistActivity.checkListListener{
+
     private var contriList: MutableList<User> = mutableListOf()
     @Inject
     lateinit var firestoreRepository:FirestoreRepository

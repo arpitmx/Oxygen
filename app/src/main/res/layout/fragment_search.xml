@@ -4,18 +4,115 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
+    android:background="@color/darkbg_main_a80"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".UI.SearchScreen.SearchFragment">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/searchParent"
+        android:elevation="5dp"
+        android:background="@color/darkbg_main"
         android:orientation="vertical">
+
+        <HorizontalScrollView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:scrollbars="none"
+            android:layout_height="wrap_content"
+            >
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:layout_width="wrap_content"
+                    android:text="@string/state_filter"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:drawablePadding="@dimen/_5dp"
+                    android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+                    android:drawableTint="@color/better_white"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="15dp"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:id="@+id/state"
+                    android:background="@drawable/item_bg_curve"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:layout_width="wrap_content"
+                    android:text="@string/assignee_filter"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:drawablePadding="@dimen/_5dp"
+                    android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+                    android:drawableTint="@color/better_white"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:id="@+id/assignee"
+                    android:background="@drawable/item_bg_curve"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:layout_width="wrap_content"
+                    android:text="@string/segment_filter"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:drawablePadding="@dimen/_5dp"
+                    android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+                    android:drawableTint="@color/better_white"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:id="@+id/segment"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:background="@drawable/item_bg_curve"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:layout_width="wrap_content"
+                    android:text="@string/type_filter"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:drawablePadding="@dimen/_5dp"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_down_24"
+                    android:drawableTint="@color/better_white"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:id="@+id/type"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:background="@drawable/item_bg_curve"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:layout_width="wrap_content"
+                    android:text="Created by"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:drawablePadding="@dimen/_5dp"
+                    android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+                    android:drawableTint="@color/better_white"
+                    android:textAllCaps="false"
+                    android:textColor="@color/better_white"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:id="@+id/created"
+                    android:background="@drawable/item_bg_curve"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </HorizontalScrollView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="10"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
+
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/search_bar"
         android:layout_width="0dp"
@@ -54,100 +151,18 @@
             android:layout_marginEnd="15dp"
             android:layout_marginTop="15dp"
             android:id="@+id/searchButton"
-            android:src="@drawable/ic_searchico"/>
+            android:src="@drawable/ic_searchico"
+            app:tint="@color/primary" />
     </LinearLayout>
 
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:scrollbars="none"
-        android:layout_height="wrap_content"
-        >
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:text="State"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:drawablePadding="@dimen/_5dp"
-            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
-            android:drawableTint="@color/better_white"
-            android:textAllCaps="false"
-            android:textColor="@color/better_white"
-            android:layout_height="40dp"
-            android:layout_marginStart="15dp"
-            android:id="@+id/state"
-            android:background="@drawable/item_bg_curve"/>
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:text="Assignee"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:drawablePadding="@dimen/_5dp"
-            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
-            android:drawableTint="@color/better_white"
-            android:textAllCaps="false"
-            android:textColor="@color/better_white"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:id="@+id/assignee"
-            android:background="@drawable/item_bg_curve"/>
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:text="Segment"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:drawablePadding="@dimen/_5dp"
-            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
-            android:drawableTint="@color/better_white"
-            android:textAllCaps="false"
-            android:textColor="@color/better_white"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:id="@+id/segment"
-            android:background="@drawable/item_bg_curve"/>
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:text="Type"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:drawablePadding="@dimen/_5dp"
-            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
-            android:drawableTint="@color/better_white"
-            android:textAllCaps="false"
-            android:textColor="@color/better_white"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:id="@+id/type"
-            android:background="@drawable/item_bg_curve"/>
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:text="Created by"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:drawablePadding="@dimen/_5dp"
-            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
-            android:drawableTint="@color/better_white"
-            android:textAllCaps="false"
-            android:textColor="@color/better_white"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:id="@+id/created"
-            android:background="@drawable/item_bg_curve"/>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-    </HorizontalScrollView>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/resultsParent"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         >
 
@@ -155,7 +170,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/sf_pro_display_semibold"
-            android:text="Matches 20 issues"
+            android:text="Matches x issues"
             android:textColor="@color/better_white"
             android:textSize="14dp"
             android:id="@+id/results"
@@ -168,10 +183,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/sf_pro_display_light"
-            android:text="Clear filters"
+            android:text="@string/clear_filters"
             android:visibility="gone"
             android:id="@+id/clear"
-            android:textColor="@color/better_white"
+            android:textColor="@color/colorAccent"
             android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -180,20 +195,29 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/black200"
+        />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:id="@+id/searchPlaceholder"
         android:textColor="@color/better_white"
-        android:text="Search Something..."
-        android:background="@color/darkbg_main"
+        android:text="Search anything..."
+        android:textSize="20dp"
+        android:background="@color/darkbg_main_a80"
+        android:paddingBottom="@dimen/bottm_navigation_offset"
         />
     <ProgressBar
         android:layout_width="75dp"
         android:layout_gravity="center"
         android:id="@+id/progressBar"
         android:visibility="gone"
+        android:elevation="10dp"
         android:layout_height="match_parent"
         android:indeterminateTint="@color/colorAccent"/>
 
@@ -204,6 +228,7 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:visibility="gone"
+        android:elevation="@dimen/_5dp"
         android:background="@color/darkbg_main"
         android:gravity="center"
         >
@@ -244,11 +269,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
+        android:background="@color/darkbg_main_a80"
         android:layoutAnimation="@anim/layout_animation_popscale"
         android:nestedScrollingEnabled="false"
         android:visibility="gone"
         android:layout_marginBottom="50dp"
-        android:elevation="2dp"
+        android:elevation="3dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -107,6 +107,13 @@
     <string name="restore_animation_duration">Restore Animation Duration : %1$d</string>
     <string name="view_drag_friction">View Drag Friction : %1$f</string>
     <string name="moderators">Moderators</string>
+    <string name="state_filter">State</string>
+    <string name="assignee_filter">Assignee</string>
+    <string name="segment_filter">Segment</string>
+    <string name="type_filter">Type</string>
+    <string name="clear_filters">Clear filters</string>
+    <string name="summary">Summary</string>
+    <string name="create_task">Create Task</string>
 
 
 </resources>
