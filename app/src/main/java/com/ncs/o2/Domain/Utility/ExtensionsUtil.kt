@@ -87,26 +87,26 @@ object ExtensionsUtil {
 
 
     fun View.progressGone(context: Context, duration: Long = 1500L) = run {
-        animFadeOut(context,duration )
+        animFadeOut(context, duration)
         visibility = View.GONE
 
     }
+
     fun View.progressVisible(context: Context, duration: Long = 1500L) = run {
         visibility = View.VISIBLE
-        animFadein(context,duration )
+        animFadein(context, duration)
     }
-
-
 
 
     fun View.progressGoneSlide(context: Context, duration: Long = 1500L) = run {
-        animSlideUp(context,duration )
+        animSlideUp(context, duration)
         visibility = View.GONE
 
     }
+
     fun View.progressVisibleSlide(context: Context, duration: Long = 1500L) = run {
         visibility = View.VISIBLE
-        animSlideDown(context, duration )
+        animSlideDown(context, duration)
     }
 
     // Toasts
@@ -155,7 +155,7 @@ object ExtensionsUtil {
         }
     }
 
-    fun Fragment.showKeyboard(editBox : EditText) {
+    fun Fragment.showKeyboard(editBox: EditText) {
         activity?.apply {
             val imm: InputMethodManager =
                 getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -164,12 +164,11 @@ object ExtensionsUtil {
     }
 
     fun EditText.showKeyboardB() {
-        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         requestFocus()
         inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
     }
-
-
 
 
     // Convert px to dp
@@ -274,7 +273,7 @@ object ExtensionsUtil {
     }
 
 
-    fun ImageView.loadProfileImg(url:Any) {
+    fun ImageView.loadProfileImg(url: Any) {
         Glide.with(context)
             .load(url)
             .listener(object : RequestListener<Drawable> {
@@ -316,8 +315,10 @@ object ExtensionsUtil {
      */
     fun ImageView.load(url: Any, placeholder: Int, thumbnail: String) {
         Glide.with(context)
-            .setDefaultRequestOptions(RequestOptions()
-                .placeholder(placeholder))
+            .setDefaultRequestOptions(
+                RequestOptions()
+                    .placeholder(placeholder)
+            )
             .load(url)
             .thumbnail(Glide.with(context).asDrawable().load(thumbnail).thumbnail(0.1f))
             .into(this)
@@ -331,8 +332,10 @@ object ExtensionsUtil {
      */
     fun ImageView.load(url: Any, placeholder: Drawable, thumbnail: String) {
         Glide.with(context)
-            .setDefaultRequestOptions(RequestOptions()
-                .placeholder(placeholder))
+            .setDefaultRequestOptions(
+                RequestOptions()
+                    .placeholder(placeholder)
+            )
             .load(url)
             .thumbnail(Glide.with(context).asDrawable().load(thumbnail).thumbnail(0.1f))
             .into(this)
@@ -350,10 +353,11 @@ object ExtensionsUtil {
 
     fun View.animSlideDown(context: Context, animDuration: Long = 1500L) = run {
         this.clearAnimation()
-        val animation = AnimationUtils.loadAnimation(context, me.shouheng.utils.R.anim.slide_top_to_bottom)
-            .apply {
-                duration = animDuration
-            }
+        val animation =
+            AnimationUtils.loadAnimation(context, me.shouheng.utils.R.anim.slide_top_to_bottom)
+                .apply {
+                    duration = animDuration
+                }
         this.startAnimation(animation)
     }
 
@@ -393,11 +397,13 @@ object ExtensionsUtil {
             }
         this.startAnimation(animation)
     }
+
     fun View.set180(context: Context, animDuration: Long = 500L) {
         clearAnimation()
         val currentRotation = tag as? Float ?: 0f
         val targetRotation = if (currentRotation == 0f) 180f else 0f
-        val rotationProperty = PropertyValuesHolder.ofFloat(View.ROTATION, currentRotation, targetRotation)
+        val rotationProperty =
+            PropertyValuesHolder.ofFloat(View.ROTATION, currentRotation, targetRotation)
         val animator = ObjectAnimator.ofPropertyValuesHolder(this, rotationProperty)
             .apply {
                 duration = animDuration
@@ -406,7 +412,6 @@ object ExtensionsUtil {
 
         animator.start()
     }
-
 
 
     fun View.rotateInfinity(context: Context) = run {
@@ -418,14 +423,14 @@ object ExtensionsUtil {
 
     fun View.popInfinity(context: Context) = run {
         this.clearAnimation()
-        val animation = AnimationUtils.loadAnimation(context,R.anim.popinfi)
+        val animation = AnimationUtils.loadAnimation(context, R.anim.popinfi)
         this.startAnimation(animation)
     }
 
 
     fun View.blink(context: Context) = run {
         this.clearAnimation()
-        val animation = AnimationUtils.loadAnimation(context,R.anim.blink)
+        val animation = AnimationUtils.loadAnimation(context, R.anim.blink)
         this.startAnimation(animation)
     }
 
@@ -437,10 +442,11 @@ object ExtensionsUtil {
 
     fun View.animFadeOut(context: Context, animDuration: Long = 1500L) = run {
         this.clearAnimation()
-        val animation = AnimationUtils.loadAnimation(context, androidx.appcompat.R.anim.abc_fade_out)
-            .apply {
-                duration = animDuration
-            }
+        val animation =
+            AnimationUtils.loadAnimation(context, androidx.appcompat.R.anim.abc_fade_out)
+                .apply {
+                    duration = animDuration
+                }
         this.startAnimation(animation)
 
     }
@@ -462,7 +468,7 @@ object ExtensionsUtil {
     }
 
 
-    fun View.setOnClickThrottleBounceListener(throttleTime: Long = 600L,onClick : ()->Unit){
+    fun View.setOnClickThrottleBounceListener(throttleTime: Long = 600L, onClick: () -> Unit) {
 
         this.setOnClickListener(object : View.OnClickListener {
 
@@ -483,7 +489,7 @@ object ExtensionsUtil {
         val doubleClickInterval = 500 // Adjust this value as needed (in milliseconds)
         var lastClickTime: Long = 0
 
-        this.setOnClickListener { view->
+        this.setOnClickListener { view ->
             view.bounce(context)
             val clickTime = SystemClock.uptimeMillis()
             if (clickTime - lastClickTime < doubleClickInterval) {
@@ -500,12 +506,10 @@ object ExtensionsUtil {
     }
 
 
-
-
-    fun View.setOnClickSingleTimeBounceListener(onClick : ()->Unit){
+    fun View.setOnClickSingleTimeBounceListener(onClick: () -> Unit) {
 
         this.setOnClickListener(object : View.OnClickListener {
-            private var clicked : Boolean = false
+            private var clicked: Boolean = false
             override fun onClick(v: View) {
                 //context.performHapticFeedback()
                 v.bounce(context)
@@ -514,17 +518,15 @@ object ExtensionsUtil {
                 clicked = true
             }
         })
-   }
+    }
 
-    inline fun View.setOnClickFadeInListener(crossinline onClick : ()->Unit){
-        setOnClickListener{
+    inline fun View.setOnClickFadeInListener(crossinline onClick: () -> Unit) {
+        setOnClickListener {
             // context.performHapticFeedback()
-            it.animFadein(context,100)
+            it.animFadein(context, 100)
             onClick()
         }
     }
-
-
 
 
     fun View.setSingleClickListener(throttleTime: Long = 600L, action: () -> Unit) {
