@@ -3,6 +3,8 @@ package com.ncs.o2.UI.StartScreen
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +14,7 @@ import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -62,6 +65,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
@@ -81,8 +85,10 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     private val util: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this@StartScreen)
     }
+    private val NOTIFICATION_PERMISSION_REQUEST_CODE = 123
 
-//    private val viewModel: LogCatViewModel by viewModels()
+
+    //    private val viewModel: LogCatViewModel by viewModels()
     private val o2Bot: O2Bot by viewModels()
 
 
@@ -103,13 +109,53 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        askNotificationPermission()
         val tasksDAO = db.tasksDao()
-        setBallAnimator()
-        setUpViews(TestingConfig.isTesting)
+//        setBallAnimator()
+//        setUpViews(TestingConfig.isTesting)
+
 
     }
 
     lateinit var scaleAnimation: ScaleAnimation
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            setBallAnimator()
+            setUpViews(TestingConfig.isTesting)
+        } else {
+            util.singleBtnDialog(title = "Notification Permission required", msg = "Notification permission is required for better functioning of the app, you can always allow permissions from phone settings", btnText = "I Understand", positive = {
+                setBallAnimator()
+                setUpViews(TestingConfig.isTesting)
+            })
+        }
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                setBallAnimator()
+                setUpViews(TestingConfig.isTesting)
+            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                util.twoBtnDialog(title = "Notification Permission required", msg = "Notification permission is required for better functioning of the app", positiveBtnText = "OK", positive = {
+                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }, negativeBtnText = "Cancel", negative = {
+                    setBallAnimator()
+                    setUpViews(TestingConfig.isTesting)
+                })
+            } else {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+        else{
+            setBallAnimator()
+            setUpViews(TestingConfig.isTesting)
+        }
+    }
 
     private fun setBallTouchAnimator() {
 
@@ -364,7 +410,10 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 PrefManager.setCurrentUserTimeStamp(Timestamp.now())
                 val dp_url = document.getString(Endpoints.User.DP_URL)
                 val dp_url_pref = PrefManager.getDpUrl()
-
+                val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
+                if (!notification_timestamp.isNull){
+                    PrefManager.setLastSeenTimeStamp(notification_timestamp!!)
+                }
                 if (dp_url_pref==null){
                     PrefManager.setDpUrl(dp_url)
                 }else if (dp_url_pref!=dp_url) {
@@ -402,6 +451,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 val projectsList=PrefManager.getProjectsList()
                 for (projects in projectsList){
                     setUpTasks(projects)
+                    setUpTags(projects)
                 }
 
 
@@ -461,7 +511,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                         for (task in tasks){
                             dao.insert(task)
                         }
-                        setUpNotifications()
 
 
                     }
@@ -478,6 +527,47 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         }
     }
 
+    private fun setUpTags(projectName:String) {
+        val dao = db.tagsDao()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val tagResult = withContext(Dispatchers.IO) {
+                    viewModel.getTagsinProject(projectName)
+                }
+
+                Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
+
+                when (tagResult) {
+
+                    is ServerResult.Failure -> {
+                    }
+
+                    is ServerResult.Progress -> {
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tags=tagResult.data
+                        for (tag in tags){
+                            dao.insert(tag)
+                        }
+                        setUpNotifications()
+
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+            }
+
+        }
+    }
     private fun setUpNotifications() {
         viewModel.setUpNewNotifications()
         viewModel.serverResultLiveData.observe(this){ result->

@@ -1,6 +1,9 @@
 package com.ncs.o2.UI.Tasks.TaskPage.Chat
 
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
@@ -10,6 +13,9 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.NotificationType
@@ -35,9 +42,12 @@ import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirebaseAuthRepository
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -52,6 +62,8 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
+import com.ncs.o2.UI.UIComponents.Adapters.AssigneeListAdpater
+import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
 import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,7 +95,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
-    ChatAdapter.onImageClicked {
+    ChatAdapter.onImageClicked,MentionUsersAdapter.onUserClick {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
@@ -98,13 +110,17 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     lateinit var task: Task
     private lateinit var mdEditor: MarkwonEditor
     lateinit var chatAdapter: ChatAdapter
-
+    lateinit var adapter:MentionUsersAdapter
     lateinit var recyclerView: RecyclerView
+    lateinit var mentionUserRv:RecyclerView
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
     private val CAMERA_PERMISSION_REQUEST = 100
     private var bitmap: Bitmap? = null
     lateinit var imageUri: Uri
+    var contributors:MutableList<String> = mutableListOf()
+    var contributorsData:MutableList<User> = mutableListOf()
+    private val mentionedUsers = mutableListOf<User>()
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
@@ -135,16 +151,66 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun setUpRecyclerview() {
         recyclerView = binding.chatRecyclerview
-
+        mentionUserRv=binding.mentionUserRv
     }
 
     private fun initViews() {
+        adapter = MentionUsersAdapter(emptyList<User>().toMutableList(),this)
+
         binding.inputBox.progressBarSendMsg.gone()
+
+        binding.inputBox.editboxMessage.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val input = s.toString()
+
+                val lastAtSymbolIndex = input.lastIndexOf('@')
+
+                if (lastAtSymbolIndex != -1 && lastAtSymbolIndex == input.length - 1) {
+                    slideUpAnimation(binding.mentionUsersView)
+
+                    if (contributors.isEmpty()) {
+                        fetchContributors()
+                    } else {
+                        if (contributorsData.isEmpty() || contributorsData.size != contributors.size) {
+                            fetchContributors()
+                        } else {
+                            filterList(input.substring(lastAtSymbolIndex + 1),mentionedUsers)
+                        }
+                    }
+                } else if ('@' in input) {
+                    if (contributors.isEmpty()) {
+                        fetchContributors()
+                    } else {
+                        if (contributorsData.isEmpty() || contributorsData.size != contributors.size) {
+                            fetchContributors()
+                        } else {
+                            val mentions = input.split('@').drop(1)
+                            for (mention in mentions) {
+                                filterList(mention,mentionedUsers)
+                            }
+                        }
+                    }
+                } else {
+                    slideDownAnimation(binding.mentionUsersView)
+                    adapter.updateList(emptyList())
+                }
+            }
+        })
+
+
+
+
+
+
+
 
         binding.inputBox.btnSend.setOnClickThrottleBounceListener {
 
             if (binding.inputBox.editboxMessage.text.toString().trim().isNotEmpty()) {
-
                 sendMessageProcess()
                 binding.inputBox.editboxMessage.text?.clear()
 
@@ -156,6 +222,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }
         }
 
+    }
+    private fun filterList(query: String,mentionedUsers: List<User>) {
+        val filteredList = contributorsData.filter { contributor ->
+            contributor.username!!.contains(query, ignoreCase = true) &&
+                    !mentionedUsers.any { it.username == contributor.username }
+        }
+        adapter.updateList(filteredList)
     }
 
     private fun sendMessageProcess() {
@@ -169,6 +242,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         )
         postMessage(message)
     }
+
+
 
     private fun setUpChatbox() {
         val markdownEditor = MarkwonEditor.builder(markwon).build()
@@ -356,7 +431,80 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }
         }
     }
+    private fun fetchContributors(){
+        firestoreRepository.getContributors(PrefManager.getcurrentProject()) { serverResult ->
+            when (serverResult) {
+                is ServerResult.Success -> {
 
+                        val contributorList = serverResult.data
+                        if (contributorList.isNotEmpty()) {
+                            contributors.addAll(contributorList)
+                            for (contributor in contributorList ) {
+                                viewModel.getUserbyId(contributor) { result ->
+                                    when (result) {
+                                        is ServerResult.Success -> {
+                                            binding.mentionProgressbar.gone()
+                                            binding.mentionUserRv.visible()
+
+                                            val user = result.data
+                                            contributorsData.add(user!!)
+                                            if (contributorsData.size==contributorList.size){
+                                                setMentionUsersRv(contributorsData)
+                                            }
+                                            Log.d("contributorsdata",contributorsData.toString())
+
+                                        }
+
+                                        is ServerResult.Failure -> {
+
+                                            utils.singleBtnDialog(
+                                                "Failure",
+                                                "Failure in fetching users : ${result.exception.message}",
+                                                "Okay"
+                                            ) {
+                                                requireActivity().finish()
+                                            }
+                                            binding.mentionProgressbar.gone()
+                                            binding.mentionUserRv.visible()
+
+                                        }
+
+                                        is ServerResult.Progress -> {
+                                            binding.mentionProgressbar.visible()
+                                            binding.mentionUserRv.gone()
+                                        }
+                                    }
+                                }
+                            }
+
+                    }
+
+                }
+
+                is ServerResult.Failure -> {
+                    binding.mentionUserRv.visible()
+                    binding.mentionProgressbar.gone()
+                    val exception = serverResult.exception
+                    utils.showSnackbar(requireView(),"Couldn't fetch Users",2000)
+
+                }
+
+                is ServerResult.Progress -> {
+                    binding.mentionUserRv.gone()
+                    binding.mentionProgressbar.visible()
+                }
+            }
+        }
+    }
+
+    private fun setMentionUsersRv(list:MutableList<User>){
+        Log.d("rvList",list.toString())
+        adapter = MentionUsersAdapter(list,this)
+        val linearLayoutManager = LinearLayoutManager(requireContext())
+        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+        mentionUserRv.layoutManager = linearLayoutManager
+        mentionUserRv.adapter = adapter
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -377,6 +525,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun setMessages() {
         chatAdapter = ChatAdapter(
+            activitybinding=activityBinding,
             repository = firestoreRepository,
             msgList = mutableListOf(),
             context = requireContext(),
@@ -406,7 +555,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         recyclerView.visible()
                         binding.placeholder.gone()
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-
                     }
 
                 }
@@ -461,28 +609,105 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
 
+
                         if (message.messageType == MessageType.NORMAL_MSG) {
-                            binding.inputBox.progressBarSendMsg.gone()
-                            binding.inputBox.editboxMessage.text?.clear()
+                            val regex = Regex("@(\\w+)")
+                            val matches = regex.findAll(message.content)
+                            val mentionedUsersName: MutableList<String> = mutableListOf()
 
-                            var trimmedMsg = message.content.substring(
-                                0,
-                                message.content.length.coerceAtMost(150)
-                            )
-
-                            if (trimmedMsg.length==150) trimmedMsg = "$trimmedMsg..."
-
-                            val notification = composeNotification(
-                                NotificationType.TASK_COMMENT_NOTIFICATION,
-                                message = trimmedMsg
-                            )
-
-                            notification?.let {
-                                sendNotification(
-                                    activityBinding.sharedViewModel.getList(),
-                                    notification
-                                )
+                            for (user in mentionedUsers) {
+                                user.username?.let {
+                                    mentionedUsersName.add(it)
+                                }
                             }
+
+                            if (matches.any()) {
+                                val mentioned = matches.map { it.groupValues[1] }.toList()
+
+                                if (mentionedUsersName.containsAll(mentioned)) {
+                                    binding.inputBox.progressBarSendMsg.gone()
+                                    binding.inputBox.editboxMessage.text?.clear()
+
+                                    var trimmedMsg = message.content.substring(
+                                        0,
+                                        message.content.length.coerceAtMost(150)
+                                    )
+
+                                    if (trimmedMsg.length==150) trimmedMsg = "$trimmedMsg..."
+
+                                    val notification = composeNotification(
+                                        NotificationType.TASK_COMMENT_MENTION_NOTIFICATION,
+                                        message = trimmedMsg
+                                    )
+                                    val mentionedUserTokenList:List<String> = mentionedUsers.map { it.fcmToken!! }
+
+                                    for (user in mentionedUsers){
+                                        chatViewModel.addNotificationToFirebase(user.firebaseID!!, notification = notification!!) { res ->
+                                            when (res) {
+                                                is ServerResult.Success -> {
+                                                    binding.progress.gone()
+                                                    notification.let {
+                                                        sendNotification(
+                                                            listOf(user.fcmToken!!).toMutableList(),
+                                                            notification
+                                                        )
+                                                    }
+                                                }
+
+                                                is ServerResult.Failure -> {
+                                                    binding.progress.gone()
+                                                    val errorMessage = res.exception.message
+                                                    GlobalUtils.EasyElements(requireContext())
+                                                        .singleBtnDialog(
+                                                            "Failure",
+                                                            "Failed in sending notification: $errorMessage",
+                                                            "Okay"
+                                                        ) {
+                                                            requireActivity().recreate()
+                                                        }
+                                                }
+
+                                                is ServerResult.Progress -> {
+                                                    binding.progress.visible()
+                                                }
+                                            }
+                                        }
+                                    }
+                                    mentionedUsers.clear()
+                                }
+                            }
+                            else{
+                                binding.inputBox.progressBarSendMsg.gone()
+                                binding.inputBox.editboxMessage.text?.clear()
+
+                                var trimmedMsg = message.content.substring(
+                                    0,
+                                    message.content.length.coerceAtMost(150)
+                                )
+
+                                if (trimmedMsg.length==150) trimmedMsg = "$trimmedMsg..."
+
+                                val notification = composeNotification(
+                                    NotificationType.TASK_COMMENT_NOTIFICATION,
+                                    message = trimmedMsg
+                                )
+
+                                val filteredList = {
+                                    val list = activityBinding.sharedViewModel.getList()
+                                    if (list.contains(PrefManager.getUserFCMToken())){
+                                        list.remove(PrefManager.getUserFCMToken())
+                                    }
+                                    list
+
+                                }
+                                notification?.let {
+                                    sendNotification(
+                                        filteredList.invoke(),
+                                        notification
+                                    )
+                                }
+                            }
+
 
                         }
                         if (message.messageType == MessageType.IMAGE_MSG) {
@@ -502,10 +727,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                             val filteredList = {
                                 val list = activityBinding.sharedViewModel.getList()
-                                if (list.contains(PrefManager.getCurrentUserEmail())) list-(PrefManager.getCurrentUserEmail())
+                                if (list.contains(PrefManager.getUserFCMToken())){
+                                    list.remove(PrefManager.getUserFCMToken())
+                                }
                                 list
-                            }
 
+                            }
                             notification?.let {
                                 sendNotification(
                                     filteredList.invoke(),
@@ -537,11 +764,28 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 timeStamp = Timestamp.now().seconds,
             )
         }
+        if (type == NotificationType.TASK_COMMENT_MENTION_NOTIFICATION) {
+            val mentionedUserNames:MutableList<String> = mutableListOf()
+            for (user in mentionedUsers){
+                mentionedUserNames.add("@${user.username!!}")
+            }
+            val usernames=mentionedUserNames.joinToString(", ")
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name,
+                taskID = task.id,
+                message = message,
+                title = "@${PrefManager.getcurrentUserdetails().USERNAME} mentioned $usernames",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = "None",
+                timeStamp = Timestamp.now().seconds,
+            )
+        }
 
         return null
     }
 
-    private fun sendNotification(receiverList: Set<String>, notification: Notification) {
+    private fun sendNotification(receiverList: MutableList<String>, notification: Notification) {
 
         try {
             CoroutineScope(Dispatchers.IO).launch {
@@ -560,6 +804,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         }
 
     }
+
 
     private fun setDetails(id: String) {
 
@@ -665,6 +910,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             
             """.trimIndent()
         binding.inputBox.editboxMessage.setText(replyFormat)
+        binding.inputBox.editboxMessage.setSelection(replyFormat.length)
+
     }
 
     fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
@@ -694,6 +941,44 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             ),
         )
     }
+
+    private fun slideUpAnimation(view: View) {
+        view.visibility = View.VISIBLE
+        val slideUp = ObjectAnimator.ofFloat(view, "translationY", view.height.toFloat(), 0f)
+        slideUp.duration = 500
+        slideUp.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+            }
+        })
+        slideUp.start()
+    }
+
+    private fun slideDownAnimation(view: View) {
+        val slideDown = ObjectAnimator.ofFloat(view, "translationY", 0f, view.height.toFloat())
+        slideDown.duration = 500
+        slideDown.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                view.visibility = View.GONE
+            }
+        })
+        slideDown.start()
+    }
+
+    override fun onClick(user: User) {
+        mentionedUsers.add(user)
+        val currentText = binding.inputBox.editboxMessage.text.toString()
+        val lastAtSymbolIndex = currentText.lastIndexOf('@')
+        val mentionedUser = "${user.username} "
+        val newText = StringBuilder(currentText)
+        if (lastAtSymbolIndex != -1) {
+            newText.replace(lastAtSymbolIndex + 1, currentText.length, mentionedUser)
+        } else {
+            newText.append(mentionedUser)
+        }
+        binding.inputBox.editboxMessage.setText(newText.toString())
+        binding.inputBox.editboxMessage.setSelection(newText.length)
+    }
+
 }
 
 

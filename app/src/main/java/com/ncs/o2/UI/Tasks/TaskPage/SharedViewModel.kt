@@ -28,8 +28,8 @@ class SharedViewModel : ViewModel(){
     val notificationReceiverLiveData: LiveData<MutableList<String>> get() = _notificationReceiverLiveData
 
 
-    fun getList(): Set<String> {
-        return _notificationReceiverLiveData.value.orEmpty().toSet()
+    fun getList(): MutableList<String> {
+        return _notificationReceiverLiveData.value.orEmpty().distinct().toMutableList()
     }
 
     fun pushReceiver(token : String){

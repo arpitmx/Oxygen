@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Message
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Utility.FirebaseRepository
@@ -36,5 +37,9 @@ class ChatViewModel @Inject constructor(
     fun getDPUrlThroughRepository(reference: StorageReference): LiveData<ServerResult<String>> {
 
         return repository.getUserDPUrl(reference)
+    }
+
+    fun addNotificationToFirebase(user_id: String,notification: Notification,resultCallback: (ServerResult<Int>) -> Unit){
+        repository.insertNotification(userID=user_id, notification = notification, result = resultCallback)
     }
 }

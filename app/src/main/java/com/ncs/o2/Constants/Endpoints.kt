@@ -45,8 +45,7 @@ object Endpoints {
         const val DETAILS_ADDED = "DETAILS_ADDED"
         const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_LAST_SEEN"
         const val TIMESTAMP="TIMESTAMP"
-
-
+        const val LAST_NOTIFICATION_UPDATED="LAST_NOTIFICATION_UPDATED"
     }
 
     object Workspace {
@@ -67,6 +66,7 @@ object Endpoints {
         const val TAGS = "TAGS"
         const val CHECKLIST="CHECKLIST"
         const val LAST_UPDATED="last_updated"
+        const val LAST_TAG_UPDATED="last_tag_updated"
     }
 
 
@@ -90,7 +90,7 @@ object Endpoints {
         const val fromUser: String = "fromUser"
         const val toUser: String = "toUser"
         const val timeStamp: String = "timeStamp"
-
+        const val lastUpdated:String="lastUpdated"
         const val TO: String = "to"
         const val TITLE: String = "title"
         const val BODY: String = "body"
@@ -146,8 +146,10 @@ object Endpoints {
         }
         object TASKS{
             const val TASKS_TABLE="tasks"
+            const val TAGS_TABLE="tags"
             const val TASKS_DB="tasks_db"
         }
+
 
 
     }

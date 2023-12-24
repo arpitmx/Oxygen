@@ -113,11 +113,10 @@
                             android:ellipsize="end"
                             android:fontFamily="@font/sf_pro_display_semibold"
                             android:gravity="top"
-                            android:maxLength="10"
                             android:maxLines="1"
                             android:padding="5dp"
                             android:paddingStart="@dimen/padding_start_task_create"
-                            android:text="Section 1"
+                            android:text="Section Ui Tinkering"
                             android:textColor="@color/better_white"
                             android:textSize="15dp" />
 
@@ -373,6 +372,7 @@
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/tag_item"
                     android:padding="@dimen/padding_start_task_details" />
+
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>

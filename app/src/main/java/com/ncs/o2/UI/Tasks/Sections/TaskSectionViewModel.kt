@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
@@ -60,7 +61,14 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
             taskRepository.getTasksItemsForSegment(projectName, segmentName, sectionName, resultCallback)
         }
     }
-
+    fun getTagsInProject(
+        projectName:String,
+        resultCallback: (DBResult<List<Tag>>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTagsInProject(projectName, resultCallback)
+        }
+    }
     fun getTasksForSegment(
         projectName: String,
         segmentName: String,

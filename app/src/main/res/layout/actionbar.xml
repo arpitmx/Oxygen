@@ -105,8 +105,9 @@
             android:id="@+id/create_task_button"
             android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="48dp"
+            android:layout_marginEnd="80dp"
             android:background="@null"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -134,20 +135,8 @@
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/create_task_button"
+            app:layout_constraintEnd_toStartOf="@+id/btnMore"
             app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:layout_width="40dp"
-                android:id="@+id/notifications"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:background="@null"
-                android:src="@drawable/notifications"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/notificationCountET"
@@ -169,7 +158,29 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
+
+            <ImageButton
+                android:id="@+id/notifications"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:src="@drawable/notifications"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/primary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/baseline_more_vert_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -322,6 +333,7 @@
         style="@style/CustomTabLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:visibility="gone"
         app:tabGravity="center"
         android:background="@color/darkbg_main"
         app:layout_constraintEnd_toEndOf="parent"
@@ -340,6 +352,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/search_cont"
+        android:visibility="gone"
         android:orientation="horizontal"
         android:layout_height="55dp">
 
@@ -392,8 +405,8 @@
             android:scaleY="0.8"
             android:layout_marginBottom="7dp"
             android:layout_height="match_parent"
-            android:src="@drawable/filter"
-            android:id="@+id/filterBtn"
+            android:src="@drawable/baseline_refresh_24"
+            android:id="@+id/refresh"
             app:tint="@color/primary" />
 
 

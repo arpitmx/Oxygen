@@ -7,6 +7,7 @@ import android.view.View
 import android.graphics.Color
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import androidx.activity.viewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +21,6 @@ import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -28,6 +28,7 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.databinding.AddTagBottomSheetBinding
+import com.ncs.o2.databinding.FilterTagBottomSheetBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,11 +40,11 @@ import net.datafaker.Faker
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val callback : getSelectedTagsCallback?=null,private var selectedTagsList: MutableList<Tag>,val type:String): BottomSheetDialogFragment(){
+class FilterTagsBottomSheet (private var TagsList: MutableList<Tag>, private val callback : getSelectedTagsCallback?=null,private var selectedTagsList: MutableList<Tag>): BottomSheetDialogFragment(){
     private var tagList: MutableList<Tag> = mutableListOf()
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
     private val viewmodel: TaskSectionViewModel by viewModels()
-    lateinit var binding: AddTagBottomSheetBinding
+    lateinit var binding: FilterTagBottomSheetBinding
     private val faker: Faker by lazy { Faker() }
     @Inject
     @FirebaseRepository
@@ -58,27 +59,13 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
         savedInstanceState: Bundle?
     ): View {
 
-        binding = AddTagBottomSheetBinding.inflate(inflater, container, false)
+        binding = FilterTagBottomSheetBinding.inflate(inflater, container, false)
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (type=="edit"){
-            binding.sheettTitle.text="Add/Edit Tags"
-            binding.createSegmentBtn.gone()
-            binding.submit.visible()
-        }
-        else{
-            binding.sheettTitle.text="Add Tags"
-            binding.createSegmentBtn.visible()
-            binding.submit.gone()
-        }
-        binding.submit.setOnClickThrottleBounceListener {
-            dismiss()
-            callback!!.onSubmitClick()
-        }
         binding.progressbar.visible()
         binding.chipGroup.gone()
         if (db.tagsDao().isNull){
@@ -126,21 +113,32 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
         binding.closeBtn.setOnClickThrottleBounceListener{
             dismiss()
         }
-
-        binding.createSegmentBtn.setOnClickThrottleBounceListener {
-
-            dismiss()
-            val createTagsBottomSheet = CreateTagsBottomSheet(selectedTagsList,TagsList,callback!!)
-            createTagsBottomSheet.show(requireActivity().supportFragmentManager,"this")
-
-        }
     }
 
     private fun setViews() {
         setBottomSheetConfig()
 
         val chipGroup = binding.chipGroup
-        Log.d("Tag",TagsList.toString())
+        Log.d("Tag", TagsList.toString())
+
+        val checkedChangeListener = CompoundButton.OnCheckedChangeListener { buttonView, isCheckedT ->
+            if (isCheckedT) {
+                for (i in 0 until chipGroup.childCount) {
+                    val chip = chipGroup.getChildAt(i) as Chip
+                    if (chip != buttonView && chip.isChecked) {
+                        chip.isChecked = false
+                        val tag = chip.tag as Tag
+                        tag.checked = false
+                        callback?.onSelectedTags(tag, false)
+                    }
+                }
+            }
+
+            val position = chipGroup.indexOfChild(buttonView)
+            val tag = TagsList[position]
+            tag.checked = isCheckedT
+            callback?.onSelectedTags(tag, isCheckedT)
+        }
 
         for (i in 0 until TagsList.size) {
             val tag = TagsList[i]
@@ -150,15 +148,13 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
             chip.isClickable = true
             chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.bgColor)))
             chip.setTextColor(ColorStateList.valueOf(Color.parseColor(tag.textColor)))
-            chip.isChecked=tag.checked
+            chip.isChecked = tag.checked
+            chip.tag = tag
+            chip.setOnCheckedChangeListener(checkedChangeListener)
             chipGroup.addView(chip)
-            chip.setOnCheckedChangeListener { buttonView, isCheckedT ->
-                val tag = TagsList[i]
-                tag.checked = isCheckedT
-                callback!!.onSelectedTags(tag, isCheckedT)
-            }
         }
     }
+
 
     private fun setBottomSheetConfig() {
         this.isCancelable = false
@@ -166,8 +162,6 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
     interface getSelectedTagsCallback{
         fun onSelectedTags(tag : Tag,isChecked:Boolean)
         fun onTagListUpdated(tagList: MutableList<Tag>)
-
-        fun onSubmitClick()
 
     }
     fun fetchfromdb(){

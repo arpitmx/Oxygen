@@ -62,6 +62,15 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         super.onViewCreated(view, savedInstanceState)
         segmentName=PrefManager.getcurrentsegment()
 
+
+        if (segmentName=="Select Segment"){
+            activityBinding.gioActionbar.tabLayout.gone()
+            activityBinding.gioActionbar.searchCont.gone()
+        }
+        else{
+            activityBinding.gioActionbar.tabLayout.visible()
+            activityBinding.gioActionbar.searchCont.visible()
+        }
         val sectionsList = PrefManager.getsectionsList().toMutableList()
 
         PrefManager.list.observe(viewLifecycleOwner) { newList ->
@@ -74,14 +83,20 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         mainActivity.segmentText.observe(viewLifecycleOwner) { newSegmentText ->
             segmentName = newSegmentText
             setUpViewPager(sectionsList)
+            if (segmentName=="Select Segment"){
+                activityBinding.gioActionbar.tabLayout.gone()
+                activityBinding.gioActionbar.searchCont.gone()
+            }
+            else{
+                activityBinding.gioActionbar.tabLayout.visible()
+                activityBinding.gioActionbar.searchCont.visible()
+            }
         }
 
         setUpViewPager(sectionsList)
         activityBinding.gioActionbar.constraintLayout2.visible()
         activityBinding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.gioActionbar.actionbar.visible()
-        activityBinding.gioActionbar.tabLayout.visible()
-        activityBinding.gioActionbar.searchCont.visible()
         activityBinding.gioActionbar.constraintLayoutsearch.gone()
 
         setUpBackPress()

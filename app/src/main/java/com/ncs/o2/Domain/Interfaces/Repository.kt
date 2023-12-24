@@ -54,8 +54,17 @@ interface Repository {
         taskId:String,
         result: (ServerResult<List<Message>>) -> Unit
     )
+    fun insertNotification(
+        userID: String,
+        notification: Notification,
+        result: (ServerResult<Int>) -> Unit
+    )
     fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>>
 
+    fun getProjectLink(
+        projectName: String,
+        result: (ServerResult<String>) -> Unit
+    )
     suspend fun addTask(task: Task)
     suspend fun postTags(tag: Tag, projectName: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun fetchProjectTags(
@@ -89,8 +98,13 @@ interface Repository {
         id: String,
         projectName: String,
         moderator:String,
-    ): ServerResult<Boolean>
+    ): ServerResult<Unit>
 
+    suspend fun updateTags(
+        newTags:List<String>,
+        projectName: String,
+        taskId: String,
+    ): ServerResult<Boolean>
     suspend fun addNewModerator(
         id: String,
         projectName: String,
@@ -101,6 +115,12 @@ interface Repository {
         id: String,
         userID:String,
         newState: String,
+        projectName: String
+    ): ServerResult<Boolean>
+
+    suspend fun updatePriority(
+        id: String,
+        newPriority: String,
         projectName: String
     ): ServerResult<Boolean>
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
@@ -147,6 +167,8 @@ interface Repository {
     ): ServerResult<Boolean>
 
     suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit)
+    suspend fun initilizeTagslistner(projectName: String,result: (ServerResult<Int>) -> Unit)
+    suspend fun initilizeNotificationslistner(userID: String,result: (ServerResult<Int>) -> Unit)
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
     suspend fun getSearchedTasks(
@@ -171,6 +193,9 @@ interface Repository {
         projectName: String,
     ): ServerResult<List<Task>>
 
+    suspend fun getTagsinProject(
+        projectName: String,
+    ): ServerResult<List<Tag>>
     fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>>
     fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>
     fun getProjectIconUrl(reference: StorageReference): LiveData<ServerResult<String>>

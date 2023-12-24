@@ -12,6 +12,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -124,10 +125,10 @@ constructor(
                             PrefManager.setLatestNotificationTimeStamp(latestNotificationTimestamp)
 
                             CoroutineScope(Dispatchers.IO).launch {
-                                val newNotificationCount = getNewNotificationCount(notificationList)
+//                                val newNotificationCount = getNewNotificationCount(notificationList)
 
                                 withContext(Dispatchers.Main) {
-                                    PrefManager.setNotificationCount(PrefManager.getNotificationCount()+newNotificationCount)
+                                    PrefManager.setNotificationCount(PrefManager.getNotificationCount())
                                     _serverResultLiveData.postValue(
                                         ServerResult.Success(
                                             notificationList
@@ -172,6 +173,13 @@ constructor(
     ) : ServerResult<List<Task>>{
 
         return repository.getTasksinProject(projectName)
+
+    }
+    suspend fun getTagsinProject(
+        projectName: String,
+    ) : ServerResult<List<Tag>>{
+
+        return repository.getTagsinProject(projectName)
 
     }
 }

@@ -32,6 +32,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Notification
@@ -56,17 +57,20 @@ import com.ncs.o2.Domain.Utility.Later
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment
 import com.ncs.o2.UI.UIComponents.BottomSheets.AssigneeListBottomSheet
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
+import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -89,16 +93,19 @@ import javax.inject.Inject
 class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter.OnProfileClickCallback,
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
-    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener {
+    AddTagsBottomSheet.getSelectedTagsCallback,
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapter.OnClick {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
     @Inject
     lateinit var db: TasksDatabase
-    private var _binding: FragmentTaskDetailsFrgamentBinding? = null
-    private val binding get() = _binding!!
+    lateinit var  binding : FragmentTaskDetailsFrgamentBinding
     private var moderators: MutableList<User> = mutableListOf()
     var moderatorsList: MutableList<String> = mutableListOf()
+    private var TagList: MutableList<Tag> = mutableListOf()
+    private val selectedTags = mutableListOf<Tag>()
+    private var tagIdList: ArrayList<String> = ArrayList()
 
     private var OList: MutableList<User> = mutableListOf()
     private val selectedAssignee: MutableList<User> = mutableListOf()
@@ -143,7 +150,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTaskDetailsFrgamentBinding.inflate(inflater, container, false)
+        binding = FragmentTaskDetailsFrgamentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -166,6 +173,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         }
         binding.assignee.isEnabled = false
         binding.section.isEnabled=false
+        binding.priority.isEnabled=false
         binding.activity.setOnClickThrottleBounceListener {
             val viewpager = tasksHolderBinding.binding.viewPager2
             val next = viewpager.currentItem + 1
@@ -178,7 +186,6 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
     }
 
 
@@ -219,14 +226,24 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             sections.sectionSelectionListener = this@TaskDetailsFragment
             sections.show(requireFragmentManager(), "Section Selection")
         }
-
+        binding.priority.setOnClickThrottleBounceListener {
+            list.clear()
+            list.addAll(listOf("Low","Medium","High","Critical"))
+            val priorityBottomSheet =
+                BottomSheet(list, "PRIORITY", this)
+            priorityBottomSheet.show(requireFragmentManager(), "PRIORITY")
+        }
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
+
+            val list:MutableList<User> = mutableListOf()
             for (i in 0 until moderators.size) {
                 if (moderatorsList.contains(moderators[i].firebaseID)) {
                     moderators[i].isChecked = true
                 }
+                list.add(moderators[i])
             }
-            val moderatorsListBottomSheet = ModeratorsBottomSheet(moderators, this)
+
+            val moderatorsListBottomSheet = ModeratorsBottomSheet(list, this)
             moderatorsListBottomSheet.show(requireFragmentManager(), "contributer list")
         }
 
@@ -266,8 +283,28 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         is ServerResult.Success -> {
                             activityBinding.binding.gioActionbar.btnModerator.visible()
                             binding.progressBar.gone()
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
+                                task?.moderators=listOf(currentUser.EMAIL)
+                                db.tasksDao().update(task!!)
+                                for (user in task.moderators){
+                                    if (user==currentUser.EMAIL){
+                                        fetchUserbyId(user){
+                                            it?.isChecked=true
+                                            ModeratorsBottomSheet.DataHolder.users.add(it!!)
+                                        }
+                                    }
+                                    else{
+                                        fetchUserbyId(user){
+                                            ModeratorsBottomSheet.DataHolder.users.add(it!!)
+                                        }
+                                    }
+                                }
+                                withContext(Dispatchers.Main) {
+                                    requireActivity().recreate()
+                                }
+                            }
                             toast("You are now a moderator")
-                            requireActivity().recreate()
 
                         }
 
@@ -290,38 +327,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         binding.sectionNameET.text = task.section
         viewModel.task = task
-        val priority = when (task.priority) {
-            1 -> "Low"
-            2 -> "Medium"
-            3 -> "High"
-            4 -> "Critical"
-            else -> "Undefined"
-        }
-
-        val type = when (task.type) {
-            1 -> "Bug"
-            2 -> "Feature"
-            3 -> "Feature request"
-            4 -> "Task"
-            5 -> "Exception"
-            6 -> "Security"
-            7 -> "Performance"
-            else -> "Undefined"
-        }
-        val status = when (task.status) {
-            1 -> "Submitted"
-            2 -> "Open"
-            3 -> "Working"
-            4 -> "Review"
-            5 -> "Completed"
-            else -> "Undefined"
-        }
-        val difficulty = when (task.difficulty) {
-            1 -> "Easy"
-            2 -> "Medium"
-            3 -> "Hard"
-            else -> "Undefined"
-        }
+        val priority = SwitchFunctions.getStringPriorityFromNumPriority(task.priority)
+        val type = SwitchFunctions.getStringTypeFromNumType(task.type)
+        val status = SwitchFunctions.getStringStateFromNumState(task.status)
+        val difficulty = SwitchFunctions.getStringDifficultyFromNumDifficulty(task.difficulty)
 
         //Priority
         binding.priorityInclude.tagIcon.text = priority.substring(0, 1)
@@ -487,7 +496,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             message = Faker().backToTheFuture().quote().toString(),
             timeStamp = Timestamp.now().seconds,
             fromUser = Faker().funnyName().name().toString(),
-            toUser = "userid1"
+            toUser = "userid1",
+            lastUpdated = Timestamp.now().seconds
         )
     }
 
@@ -498,6 +508,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                 isModerator = true
                 binding.assignee.isEnabled = true
                 binding.section.isEnabled=true
+                binding.priority.isEnabled=true
                 activityBinding.binding.gioActionbar.btnModerator.visible()
             }
             manageState(taskDetails)
@@ -518,14 +529,21 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     }
 
     private fun setTagsView(list: MutableList<Tag>) {
+        val newList = ArrayList(list)
+        if (isModerator){
+            val editTag = Tag("Edit Tags", bgColor = "#FFFFFF", textColor = "#000000", tagID = "edit", projectName = PrefManager.getcurrentProject())
+            newList.add(editTag)
+        }
         val tagsRecyclerView = binding.tagRecyclerView
         val layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         tagsRecyclerView.layoutManager = layoutManager
-        val adapter = TagAdapter(list)
+        val adapter = TagAdapter(newList, this)
         tagsRecyclerView.adapter = adapter
+
     }
+
 
 //    private fun setLinksView(list: MutableList<String>) {
 //        val num = list.size
@@ -569,9 +587,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         taskDetails = task
         activityBinding.moderatorsList.addAll(taskDetails.moderators)
-        setTags()
+//        setTags()
         fetchUsers()
-
         binding.titleTv.text = task.title
 
         runDelayed(500) {
@@ -637,12 +654,14 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                             val user = result.data
 
                             user?.let {
-
-                                users.add(user)
-                                moderators.add(user)
-                                moderatorsList.add(user.firebaseID!!)
-                                setContributors(users)
-                                pushToReceiver(user)
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    users.add(user)
+                                    moderators.add(user)
+                                    moderatorsList.add(user.firebaseID!!)
+                                    setContributors(users)
+                                    pushToReceiver(user)
+                                    setTagsView(selectedTags)
+                                }
                             }
 
 
@@ -972,51 +991,65 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         }
         else{
             Log.d("detailsFetch","Fetch from db")
-
-            viewModel.getTaskbyIdFromDB(
-                projectName = PrefManager.getcurrentProject(),
-                taskId = id
-                ) { result ->
-                when (result) {
-                    is DBResult.Success -> {
-                        val currentUser = FirebaseAuth.getInstance().currentUser
-                        val localUserObj = PrefManager.getcurrentUserdetails()
-
-                        currentUser?.let { userObj ->
-
-                            if (result.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
-                                binding.becomeModerator.visible()
-                            }
-                        }
-
-                        binding.progressBar.gone()
-
-                        setDefaultViews(result.data)
-                        setTaskDetails(result.data)
-
-                    }
-                    is DBResult.Failure -> {
-                        utils.singleBtnDialog(
-                            "Failure",
-                            "Failure in task fetching : ${result.exception.message}",
-                            "Okay"
-                        ) {
-                            requireActivity().finish()
-                        }
-
-                        binding.progressBar.gone()
-                    }
-
-                    is DBResult.Progress -> {
-                        binding.progressBar.visible()
-                    }
-
-                }
-
-            }
+            fetchFromDB(id)
         }
     }
 
+    private fun fetchFromDB(id: String){
+        viewModel.getTaskbyIdFromDB(
+            projectName = PrefManager.getcurrentProject(),
+            taskId = id
+        ) { result ->
+            when (result) {
+                is DBResult.Success -> {
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    val localUserObj = PrefManager.getcurrentUserdetails()
+
+                    currentUser?.let { userObj ->
+
+                        if (result.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                            binding.becomeModerator.visible()
+                        }
+                    }
+
+                    binding.progressBar.gone()
+                    selectedTags.clear()
+                    CoroutineScope(Dispatchers.IO).launch{
+                        for (tagId in result.data.tags){
+                            val tag=db.tagsDao().getTagbyId(tagId)
+                            if (!tag.isNull) {
+                                tag?.checked = true
+                                selectedTags.add(tag!!)
+                            }
+                        }
+                        withContext(Dispatchers.Main){
+                            setDefaultViews(result.data)
+                            setTaskDetails(result.data)
+                        }
+                    }
+
+
+                }
+                is DBResult.Failure -> {
+                    utils.singleBtnDialog(
+                        "Failure",
+                        "Failure in task fetching : ${result.exception.message}",
+                        "Okay"
+                    ) {
+                        requireActivity().finish()
+                    }
+
+                    binding.progressBar.gone()
+                }
+
+                is DBResult.Progress -> {
+                    binding.progressBar.visible()
+                }
+
+            }
+
+        }
+    }
 
     private fun setTags() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -1032,8 +1065,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val tag = result.data
                                     tags.add(tag)
+                                    withContext(Dispatchers.Main){
+                                        setTagsView(tags)
+                                    }
                                 }
-                                setTagsView(tags)
 
                             }
 
@@ -1254,56 +1289,114 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     }
 
     override fun stringtext(text: String, type: String) {
-        binding.stateInclude.tagText.text = text
-        binding.stateInclude.tagIcon.text = text.substring(0, 1)
-        viewLifecycleOwner.lifecycleScope.launch {
+        when(type){
+            "PRIORITY" -> {
+                binding.priorityInclude.tagText.text = text
+                binding.priorityInclude.tagIcon.text = text.substring(0, 1)
+                viewLifecycleOwner.lifecycleScope.launch {
 
-            try {
-                val result = withContext(Dispatchers.IO) {
-                    viewModel.updateState(
-                        taskID = activityBinding.taskId,
-                        userID = taskDetails.assignee,
-                        newState = text,
-                        projectName = PrefManager.getcurrentProject()
-                    )
-                }
-                when (result) {
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            viewModel.updatePriority(
+                                taskID = activityBinding.taskId,
+                                newPriority = text,
+                                projectName = PrefManager.getcurrentProject()
+                            )
+                        }
+                        when (result) {
 
-                    is ServerResult.Failure -> {
+                            is ServerResult.Failure -> {
 
-                        utils.singleBtnDialog(
-                            "Failure",
-                            "Failure in Updating: ${result.exception.message}",
-                            "Okay"
-                        ) {
-                            requireActivity().finish()
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in Updating: ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+
+                                binding.progressBar.gone()
+
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
+
+                            is ServerResult.Success -> {
+
+                                binding.progressBar.gone()
+                                toast("Updated Task Priority")
+
+                            }
+
                         }
 
+                    } catch (e: Exception) {
+
+                        Timber.tag(TAG).e(e)
                         binding.progressBar.gone()
-
-                    }
-
-                    is ServerResult.Progress -> {
-                        binding.progressBar.visible()
-                    }
-
-                    is ServerResult.Success -> {
-
-                        binding.progressBar.gone()
-                        toast("Updated Task State")
 
                     }
 
                 }
-
-            } catch (e: Exception) {
-
-                Timber.tag(TAG).e(e)
-                binding.progressBar.gone()
-
             }
+            "STATE" ->  {
+                binding.stateInclude.tagText.text = text
+                binding.stateInclude.tagIcon.text = text.substring(0, 1)
+                viewLifecycleOwner.lifecycleScope.launch {
 
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            viewModel.updateState(
+                                taskID = activityBinding.taskId,
+                                userID = taskDetails.assignee,
+                                newState = text,
+                                projectName = PrefManager.getcurrentProject()
+                            )
+                        }
+                        when (result) {
+
+                            is ServerResult.Failure -> {
+
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in Updating: ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+
+                                binding.progressBar.gone()
+
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
+
+                            is ServerResult.Success -> {
+
+                                binding.progressBar.gone()
+                                toast("Updated Task State")
+
+                            }
+
+                        }
+
+                    } catch (e: Exception) {
+
+                        Timber.tag(TAG).e(e)
+                        binding.progressBar.gone()
+
+                    }
+
+                }
+            }
         }
+
+
+
 
 
     }
@@ -1366,7 +1459,28 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         activityBinding.binding.gioActionbar.btnModerator.visible()
                         binding.progressBar.gone()
                         toast("Updated new Moderators")
-                        requireActivity().recreate()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
+                            val moderatorsListDB=task?.moderators?.toMutableList()
+                            if (unselected.isNotEmpty()){
+                                for (i in 0 until unselected.size){
+                                    if (moderatorsListDB?.isNotEmpty()!!){
+                                        if (moderatorsListDB.contains(unselected[i])){
+                                            moderatorsListDB.remove(unselected[i])
+                                        }
+                                    }
+                                }
+                            }
+                            moderatorsListDB?.addAll(selected)
+                            val filterList=moderatorsListDB?.distinct()
+                            Log.d("moderatorsList",filterList.toString())
+                            task?.moderators=filterList!!
+                            db.tasksDao().update(task)
+                            withContext(Dispatchers.Main) {
+                                requireActivity().recreate()
+                            }
+                        }
+
 
                     }
 
@@ -1416,7 +1530,96 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     is ServerResult.Success -> {
                         binding.progressBar.gone()
                         toast("Update Section")
-                        requireActivity().recreate()
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+
+            }
+        }
+    }
+
+    override fun onTagClick(tag: Tag) {
+        if (tag.tagID=="edit"){
+            val addTagsBottomSheet =
+                AddTagsBottomSheet(TagList, this@TaskDetailsFragment, selectedTags,"edit")
+            addTagsBottomSheet.show(requireFragmentManager(), "OList")
+        }
+        else {
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            intent.putExtra("search", "GoToSearch")
+            intent.putExtra("tagText", tag.tagID)
+            startActivity(intent)
+        }
+    }
+    override fun onSelectedTags(tag: Tag, isChecked: Boolean) {
+        if (isChecked) {
+            selectedTags.add(tag)
+            tag.tagID?.let { tagIdList.add(it) }
+            setTagsView(selectedTags)
+        } else {
+            selectedTags.remove(tag)
+            tag.tagID?.let { tagIdList.remove(it) }
+            setTagsView(selectedTags)
+
+        }
+
+
+    }
+
+    override fun onTagListUpdated(tagList: MutableList<Tag>) {
+        TagList.clear()
+        TagList = tagList
+    }
+
+    override fun onSubmitClick() {
+        val idList:MutableList<String> = mutableListOf()
+        for (i in 0 until selectedTags.size){
+            idList.add(selectedTags[i].tagID)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    viewModel.updateTags(
+                        newTags = idList, projectName = PrefManager.getcurrentProject(), taskID = activityBinding.taskId
+                    )
+
+                }
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in Updating: ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        toast("Updated Tags")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
+                            task?.tags=idList
+                            db.tasksDao().update(task!!)
+                            withContext(Dispatchers.Main) {
+                                requireActivity().recreate()
+                            }
+                        }
 
                     }
 

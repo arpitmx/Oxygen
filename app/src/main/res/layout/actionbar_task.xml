@@ -112,6 +112,18 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_design_services_24"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/baseline_more_vert_24"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
