@@ -1,6 +1,10 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +14,7 @@ import androidx.core.graphics.drawable.toDrawable
 import com.github.dhaval2404.colorpicker.ColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.chip.ChipDrawable
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -56,7 +61,7 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
         return binding.root
     }
     var initialbgcolor="#FFFFFF"
-    var initialtextcolor="#FFFFFF"
+    var initialtextcolor="#000000"
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -115,6 +120,21 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
 
     private fun setViews() {
         setBottomSheetConfig()
+        binding.tagTitle.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                binding.previewChip.text=binding.tagTitle.text.toString()
+                if (s.isNullOrBlank()){
+                    binding.tagPreview.gone()
+                }
+                else{
+                    binding.tagPreview.visible()
+                }
+            }
+        })
         binding.tagbg.setOnClickThrottleBounceListener {
             ColorPickerDialog
                 .Builder(requireContext())
@@ -123,7 +143,10 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
                 .setDefaultColor(initialbgcolor)
                 .setColorListener { color, colorHex ->
                     initialbgcolor=colorHex
+                    binding.tagPreview.visible()
                     binding.tagbg.background=Color.parseColor(initialbgcolor).toDrawable()
+                    binding.previewChip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(initialbgcolor)))
+
                 }
                 .show()
         }
@@ -135,7 +158,10 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
                 .setDefaultColor(initialtextcolor)
                 .setColorListener { color, colorHex ->
                     initialtextcolor=colorHex
+                    binding.tagPreview.visible()
                     binding.textbg.setBackgroundColor(Color.parseColor(initialtextcolor))
+                    binding.previewChip.setTextColor(Color.parseColor(initialtextcolor))
+
                 }
                 .setPositiveButton("Set")
                 .show()

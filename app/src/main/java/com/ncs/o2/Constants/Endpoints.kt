@@ -45,8 +45,7 @@ object Endpoints {
         const val DETAILS_ADDED = "DETAILS_ADDED"
         const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_LAST_SEEN"
         const val TIMESTAMP="TIMESTAMP"
-
-
+        const val LAST_NOTIFICATION_UPDATED="LAST_NOTIFICATION_UPDATED"
     }
 
     object Workspace {
@@ -91,7 +90,7 @@ object Endpoints {
         const val fromUser: String = "fromUser"
         const val toUser: String = "toUser"
         const val timeStamp: String = "timeStamp"
-
+        const val lastUpdated:String="lastUpdated"
         const val TO: String = "to"
         const val TITLE: String = "title"
         const val BODY: String = "body"

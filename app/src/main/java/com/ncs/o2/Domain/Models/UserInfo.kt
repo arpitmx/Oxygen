@@ -7,4 +7,5 @@ data class UserInfo(
     val DESIGNATION:String?="",
     val DP_URL:String?=null,
 
+
 )

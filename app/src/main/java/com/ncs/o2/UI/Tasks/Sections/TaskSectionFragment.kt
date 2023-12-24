@@ -24,6 +24,7 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
@@ -250,7 +251,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
 
 
-        activityBinding.gioActionbar.refresh.setOnClickListener {
+        activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
             fetchfromdb()
         }
 

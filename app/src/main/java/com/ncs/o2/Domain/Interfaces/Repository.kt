@@ -54,6 +54,11 @@ interface Repository {
         taskId:String,
         result: (ServerResult<List<Message>>) -> Unit
     )
+    fun insertNotification(
+        userID: String,
+        notification: Notification,
+        result: (ServerResult<Int>) -> Unit
+    )
     fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>>
 
     fun getProjectLink(
@@ -163,6 +168,7 @@ interface Repository {
 
     suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit)
     suspend fun initilizeTagslistner(projectName: String,result: (ServerResult<Int>) -> Unit)
+    suspend fun initilizeNotificationslistner(userID: String,result: (ServerResult<Int>) -> Unit)
     suspend fun setFCMToken(token: String, serverResult: (ServerResult<Int>) -> Unit)
     suspend fun getNotificationLastSeenTimeStamp(serverResult: (ServerResult<Long>) -> Unit)
     suspend fun getSearchedTasks(

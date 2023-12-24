@@ -70,6 +70,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
+import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -99,8 +100,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     lateinit var utils: GlobalUtils.EasyElements
     @Inject
     lateinit var db: TasksDatabase
-    private var _binding: FragmentTaskDetailsFrgamentBinding? = null
-    private val binding get() = _binding!!
+    lateinit var  binding : FragmentTaskDetailsFrgamentBinding
     private var moderators: MutableList<User> = mutableListOf()
     var moderatorsList: MutableList<String> = mutableListOf()
     private var TagList: MutableList<Tag> = mutableListOf()
@@ -150,7 +150,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTaskDetailsFrgamentBinding.inflate(inflater, container, false)
+        binding = FragmentTaskDetailsFrgamentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -186,7 +186,6 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
     }
 
 
@@ -235,12 +234,16 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             priorityBottomSheet.show(requireFragmentManager(), "PRIORITY")
         }
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
+
+            val list:MutableList<User> = mutableListOf()
             for (i in 0 until moderators.size) {
                 if (moderatorsList.contains(moderators[i].firebaseID)) {
                     moderators[i].isChecked = true
                 }
+                list.add(moderators[i])
             }
-            val moderatorsListBottomSheet = ModeratorsBottomSheet(moderators, this)
+
+            val moderatorsListBottomSheet = ModeratorsBottomSheet(list, this)
             moderatorsListBottomSheet.show(requireFragmentManager(), "contributer list")
         }
 
@@ -280,15 +283,28 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         is ServerResult.Success -> {
                             activityBinding.binding.gioActionbar.btnModerator.visible()
                             binding.progressBar.gone()
-                            toast("You are now a moderator")
                             CoroutineScope(Dispatchers.IO).launch {
                                 val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
                                 task?.moderators=listOf(currentUser.EMAIL)
                                 db.tasksDao().update(task!!)
+                                for (user in task.moderators){
+                                    if (user==currentUser.EMAIL){
+                                        fetchUserbyId(user){
+                                            it?.isChecked=true
+                                            ModeratorsBottomSheet.DataHolder.users.add(it!!)
+                                        }
+                                    }
+                                    else{
+                                        fetchUserbyId(user){
+                                            ModeratorsBottomSheet.DataHolder.users.add(it!!)
+                                        }
+                                    }
+                                }
                                 withContext(Dispatchers.Main) {
                                     requireActivity().recreate()
                                 }
                             }
+                            toast("You are now a moderator")
 
                         }
 
@@ -480,7 +496,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             message = Faker().backToTheFuture().quote().toString(),
             timeStamp = Timestamp.now().seconds,
             fromUser = Faker().funnyName().name().toString(),
-            toUser = "userid1"
+            toUser = "userid1",
+            lastUpdated = Timestamp.now().seconds
         )
     }
 
@@ -570,9 +587,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         taskDetails = task
         activityBinding.moderatorsList.addAll(taskDetails.moderators)
-        setTags()
+//        setTags()
         fetchUsers()
-
         binding.titleTv.text = task.title
 
         runDelayed(500) {
@@ -638,12 +654,14 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                             val user = result.data
 
                             user?.let {
-
-                                users.add(user)
-                                moderators.add(user)
-                                moderatorsList.add(user.firebaseID!!)
-                                setContributors(users)
-                                pushToReceiver(user)
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    users.add(user)
+                                    moderators.add(user)
+                                    moderatorsList.add(user.firebaseID!!)
+                                    setContributors(users)
+                                    pushToReceiver(user)
+                                    setTagsView(selectedTags)
+                                }
                             }
 
 
@@ -1441,7 +1459,28 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         activityBinding.binding.gioActionbar.btnModerator.visible()
                         binding.progressBar.gone()
                         toast("Updated new Moderators")
-                        requireActivity().recreate()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
+                            val moderatorsListDB=task?.moderators?.toMutableList()
+                            if (unselected.isNotEmpty()){
+                                for (i in 0 until unselected.size){
+                                    if (moderatorsListDB?.isNotEmpty()!!){
+                                        if (moderatorsListDB.contains(unselected[i])){
+                                            moderatorsListDB.remove(unselected[i])
+                                        }
+                                    }
+                                }
+                            }
+                            moderatorsListDB?.addAll(selected)
+                            val filterList=moderatorsListDB?.distinct()
+                            Log.d("moderatorsList",filterList.toString())
+                            task?.moderators=filterList!!
+                            db.tasksDao().update(task)
+                            withContext(Dispatchers.Main) {
+                                requireActivity().recreate()
+                            }
+                        }
+
 
                     }
 

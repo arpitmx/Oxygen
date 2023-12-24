@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -20,6 +21,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
 import com.ncs.o2.databinding.ActivityNotificationsBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
@@ -112,12 +114,24 @@ class NotificationsActivity : AppCompatActivity() {
                 is ServerResult.Success -> {
                     binding.progress.gone()
                     notifications = result.data
-                    adapter = NotificationAdapter(PrefManager.getLastSeenTimeStamp(),result.data)
-                    adapter.notifyDataSetChanged()
-                    notificationRV.adapter = adapter
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        handleUpdateNotification_TimeStamp()
-                    },100)
+                    if (notifications.isEmpty()){
+                        binding.notificationRV.gone()
+                        binding.noNotificationTv.visible()
+                    }
+                    else{
+                        binding.notificationRV.visible()
+                        binding.noNotificationTv.gone()
+                        adapter = NotificationAdapter(PrefManager.getLastSeenTimeStamp(),result.data)
+                        adapter.notifyDataSetChanged()
+                        notificationRV.adapter = adapter
+                        FirebaseFirestore.getInstance().collection(Endpoints.USERS)
+                            .document(PrefManager.getCurrentUserEmail())
+                            .update("NOTIFICATION_LAST_SEEN",Timestamp.now().seconds)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            handleUpdateNotification_TimeStamp()
+                        },100)
+                    }
+
                 }
             }
         }

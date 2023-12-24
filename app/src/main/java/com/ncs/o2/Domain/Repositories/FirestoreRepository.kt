@@ -22,6 +22,7 @@ import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Constants.SwitchFunctions
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
@@ -88,6 +89,8 @@ class FirestoreRepository @Inject constructor(
 //    }
     @Inject
     lateinit var db:TasksDatabase
+    @Inject
+    lateinit var notificationDB:NotificationDatabase
 
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
@@ -204,7 +207,6 @@ class FirestoreRepository @Inject constructor(
                         documentSnapshot.getString(Endpoints.Notifications.toUser)!!
                     val timeStamp: Long =
                         documentSnapshot.getLong(Endpoints.Notifications.timeStamp)!!
-
                     Notification(
                         notificationID = notificationID,
                         notificationType = notificationType,
@@ -213,7 +215,7 @@ class FirestoreRepository @Inject constructor(
                         message = message,
                         fromUser = fromUser,
                         toUser = toUser,
-                        timeStamp = timeStamp
+                        timeStamp = timeStamp,
                     )
                 }
             }.await()
@@ -1330,8 +1332,9 @@ class FirestoreRepository @Inject constructor(
                     val EMAIL = document.getString("EMAIL")
                     val DP_URL = document.getString("DP_URL")
                     val USERNAME = document.getString("USERNAME")!!
+                    val FCM_TOKEN=document.getString("FCM_TOKEN")
                     val user = UserInMessage(
-                        EMAIL = EMAIL!!, USERNAME = USERNAME, DP_URL = DP_URL
+                        EMAIL = EMAIL!!, USERNAME = USERNAME, DP_URL = DP_URL, FCM_TOKEN = FCM_TOKEN
                     )
                     serverResult(ServerResult.Success(user))
                 } else {
@@ -1809,6 +1812,77 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+    override suspend fun initilizeNotificationslistner(userID: String,result: (ServerResult<Int>) -> Unit) {
+        val userDocument = FirebaseFirestore.getInstance().collection(Endpoints.USERS).document(userID)
+        val listenerRegistration = userDocument.addSnapshotListener { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->
+            if (exception != null) {
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.User.LAST_NOTIFICATION_UPDATED)) {
+                val lastUpdatedValue = snapshot.get(Endpoints.User.LAST_NOTIFICATION_UPDATED)
+                firestore.collection(Endpoints.USERS)
+                    .document(userID)
+                    .collection(Endpoints.Notifications.NOTIFICATIONS)
+                    .whereGreaterThan(Endpoints.Notifications.lastUpdated, PrefManager.getLastNotificationCacheUpdateTimestamp())
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val notificationsList = mutableListOf<Notification>()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            for (document in querySnapshot.documents) {
+                                val notificationID: String =
+                                    document.getString(Endpoints.Notifications.notificationID)!!
+                                val notificationType: String =
+                                    document.getString(Endpoints.Notifications.notificationType)!!
+                                val taskID: String =
+                                    document.getString(Endpoints.Notifications.taskID)!!
+                                val title: String = document.getString(Endpoints.Notifications.title)!!
+                                val message: String =
+                                    document.getString(Endpoints.Notifications.message)!!
+                                val fromUser: String =
+                                    document.getString(Endpoints.Notifications.fromUser)!!
+                                val toUser: String =
+                                    document.getString(Endpoints.Notifications.toUser)!!
+                                val timeStamp: Long =
+                                    document.getLong(Endpoints.Notifications.timeStamp)!!
+                                var LastUpdatedtimeStamp: Long? =null
+                                if (!document.getLong(Endpoints.Notifications.lastUpdated)!!.isNull){
+                                    LastUpdatedtimeStamp=document.getLong(Endpoints.Notifications.lastUpdated)!!
+                                }
+
+                                val notificationData=Notification(
+                                    notificationID = notificationID,
+                                    notificationType = notificationType,
+                                    taskID = taskID,
+                                    title = title,
+                                    message = message,
+                                    fromUser = fromUser,
+                                    toUser = toUser,
+                                    timeStamp = timeStamp,
+                                    lastUpdated = LastUpdatedtimeStamp
+                                )
+                                PrefManager.putLastNotificationCacheUpdateTimestamp(Timestamp.now().seconds)
+                                val count=PrefManager.getNotificationCount()+1
+                                PrefManager.setNotificationCount(count)
+                                if (notificationDB.notificationDao().getNotificationById(
+                                        notificationData.notificationID
+                                    ).isNull){
+                                    notificationDB.notificationDao().insert(notificationData)
+                                }
+                                else{
+                                    notificationDB.notificationDao().update(notificationData)
+                                }
+                            }
+                        }
+                        result(ServerResult.Success(1))
+
+                    }
+                    .addOnFailureListener { exception ->
+                        result(ServerResult.Failure(exception))
+                    }
+            }
+        }
+    }
+
     override suspend fun getSearchedTasks(
         assignee: String,
         creator: String,
@@ -1876,6 +1950,25 @@ class FirestoreRepository @Inject constructor(
             Endpoints.Project.LAST_UPDATED to last_updated
         )
         transaction.update(projectDocRef, projectData)
+    }
+
+    fun updateLastUserNotificationUpdated(userID: String,transaction:Transaction){
+        val userDocRef = firestore.collection(Endpoints.USERS)
+            .document(userID)
+        val last_updated=Timestamp.now().seconds
+        val userData = mapOf(
+            Endpoints.User.LAST_NOTIFICATION_UPDATED to last_updated
+        )
+        transaction.update(userDocRef, userData)
+    }
+    fun updateNotifactionLastUpdated(userID: String,transaction:Transaction,notificationID: String){
+        val userDocRef = firestore.collection(Endpoints.USERS)
+            .document(userID).collection(Endpoints.Notifications.NOTIFICATIONS).document(notificationID)
+        val last_updated=Timestamp.now().seconds
+        val userData = mapOf(
+            Endpoints.Notifications.lastUpdated to last_updated
+        )
+        transaction.update(userDocRef, userData)
     }
     fun updateLastProjectTagUpdated(projectName: String,transaction:Transaction){
         val projectDocRef = firestore.collection(Endpoints.PROJECTS)
@@ -1969,6 +2062,35 @@ class FirestoreRepository @Inject constructor(
     private suspend fun getUserProjects(userDocument: DocumentReference): ArrayList<String> {
         val userSnapshot = userDocument.get().await()
         return userSnapshot.get("PROJECTS") as ArrayList<String>? ?: ArrayList()
+    }
+
+    override fun insertNotification(
+        userID: String,
+        notification: Notification,
+        result: (ServerResult<Int>) -> Unit
+    ){
+
+
+        firestore.runTransaction { transaction ->
+
+            try {
+                transaction.set(
+                    firestore.collection(Endpoints.USERS)
+                        .document(userID)
+                        .collection(Endpoints.Notifications.NOTIFICATIONS)
+                        .document(notification.notificationID),
+                    notification
+                )
+                updateLastUserNotificationUpdated(userID,transaction)
+                updateNotifactionLastUpdated(userID,transaction,notification.notificationID)
+                result(ServerResult.Success(200))
+
+            } catch (exception: Exception) {
+                result(ServerResult.Failure(exception))
+                throw FirebaseFirestoreException("Transaction failed", FirebaseFirestoreException.Code.ABORTED)
+            }
+        }
+
     }
 
 }

@@ -258,11 +258,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         search = binding.gioActionbar.searchCont
         setNotificationCountOnActionBar()
 
-        // Rotate animation for CreateTaskButton
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.gioActionbar.createTaskButton.rotate180(this)
-        }, 1000)
-
 
         val drawerLayout = binding.drawer
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
