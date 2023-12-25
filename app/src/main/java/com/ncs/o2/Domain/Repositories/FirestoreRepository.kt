@@ -578,6 +578,13 @@ class FirestoreRepository @Inject constructor(
                         taskDocRef.collection(Endpoints.Project.CHECKLIST).document(checkList[i].id)
                     transaction.set(checklistDocRef, checkList[i])
                 }
+                if (task.assignee!="None"){
+                    firestore.collection(Endpoints.USERS)
+                        .document(task.assignee)
+                        .collection(Endpoints.Workspace.WORKSPACE)
+                        .document(task.id)
+                        .set(WorkspaceTaskItem(id = task.id, status = "Assigned"))
+                }
 
             }.addOnSuccessListener {
                 CoroutineScope(Dispatchers.IO).launch {
@@ -1539,7 +1546,7 @@ class FirestoreRepository @Inject constructor(
                         "Working" -> 3
                         "Review" -> 4
                         "Completed" -> 5
-                        "Assigned" -> 2
+                        "Assigned" -> 6
                         else -> -1
                     }
 

@@ -296,30 +296,34 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        if (PrefManager.getcurrentUserdetails().ROLE>=3){
+            manageViewsforModerators()
+            setDefaultViewsforModerators()
+        }
+        if (PrefManager.getcurrentUserdetails().ROLE<3){
+            manageViewsforNormalUsers()
+            setDefaultViewsforNormalUsers()
+        }
+        manageBottomSheets()
+
+        binding.description.setOnClickThrottleBounceListener {
+            this.startActivity(Intent(this,DescriptionEditorActivity::class.java))
+        }
+
+        setUpViews()
+        setUpLiveData()
+
+
+    }
+
+    private fun manageBottomSheets(){
         Codes.STRINGS.segmentText = ""
         binding.duration.setOnClickThrottleBounceListener {
-//            viewmodel.createTask(testTask)
-
             val durationBottomSheet = setDurationBottomSheet(this)
             durationBottomSheet.show(supportFragmentManager, "duration")
 
         }
 
-        if (PrefManager.getcurrentUserdetails().ROLE<2){
-            binding.addContributorsBtn.setOnClickThrottleBounceListener {
-                toast("You can't select moderators")
-            }
-        }
-        if (PrefManager.getcurrentUserdetails().ROLE>=2) {
-            binding.addContributorsBtn.isEnabled=true
-            binding.addContributorsBtn.setOnClickThrottleBounceListener {
-
-                val userListBottomSheet = UserlistBottomSheet(this)
-                userListBottomSheet.show(supportFragmentManager, "contributer list")
-
-            }
-
-        }
         binding.addCheckListBtn.setOnClickThrottleBounceListener {
             ChecklistActivity.ListenerHolder.checkListListener = this
             val intent = Intent(this, ChecklistActivity::class.java)
@@ -359,22 +363,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             addTagsBottomSheet.show(supportFragmentManager, "OList")
         }
 
-        binding.priority.setOnClickThrottleBounceListener {
-            list.clear()
-            list.addAll(listOf("Low","Medium","High","Critical"))
-            val priorityBottomSheet =
-                BottomSheet(list,"PRIORITY",this)
-            priorityBottomSheet.show(supportFragmentManager, "PRIORITY")
-        }
-
-        binding.status.setOnClickThrottleBounceListener {
-            list.clear()
-            list.addAll(listOf("Submitted","Open","Working","Review","Completed"))
-            val priorityBottomSheet =
-                BottomSheet(list,"STATE",this)
-            priorityBottomSheet.show(supportFragmentManager, "STATE")
-        }
-
         binding.taskType.setOnClickThrottleBounceListener {
             list.clear()
             list.addAll(listOf("Bug","Feature","Feature request","Task","Exception","Security","Performance"))
@@ -383,6 +371,45 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             priorityBottomSheet.show(supportFragmentManager, "TYPE")
         }
 
+    }
+
+    private fun manageViewsforNormalUsers(){
+        binding.addContributorsBtn.setOnClickThrottleBounceListener {
+            toast("You can't select moderators")
+        }
+        binding.assignee.setOnClickThrottleBounceListener {
+            toast("You can't select an assignee")
+        }
+        binding.taskDuration.setOnClickThrottleBounceListener {
+            toast("You can't set task duration")
+        }
+        binding.difficulty.setOnClickThrottleBounceListener {
+            toast("You can't set task difficulty")
+        }
+        binding.status.setOnClickThrottleBounceListener {
+            toast("You can't set task state")
+        }
+        binding.priority.setOnClickThrottleBounceListener {
+            toast("You can't set task priority")
+        }
+
+    }
+
+    private fun manageViewsforModerators(){
+        binding.addContributorsBtn.isEnabled=true
+        binding.addContributorsBtn.setOnClickThrottleBounceListener {
+            val userListBottomSheet = UserlistBottomSheet(this)
+            userListBottomSheet.show(supportFragmentManager, "contributer list")
+        }
+        binding.assignee.isEnabled=true
+        binding.assignee.setOnClickThrottleBounceListener {
+            val assigneeListBottomSheet = AssigneeListBottomSheet(OList, selectedAssignee,this@CreateTaskActivity,this)
+            assigneeListBottomSheet.show(supportFragmentManager, "assigneelist")
+        }
+        binding.taskDuration.setOnClickThrottleBounceListener {
+            val durationBottomSheet=setDurationBottomSheet(this)
+            durationBottomSheet.show(supportFragmentManager,"TAG")
+        }
         binding.difficulty.setOnClickThrottleBounceListener {
             list.clear()
             list.addAll(listOf("Easy","Medium","Hard"))
@@ -390,52 +417,90 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 BottomSheet(list,"DIFFICULTY",this)
             priorityBottomSheet.show(supportFragmentManager, "DIFFICULTY")
         }
-
-        binding.taskDuration.setOnClickThrottleBounceListener {
-            val durationBottomSheet=setDurationBottomSheet(this)
-            durationBottomSheet.show(supportFragmentManager,"TAG")
+        binding.status.setOnClickThrottleBounceListener {
+            list.clear()
+            list.addAll(listOf("Submitted","Open","Working","Review","Completed"))
+            val priorityBottomSheet =
+                BottomSheet(list,"STATE",this)
+            priorityBottomSheet.show(supportFragmentManager, "STATE")
+        }
+        binding.priority.setOnClickThrottleBounceListener {
+            list.clear()
+            list.addAll(listOf("Low","Medium","High","Critical"))
+            val priorityBottomSheet =
+                BottomSheet(list,"PRIORITY",this)
+            priorityBottomSheet.show(supportFragmentManager, "PRIORITY")
         }
 
-        binding.description.setOnClickThrottleBounceListener {
-            this.startActivity(Intent(this,DescriptionEditorActivity::class.java))
-        }
 
-        if (PrefManager.getcurrentUserdetails().ROLE<2){
-            binding.assignee.setOnClickThrottleBounceListener {
-                toast("You can't select an assignee")
+    }
+
+    private fun postTask(task: Task,checkList: MutableList<CheckList>){
+        val list:MutableList<CheckList> = mutableListOf()
+        if (checkList.isNotEmpty()){
+            list.addAll(checkList)
+        }
+        if(checkList.isEmpty()){
+            list.add(CheckList(id = RandomIDGenerator.generateRandomTaskId(5),
+                title = task.title, desc = task.description.substring(0,200), done = false, index = 0))
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+
+            repository.postTask(task,list) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+                        binding.progressBar.gone()
+                    }
+
+                    ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        PrefManager.setcurrentsegment(binding.segment.text.toString())
+                        toast("Task Created Successfully")
+                        finish()
+                        startActivity(intent)
+                    }
+
+                }
             }
         }
-        if (PrefManager.getcurrentUserdetails().ROLE>=2) {
-            binding.assignee.isEnabled=true
-            binding.assignee.setOnClickThrottleBounceListener {
-                val assigneeListBottomSheet = AssigneeListBottomSheet(OList, selectedAssignee,this@CreateTaskActivity,this)
-                assigneeListBottomSheet.show(supportFragmentManager, "assigneelist")
-            }
-        }
+    }
 
+
+    private fun setUpLiveData() {
+
+
+    }
+
+    private fun setUpViews() {
+        createTask()
+        setUpActionBar()
+        setUpDatePicker()
+        setUpClickListeners()
+        setUpCallbacks()
+        setupSelectedMembersRecyclerView()
+    }
+
+    private fun createTask(){
         binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
-            var validate=true
             if (binding.taskDurationET.text=="Select"){
                 toast("Add Task Duration")
-                validate=false
             }
-            if (binding.segment.text=="Segment"){
+            else if (binding.segment.text=="Segment"){
                 toast("Select Task Segment")
-                validate=false
             }
-            if (binding.section.text=="Section"){
+            else if (binding.section.text=="Section"){
                 toast("Select Task Section")
-                validate=false
             }
-            if (binding.title.text.isNullOrBlank()){
+            else if (binding.title.text.isNullOrBlank()){
                 toast("Enter Task Title")
-                validate=false
             }
-            if (binding.chipGroup.isEmpty()){
-                toast("Tags are required")
-                validate=false
-            }
-            if (validate){
+            else{
                 val title=binding.title.text
                 val difficulty= SwitchFunctions.getNumDifficultyFromStringDifficulty(binding.difficultyInclude.tagText.text.toString())
                 val priority= SwitchFunctions.getNumPriorityFromStringPriority(binding.priorityInclude.tagText.text.toString())
@@ -469,7 +534,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         assigner = assigner.EMAIL,
                         duration = duration.text.toString(),
                         time_STAMP = Timestamp.now(),
-                        tags = tags.toList(),
+                        tags = tags.toList().ifEmpty { emptyList() },
                         project_ID = PrefManager.getcurrentProject(),
                         segment = segment.toString(),
                         section = section.toString(),
@@ -492,7 +557,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         assigner = assigner.EMAIL,
                         duration = duration.text.toString(),
                         time_STAMP = Timestamp.now(),
-                        tags = tags.toList(),
+                        tags = tags.toList().ifEmpty { emptyList() },
                         project_ID = PrefManager.getcurrentProject(),
                         segment = segment.toString(),
                         section = section.toString(),
@@ -504,68 +569,11 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     postTask(task,checkListArray)
                 }
             }
-
-        }
-
-        setUpViews()
-        setUpLiveData()
-
-
-    }
-
-    private fun postTask(task: Task,checkList: MutableList<CheckList>){
-        val list:MutableList<CheckList> = mutableListOf()
-        if (checkList.isNotEmpty()){
-            list.addAll(checkList)
-        }
-        if(checkList.isEmpty()){
-            list.add(CheckList(id = RandomIDGenerator.generateRandomTaskId(5),
-                title = task.title, desc = task.description.substring(0,200), done = false, index = 0))
-        }
-        CoroutineScope(Dispatchers.Main).launch {
-
-            repository.postTask(task,list) { result ->
-
-                when (result) {
-
-                    is ServerResult.Failure -> {
-                        binding.progressBar.gone()
-                    }
-
-                    ServerResult.Progress -> {
-                        binding.progressBar.visible()
-                    }
-
-                    is ServerResult.Success -> {
-                        binding.progressBar.gone()
-                        toast("Task Created Successfully")
-                        finish()
-                        startActivity(intent)
-                    }
-
-                }
-            }
         }
     }
 
-
-    private fun setUpLiveData() {
-
-
-    }
-
-    private fun setUpViews() {
-        setUpActionBar()
-        setUpDatePicker()
-        setUpClickListeners()
-        setUpCallbacks()
-        setupSelectedMembersRecyclerView()
-        setDefaultViews()
-    }
-
-    private fun setDefaultViews(){
+    private fun setDefaultViewsforModerators(){
         binding.projectNameET.text=PrefManager.getcurrentProject()
-
         binding.priorityInclude.tagIcon.text="L"
         binding.priorityInclude.tagText.text="Low"
 
@@ -579,10 +587,27 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_green)
         binding.difficultyInclude.tagText.text="Easy"
 
+    }
 
+    private fun setDefaultViewsforNormalUsers(){
+        binding.projectNameET.text=PrefManager.getcurrentProject()
+        binding.priorityInclude.tagIcon.text="L"
+        binding.priorityInclude.tagText.text="Low"
 
+        binding.typeInclude.tagIcon.text="T"
+        binding.typeInclude.tagText.text="Task"
+
+        binding.stateInclude.tagIcon.text="S"
+        binding.stateInclude.tagText.text="Submitted"
+
+        binding.difficultyInclude.tagIcon.text="E"
+        binding.difficultyInclude.tagIcon.background=resources.getDrawable(R.drawable.label_cardview_green)
+        binding.difficultyInclude.tagText.text="Easy"
+
+        binding.taskDurationET.text="5 Hours"
 
     }
+
 
     private fun setupSelectedMembersRecyclerView() {
         val layoutManager = FlexboxLayoutManager(this)
