@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            finish()
             Toast.makeText(this, "Please log in first", Toast.LENGTH_LONG).show()
         }
         // Hide keyboard at startup

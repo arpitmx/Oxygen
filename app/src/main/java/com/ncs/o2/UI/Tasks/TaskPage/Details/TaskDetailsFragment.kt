@@ -529,6 +529,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     }
 
     private fun setTagsView(list: MutableList<Tag>) {
+        Log.d("tagchecks",list.toString())
         val newList = ArrayList(list)
         if (isModerator){
             val editTag = Tag("Edit Tags", bgColor = "#FFFFFF", textColor = "#000000", tagID = "edit", projectName = PrefManager.getcurrentProject())
@@ -636,6 +637,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             //toast("Contributor empty")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
+            setTagsView(selectedTags)
+
         } else {
 
             binding.contributorsRecyclerView.visible()
@@ -1014,15 +1017,18 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
                     binding.progressBar.gone()
                     selectedTags.clear()
+                    Log.d("tagcheckfromDB",result.data.tags.toString())
                     CoroutineScope(Dispatchers.IO).launch{
                         for (tagId in result.data.tags){
                             val tag=db.tagsDao().getTagbyId(tagId)
+
                             if (!tag.isNull) {
                                 tag?.checked = true
                                 selectedTags.add(tag!!)
                             }
                         }
                         withContext(Dispatchers.Main){
+                            Log.d("tagcheckfromDB",selectedTags?.toString()!!)
                             setDefaultViews(result.data)
                             setTaskDetails(result.data)
                         }
