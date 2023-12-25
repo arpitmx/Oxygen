@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.text.toLowerCase
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -28,6 +29,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.util.query
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserInfo
@@ -120,7 +122,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     lateinit var imageUri: Uri
     var contributors:MutableList<String> = mutableListOf()
     var contributorsData:MutableList<User> = mutableListOf()
-    private val mentionedUsers = mutableListOf<User>()
+    private var mentionedUsers = mutableListOf<User>()
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
@@ -155,6 +157,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     private fun initViews() {
+        mentionedUsers.clear()
         adapter = MentionUsersAdapter(emptyList<User>().toMutableList(),this)
 
         binding.inputBox.progressBarSendMsg.gone()
@@ -190,6 +193,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         } else {
                             val mentions = input.split('@').drop(1)
                             for (mention in mentions) {
+                                for (cont in contributorsData){
+                                    if (cont.username.equals(mention.trim(), ignoreCase = true)){
+                                        mentionedUsers.add(cont)
+                                        val list=mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
+                                        Log.d("listcheck",list.toString())
+                                    }
+                                }
                                 filterList(mention,mentionedUsers)
                             }
                         }
@@ -225,8 +235,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
     private fun filterList(query: String,mentionedUsers: List<User>) {
         val filteredList = contributorsData.filter { contributor ->
-            contributor.username!!.contains(query, ignoreCase = true) &&
-                    !mentionedUsers.any { it.username == contributor.username }
+            contributor.username!!.contains(query, ignoreCase = true)
         }
         adapter.updateList(filteredList)
     }
@@ -611,19 +620,23 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
 
                         if (message.messageType == MessageType.NORMAL_MSG) {
+                            Log.d("listcheck",mentionedUsers.toString())
+                            val list=mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
                             val regex = Regex("@(\\w+)")
                             val matches = regex.findAll(message.content)
                             val mentionedUsersName: MutableList<String> = mutableListOf()
+                            Log.d("listcheckmatches",matches.toString())
 
-                            for (user in mentionedUsers) {
+                            for (user in list) {
                                 user.username?.let {
-                                    mentionedUsersName.add(it)
+                                    mentionedUsersName.add(it.toLowerCase())
                                 }
                             }
+                            Log.d("listcheckmentioned",mentionedUsersName.toString())
 
                             if (matches.any()) {
-                                val mentioned = matches.map { it.groupValues[1] }.toList()
-
+                                val mentioned = matches.map { it.groupValues[1].toLowerCase() }.toList()
+                                Log.d("listcheckmentioned",mentioned.toString())
                                 if (mentionedUsersName.containsAll(mentioned)) {
                                     binding.inputBox.progressBarSendMsg.gone()
                                     binding.inputBox.editboxMessage.text?.clear()
@@ -639,9 +652,11 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                         NotificationType.TASK_COMMENT_MENTION_NOTIFICATION,
                                         message = trimmedMsg
                                     )
-                                    val mentionedUserTokenList:List<String> = mentionedUsers.map { it.fcmToken!! }
+                                    val mentionedUserTokenList:List<String> = list.map { it.fcmToken!! }
+                                    Log.d("listcheck",list.toString())
 
-                                    for (user in mentionedUsers){
+                                    for (user in list){
+
                                         chatViewModel.addNotificationToFirebase(user.firebaseID!!, notification = notification!!) { res ->
                                             when (res) {
                                                 is ServerResult.Success -> {
@@ -673,6 +688,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                             }
                                         }
                                     }
+                                    list.clear()
                                     mentionedUsers.clear()
                                 }
                             }
@@ -766,7 +782,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         }
         if (type == NotificationType.TASK_COMMENT_MENTION_NOTIFICATION) {
             val mentionedUserNames:MutableList<String> = mutableListOf()
-            for (user in mentionedUsers){
+            val list=mentionedUsers.distinctBy { it.firebaseID }
+            for (user in list){
                 mentionedUserNames.add("@${user.username!!}")
             }
             val usernames=mentionedUserNames.joinToString(", ")
