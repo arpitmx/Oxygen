@@ -19,6 +19,7 @@ object SwitchFunctions {
             3 -> "Working"
             4 -> "Review"
             5 -> "Completed"
+            6 -> "Open"
             else -> "Undefined"
         }
     }

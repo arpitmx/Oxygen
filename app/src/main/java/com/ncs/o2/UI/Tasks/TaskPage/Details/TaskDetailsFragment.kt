@@ -973,6 +973,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                             setDefaultViews(taskResult.data)
                             setTaskDetails(taskResult.data)
 
+
                         }
 
                     }
@@ -1018,6 +1019,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     binding.progressBar.gone()
                     selectedTags.clear()
                     Log.d("tagcheckfromDB",result.data.tags.toString())
+                    if (result.data.moderators.contains(currentUser?.email)){
+                        isModerator=true
+                    }
+                    manageState(result.data)
                     CoroutineScope(Dispatchers.IO).launch{
                         for (tagId in result.data.tags){
                             val tag=db.tagsDao().getTagbyId(tagId)
