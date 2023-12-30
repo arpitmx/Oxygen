@@ -1636,26 +1636,17 @@ class FirestoreRepository @Inject constructor(
     override suspend fun updateCheckListCompletion(
         taskId: String,
         projectName: String,
-        id: String,
-        done: Boolean,
+        id:String,
+        done:Boolean,
     ): ServerResult<Boolean> {
         try {
-            firestore.runTransaction { transaction ->
-                val documentRef = firestore.collection(Endpoints.PROJECTS)
-                    .document(projectName)
-                    .collection(Endpoints.Project.TASKS)
-                    .document(taskId)
-                    .collection(Endpoints.Project.CHECKLIST)
-                    .document(id)
-
-                transaction.update(documentRef, "done", done)
-
-                updateLastUpdated(projectName, transaction)
-                updateTaskLastUpdated(projectName,transaction,id)
-
-                true
-            }
-
+            val documentRef = firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+                .document(id)
+            val updateData = mapOf<String, Any>(
+                "done" to done
+            )
+            documentRef.update(updateData).await()
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
@@ -1666,26 +1657,13 @@ class FirestoreRepository @Inject constructor(
     override suspend fun updateCheckList(
         taskId: String,
         projectName: String,
-        id: String,
+        id:String,
         checkList: CheckList
     ): ServerResult<Boolean> {
         try {
-            firestore.runTransaction { transaction ->
-                val documentRef = firestore.collection(Endpoints.PROJECTS)
-                    .document(projectName)
-                    .collection(Endpoints.Project.TASKS)
-                    .document(taskId)
-                    .collection(Endpoints.Project.CHECKLIST)
-                    .document(id)
-
-                transaction.set(documentRef, checkList)
-
-                updateLastUpdated(projectName, transaction)
-                updateTaskLastUpdated(projectName,transaction,id)
-
-                true
-            }
-
+            firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+                .document(id).set(checkList).await()
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)

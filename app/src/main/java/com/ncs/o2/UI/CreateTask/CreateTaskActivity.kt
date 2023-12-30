@@ -7,11 +7,19 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import android.webkit.JavascriptInterface
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isEmpty
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import br.tiagohm.markdownview.css.InternalStyleSheet
+import br.tiagohm.markdownview.css.styles.Github
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -34,6 +42,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -42,6 +51,10 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.Tasks.TaskPage.Details.CodeViewerActivity
+import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageAdapter
+import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.UIComponents.BottomSheets.AssigneeListBottomSheet
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
@@ -51,6 +64,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.setDurationBottomSheet
 import com.ncs.o2.databinding.ActivityCreateTaskBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +82,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     SegmentSelectionBottomSheet.sendSectionsListListner,
     setDurationBottomSheet.DurationAddedListener,
     sectionDisplayBottomSheet.SectionSelectionListener ,BottomSheet.SendText,
-    AssigneeListBottomSheet.getassigneesCallback, AssigneeListBottomSheet.updateAssigneeCallback,ChecklistActivity.checkListListener{
+    AssigneeListBottomSheet.getassigneesCallback, AssigneeListBottomSheet.updateAssigneeCallback,ChecklistActivity.checkListListener,ImageAdapter.ImagesListner{
 
     private var contriList: MutableList<User> = mutableListOf()
     @Inject
@@ -91,6 +105,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private val binding: ActivityCreateTaskBinding by lazy {
         ActivityCreateTaskBinding.inflate(layoutInflater)
     }
+    private var description:String?=null
+
 
 //    private val viewmodel: CreateTaskViewModel by viewModels()
 
@@ -306,15 +322,43 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         }
         manageBottomSheets()
 
-        binding.description.setOnClickThrottleBounceListener {
-            this.startActivity(Intent(this,DescriptionEditorActivity::class.java))
-        }
 
         setUpViews()
         setUpLiveData()
-
-
+        if (description.isNull){
+            binding.description.isClickable=true
+            binding.description.setOnClickThrottleBounceListener {
+                val intent = Intent(this, DescriptionEditorActivity::class.java)
+                intent.putExtra("summary", description)
+                startActivityForResult(intent,1)
+            }
+        }
+        else{
+            binding.description.isClickable=false
+            binding.EditSummary.setOnClickThrottleBounceListener {
+                val intent = Intent(this, DescriptionEditorActivity::class.java)
+                intent.putExtra("summary", description)
+                startActivityForResult(intent,1)
+            }
+        }
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            val summary = data?.getStringExtra("summary")
+            if (!summary.isNull){
+                description=summary!!.trimIndent()
+                setUpTaskDescription(summary!!.trimIndent())
+                binding.description.isClickable=false
+                binding.EditSummary.setOnClickThrottleBounceListener {
+                    val intent = Intent(this, DescriptionEditorActivity::class.java)
+                    intent.putExtra("summary", description)
+                    startActivityForResult(intent,1)
+                }
+            }
+        }
+    }
+
 
     private fun manageBottomSheets(){
         Codes.STRINGS.segmentText = ""
@@ -500,6 +544,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             else if (binding.title.text.isNullOrBlank()){
                 toast("Enter Task Title")
             }
+            else if(description.isNull){
+                toast("Task Summary is required")
+            }
             else{
                 val title=binding.title.text
                 val difficulty= SwitchFunctions.getNumDifficultyFromStringDifficulty(binding.difficultyInclude.tagText.text.toString())
@@ -525,7 +572,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     }
                     val task= Task(
                         title = title.toString(),
-                        description = desc3,
+                        description = description!!,
                         id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                         difficulty = difficulty,
                         priority = priority,
@@ -548,7 +595,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 else{
                     val task= Task(
                         title = title.toString(),
-                        description = desc3,
+                        description = description!!,
                         id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                         difficulty = difficulty,
                         priority = priority,
@@ -880,6 +927,138 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         }
     }
 
+    val script = """
+    var allPreTags = document.querySelectorAll('pre');
+
+    allPreTags.forEach(function(preTag) {
+      preTag.addEventListener('click', function() {
+        var clickedText = preTag.textContent;
+        var languageType = preTag.getAttribute('language');
+        send.sendCode(clickedText, languageType);
+       
+      });
+    });
+    
+    var allImgTags = document.querySelectorAll('img');
+    var imgArray = [];
+
+    allImgTags.forEach(function(imgTag) {
+        if (imgTag.tagName.toLowerCase() === 'img' && imgTag.parentElement.tagName.toLowerCase() !== 'pre') {
+        imgTag.addEventListener('click', function() {
+            send.sendsingleImage(imgTag.src);
+        });
+        imgArray.push(imgTag.src);
+    }
+    });
+
+    send.sendImages(imgArray);
+
+"""
+    private fun setUpTaskDescription(description: String) {
+        binding.textView2.gone()
+        binding.EditSummary.visible()
+        val css: InternalStyleSheet = Github()
+
+        with(css) {
+            addFontFace(
+                "o2font",
+                "normal",
+                "normal",
+                "normal",
+                "url('file:///android_res/font/sfregular.ttf')"
+            )
+            addRule("body", "font-family:o2font")
+            addRule("body", "font-size:16px")
+            addRule("body", "line-height:21px")
+            addRule("body", "background-color: #E3E1E1")
+            addRule("body", "color: #222222")
+            addRule("body", "padding: 0px 0px 0px 0px")
+            addRule("a", "color: #86ff7c")
+            addRule("pre", "border: 1px solid #000;")
+            addRule("pre", "border-radius: 4px;")
+            addRule("pre", "max-height: 400px;")
+            addRule("pre", "overflow:auto")
+            addRule("pre", "white-space: pre-line")
+
+        }
+
+        binding.markdownView.settings.javaScriptEnabled = true
+        binding.markdownView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        binding.markdownView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
+
+        binding.markdownView.addStyleSheet(css)
+        binding.markdownView.addJavascriptInterface(AndroidToJsInterface(), "send")
+
+        binding.markdownView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                view?.evaluateJavascript(script) {}
+            }
+
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                val intent = Intent(Intent.ACTION_VIEW, request?.url)
+                startActivity(intent)
+                return true
+            }
+
+        }
+
+        binding.markdownView.loadMarkdown(description)
+        binding.markdownView.visible()
+
+    }
+    inner class AndroidToJsInterface {
+        @JavascriptInterface
+        fun sendCode(codeText: String, language: String?) {
+            this@CreateTaskActivity.runOnUiThread {
+
+                val codeViewerIntent =
+                    Intent(this@CreateTaskActivity, CodeViewerActivity::class.java)
+                codeViewerIntent.putExtra(
+                    Endpoints.CodeViewer.CODE,
+                    codeText.trimIndent().trim()
+                )
+                codeViewerIntent.putExtra(
+                    Endpoints.CodeViewer.LANG,
+                    language?.trimIndent()?.trim()
+                )
+
+                startActivity(codeViewerIntent)
+                this@CreateTaskActivity.overridePendingTransition(
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_left
+                )
+            }
+        }
+
+        @JavascriptInterface
+        fun sendImages(imageUrls: Array<String>) {
+            this@CreateTaskActivity.runOnUiThread {
+                val recyclerView = binding.imageRecyclerView
+                recyclerView.layoutManager =
+                    LinearLayoutManager(
+                        this@CreateTaskActivity,
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
+                Log.d("list", imageUrls.toMutableList().toString())
+                val adapter =
+                    ImageAdapter(imageUrls.toMutableList(), this@CreateTaskActivity)
+                recyclerView.adapter = adapter
+            }
+        }
+
+        @JavascriptInterface
+        fun sendsingleImage(imageUrl: String) {
+            this@CreateTaskActivity.runOnUiThread {
+                onImageClicked(0, mutableListOf(imageUrl))
+            }
+        }
+
+    }
+
     override fun updateAssignee(assignee: User) {
     }
 
@@ -894,6 +1073,19 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             binding.checkListCount.gone()
         }
     }
+    override fun onImageClicked(position: Int, imageList: MutableList<String>) {
+        val imageViewerIntent =
+            Intent(this, ImageViewerActivity::class.java)
+        imageViewerIntent.putExtra("position", position)
+        imageViewerIntent.putStringArrayListExtra("images", ArrayList(imageList))
+        startActivity(
+            ImageViewerActivity.createIntent(
+                this,
+                ArrayList(imageList),
+                position,
+            ),
+        )
 
+    }
 
 }

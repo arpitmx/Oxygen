@@ -3,14 +3,10 @@ package com.ncs.o2.Services
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ncs.o2.Constants.NotificationType
-import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
-import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Domain.Models.FCMNotification
-import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.HelperClasses.NotificationBuilderUtil.showNotification
 import com.ncs.versa.Constants.Endpoints.Notifications as N
 import timber.log.Timber
-import javax.inject.Inject
 
 /*
 File : FirebaseMessagingService.kt -> com.ncs.o2
@@ -71,6 +67,33 @@ class FCMessagingService : FirebaseMessagingService() {
                     taskID =  taskID.orEmpty(),
                 )
 
+                showNotification(notification = notif, context = applicationContext)
+            }
+            if (type == NotificationType.TASK_ASSIGNED_NOTIFICATION.name){
+                val notif = FCMNotification(
+                    notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION,
+                    title =  title.orEmpty(),
+                    message = body.orEmpty(),
+                    taskID =  taskID.orEmpty(),
+                )
+                showNotification(notification = notif, context = applicationContext)
+            }
+            if (type == NotificationType.WORKSPACE_TASK_UPDATE.name){
+                val notif = FCMNotification(
+                    notificationType = NotificationType.WORKSPACE_TASK_UPDATE,
+                    title =  title.orEmpty(),
+                    message = body.orEmpty(),
+                    taskID =  taskID.orEmpty(),
+                )
+                showNotification(notification = notif, context = applicationContext)
+            }
+            if (type == NotificationType.TASK_CHECKLIST_UPDATE.name){
+                val notif = FCMNotification(
+                    notificationType = NotificationType.TASK_CHECKLIST_UPDATE,
+                    title =  title.orEmpty(),
+                    message = body.orEmpty(),
+                    taskID =  taskID.orEmpty(),
+                )
                 showNotification(notification = notif, context = applicationContext)
             }
         }

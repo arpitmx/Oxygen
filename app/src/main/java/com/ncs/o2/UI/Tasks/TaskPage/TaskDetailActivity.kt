@@ -30,6 +30,8 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     var users:MutableList<UserInMessage> = mutableListOf()
     val sharedViewModel: SharedViewModel by viewModels()
     var moderatorsList: MutableList<String> = mutableListOf()
+    var moderators: MutableList<User> = mutableListOf()
+
     var assignee:String=""
 
     override fun onCreate(savedInstanceState: Bundle?) {

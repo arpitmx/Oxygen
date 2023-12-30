@@ -23,5 +23,7 @@ enum class NotificationType(val title: String, val priority : Int) {
     TASK_CREATION_NOTIFICATION("Task Created",3),
     TASK_COMMENT_MENTION_NOTIFICATION("Mentioned",3),
     TASK_COMMENT_NOTIFICATION("Comment",1) ,
-
+    TASK_ASSIGNED_NOTIFICATION("Task Assigned",3),
+    WORKSPACE_TASK_UPDATE("Workspace task updated",3),
+    TASK_CHECKLIST_UPDATE("Task checklist updated",3)
 }

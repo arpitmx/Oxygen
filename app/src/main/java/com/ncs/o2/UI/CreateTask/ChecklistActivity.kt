@@ -99,7 +99,7 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
         }
     }
 
-    override fun checkListItem(checkList: CheckList, isEdited: Boolean) {
+    override fun checkListItem(checkList: CheckList, isEdited: Boolean,position: Int) {
         val existingIndex = list.indexOfFirst { it.id == checkList.id }
 
         if (existingIndex != -1) {

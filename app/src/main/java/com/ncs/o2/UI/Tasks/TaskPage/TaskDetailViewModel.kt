@@ -178,5 +178,9 @@ constructor(val notificationApiService: NotificationApiService,
         }
     }
 
+    fun addNotificationToFirebase(user_id: String,notification: Notification,resultCallback: (ServerResult<Int>) -> Unit){
+        repository.insertNotification(userID=user_id, notification = notification, result = resultCallback)
+    }
+
 
 }

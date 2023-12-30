@@ -104,6 +104,55 @@ object NotificationsUtils {
             return payload
         }
 
+        if (notification.notificationType == NotificationType.TASK_ASSIGNED_NOTIFICATION.name) {
+
+            val payload = JsonObject()
+            val data = JsonObject()
+
+            payload.addProperty(N.TO, token)
+            data.addProperty(N.TITLE, notification.title)
+            data.addProperty(N.BODY, notification.message)
+            data.addProperty(N.TYPE, notification.notificationType)
+            data.addProperty(N.TASKID, notification.taskID)
+
+            payload.add(N.DATA, data)
+
+            return payload
+        }
+
+        if (notification.notificationType == NotificationType.WORKSPACE_TASK_UPDATE.name) {
+
+            val payload = JsonObject()
+            val data = JsonObject()
+
+            payload.addProperty(N.TO, token)
+            data.addProperty(N.TITLE, notification.title)
+            data.addProperty(N.BODY, notification.message)
+            data.addProperty(N.TYPE, notification.notificationType)
+            data.addProperty(N.TASKID, notification.taskID)
+
+            payload.add(N.DATA, data)
+
+            return payload
+        }
+
+        if (notification.notificationType == NotificationType.TASK_CHECKLIST_UPDATE.name) {
+
+            val payload = JsonObject()
+            val data = JsonObject()
+
+            payload.addProperty(N.TO, token)
+            data.addProperty(N.TITLE, notification.title)
+            data.addProperty(N.BODY, notification.message)
+            data.addProperty(N.TYPE, notification.notificationType)
+            data.addProperty(N.TASKID, notification.taskID)
+
+            payload.add(N.DATA, data)
+
+            return payload
+        }
+
+
         return null
     }
 

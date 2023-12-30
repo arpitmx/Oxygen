@@ -121,7 +121,7 @@ class NotificationsActivity : AppCompatActivity() {
                     else{
                         binding.notificationRV.visible()
                         binding.noNotificationTv.gone()
-                        adapter = NotificationAdapter(PrefManager.getLastSeenTimeStamp(),result.data)
+                        adapter = NotificationAdapter(this,PrefManager.getLastSeenTimeStamp(),result.data)
                         adapter.notifyDataSetChanged()
                         notificationRV.adapter = adapter
                         FirebaseFirestore.getInstance().collection(Endpoints.USERS)

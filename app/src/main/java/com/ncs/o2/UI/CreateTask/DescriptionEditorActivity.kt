@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.CreateTask
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.text.getSpans
@@ -7,6 +8,7 @@ import androidx.core.view.isNotEmpty
 import com.google.ai.client.generativeai.GenerativeModel
 import com.ncs.o2.BuildConfig
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -38,7 +40,10 @@ class DescriptionEditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        val summary = intent.getStringExtra("summary")
+        if (!summary.isNull){
+            binding.summaryEt.setText(summary)
+        }
         setUpViews()
         setUpGemini()
     }
@@ -59,11 +64,18 @@ class DescriptionEditorActivity : AppCompatActivity() {
     }
 
     private fun setUpViews() {
+
         binding.gioActionbar.titleTv.text = getString(R.string.summary)
+        binding.gioActionbar.btnDone.visible()
         binding.gioActionbar.btnFav.gone()
         binding.gioActionbar.btnRequestWork.gone()
-
-        binding.summaryEt.append("What is kotlin?")
+        binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
+            onBackPressed()
+        }
+        val summary = intent.getStringExtra("summary")
+        if (summary.isNull){
+            binding.summaryEt.append("What is kotlin")
+        }
         binding.btnWrite.setOnClickThrottleBounceListener {
             CoroutineScope(Dispatchers.Main).launch {
                 startAutoCompleteProcess()
@@ -78,6 +90,17 @@ class DescriptionEditorActivity : AppCompatActivity() {
 
             }
         }
+        binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
+            if (binding.summaryEt.text.toString().isEmpty()) {
+                utils.showSnackbar(binding.root, "Enter something in summary first", 3000)
+            } else {
+                val resultIntent = Intent()
+                resultIntent.putExtra("summary", binding.summaryEt.text.toString())
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+        }
+
     }
 
     val regex = Regex("!\\{\\[(.*?)\\]\\}!")
@@ -91,14 +114,11 @@ class DescriptionEditorActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             try {
-
-
                 val output = CoroutineScope(Dispatchers.IO).async {
                     generativeModel.generateContent(filteredPrompt)
                 }.await()
                 val lastPos = output.text?.length
                 binding.summaryEt.text.insert(position,output.text)
-
 
                 //binding.summaryEt.text.clearSpans()
                 //binding.summaryEt.setSelection(position, lastPos!!)

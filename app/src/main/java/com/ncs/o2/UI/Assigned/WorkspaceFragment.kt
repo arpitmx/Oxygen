@@ -232,7 +232,6 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
             viewModel.getTasksbyIdFromDB(
                 projectName = projectName,
                 taskId = taskIdsList[i].id,
-
                 ) { result ->
                 when (result) {
                     is DBResult.Success -> {
