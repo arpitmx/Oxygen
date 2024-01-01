@@ -197,8 +197,12 @@ interface Repository {
         projectName: String,
     ): ServerResult<List<Tag>>
     fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>>
+    fun uploadImage(bitmap: Bitmap, taskID: String): LiveData<ServerResult<StorageReference>>
+
     fun getProjectIcon(reference:StorageReference): LiveData<ServerResult<StorageReference>>
     fun getProjectIconUrl(reference: StorageReference): LiveData<ServerResult<String>>
+    fun getImageUrl(reference: StorageReference): LiveData<ServerResult<String>>
+
     fun addProjectImageUrlToFirestore(IconUrl: String, projectName: String): LiveData<Boolean>
     // User DP Related
     fun getUserDPUrl(reference: StorageReference): LiveData<ServerResult<String>>

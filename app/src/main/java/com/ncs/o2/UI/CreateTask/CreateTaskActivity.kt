@@ -348,7 +348,12 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             val summary = data?.getStringExtra("summary")
             if (!summary.isNull){
                 description=summary!!.trimIndent()
-                setUpTaskDescription(summary!!.trimIndent())
+                if (summary.length>400){
+                    setUpTaskDescription(summary!!.trimIndent().substring(0,400))
+                }
+                else{
+                    setUpTaskDescription(summary!!.trimIndent())
+                }
                 binding.description.isClickable=false
                 binding.EditSummary.setOnClickThrottleBounceListener {
                     val intent = Intent(this, DescriptionEditorActivity::class.java)
@@ -973,7 +978,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             addRule("body", "background-color: #E3E1E1")
             addRule("body", "color: #222222")
             addRule("body", "padding: 0px 0px 0px 0px")
-            addRule("a", "color: #86ff7c")
+            addRule("a", "color: #0000FF")
             addRule("pre", "border: 1px solid #000;")
             addRule("pre", "border-radius: 4px;")
             addRule("pre", "max-height: 400px;")

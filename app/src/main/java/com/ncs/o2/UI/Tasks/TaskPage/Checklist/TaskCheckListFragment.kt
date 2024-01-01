@@ -560,8 +560,8 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 taskID = activityBinding.taskId,
                 message = message,
                 title =
-                if (isComplete) "Checklist marked as completed in ${activityBinding.taskId}"
-                else "Checklist marked as not completed in ${activityBinding.taskId}",
+                if (isComplete) "Marked as completed"
+                else "Marked as not completed",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,

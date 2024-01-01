@@ -714,7 +714,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             addRule("body", "background-color: #222222")
             addRule("body", "color: #fff")
             addRule("body", "padding: 0px 0px 0px 0px")
-            addRule("a", "color: #86ff7c")
+            addRule("a", "color: #0000FF")
             addRule("pre", "border: 1px solid #000;")
             addRule("pre", "border-radius: 4px;")
             addRule("pre", "max-height: 400px;")
@@ -854,6 +854,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         fun sendImages(imageUrls: Array<String>) {
             requireActivity().runOnUiThread {
                 val recyclerView = binding.imageRecyclerView
+                recyclerView.visible()
                 recyclerView.layoutManager =
                     LinearLayoutManager(
                         requireContext(),
@@ -870,7 +871,19 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         @JavascriptInterface
         fun sendsingleImage(imageUrl: String) {
             requireActivity().runOnUiThread {
-                onImageClicked(0, mutableListOf(imageUrl))
+                val recyclerView = binding.imageRecyclerView
+                recyclerView.visible()
+                recyclerView.layoutManager =
+                    LinearLayoutManager(
+                        requireContext(),
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
+                Log.d("list", listOf(imageUrl).toMutableList().toString())
+                val adapter =
+                    ImageAdapter(listOf(imageUrl).toMutableList(), this@TaskDetailsFragment)
+                recyclerView.adapter = adapter
+//                onImageClicked(0, mutableListOf(imageUrl))
             }
         }
 
@@ -1423,6 +1436,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                                 val notification = composeWorkspaceUpdateNotification(
                                     NotificationType.WORKSPACE_TASK_UPDATE,
                                     message = "${PrefManager.getcurrentUserdetails().USERNAME} updated the state of task ${activityBinding.taskId} in their workspace",
+                                    newState = text
                                 )
                                 if (moderators.isNotEmpty()){
                                     for (moderator in moderators){
@@ -1731,14 +1745,14 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         return null
     }
 
-    private fun composeWorkspaceUpdateNotification(type: NotificationType, message: String): Notification? {
+    private fun composeWorkspaceUpdateNotification(type: NotificationType, message: String,newState:String): Notification? {
         if (type == NotificationType.WORKSPACE_TASK_UPDATE) {
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.WORKSPACE_TASK_UPDATE.name,
                 taskID = activityBinding.taskId,
                 message = message,
-                title = "${PrefManager.getcurrentUserdetails().USERNAME} updated the task state ${activityBinding.taskId}",
+                title = "${PrefManager.getcurrentUserdetails().USERNAME} changed state of ${activityBinding.taskId} to ${newState}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,

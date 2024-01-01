@@ -1,9 +1,11 @@
 package com.ncs.o2.UI.CreateTask
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
@@ -127,5 +129,12 @@ class CreateTaskViewModel @Inject constructor
 
         companion object{
             const val TAG = "CreateTaskViewModel"
+        }
+
+        fun uploadImagethroughRepository(bitmap: Bitmap, taskID:String): LiveData<ServerResult<StorageReference>> {
+            return repository.uploadImage(bitmap, taskID)
+        }
+        fun getImageUrlThroughRepository(reference: StorageReference): LiveData<ServerResult<String>> {
+            return repository.getImageUrl(reference)
         }
     }

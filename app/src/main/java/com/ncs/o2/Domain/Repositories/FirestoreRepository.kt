@@ -283,11 +283,52 @@ class FirestoreRepository @Inject constructor(
         return liveData
     }
 
+    override fun uploadImage(
+        bitmap: Bitmap,
+        taskId: String
+    ): LiveData<ServerResult<StorageReference>> {
+
+        val liveData = MutableLiveData<ServerResult<StorageReference>>()
+        val imageFileName =
+            "${Endpoints.Project.TASKS}/${taskId}${Endpoints.Storage.IMAGE_PATH}"
+        val imageRef = storageReference.child(imageFileName)
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
+        val data = baos.toByteArray()
+        val uploadTask = imageRef.putBytes(data)
+
+
+        uploadTask.addOnSuccessListener {
+            liveData.postValue(ServerResult.Success(imageRef))
+
+
+        }.addOnFailureListener { exception ->
+            liveData.postValue(ServerResult.Failure(exception))
+
+        }
+
+        return liveData
+    }
     override fun getProjectIcon(reference: StorageReference): LiveData<ServerResult<StorageReference>> {
         TODO("Not yet implemented")
     }
 
     override fun getProjectIconUrl(reference: StorageReference): LiveData<ServerResult<String>> {
+
+        val liveData = MutableLiveData<ServerResult<String>>()
+
+        liveData.postValue(ServerResult.Progress)
+        reference.downloadUrl
+            .addOnSuccessListener { uri ->
+                val imageUrl = uri.toString()
+                liveData.postValue(ServerResult.Success(imageUrl))
+            }
+            .addOnFailureListener { exception ->
+                liveData.postValue(ServerResult.Failure(exception))
+            }
+        return liveData
+    }
+    override fun getImageUrl(reference: StorageReference): LiveData<ServerResult<String>> {
 
         val liveData = MutableLiveData<ServerResult<String>>()
 
