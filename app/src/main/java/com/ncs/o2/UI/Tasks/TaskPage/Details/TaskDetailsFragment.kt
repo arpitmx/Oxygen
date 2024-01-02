@@ -165,6 +165,14 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         runDelayed(100) {
             setDetails(activityBinding.taskId)
         }
+        val viewpager = tasksHolderBinding.binding.viewPager2
+        if (!activityBinding.index.isNull){
+            when(activityBinding.index){
+                "0"-> viewpager.currentItem=0
+                "1"-> viewpager.currentItem=1
+                "2"-> viewpager.currentItem=2
+            }
+        }
         binding.assignee.isEnabled = false
         binding.section.isEnabled=false
         binding.priority.isEnabled=false

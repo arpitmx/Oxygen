@@ -9,6 +9,7 @@ import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 import com.ncs.o2.databinding.NotificationMentionItemBinding
@@ -35,7 +36,8 @@ Tasks FUTURE ADDITION :
 class NotificationAdapter(
     private val context: Context,
     private val lastSeenTimeStamp: Long,
-    private var notifications: List<Notification>
+    private var notifications: List<Notification>,
+    private val notificationClick: OnNotificationClick
 ) :
     RecyclerView.Adapter<ViewHolder>() {
 
@@ -143,7 +145,9 @@ class NotificationAdapter(
             } else {
                 binding.newNotifMark.invisible()
             }
-
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
+            }
         }
 
 
@@ -163,6 +167,9 @@ class NotificationAdapter(
                 binding.newNotifMark.visible()
             } else {
                 binding.newNotifMark.invisible()
+            }
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
             }
 
         }
@@ -186,6 +193,9 @@ class NotificationAdapter(
             } else {
                 binding.newNotifMark.invisible()
             }
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
+            }
 
         }
 
@@ -208,9 +218,16 @@ class NotificationAdapter(
             } else {
                 binding.newNotifMark.invisible()
             }
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
+            }
 
         }
 
 
+    }
+
+    interface OnNotificationClick{
+        fun onClick(notification: Notification)
     }
 }

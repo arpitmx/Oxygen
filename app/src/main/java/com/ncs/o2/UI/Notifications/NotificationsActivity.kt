@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Notifications
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,22 +12,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
-class NotificationsActivity : AppCompatActivity() {
+class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick {
 
     private val binding: ActivityNotificationsBinding by lazy {
         ActivityNotificationsBinding.inflate(layoutInflater)
@@ -121,7 +125,7 @@ class NotificationsActivity : AppCompatActivity() {
                     else{
                         binding.notificationRV.visible()
                         binding.noNotificationTv.gone()
-                        adapter = NotificationAdapter(this,PrefManager.getLastSeenTimeStamp(),result.data)
+                        adapter = NotificationAdapter(this,PrefManager.getLastSeenTimeStamp(),result.data,this)
                         adapter.notifyDataSetChanged()
                         notificationRV.adapter = adapter
                         FirebaseFirestore.getInstance().collection(Endpoints.USERS)
@@ -143,6 +147,44 @@ class NotificationsActivity : AppCompatActivity() {
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
         //finish()
+    }
+
+    override fun onClick(notification: Notification) {
+        val type=notification.notificationType
+
+        when(type){
+            NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name->{
+                val intent = Intent(this, TaskDetailActivity::class.java)
+                intent.putExtra("task_id", notification.taskID)
+                intent.putExtra("index", "1")
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            NotificationType.TASK_ASSIGNED_NOTIFICATION.name->{
+                val intent = Intent(this, TaskDetailActivity::class.java)
+                intent.putExtra("task_id", notification.taskID)
+                intent.putExtra("index", "0")
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            NotificationType.WORKSPACE_TASK_UPDATE.name->{
+                val intent = Intent(this, TaskDetailActivity::class.java)
+                intent.putExtra("task_id", notification.taskID)
+                intent.putExtra("index", "0")
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            NotificationType.TASK_CHECKLIST_UPDATE.name->{
+                val intent = Intent(this, TaskDetailActivity::class.java)
+                intent.putExtra("task_id", notification.taskID)
+                intent.putExtra("index", "2")
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            else->{
+                toast("Something went wrong")
+            }
+        }
     }
 
 
