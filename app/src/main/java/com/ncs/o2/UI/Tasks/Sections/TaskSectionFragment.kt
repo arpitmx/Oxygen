@@ -343,7 +343,8 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                         setUpResultListRV(resultList)
 
                     }else{
-                        showLoader(-2)
+
+                        searchFromDescription(text)
                     }
                 }else{
                     showLoader(0)
@@ -351,6 +352,57 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
             }
         })
+    }
+
+    private fun searchFromDescription(query: String){
+
+        taskList2 =  ArrayList()
+        viewModel.getTasksForSegment(projectName, segmentName, sectionName){ result ->
+
+            when (result) {
+                is ServerResult.Success -> {
+
+                    val task = result.data
+                    taskList2.clear()
+
+                    for (element in task) {
+                        taskList2.add(element)
+                    }
+
+                    resultList = ArrayList(taskList.filter { taskItem ->
+                        taskList2.any { task ->
+                            task.title == taskItem.title
+                        }
+                    })
+
+                    if (resultList.size> 0) {
+
+                        setUpResultListRV(resultList)
+
+                    }else if(resultList.isEmpty()){
+                        showLoader(-2)
+                    }
+
+                }
+
+                is ServerResult.Failure -> {
+
+                    showLoader(-2)
+                    val errorMessage = result.exception.message
+                    util.singleBtnDialog(
+                        "Failure",
+                        "Failure in loading tasks, try again : ${errorMessage}", "Reload"
+                    ) {
+                        setupRecyclerView()
+                    }
+                }
+
+                is ServerResult.Progress -> {
+                    showLoader(1)
+                }
+
+            }
+        }
     }
 
     private fun setUpResultListRV(resultList: ArrayList<TaskItem>){
