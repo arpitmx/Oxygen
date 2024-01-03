@@ -28,11 +28,14 @@ import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateProjectBinding
@@ -95,106 +98,132 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 //        }
 
         binding.gioActionbar.btnNext.setOnClickThrottleBounceListener {
-            val project_id =
-                "${title}${System.currentTimeMillis().toString().substring(8, 12).trim()}"
-            val _title=binding.projectTitle.text.toString()
-            val __title = _title.replace(" ", "")
-            val title = __title.toLowerCase().capitalize()
-            val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                .setLink(Uri.parse("https://oxy2.page.link/join/${title.toLowerCase().trim()}"))
-                .setDomainUriPrefix("https://oxy2.page.link")
-                .setAndroidParameters(
-                    DynamicLink.AndroidParameters.Builder("com.ncs.o2")
-                        .setMinimumVersion(1)
-                        .build()
-                )
-                .buildDynamicLink()
-            FirebaseDynamicLinks.getInstance().createDynamicLink()
-                .setLongLink(dynamicLink.uri)
-                .buildShortDynamicLink()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val shortLink = task.result?.shortLink
-                        val previewLink = task.result?.previewLink
-                        val projectData = hashMapOf(
-                            "PROJECT_NAME" to title.trim(),
-                            "PROJECT_ID" to "${title}${System.currentTimeMillis().toString().substring(8,12).trim()}",
-                            "PROJECT_LINK" to shortLink,
-                            "PROJECT_DEEPLINK" to "https://oxy2.page.link/join/${title.toLowerCase().trim()}",
-                            "PROJECT_DESC" to desc.toString().trim(),
-                            "last_updated" to Timestamp.now(),
-                        )
-                        Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
+            if (binding.projectTitle.text.toString().isNotEmpty() && !bitmap.isNull) {
+                val project_id =
+                    "${title}${System.currentTimeMillis().toString().substring(8, 12).trim()}"
+                val _title = binding.projectTitle.text.toString()
+                val __title = _title.replace(" ", "")
+                val title = __title.toLowerCase().capitalize()
+                val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                    .setLink(Uri.parse("https://oxy2.page.link/join/${title.toLowerCase().trim()}"))
+                    .setDomainUriPrefix("https://oxy2.page.link")
+                    .setAndroidParameters(
+                        DynamicLink.AndroidParameters.Builder("com.ncs.o2")
+                            .setMinimumVersion(1)
+                            .build()
+                    )
+                    .buildDynamicLink()
+                FirebaseDynamicLinks.getInstance().createDynamicLink()
+                    .setLongLink(dynamicLink.uri)
+                    .buildShortDynamicLink()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val shortLink = task.result?.shortLink
+                            val previewLink = task.result?.previewLink
+                            val projectData = hashMapOf(
+                                "PROJECT_NAME" to title.trim(),
+                                "PROJECT_ID" to "${title}${
+                                    System.currentTimeMillis().toString().substring(8, 12).trim()
+                                }",
+                                "PROJECT_LINK" to shortLink,
+                                "PROJECT_DEEPLINK" to "https://oxy2.page.link/join/${
+                                    title.toLowerCase().trim()
+                                }",
+                                "PROJECT_DESC" to desc.toString().trim(),
+                                "last_updated" to Timestamp.now(),
+                                "contributors" to listOf(PrefManager.getCurrentUserEmail())
+                            )
+                            Log.d("checking image size", bitmap!!.byteCount.toLong().toString())
 
-                        if (title.isNotEmpty()) {
+                            if (title.isNotEmpty()) {
 
-                            if (bitmap == null) {
-                                util.singleBtnDialog(
-                                    "Select a photo",
-                                    "Project Photo cannot be kept empty",
-                                    "Okay",
-                                    {})
-                            } else {
-                                binding.progressBar.visible()
+                                if (bitmap == null) {
+                                    util.singleBtnDialog(
+                                        "Select a photo",
+                                        "Project Photo cannot be kept empty",
+                                        "Okay",
+                                        {})
+                                } else {
+                                    binding.progressBar.visible()
 
 
-                                FirebaseFirestore.getInstance().collection("Projects").document(title)
-                                    .get()
-                                    .addOnSuccessListener { documentSnapshot ->
-                                        if (documentSnapshot.exists()) {
-                                            Toast.makeText(
-                                                this,
-                                                "Project with this title already exists",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            binding.progressBar.gone()
-                                        } else {
-                                            FirebaseFirestore.getInstance().collection("Projects")
-                                                .document(title)
-                                                .set(projectData)
-                                                .addOnSuccessListener {
+                                    FirebaseFirestore.getInstance().collection("Projects")
+                                        .document(title)
+                                        .get()
+                                        .addOnSuccessListener { documentSnapshot ->
+                                            if (documentSnapshot.exists()) {
+                                                Toast.makeText(
+                                                    this,
+                                                    "Project with this title already exists",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                binding.progressBar.gone()
+                                            } else {
+                                                FirebaseFirestore.getInstance()
+                                                    .collection("Projects")
+                                                    .document(title)
+                                                    .set(projectData)
+                                                    .addOnSuccessListener {
 
-                                                    uploadImageToFirebaseStorage(bitmap!!, project_id, title)
+                                                        uploadImageToFirebaseStorage(
+                                                            bitmap!!,
+                                                            project_id,
+                                                            title
+                                                        )
 
-                                                    FirebaseFirestore.getInstance().collection("Users")
-                                                        .document(FirebaseAuth.getInstance().currentUser?.email!!)
-                                                        .update("PROJECTS", FieldValue.arrayUnion(title))
-                                                        .addOnSuccessListener {
-                                                        }
-                                                        .addOnFailureListener { e ->
-                                                        }
-                                                }
-                                                .addOnFailureListener { e ->
-                                                }
+                                                        FirebaseFirestore.getInstance()
+                                                            .collection("Users")
+                                                            .document(FirebaseAuth.getInstance().currentUser?.email!!)
+                                                            .update(
+                                                                "PROJECTS",
+                                                                FieldValue.arrayUnion(title)
+                                                            )
+                                                            .addOnSuccessListener {
+                                                                val userProjects = PrefManager.getProjectsList()
+                                                                Log.d("userProjects(OLD)", userProjects.toString())
+                                                                val mutableUserProjects = userProjects.toMutableList()
+                                                                mutableUserProjects.add(title.trim())
+                                                                Log.d("userProjects(NEW)", mutableUserProjects.toString())
+                                                                PrefManager.putProjectsList(mutableUserProjects)
+
+                                                            }
+                                                            .addOnFailureListener { e ->
+                                                            }
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                    }
+                                            }
                                         }
-                                    }
-                                    .addOnFailureListener { e ->
-                                    }
-                            }
-                        }
-                        else {
-                            if (bitmap == null) {
-                                util.singleBtnDialog(
-                                    "Select a photo",
-                                    "Project Photo cannot be kept empty",
-                                    "Okay",
-                                    {})
+                                        .addOnFailureListener { e ->
+                                        }
+                                }
                             } else {
-                                Toast.makeText(
-                                    this,
-                                    "Project Title can't be empty",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                if (bitmap == null) {
+                                    util.singleBtnDialog(
+                                        "Select a photo",
+                                        "Project Photo cannot be kept empty",
+                                        "Okay",
+                                        {})
+                                } else {
+                                    Toast.makeText(
+                                        this,
+                                        "Project Title can't be empty",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
+                        } else {
+                            println("Error creating short link: ${task.exception}")
                         }
-                    } else {
-                        println("Error creating short link: ${task.exception}")
                     }
-                }
 
 
+            }
+            else{
+                toast("Title and Project Icon are required")
+            }
+            // setUpViews()
         }
-       // setUpViews()
 
     }
 

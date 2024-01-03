@@ -207,6 +207,11 @@ class FirestoreRepository @Inject constructor(
                         documentSnapshot.getString(Endpoints.Notifications.toUser)!!
                     val timeStamp: Long =
                         documentSnapshot.getLong(Endpoints.Notifications.timeStamp)!!
+                    val projectID: String? = if (documentSnapshot.getString(Endpoints.Notifications.project_id).isNull){
+                        null
+                    } else{
+                        documentSnapshot.getString(Endpoints.Notifications.project_id)!!
+                    }
                     Notification(
                         notificationID = notificationID,
                         notificationType = notificationType,
@@ -216,6 +221,7 @@ class FirestoreRepository @Inject constructor(
                         fromUser = fromUser,
                         toUser = toUser,
                         timeStamp = timeStamp,
+                        projectID = projectID
                     )
                 }
             }.await()
@@ -1109,6 +1115,7 @@ class FirestoreRepository @Inject constructor(
 
     override fun getUserTasks(
         sectionName: String,
+        projectID: String,
         serverResult: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit
     ) {
         val user = FirebaseAuth.getInstance().currentUser?.email!!
@@ -1116,6 +1123,8 @@ class FirestoreRepository @Inject constructor(
             .document(user)
             .collection(Endpoints.Workspace.WORKSPACE)
             .whereEqualTo(Endpoints.Workspace.STATUS, sectionName)
+            .whereEqualTo(Endpoints.Workspace.PROJECT_ID, projectID)
+
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val workspaceTaskItemList = mutableListOf<WorkspaceTaskItem>()
@@ -1867,6 +1876,12 @@ class FirestoreRepository @Inject constructor(
                                     document.getString(Endpoints.Notifications.toUser)!!
                                 val timeStamp: Long =
                                     document.getLong(Endpoints.Notifications.timeStamp)!!
+
+                                val projectID: String? = if (document.getString(Endpoints.Notifications.project_id).isNull){
+                                    null
+                                } else{
+                                    document.getString(Endpoints.Notifications.project_id)!!
+                                }
                                 var LastUpdatedtimeStamp: Long? =null
                                 if (!document.getLong(Endpoints.Notifications.lastUpdated)!!.isNull){
                                     LastUpdatedtimeStamp=document.getLong(Endpoints.Notifications.lastUpdated)!!
@@ -1881,7 +1896,9 @@ class FirestoreRepository @Inject constructor(
                                     fromUser = fromUser,
                                     toUser = toUser,
                                     timeStamp = timeStamp,
-                                    lastUpdated = LastUpdatedtimeStamp
+                                    lastUpdated = LastUpdatedtimeStamp,
+                                    projectID=projectID,
+
                                 )
                                 PrefManager.putLastNotificationCacheUpdateTimestamp(Timestamp.now().seconds)
 

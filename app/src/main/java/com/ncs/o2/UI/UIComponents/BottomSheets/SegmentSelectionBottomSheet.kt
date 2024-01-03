@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.datafaker.Faker
 import javax.inject.Inject
@@ -127,6 +129,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
         PrefManager.setcurrentsegment(segment.segment_NAME)
         segmentName=segment.segment_NAME
         sendsectionList(PrefManager.getcurrentProject())
+        PrefManager.putsectionsList(sectionList)
         segmentSelectionListener?.onSegmentSelected(segment.segment_NAME)
         sectionSelectionListener?.sendSectionsList(sectionList)
         dismiss()
@@ -168,11 +171,11 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
             when (serverResult) {
                 is ServerResult.Success -> {
                     binding.progressbar.gone()
-                    CoroutineScope(Dispatchers.IO).launch {
+                    CoroutineScope(Dispatchers.Main).launch {
                         val segList = serverResult.data
                         if (segList.isNotEmpty()) {
-                            for (i in 0 until segList.size){
-                                if (segList[i].segment_NAME == segmentName){
+                            for (i in 0 until segList.size) {
+                                if (segList[i].segment_NAME == segmentName) {
                                     sectionList = segList[i].sections
                                 }
                             }
@@ -193,6 +196,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
             }
         }
     }
+
 
 
 }

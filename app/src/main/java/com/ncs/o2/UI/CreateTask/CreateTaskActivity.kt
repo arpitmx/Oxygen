@@ -32,9 +32,11 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.firebase.Timestamp
+import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.CheckList
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
@@ -48,6 +50,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
@@ -69,6 +72,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -101,6 +105,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private var OList: MutableList<User> = mutableListOf()
     private val selectedTags = mutableListOf<Tag>()
     private var showsheet = false
+    @Inject
+    lateinit var utils: GlobalUtils.EasyElements
     private var checkListArray : MutableList<CheckList> = mutableListOf()
     private val binding: ActivityCreateTaskBinding by lazy {
         ActivityCreateTaskBinding.inflate(layoutInflater)
@@ -511,10 +517,49 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         binding.progressBar.gone()
                         PrefManager.setcurrentsegment(binding.segment.text.toString())
                         toast("Task Created Successfully")
+                        if (task.assignee!="None"){
+                            val notification = composeNotification(
+                                NotificationType.TASK_ASSIGNED_NOTIFICATION,
+                                message = "You are assigned as an assignee in the task ${task.id} in the project ${PrefManager.getcurrentProject()}",
+                                assignee = task.assignee,
+                                taskID = task.id
+                            )
+
+
+                            repository.insertNotification(selectedAssignee[0].firebaseID!!, notification = notification!!) { res ->
+                                when (res) {
+                                    is ServerResult.Success -> {
+                                        binding.progressBar.gone()
+                                        notification.let {
+                                            sendNotification(
+                                                listOf(selectedAssignee[0].fcmToken!!).toMutableList(),
+                                                notification
+                                            )
+                                        }
+                                    }
+
+                                    is ServerResult.Failure -> {
+                                        binding.progressBar.gone()
+                                        val errorMessage = res.exception.message
+                                        GlobalUtils.EasyElements(this@CreateTaskActivity)
+                                            .singleBtnDialog(
+                                                "Failure",
+                                                "Failed in sending notification: $errorMessage",
+                                                "Okay"
+                                            ) {
+                                                recreate()
+                                            }
+                                    }
+
+                                    is ServerResult.Progress -> {
+                                        binding.progressBar.visible()
+                                    }
+                                }
+                            }
+                        }
                         finish()
                         startActivity(intent)
                     }
-
                 }
             }
         }
@@ -1092,5 +1137,41 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         )
 
     }
+    private fun composeNotification(type: NotificationType, message: String, assignee: String,taskID:String): Notification? {
 
+        if (type == NotificationType.TASK_ASSIGNED_NOTIFICATION) {
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION.name,
+                taskID = taskID,
+                message = message,
+                title = "You are assigned in the task $taskID",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = assignee ,
+                timeStamp = Timestamp.now().seconds,
+                projectID = PrefManager.getcurrentProject(),
+
+                )
+        }
+        return null
+    }
+    private fun sendNotification(receiverList: MutableList<String>, notification: Notification) {
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                for (receiverToken in receiverList) {
+                    NotificationsUtils.sendFCMNotification(
+                        receiverToken,
+                        notification = notification
+                    )
+                }
+
+            }
+
+        } catch (exception: Exception) {
+            Timber.tag("")
+            utils.showSnackbar(binding.root, "Failure in sending notifications", 5000)
+        }
+
+    }
 }
