@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        projects=ArrayList()
         if (FirebaseAuth.getInstance().currentUser!=null) {
             if (savedInstanceState == null) {
                 handleDynamicLink(intent)
@@ -373,7 +373,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
     private fun setupProjectsList(){
         projects=PrefManager.getProjectsList().toMutableList()
-        projectListAdapter=ListAdapter(this,projects)
+        val list=ArrayList<String>()
+        list.addAll(projects)
+        projectListAdapter=ListAdapter(this,list)
         binding.drawerheaderfile.projectlistView.adapter=projectListAdapter
     }
 
@@ -494,6 +496,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         if (pathSegments.size >= 2) {
             val operationType = pathSegments[0]
             val id = pathSegments[1]
+            var project:String=""
+            if (pathSegments.size>=3){
+                project=pathSegments[2]
+            }
             Log.d("shareLinkTest",operationType.toString())
             Log.d("shareLinkTest",id.toString())
 
@@ -515,14 +521,46 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 "share" -> {
                     val taskId="#T${id}"
                     CoroutineScope(Dispatchers.Main).launch {
-                        if (db.tasksDao().getTasksbyId(taskId,PrefManager.getcurrentProject())?.isNull!!){
-                            easyElements.showSnackbar(binding.root,"No Task found, check the link",2000)
+                        if (PrefManager.getProjectsList().contains(project)) {
+                            if (db.tasksDao().getTasksbyId(taskId, project)?.isNull!!) {
+                                easyElements.showSnackbar(
+                                    binding.root,
+                                    "No Task found, check the link",
+                                    2000
+                                )
+                            } else {
+                                PrefManager.setcurrentsegment("Select Segment")
+                                viewModel.updateCurrentSegment("Select Segment")
+                                binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
+                                val list = PrefManager.getProjectsList()
+                                var position:Int=0
+                                for (i in 0 until list.size){
+                                    if (list[i]==project){
+                                        position=i
+                                    }
+                                }
+                                Log.d("position",position.toString())
+                                PrefManager.setcurrentProject(project)
+                                PrefManager.setRadioButton(position)
+                                PrefManager.selectedPosition.value = position
+                                projectListAdapter.notifyDataSetChanged()
+                                setupProjectsList()
+                                val intent =
+                                    Intent(this@MainActivity, TaskDetailActivity::class.java)
+                                intent.putExtra("task_id", taskId)
+                                startActivity(intent)
+                                overridePendingTransition(
+                                    R.anim.slide_in_left,
+                                    R.anim.slide_out_left
+                                )
+                            }
                         }
                         else{
-                            val intent = Intent(this@MainActivity, TaskDetailActivity::class.java)
-                            intent.putExtra("task_id", taskId)
-                            startActivity(intent)
-                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                            easyElements.showSnackbar(
+                                binding.root,
+                                "Can't view task you are not enrolled in this project",
+                                2000
+                            )
                         }
                     }
                 }
@@ -569,7 +607,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
     private fun addProjectToUser(projectLink: String) {
-
         GlobalScope.launch(Dispatchers.Main) {
             val result = firestoreRepository.addProjectToUser(projectLink)
             when (result) {
@@ -579,6 +616,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     Log.d("result",result.data.toString())
                     PrefManager.putProjectsList(result.data)
                     projectListAdapter.notifyDataSetChanged()
+                    setupProjectsList()
                     easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)
                 }
                 is ServerResult.Failure -> {

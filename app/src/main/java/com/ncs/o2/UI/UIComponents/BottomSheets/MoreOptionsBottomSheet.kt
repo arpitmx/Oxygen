@@ -19,6 +19,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.MoreOptionBottomSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -73,7 +74,7 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
 
     private fun createTaskLink(taskId: String){
         val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-            .setLink(Uri.parse("https://oxy2.page.link/share/${taskId.substring(2)}"))
+            .setLink(Uri.parse("https://oxy2.page.link/share/${taskId.substring(2)}/${PrefManager.getcurrentProject()}"))
             .setDomainUriPrefix("https://oxy2.page.link")
             .setAndroidParameters(
                 DynamicLink.AndroidParameters.Builder("com.ncs.o2")

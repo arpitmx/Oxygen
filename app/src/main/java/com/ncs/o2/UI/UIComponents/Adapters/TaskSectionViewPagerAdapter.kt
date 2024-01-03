@@ -31,8 +31,8 @@ class TaskSectionViewPagerAdapter(fragmentActivity: Fragment, private var totalC
 
     override fun createFragment(position: Int): Fragment {
         if (position < sectionsList.size) {
-            return TaskSectionFragment(sectionsList[position])
+            return TaskSectionFragment.newInstance(sectionsList[position])
         }
-        return TaskSectionFragment("")
+        return TaskSectionFragment.newInstance("")
     }
 }

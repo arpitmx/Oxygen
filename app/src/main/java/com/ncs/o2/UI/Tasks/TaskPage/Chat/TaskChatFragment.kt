@@ -445,46 +445,46 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             when (serverResult) {
                 is ServerResult.Success -> {
 
-                        val contributorList = serverResult.data
-                        if (contributorList.isNotEmpty()) {
-                            contributors.addAll(contributorList)
-                            for (contributor in contributorList ) {
-                                viewModel.getUserbyId(contributor) { result ->
-                                    when (result) {
-                                        is ServerResult.Success -> {
-                                            binding.mentionProgressbar.gone()
-                                            binding.mentionUserRv.visible()
+                    val contributorList = serverResult.data
+                    if (contributorList.isNotEmpty()) {
+                        contributors.addAll(contributorList)
+                        for (contributor in contributorList ) {
+                            viewModel.getUserbyId(contributor) { result ->
+                                when (result) {
+                                    is ServerResult.Success -> {
+                                        binding.mentionProgressbar.gone()
+                                        binding.mentionUserRv.visible()
 
-                                            val user = result.data
-                                            contributorsData.add(user!!)
-                                            if (contributorsData.size==contributorList.size){
-                                                setMentionUsersRv(contributorsData)
-                                            }
-                                            Log.d("contributorsdata",contributorsData.toString())
-
+                                        val user = result.data
+                                        contributorsData.add(user!!)
+                                        if (contributorsData.size==contributorList.size){
+                                            setMentionUsersRv(contributorsData)
                                         }
+                                        Log.d("contributorsdata",contributorsData.toString())
 
-                                        is ServerResult.Failure -> {
+                                    }
 
-                                            utils.singleBtnDialog(
-                                                "Failure",
-                                                "Failure in fetching users : ${result.exception.message}",
-                                                "Okay"
-                                            ) {
-                                                requireActivity().finish()
-                                            }
-                                            binding.mentionProgressbar.gone()
-                                            binding.mentionUserRv.visible()
+                                    is ServerResult.Failure -> {
 
+                                        utils.singleBtnDialog(
+                                            "Failure",
+                                            "Failure in fetching users : ${result.exception.message}",
+                                            "Okay"
+                                        ) {
+                                            requireActivity().finish()
                                         }
+                                        binding.mentionProgressbar.gone()
+                                        binding.mentionUserRv.visible()
 
-                                        is ServerResult.Progress -> {
-                                            binding.mentionProgressbar.visible()
-                                            binding.mentionUserRv.gone()
-                                        }
+                                    }
+
+                                    is ServerResult.Progress -> {
+                                        binding.mentionProgressbar.visible()
+                                        binding.mentionUserRv.gone()
                                     }
                                 }
                             }
+                        }
 
                     }
 
@@ -798,7 +798,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
                 projectID = PrefManager.getcurrentProject(),
-                )
+            )
         }
 
         return null
@@ -999,8 +999,3 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
 }
-
-
-
-
-

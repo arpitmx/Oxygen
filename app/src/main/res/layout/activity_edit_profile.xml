@@ -66,6 +66,7 @@
                 android:layout_below="@id/login_welcome_msg"
                 android:layout_marginTop="@dimen/layout_in_between_margins"
                 android:hint="@string/full_name_hint"
+                android:maxLength="15"
                 android:textColor="@color/primary"
                 android:inputType="textEmailAddress" />
 
