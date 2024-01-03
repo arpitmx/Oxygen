@@ -376,26 +376,52 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/description"
-                    android:background="@drawable/card_view_white"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="100dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_height="100dp">
+                    android:background="@drawable/card_view_white">
+
                     <TextView
+                        android:id="@+id/textView2"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_margin="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
                         android:fontFamily="@font/sf_pro_display_regular"
                         android:gravity="top|start"
-                        android:text="Write Task Summary here..."
                         android:maxHeight="300dp"
-                        android:layout_margin="16dp"
                         android:maxLength="200"
                         android:minHeight="100dp"
+                        android:text="Write Task Summary here..."
                         android:textColor="@color/account"
-                        android:textSize="16dp"/>
-                </LinearLayout>
+                        android:textSize="16dp"
+                         />
+
+                    <br.tiagohm.markdownview.MarkdownView
+                        android:id="@+id/markdownView"
+                        android:layout_width="match_parent"
+                        android:layout_margin="10dp"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="true"
+                        android:visibility="gone"
+                        app:escapeHtml="false" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/imageRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:visibility="gone"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_animation_popscale"
+                    android:nestedScrollingEnabled="false" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
@@ -488,12 +514,67 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
 
+
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/contributors_parent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:orientation="vertical">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/EditSummary">
+
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="#65686B"
+
+                        />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/EditSummaryBtn"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="@dimen/_5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="10">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_weight="1"
+                            android:paddingStart="0dp"
+                            android:src="@drawable/round_edit_24"
+                            app:tint="@color/better_white" />
+
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="8"
+                            android:fontFamily="@font/sf_pro_display_regular"
+                            android:gravity="start|center_vertical"
+                            android:orientation="vertical"
+                            android:text="Edit Summary"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="18dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
                     <View
                         android:layout_width="match_parent"

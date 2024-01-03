@@ -106,6 +106,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                     }
                     else {
                         taskIdsList = task!!.toMutableList()
+                        Log.d("workspacecheck",taskIdsList.toString())
                         getTasks()
                     }
                 }
@@ -131,7 +132,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
         taskList = ArrayList()
         binding.recyclerView.gone()
         if (db.tasksDao().isNull) {
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(Dispatchers.Main).launch {
                 for (i in 0 until taskIdsList.size) {
                     viewModel.getTasksItembyId(
                         id = taskIdsList[i].id,
@@ -142,6 +143,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                                 binding.lottieProgressInclude.progressbarBlock.gone()
 
                                 taskList.add(result.data)
+                                Log.d("workspacecheck",taskList.toString())
 
                                 if (taskList.isEmpty()) {
                                     binding.layout.gone()
@@ -152,10 +154,11 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                                     binding.lottieProgressInclude.progressbarBlock.gone()
                                     binding.placeholder.gone()
                                     recyclerView = binding.recyclerView
+
                                     taskListAdapter = TaskListAdapter(
                                         firestoreRepository,
                                         requireContext(),
-                                        taskList
+                                        taskList.toMutableList()
                                     )
                                     taskListAdapter.setTaskList(taskList)
                                     taskListAdapter.notifyDataSetChanged()
@@ -213,13 +216,13 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                             }
 
                         }
-
                     }
                 }
             }
         }
         else{
             tasks= ArrayList()
+            Log.d("fetchfrom","DB")
             fetchfromdb()
         }
 
@@ -229,7 +232,6 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
             viewModel.getTasksbyIdFromDB(
                 projectName = projectName,
                 taskId = taskIdsList[i].id,
-
                 ) { result ->
                 when (result) {
                     is DBResult.Success -> {

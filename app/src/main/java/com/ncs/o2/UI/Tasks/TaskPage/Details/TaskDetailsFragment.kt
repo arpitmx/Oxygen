@@ -3,8 +3,6 @@ package com.ncs.o2.UI.Tasks.TaskPage.Details
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -22,7 +20,6 @@ import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
 import com.google.android.flexbox.FlexDirection
@@ -39,7 +36,6 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
@@ -51,9 +47,9 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListen
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
-import com.ncs.o2.Domain.Utility.FirebaseUtils
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.Later
+import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
@@ -70,10 +66,8 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
-import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
-import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.editor.MarkwonEditor
@@ -170,6 +164,14 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         setUpViews()
         runDelayed(100) {
             setDetails(activityBinding.taskId)
+        }
+        val viewpager = tasksHolderBinding.binding.viewPager2
+        if (!activityBinding.index.isNull){
+            when(activityBinding.index){
+                "0"-> viewpager.currentItem=0
+                "1"-> viewpager.currentItem=1
+                "2"-> viewpager.currentItem=2
+            }
         }
         binding.assignee.isEnabled = false
         binding.section.isEnabled=false
@@ -529,6 +531,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     }
 
     private fun setTagsView(list: MutableList<Tag>) {
+        Log.d("tagchecks",list.toString())
         val newList = ArrayList(list)
         if (isModerator){
             val editTag = Tag("Edit Tags", bgColor = "#FFFFFF", textColor = "#000000", tagID = "edit", projectName = PrefManager.getcurrentProject())
@@ -587,6 +590,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         taskDetails = task
         activityBinding.moderatorsList.addAll(taskDetails.moderators)
+
 //        setTags()
         fetchUsers()
         binding.titleTv.text = task.title
@@ -636,6 +640,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             //toast("Contributor empty")
             binding.contributorsRecyclerView.gone()
             binding.noContributors.visible()
+            setTagsView(selectedTags)
+
         } else {
 
             binding.contributorsRecyclerView.visible()
@@ -657,6 +663,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                                 CoroutineScope(Dispatchers.Main).launch {
                                     users.add(user)
                                     moderators.add(user)
+                                    activityBinding.moderators.add(user)
                                     moderatorsList.add(user.firebaseID!!)
                                     setContributors(users)
                                     pushToReceiver(user)
@@ -715,7 +722,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             addRule("body", "background-color: #222222")
             addRule("body", "color: #fff")
             addRule("body", "padding: 0px 0px 0px 0px")
-            addRule("a", "color: #86ff7c")
+            addRule("a", "color: #0000FF")
             addRule("pre", "border: 1px solid #000;")
             addRule("pre", "border-radius: 4px;")
             addRule("pre", "max-height: 400px;")
@@ -855,6 +862,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         fun sendImages(imageUrls: Array<String>) {
             requireActivity().runOnUiThread {
                 val recyclerView = binding.imageRecyclerView
+                recyclerView.visible()
                 recyclerView.layoutManager =
                     LinearLayoutManager(
                         requireContext(),
@@ -871,7 +879,19 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         @JavascriptInterface
         fun sendsingleImage(imageUrl: String) {
             requireActivity().runOnUiThread {
-                onImageClicked(0, mutableListOf(imageUrl))
+                val recyclerView = binding.imageRecyclerView
+                recyclerView.visible()
+                recyclerView.layoutManager =
+                    LinearLayoutManager(
+                        requireContext(),
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
+                Log.d("list", listOf(imageUrl).toMutableList().toString())
+                val adapter =
+                    ImageAdapter(listOf(imageUrl).toMutableList(), this@TaskDetailsFragment)
+                recyclerView.adapter = adapter
+//                onImageClicked(0, mutableListOf(imageUrl))
             }
         }
 
@@ -970,6 +990,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                             setDefaultViews(taskResult.data)
                             setTaskDetails(taskResult.data)
 
+
                         }
 
                     }
@@ -1014,15 +1035,22 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
                     binding.progressBar.gone()
                     selectedTags.clear()
+                    Log.d("tagcheckfromDB",result.data.tags.toString())
+                    if (result.data.moderators.contains(currentUser?.email)){
+                        isModerator=true
+                    }
+                    manageState(result.data)
                     CoroutineScope(Dispatchers.IO).launch{
                         for (tagId in result.data.tags){
                             val tag=db.tagsDao().getTagbyId(tagId)
+
                             if (!tag.isNull) {
                                 tag?.checked = true
                                 selectedTags.add(tag!!)
                             }
                         }
                         withContext(Dispatchers.Main){
+                            Log.d("tagcheckfromDB",selectedTags?.toString()!!)
                             setDefaultViews(result.data)
                             setTaskDetails(result.data)
                         }
@@ -1271,6 +1299,43 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     }
 
                     is ServerResult.Success -> {
+                        val notification = composeNotification(
+                            NotificationType.TASK_ASSIGNED_NOTIFICATION,
+                            message = "You are assigned as an assignee in the task ${activityBinding.taskId} in the project ${PrefManager.getcurrentProject()}",
+                            assignee = assignee
+                        )
+                        if (assignee.firebaseID!="None"){
+                            viewModel.addNotificationToFirebase(assignee.firebaseID!!, notification = notification!!) { res ->
+                                when (res) {
+                                    is ServerResult.Success -> {
+                                        binding.progressBar2.gone()
+                                        notification.let {
+                                            sendNotification(
+                                                listOf(assignee.fcmToken!!).toMutableList(),
+                                                notification
+                                            )
+                                        }
+                                    }
+
+                                    is ServerResult.Failure -> {
+                                        binding.progressBar2.gone()
+                                        val errorMessage = res.exception.message
+                                        GlobalUtils.EasyElements(requireContext())
+                                            .singleBtnDialog(
+                                                "Failure",
+                                                "Failed in sending notification: $errorMessage",
+                                                "Okay"
+                                            ) {
+                                                requireActivity().recreate()
+                                            }
+                                    }
+
+                                    is ServerResult.Progress -> {
+                                        binding.progressBar2.visible()
+                                    }
+                                }
+                            }
+                        }
 
                         binding.progressBar.gone()
                         toast("Updated Assignee")
@@ -1376,7 +1441,45 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                             }
 
                             is ServerResult.Success -> {
+                                val notification = composeWorkspaceUpdateNotification(
+                                    NotificationType.WORKSPACE_TASK_UPDATE,
+                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} updated the state of task ${activityBinding.taskId} in their workspace",
+                                    newState = text
+                                )
+                                if (moderators.isNotEmpty()){
+                                    for (moderator in moderators){
+                                        viewModel.addNotificationToFirebase(moderator.firebaseID!!, notification = notification!!) { res ->
+                                            when (res) {
+                                                is ServerResult.Success -> {
+                                                    binding.progressBar2.gone()
+                                                    notification.let {
+                                                        sendNotification(
+                                                            listOf(moderator.fcmToken!!).toMutableList(),
+                                                            notification
+                                                        )
+                                                    }
+                                                }
 
+                                                is ServerResult.Failure -> {
+                                                    binding.progressBar2.gone()
+                                                    val errorMessage = res.exception.message
+                                                    GlobalUtils.EasyElements(requireContext())
+                                                        .singleBtnDialog(
+                                                            "Failure",
+                                                            "Failed in sending notification: $errorMessage",
+                                                            "Okay"
+                                                        ) {
+                                                            requireActivity().recreate()
+                                                        }
+                                                }
+
+                                                is ServerResult.Progress -> {
+                                                    binding.progressBar2.visible()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 binding.progressBar.gone()
                                 toast("Updated Task State")
 
@@ -1633,7 +1736,61 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             }
         }
     }
+    private fun composeNotification(type: NotificationType, message: String,assignee: User): Notification? {
+
+        if (type == NotificationType.TASK_ASSIGNED_NOTIFICATION) {
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION.name,
+                taskID = activityBinding.taskId,
+                message = message,
+                title = "You are assigned in the task ${activityBinding.taskId}",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = assignee.firebaseID!! ,
+                timeStamp = Timestamp.now().seconds,
+            )
+        }
+        return null
+    }
+
+    private fun composeWorkspaceUpdateNotification(type: NotificationType, message: String,newState:String): Notification? {
+        if (type == NotificationType.WORKSPACE_TASK_UPDATE) {
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.WORKSPACE_TASK_UPDATE.name,
+                taskID = activityBinding.taskId,
+                message = message,
+                title = "${PrefManager.getcurrentUserdetails().USERNAME} changed state of ${activityBinding.taskId} to ${newState}",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = "None" ,
+                timeStamp = Timestamp.now().seconds,
+            )
+        }
+        return null
+    }
+    private fun sendNotification(receiverList: MutableList<String>, notification: Notification) {
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                for (receiverToken in receiverList) {
+                    NotificationsUtils.sendFCMNotification(
+                        receiverToken,
+                        notification = notification
+                    )
+                }
+
+            }
+
+        } catch (exception: Exception) {
+            Timber.tag("")
+            utils.showSnackbar(binding.root, "Failure in sending notifications", 5000)
+        }
+
+    }
+
 }
+
+
 
 
 //Code for getting html

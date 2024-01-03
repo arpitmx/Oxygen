@@ -14,21 +14,28 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.CheckList
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.NotificationsUtils
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.CheckListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CheckListBottomSheet
 import com.ncs.o2.databinding.FragmentTaskChecklistBinding
@@ -74,6 +81,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     }
     var isModerator:Boolean=false
     var isAssignee:Boolean=false
+    private val viewModel: TaskDetailViewModel by viewModels()
 
     val TAG = TaskCheckListFragment::class.java.simpleName
 
@@ -180,6 +188,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         }
     }
 
+
     override fun removeCheckList(position: Int) {
     }
 
@@ -232,6 +241,44 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                             binding.progressbar.gone()
                             if (isChecked) {
                                 checkListDialog()
+                                val notification = composeCheckListCompleteNotification(
+                                    NotificationType.TASK_CHECKLIST_UPDATE,
+                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} marked #${position+1} checklist as completed in ${activityBinding.taskId}", position = position+1, isComplete = true
+                                )
+                                if (activityBinding.moderatorsList.isNotEmpty()){
+                                    for (moderator in activityBinding.moderators){
+                                        viewModel.addNotificationToFirebase(moderator.firebaseID!!, notification = notification!!) { res ->
+                                            when (res) {
+                                                is ServerResult.Success -> {
+                                                    binding.progressbar.gone()
+                                                    notification.let {
+                                                        sendNotification(
+                                                            listOf(moderator.fcmToken!!).toMutableList(),
+                                                            notification
+                                                        )
+                                                    }
+                                                }
+
+                                                is ServerResult.Failure -> {
+                                                    binding.progressbar.gone()
+                                                    val errorMessage = res.exception.message
+                                                    GlobalUtils.EasyElements(requireContext())
+                                                        .singleBtnDialog(
+                                                            "Failure",
+                                                            "Failed in sending notification: $errorMessage",
+                                                            "Okay"
+                                                        ) {
+                                                            requireActivity().recreate()
+                                                        }
+                                                }
+
+                                                is ServerResult.Progress -> {
+                                                    binding.progressbar.gone()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 toast("Marked as completed")
                             }
                         }
@@ -286,6 +333,44 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                                 val index = checkListArray.indexOf(item)
                                 checkListArray[index].done = isChecked
                                 binding.progressbar.gone()
+                                val notification = composeCheckListCompleteNotification(
+                                    NotificationType.TASK_CHECKLIST_UPDATE,
+                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} marked #${position+1} checklist as not completed in ${activityBinding.taskId}", position = position+1, isComplete = false
+                                )
+                                if (activityBinding.moderatorsList.isNotEmpty()){
+                                    for (moderator in activityBinding.moderators){
+                                        viewModel.addNotificationToFirebase(moderator.firebaseID!!, notification = notification!!) { res ->
+                                            when (res) {
+                                                is ServerResult.Success -> {
+                                                    binding.progressbar.gone()
+                                                    notification.let {
+                                                        sendNotification(
+                                                            listOf(moderator.fcmToken!!).toMutableList(),
+                                                            notification
+                                                        )
+                                                    }
+                                                }
+
+                                                is ServerResult.Failure -> {
+                                                    binding.progressbar.gone()
+                                                    val errorMessage = res.exception.message
+                                                    GlobalUtils.EasyElements(requireContext())
+                                                        .singleBtnDialog(
+                                                            "Failure",
+                                                            "Failed in sending notification: $errorMessage",
+                                                            "Okay"
+                                                        ) {
+                                                            requireActivity().recreate()
+                                                        }
+                                                }
+
+                                                is ServerResult.Progress -> {
+                                                    binding.progressbar.gone()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 toast("Marked as not completed")
                             }
 
@@ -338,7 +423,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             .build()
     }
 
-    override fun checkListItem(checkList: CheckList, isEdited: Boolean) {
+    override fun checkListItem(checkList: CheckList, isEdited: Boolean,position: Int) {
         if (isEdited){
             CoroutineScope(Dispatchers.Main).launch {
                 try {
@@ -369,6 +454,44 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
                         is ServerResult.Success -> {
                             binding.progressbar.gone()
+                            val notification = composeCheckListUpdateNotification(
+                                NotificationType.TASK_CHECKLIST_UPDATE,
+                                message = "${PrefManager.getcurrentUserdetails().USERNAME} updated #${position} checklist in ${activityBinding.taskId}", position = position+1
+                            )
+                            if (activityBinding.moderatorsList.isNotEmpty()){
+                                for (moderator in activityBinding.moderators){
+                                    viewModel.addNotificationToFirebase(moderator.firebaseID!!, notification = notification!!) { res ->
+                                        when (res) {
+                                            is ServerResult.Success -> {
+                                                binding.progressbar.gone()
+                                                notification.let {
+                                                    sendNotification(
+                                                        listOf(moderator.fcmToken!!).toMutableList(),
+                                                        notification
+                                                    )
+                                                }
+                                            }
+
+                                            is ServerResult.Failure -> {
+                                                binding.progressbar.gone()
+                                                val errorMessage = res.exception.message
+                                                GlobalUtils.EasyElements(requireContext())
+                                                    .singleBtnDialog(
+                                                        "Failure",
+                                                        "Failed in sending notification: $errorMessage",
+                                                        "Okay"
+                                                    ) {
+                                                        requireActivity().recreate()
+                                                    }
+                                            }
+
+                                            is ServerResult.Progress -> {
+                                                binding.progressbar.gone()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             toast("Updated Successfully")
                             isModerator=true
                             initViews()
@@ -414,5 +537,55 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         }
         dialog.show()
     }
+    private fun composeCheckListUpdateNotification(type: NotificationType, message: String, position: Int): Notification? {
+        if (type == NotificationType.TASK_CHECKLIST_UPDATE) {
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.TASK_CHECKLIST_UPDATE.name,
+                taskID = activityBinding.taskId,
+                message = message,
+                title = "Checklist updated in ${activityBinding.taskId}",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = "None" ,
+                timeStamp = Timestamp.now().seconds,
+            )
+        }
+        return null
+    }
+    private fun composeCheckListCompleteNotification(type: NotificationType, message: String, position: Int,isComplete:Boolean): Notification? {
+        if (type == NotificationType.TASK_CHECKLIST_UPDATE) {
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.TASK_CHECKLIST_UPDATE.name,
+                taskID = activityBinding.taskId,
+                message = message,
+                title =
+                if (isComplete) "Marked as completed"
+                else "Marked as not completed",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = "None" ,
+                timeStamp = Timestamp.now().seconds,
+            )
+        }
+        return null
+    }
+    private fun sendNotification(receiverList: MutableList<String>, notification: Notification) {
 
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                for (receiverToken in receiverList) {
+                    NotificationsUtils.sendFCMNotification(
+                        receiverToken,
+                        notification = notification
+                    )
+                }
+
+            }
+
+        } catch (exception: Exception) {
+            Timber.tag("")
+            utils.showSnackbar(binding.root, "Failure in sending notifications", 5000)
+        }
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Notifications.Adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -7,10 +8,10 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Utility.DateTimeUtils
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisibleIf
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.R
 import com.ncs.o2.databinding.NotificationMentionItemBinding
 import com.ncs.versa.Constants.Endpoints.Notifications.Types as T
 
@@ -33,8 +34,10 @@ Tasks FUTURE ADDITION :
 
 */
 class NotificationAdapter(
+    private val context: Context,
     private val lastSeenTimeStamp: Long,
-    private var notifications: List<Notification>
+    private var notifications: List<Notification>,
+    private val notificationClick: OnNotificationClick
 ) :
     RecyclerView.Adapter<ViewHolder>() {
 
@@ -62,7 +65,15 @@ class NotificationAdapter(
             NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.toString() -> {
                 return T.TASK_COMMENT_MENTION_NOTIFICATION
             }
-
+            NotificationType.TASK_ASSIGNED_NOTIFICATION.toString() -> {
+                return T.TASK_ASSIGNED_NOTIFICATION
+            }
+            NotificationType.WORKSPACE_TASK_UPDATE.toString() -> {
+                return T.WORKSPACE_TASK_UPDATED
+            }
+            NotificationType.TASK_CHECKLIST_UPDATE.toString() -> {
+                return T.TASK_CHECKLIST_UPDATED
+            }
             else -> {
                 return T.UNKNOWN_TYPE_NOTIFICATION
             }
@@ -81,6 +92,19 @@ class NotificationAdapter(
                 val binding = NotificationMentionItemBinding.inflate(inflater, parent, false)
                 ActivityMentionNotificationVH(binding)
             }
+            T.TASK_ASSIGNED_NOTIFICATION -> {
+                val binding = NotificationMentionItemBinding.inflate(inflater, parent, false)
+                ActivityAssignedNotificationVH(binding)
+            }
+            T.WORKSPACE_TASK_UPDATED -> {
+                val binding = NotificationMentionItemBinding.inflate(inflater, parent, false)
+                ActivityWorkspaceUpdatedNotificationVH(binding)
+            }
+            T.TASK_CHECKLIST_UPDATED -> {
+                val binding = NotificationMentionItemBinding.inflate(inflater, parent, false)
+                ActivityCheckLstUpdatedNotificationVH(binding)
+            }
+
 
             else -> throw IllegalArgumentException("Invalid view type: $viewType")
         }
@@ -93,7 +117,15 @@ class NotificationAdapter(
             NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.toString() -> {
                 (holder as ActivityMentionNotificationVH).bind(notification)
             }
-
+            NotificationType.TASK_ASSIGNED_NOTIFICATION.toString() -> {
+                (holder as ActivityAssignedNotificationVH).bind(notification)
+            }
+            NotificationType.WORKSPACE_TASK_UPDATE.toString() -> {
+                (holder as ActivityWorkspaceUpdatedNotificationVH).bind(notification)
+            }
+            NotificationType.TASK_CHECKLIST_UPDATE.toString() -> {
+                (holder as ActivityCheckLstUpdatedNotificationVH).bind(notification)
+            }
         }
     }
 
@@ -113,10 +145,89 @@ class NotificationAdapter(
             } else {
                 binding.newNotifMark.invisible()
             }
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
+            }
+        }
+
+
+    }
+    private inner class ActivityAssignedNotificationVH(val binding: NotificationMentionItemBinding) :
+        ViewHolder(binding.root) {
+
+        fun bind(notification: Notification) {
+            binding.difficulty.setBackgroundResource(R.drawable.label_cardview_green)
+            binding.difficulty.text="@Assigned"
+            binding.difficulty.setTextColor(context.resources.getColor(R.color.darkbg_main))
+            binding.taskId.text = notification.taskID
+            binding.durationTv.text = DateTimeUtils.getTimeAgo(notification.timeStamp)
+            binding.msgTv.text = notification.message
+
+            if (notification.timeStamp > lastSeenTimeStamp) {
+                binding.newNotifMark.visible()
+            } else {
+                binding.newNotifMark.invisible()
+            }
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
+            }
 
         }
 
 
     }
 
+    private inner class ActivityWorkspaceUpdatedNotificationVH(val binding: NotificationMentionItemBinding) :
+        ViewHolder(binding.root) {
+
+        fun bind(notification: Notification) {
+            binding.difficulty.setBackgroundResource(R.drawable.label_cardview_yellow)
+            binding.difficulty.text="@Workspace Update"
+            binding.difficulty.setTextColor(context.resources.getColor(R.color.darkbg_main))
+            binding.taskId.text = notification.taskID
+            binding.durationTv.text = DateTimeUtils.getTimeAgo(notification.timeStamp)
+            binding.msgTv.text = notification.message
+
+            if (notification.timeStamp > lastSeenTimeStamp) {
+                binding.newNotifMark.visible()
+            } else {
+                binding.newNotifMark.invisible()
+            }
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
+            }
+
+        }
+
+
+    }
+
+    private inner class ActivityCheckLstUpdatedNotificationVH(val binding: NotificationMentionItemBinding) :
+        ViewHolder(binding.root) {
+
+        fun bind(notification: Notification) {
+            binding.difficulty.setBackgroundResource(R.drawable.label_cardview_red)
+            binding.difficulty.text="@Checklist Update"
+            binding.difficulty.setTextColor(context.resources.getColor(R.color.better_white))
+            binding.taskId.text = notification.taskID
+            binding.durationTv.text = DateTimeUtils.getTimeAgo(notification.timeStamp)
+            binding.msgTv.text = notification.message
+
+            if (notification.timeStamp > lastSeenTimeStamp) {
+                binding.newNotifMark.visible()
+            } else {
+                binding.newNotifMark.invisible()
+            }
+            binding.parent.setOnClickThrottleBounceListener{
+                notificationClick.onClick(notification)
+            }
+
+        }
+
+
+    }
+
+    interface OnNotificationClick{
+        fun onClick(notification: Notification)
+    }
 }

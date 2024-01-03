@@ -283,11 +283,52 @@ class FirestoreRepository @Inject constructor(
         return liveData
     }
 
+    override fun uploadImage(
+        bitmap: Bitmap,
+        taskId: String
+    ): LiveData<ServerResult<StorageReference>> {
+
+        val liveData = MutableLiveData<ServerResult<StorageReference>>()
+        val imageFileName =
+            "${Endpoints.Project.TASKS}/${taskId}${Endpoints.Storage.IMAGE_PATH}"
+        val imageRef = storageReference.child(imageFileName)
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
+        val data = baos.toByteArray()
+        val uploadTask = imageRef.putBytes(data)
+
+
+        uploadTask.addOnSuccessListener {
+            liveData.postValue(ServerResult.Success(imageRef))
+
+
+        }.addOnFailureListener { exception ->
+            liveData.postValue(ServerResult.Failure(exception))
+
+        }
+
+        return liveData
+    }
     override fun getProjectIcon(reference: StorageReference): LiveData<ServerResult<StorageReference>> {
         TODO("Not yet implemented")
     }
 
     override fun getProjectIconUrl(reference: StorageReference): LiveData<ServerResult<String>> {
+
+        val liveData = MutableLiveData<ServerResult<String>>()
+
+        liveData.postValue(ServerResult.Progress)
+        reference.downloadUrl
+            .addOnSuccessListener { uri ->
+                val imageUrl = uri.toString()
+                liveData.postValue(ServerResult.Success(imageUrl))
+            }
+            .addOnFailureListener { exception ->
+                liveData.postValue(ServerResult.Failure(exception))
+            }
+        return liveData
+    }
+    override fun getImageUrl(reference: StorageReference): LiveData<ServerResult<String>> {
 
         val liveData = MutableLiveData<ServerResult<String>>()
 
@@ -577,6 +618,13 @@ class FirestoreRepository @Inject constructor(
                     val checklistDocRef =
                         taskDocRef.collection(Endpoints.Project.CHECKLIST).document(checkList[i].id)
                     transaction.set(checklistDocRef, checkList[i])
+                }
+                if (task.assignee!="None"){
+                    firestore.collection(Endpoints.USERS)
+                        .document(task.assignee)
+                        .collection(Endpoints.Workspace.WORKSPACE)
+                        .document(task.id)
+                        .set(WorkspaceTaskItem(id = task.id, status = "Assigned"))
                 }
 
             }.addOnSuccessListener {
@@ -1539,7 +1587,7 @@ class FirestoreRepository @Inject constructor(
                         "Working" -> 3
                         "Review" -> 4
                         "Completed" -> 5
-                        "Assigned" -> 2
+                        "Assigned" -> 6
                         else -> -1
                     }
 
@@ -1629,26 +1677,17 @@ class FirestoreRepository @Inject constructor(
     override suspend fun updateCheckListCompletion(
         taskId: String,
         projectName: String,
-        id: String,
-        done: Boolean,
+        id:String,
+        done:Boolean,
     ): ServerResult<Boolean> {
         try {
-            firestore.runTransaction { transaction ->
-                val documentRef = firestore.collection(Endpoints.PROJECTS)
-                    .document(projectName)
-                    .collection(Endpoints.Project.TASKS)
-                    .document(taskId)
-                    .collection(Endpoints.Project.CHECKLIST)
-                    .document(id)
-
-                transaction.update(documentRef, "done", done)
-
-                updateLastUpdated(projectName, transaction)
-                updateTaskLastUpdated(projectName,transaction,id)
-
-                true
-            }
-
+            val documentRef = firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+                .document(id)
+            val updateData = mapOf<String, Any>(
+                "done" to done
+            )
+            documentRef.update(updateData).await()
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
@@ -1659,26 +1698,13 @@ class FirestoreRepository @Inject constructor(
     override suspend fun updateCheckList(
         taskId: String,
         projectName: String,
-        id: String,
+        id:String,
         checkList: CheckList
     ): ServerResult<Boolean> {
         try {
-            firestore.runTransaction { transaction ->
-                val documentRef = firestore.collection(Endpoints.PROJECTS)
-                    .document(projectName)
-                    .collection(Endpoints.Project.TASKS)
-                    .document(taskId)
-                    .collection(Endpoints.Project.CHECKLIST)
-                    .document(id)
-
-                transaction.set(documentRef, checkList)
-
-                updateLastUpdated(projectName, transaction)
-                updateTaskLastUpdated(projectName,transaction,id)
-
-                true
-            }
-
+            firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+                .document(id).set(checkList).await()
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)

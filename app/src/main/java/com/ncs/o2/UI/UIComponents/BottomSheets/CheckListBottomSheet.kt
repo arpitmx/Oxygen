@@ -82,11 +82,11 @@ class CheckListBottomSheet (private val count:Int,private val listener: checkLis
             }
             else{
                 if (checkList.id!=""){
-                    listener.checkListItem(CheckList(id = checkList.id, title = title, desc = desc, done = checkList.done, index = count-1), isEdited = true)
+                    listener.checkListItem(CheckList(id = checkList.id, title = title, desc = desc, done = checkList.done, index = count-1), isEdited = true, position = count)
                     toast("Updated Successfully")
                 }
                 else{
-                    listener.checkListItem(CheckList(id = RandomIDGenerator.generateRandomTaskId(5), title = title, desc = desc, done = false, index = count-1))
+                    listener.checkListItem(CheckList(id = RandomIDGenerator.generateRandomTaskId(5), title = title, desc = desc, done = false, index = count-1), position = count)
                 }
                 binding.title.text?.clear()
                 binding.desc.text?.clear()
@@ -95,6 +95,6 @@ class CheckListBottomSheet (private val count:Int,private val listener: checkLis
         }
     }
     interface checkListItemListener{
-        fun checkListItem(checkList: CheckList,isEdited:Boolean=false)
+        fun checkListItem(checkList: CheckList,isEdited:Boolean=false,position:Int)
     }
 }

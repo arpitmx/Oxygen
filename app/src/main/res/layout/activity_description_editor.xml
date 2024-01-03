@@ -36,30 +36,69 @@
         android:layout_margin="5dp"
         >
 
-
-
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:id="@+id/description"
             android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/summary_et"
+            <ProgressBar
+                android:id="@+id/progress_bar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fontFamily="@font/sf_pro_display_medium"
-                android:gravity="top|start"
-                android:background="@null"
-                android:scrollbars="vertical"
-                android:scrollbarThumbVertical="@color/primary"
-                android:minHeight="600dp"
-                android:inputType="textMultiLine"
-                android:hint="Write Task Summary here..."
-                android:padding="10dp"
-                android:textColorHint="@color/account"
-                android:textColor="@color/darkbg_main"
-                android:textSize="16dp"/>
-        </LinearLayout>
+                android:layout_height="70dp"
+                android:visibility="gone"
+                android:indeterminateTint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+
+                <EditText
+                    android:id="@+id/summary_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:gravity="top|start"
+                    android:hint="Write Task Summary here..."
+                    android:inputType="textMultiLine"
+                    android:minHeight="600dp"
+                    android:padding="10dp"
+                    android:scrollbarThumbVertical="@color/primary"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/darkbg_main"
+                    android:textColorHint="@color/account"
+                    android:textSize="16dp" />
+
+                <br.tiagohm.markdownview.MarkdownView
+                    android:id="@+id/markdownView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:nestedScrollingEnabled="true"
+                    android:paddingTop="10dp"
+                    android:visibility="gone"
+                    app:escapeHtml="false" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/imageRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_animation_popscale"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -95,6 +134,26 @@
             android:text="O2Mate"
             android:drawableEnd="@drawable/baseline_auto_awesome_24"
             android:drawablePadding="5dp"
+            android:drawableTint="@color/light_blue_600"
+            />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnPreview"
+            style="@style/editor_options"
+            android:text="Preview"
+            android:visibility="visible"
+            android:drawableEnd="@drawable/baseline_assistant_24"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/light_blue_600"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnEdit"
+            style="@style/editor_options"
+            android:text="Edit"
+            android:visibility="visible"
+            android:drawableEnd="@drawable/round_edit_24"
+            android:drawablePadding="10dp"
             android:drawableTint="@color/light_blue_600"
             />
 

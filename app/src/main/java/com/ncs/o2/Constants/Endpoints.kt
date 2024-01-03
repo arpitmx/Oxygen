@@ -109,6 +109,9 @@ object Endpoints {
             const val TASK_CREATION_NOTIFICATION = 3
             const val TASK_COMMENT_MENTION_NOTIFICATION = 4
             const val UNKNOWN_TYPE_NOTIFICATION = -1
+            const val TASK_ASSIGNED_NOTIFICATION = 5
+            const val WORKSPACE_TASK_UPDATED=6
+            const val TASK_CHECKLIST_UPDATED=7
         }
 
     }

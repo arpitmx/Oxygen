@@ -26,16 +26,23 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         ActivityTaskDetailBinding.inflate(layoutInflater)
     }
     lateinit var taskId:String
+    var index:String?=null
     lateinit var isworkspace:String
     var users:MutableList<UserInMessage> = mutableListOf()
     val sharedViewModel: SharedViewModel by viewModels()
     var moderatorsList: MutableList<String> = mutableListOf()
+    var moderators: MutableList<User> = mutableListOf()
+
     var assignee:String=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         taskId = intent.getStringExtra("task_id")!!
+        val _index= intent.getStringExtra("index")
+        if (_index!=null){
+            index=_index
+        }
         setActionbar()
 
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
