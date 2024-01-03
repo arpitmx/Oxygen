@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -117,15 +118,22 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
 
                 is ServerResult.Success -> {
                     binding.progress.gone()
-                    notifications = result.data
-                    if (notifications.isEmpty()){
+                    Log.d("notificationDB",result.data.toString())
+                    val list=ArrayList<Notification>()
+                    for (notification in result.data){
+                        if (notification.projectID==PrefManager.getcurrentProject()){
+                            list.add(notification)
+                        }
+                    }
+                    Log.d("notificationDB",list.toString())
+                    if (list.isEmpty()){
                         binding.notificationRV.gone()
                         binding.noNotificationTv.visible()
                     }
                     else{
                         binding.notificationRV.visible()
                         binding.noNotificationTv.gone()
-                        adapter = NotificationAdapter(this,PrefManager.getLastSeenTimeStamp(),result.data,this)
+                        adapter = NotificationAdapter(this,PrefManager.getLastSeenTimeStamp(),list,this)
                         adapter.notifyDataSetChanged()
                         notificationRV.adapter = adapter
                         FirebaseFirestore.getInstance().collection(Endpoints.USERS)

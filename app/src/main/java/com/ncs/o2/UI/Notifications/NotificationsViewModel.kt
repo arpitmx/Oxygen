@@ -10,6 +10,8 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDao
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.HelperClasses.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.grpc.Server
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -88,6 +90,7 @@ class NotificationsViewModel @Inject constructor
             try {
                 _notificationsResult.value = ServerResult.Progress
                 val notificationList = CoroutineScope(Dispatchers.IO).async{
+//                    notificationDAO.getAllNotificationsForProject(PrefManager.getcurrentProject())
                     notificationDAO.getAllNotifications()
                 }.await()
                 _notificationsResult.value = ServerResult.Success(notificationList)

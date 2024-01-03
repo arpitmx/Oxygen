@@ -52,7 +52,6 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
     private lateinit var taskList: ArrayList<TaskItem>
-    private  lateinit var tasks: ArrayList<Task>
 
     private var taskIdsList:MutableList<WorkspaceTaskItem> = mutableListOf()
     private lateinit var projectName: String
@@ -95,7 +94,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
             "Reviewing" -> "Review"
             else -> sectionName
         }
-        viewModel.getUserTasksId(_sectionName) { result ->
+        viewModel.getUserTasksId(_sectionName, projectName = PrefManager.getcurrentProject()) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     binding.lottieProgressInclude.progressbarBlock.gone()
@@ -221,13 +220,13 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
             }
         }
         else{
-            tasks= ArrayList()
             Log.d("fetchfrom","DB")
             fetchfromdb()
         }
 
     }
     fun fetchfromdb(){
+        val tasks: MutableList<Task> = mutableListOf()
         for (i in 0 until taskIdsList.size) {
             viewModel.getTasksbyIdFromDB(
                 projectName = projectName,
@@ -236,9 +235,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                 when (result) {
                     is DBResult.Success -> {
                         binding.lottieProgressInclude.progressbarBlock.gone()
-
                         tasks.add(result.data)
-
                         if (tasks.isEmpty()) {
                             binding.layout.gone()
                             binding.placeholder.visible()

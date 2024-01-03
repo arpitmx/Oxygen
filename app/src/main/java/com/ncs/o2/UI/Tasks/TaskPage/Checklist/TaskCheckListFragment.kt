@@ -548,7 +548,8 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,
-            )
+                projectID = PrefManager.getcurrentProject(),
+                )
         }
         return null
     }
@@ -565,7 +566,8 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,
-            )
+                projectID = PrefManager.getcurrentProject(),
+                )
         }
         return null
     }

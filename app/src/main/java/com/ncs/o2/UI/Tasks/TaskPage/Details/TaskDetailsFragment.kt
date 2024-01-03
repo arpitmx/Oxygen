@@ -499,7 +499,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             timeStamp = Timestamp.now().seconds,
             fromUser = Faker().funnyName().name().toString(),
             toUser = "userid1",
-            lastUpdated = Timestamp.now().seconds
+            lastUpdated = Timestamp.now().seconds,
+            projectID = PrefManager.getcurrentProject()
         )
     }
 
@@ -1443,7 +1444,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                             is ServerResult.Success -> {
                                 val notification = composeWorkspaceUpdateNotification(
                                     NotificationType.WORKSPACE_TASK_UPDATE,
-                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} updated the state of task ${activityBinding.taskId} in their workspace",
+                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} updated the state of task ${activityBinding.taskId} to $text",
                                     newState = text
                                 )
                                 if (moderators.isNotEmpty()){
@@ -1748,7 +1749,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = assignee.firebaseID!! ,
                 timeStamp = Timestamp.now().seconds,
-            )
+                projectID = PrefManager.getcurrentProject(),
+
+                )
         }
         return null
     }
@@ -1764,7 +1767,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,
-            )
+                projectID = PrefManager.getcurrentProject(),
+
+                )
         }
         return null
     }

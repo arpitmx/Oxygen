@@ -21,9 +21,10 @@ class AssignedViewModel @Inject constructor(private val firestoreRepository: Fir
 
     fun getUserTasksId(
         sectionName:String,
+        projectName: String,
         resultCallback: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit
     ) {
-        firestoreRepository.getUserTasks(sectionName,resultCallback)
+        firestoreRepository.getUserTasks(sectionName,projectName,resultCallback)
     }
 
     fun getTasksItembyId(

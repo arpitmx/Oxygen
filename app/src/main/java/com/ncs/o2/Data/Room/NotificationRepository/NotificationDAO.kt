@@ -43,4 +43,7 @@ interface NotificationDao {
     @Query("SELECT * FROM notifications")
     suspend fun getAllNotifications(): List<Notification>
 
+    @Query("SELECT * FROM notifications WHERE projectID= :projectID")
+    suspend fun getAllNotificationsForProject(projectID:String): List<Notification>
+
 }

@@ -58,6 +58,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
+import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsBottomSheet
@@ -74,7 +75,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener  {
-    private lateinit var projectListAdapter: ListAdapter
+    lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
     private var dynamicLinkHandled = false
@@ -410,8 +411,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.tabLayout.gone()
             binding.gioActionbar.searchCont.gone()
         }
+        else{
+            movetotaskspage()
+        }
 
     }
+
+
 
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         projects.clear()
@@ -596,5 +602,14 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         binding.bottomNav.menu.getItem(2).isChecked = true
         binding.bottomNav.menu.getItem(2).setIcon(R.drawable.ic_searchico)
+    }
+    private fun movetotaskspage() {
+        val transaction = supportFragmentManager.beginTransaction()
+        val fragment = TasksHolderFragment()
+        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+        binding.bottomNav.menu.getItem(0).isChecked = true
+        binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
     }
 }

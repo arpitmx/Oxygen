@@ -21,7 +21,7 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION : 
 
 */
-@Database(entities = [Notification::class], version = 1)
+@Database(entities = [Notification::class], version = 2)
 abstract class NotificationDatabase : RoomDatabase() {
 
     // Step 2: Define an abstract function to get the NotificationDao

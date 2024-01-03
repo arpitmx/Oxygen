@@ -87,7 +87,7 @@ interface ProjectCallback{
              .addOnSuccessListener { documentSnapshot ->
                  if (documentSnapshot.exists()) {
                      val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
-                     if (imageUrl != null && !((context as? Activity)?.isDestroyed == true)) {
+                     if (imageUrl != null && (context as? Activity)?.isDestroyed != true) {
                          Glide.with(context)
                              .load(imageUrl)
                              .error(R.drawable.placeholder_image)
@@ -134,7 +134,4 @@ private class ListRowHolder(row: View?) {
         this.layout=row.findViewById(R.id.layout) as LinearLayout
         this.icon= row.findViewById(R.id.project_dp) as ImageView
     }
-
-
-
 }

@@ -52,6 +52,7 @@ object Endpoints {
         const val WORKSPACE = "WORKSPACE"
         const val STATUS = "status"
         const val ID = "id"
+        const val PROJECT_ID="project_id"
     }
 
     object Project {
@@ -96,7 +97,7 @@ object Endpoints {
         const val BODY: String = "body"
         const val DATA: String = "data"
         const val TYPE: String = "type"
-
+        const val project_id:String = "projectID"
 
         object Groups{
             const val COMMENT_NOTIF_GROUP: String = "Comment_Notification_Group"

@@ -778,6 +778,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
+                projectID = PrefManager.getcurrentProject(),
             )
         }
         if (type == NotificationType.TASK_COMMENT_MENTION_NOTIFICATION) {
@@ -796,7 +797,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
-            )
+                projectID = PrefManager.getcurrentProject(),
+                )
         }
 
         return null

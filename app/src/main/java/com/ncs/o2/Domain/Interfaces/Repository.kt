@@ -132,7 +132,11 @@ interface Repository {
     //Project related
     fun fetchUserProjectIDs(projectListCallback: (ServerResult<List<String>>) -> Unit)
 
-    fun getUserTasks(sectionName: String, serverResult: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit)
+    fun getUserTasks(
+        sectionName: String,
+        projectID: String,
+        serverResult: (ServerResult<List<WorkspaceTaskItem>?>) -> Unit
+    )
     fun getSection(projectName: String, segmentName: String, result: (ServerResult<List<*>>) -> Unit)
     fun createSegment(segment: Segment, serverResult: (ServerResult<Int>) -> Unit)
 
