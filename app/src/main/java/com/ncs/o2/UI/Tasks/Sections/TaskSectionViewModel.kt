@@ -41,6 +41,9 @@ Tasks FUTURE ADDITION :
 @HiltViewModel
 class TaskSectionViewModel @Inject constructor(private val firestoreRepository: FirestoreRepository, private val taskRepository: TaskRepository) : ViewModel(){
 
+
+    var sectionName: String? = null
+
     fun getTasksItemsForSegment(
         projectName: String,
         segmentName: String,

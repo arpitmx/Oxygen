@@ -31,6 +31,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -42,8 +43,17 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter.OnClickListener {
+class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 
+    companion object {
+        fun newInstance(sectionName: String): TaskSectionFragment {
+            val fragment = TaskSectionFragment()
+            val args = Bundle()
+            args.putString("sectionName", sectionName)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
@@ -62,6 +72,9 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     val state = arrayOf(1)
 
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val sectionName: String? by lazy {
+        viewModel.sectionName
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,6 +89,8 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
     }
 
 
+
+
     private val searchCont by lazy {
         activityBinding.gioActionbar.searchCont
     }
@@ -88,12 +103,17 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         super.onResume()
 
     }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TaskSectionViewModel::class.java)
+        val sectionName = arguments?.getString("sectionName", "") ?: ""
 
         projectName = PrefManager.getcurrentProject()
         segmentName = PrefManager.getcurrentsegment()
+        viewModel.sectionName = sectionName
+
         setupViews()
 
     }
@@ -159,7 +179,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         if (db.tasksDao().isNull) {
             taskList = ArrayList()
             Log.d("fetch","fetching from firestore")
-            viewModel.getTasksItemsForSegment(projectName, segmentName, sectionName) { result ->
+            viewModel.getTasksItemsForSegment(projectName, segmentName, viewModel.sectionName!!) { result ->
                 when (result) {
                     is ServerResult.Success -> {
 
@@ -252,14 +272,14 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
 
 
         activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
-            fetchfromdb()
+            requireActivity().recreate()
         }
 
 
     }
 
     fun fetchfromdb(){
-        viewModel.getTasksForSegmentFromDB(projectName, segmentName, sectionName) { result ->
+        viewModel.getTasksForSegmentFromDB(projectName, segmentName, viewModel.sectionName!!) { result ->
             when (result) {
                 is DBResult.Success -> {
 
@@ -274,12 +294,12 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                         tasks.add(element)
                     }
 
-                    if (tasks.isEmpty()) {
+                    if (result.data.isEmpty()) {
                         showLoader(-1)
                     } else {
 
                         recyclerView = binding.recyclerView
-                        val taskItems: List<TaskItem> = tasks.map { task ->
+                        val taskItems: List<TaskItem> = result.data.map { task ->
                             TaskItem(
                                 title = task.title,
                                 id = task.id,
@@ -303,6 +323,7 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
                             adapter = taskadapter
                             edgeEffectFactory = BounceEdgeEffectFactory()
                         }
+                        taskadapter.notifyDataSetChanged()
 
                         recyclerView.addOnScrollListener(object :
                             RecyclerView.OnScrollListener() {
@@ -364,5 +385,14 @@ class TaskSectionFragment(var sectionName: String) : Fragment(), TaskListAdapter
         intent.putExtra("task_id", task.id)
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+    }
+    private fun movetotaskspage() {
+        val transaction = fragmentManager?.beginTransaction()!!
+        val fragment = TasksHolderFragment()
+        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+        activityBinding.bottomNav.menu.getItem(0).isChecked = true
+        activityBinding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
     }
 }
