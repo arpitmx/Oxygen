@@ -55,7 +55,6 @@ class O2Bot @Inject constructor(@FirebaseRepository val repository: Repository):
             project_ID = "NCSOxygen",
             segment = "Bugs\uD83D\uDC1E", //change segments here //like Design
             section = "Bugs Found",  //Testing // Completed //Ready //Ongoing
-            completed = false,
             duration = Random(System.currentTimeMillis()).nextInt(1,5).toString(),
             time_STAMP = Timestamp.now(),
         )

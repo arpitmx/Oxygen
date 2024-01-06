@@ -11,6 +11,7 @@ data class TaskItem(
     val difficulty: Int = 0,
     val timestamp: Timestamp?=null,
     val completed:Boolean=false,
+    val tagList: List<String>
 ) {
     @Exclude
     fun getDifficultyColor(): Int {

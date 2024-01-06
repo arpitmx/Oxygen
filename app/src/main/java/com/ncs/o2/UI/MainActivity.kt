@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
     private var dynamicLinkHandled = false
+    private var doubleBackPress = false
 
     // ViewModels
     private val viewModel: MainActivityViewModel by viewModels()
@@ -649,5 +650,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         transaction.commit()
         binding.bottomNav.menu.getItem(0).isChecked = true
         binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
+    }
+    override fun onBackPressed() {
+        if (doubleBackPress) {
+            super.onBackPressed()
+            return
+        }
+
+        this.doubleBackPress = true
+        easyElements.showSnackbar(binding.root,"Press back again to exit",2000)
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            doubleBackPress = false
+        }, 2000)
     }
 }

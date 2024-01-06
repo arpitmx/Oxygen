@@ -13,21 +13,37 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.ncs.o2.Constants.SwitchFunctions
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
+import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.databinding.TaskItemBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
+import javax.inject.Inject
 
-class TaskListAdapter(val repository: FirestoreRepository,val context: Context,val taskList:MutableList<TaskItem>) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
+class TaskListAdapter(val repository: FirestoreRepository,val context: Context,val taskList:MutableList<TaskItem>,val db:TasksDatabase) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>(), TagAdapter.OnClick {
+
+
+    private val selectedTags = mutableListOf<Tag>()
 
     private var onClickListener: OnClickListener? = null
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
@@ -56,7 +72,41 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 3 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_red)
             }
 
+            CoroutineScope(Dispatchers.IO).launch{
+                for (tagId in task.tagList){
+                    val tag=db.tagsDao().getTagbyId(tagId)
+
+                    if (!tag.isNull) {
+                        tag?.checked = true
+                        selectedTags.add(tag!!)
+                    }
+                }
+                withContext(Dispatchers.Main){
+                    Log.d("tagcheckfromDB",selectedTags?.toString()!!)
+                    setTagsView(selectedTags,binding,task)
+                }
+            }
+
+
+
         }
+    }
+
+    private fun setTagsView(list: MutableList<Tag>,binding: TaskItemBinding,task: TaskItem) {
+        val newList:MutableList<Tag> = mutableListOf()
+        for (tag in list){
+            if (task.tagList.contains(tag.tagID)){
+                newList.add(tag)
+            }
+        }
+        val finalList=newList.distinctBy { it.tagID }
+        val tagsRecyclerView = binding.tagRecyclerView
+        val layoutManager = FlexboxLayoutManager(context)
+        layoutManager.flexDirection = FlexDirection.ROW
+        layoutManager.flexWrap = FlexWrap.WRAP
+        tagsRecyclerView.layoutManager = layoutManager
+        val adapter = TagAdapter(finalList, this)
+        tagsRecyclerView.adapter = adapter
     }
 
     fun setTaskList(newTaskList: List<TaskItem>) {
@@ -75,7 +125,8 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 assignee_id = task.assignee,
                 difficulty = task.difficulty,
                 timestamp = task.time_STAMP,
-                completed = task.completed
+                completed = if (SwitchFunctions.getStringStateFromNumState(task.status)=="Completed") true else false,
+                tagList = task.tags
             )
         }
         val diffCallback = TaskDiffCallback(taskList, taskItems)
@@ -173,6 +224,10 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 isChecked = false
             ))
         }
+    }
+
+    override fun onTagClick(tag: Tag) {
+
     }
 
 }

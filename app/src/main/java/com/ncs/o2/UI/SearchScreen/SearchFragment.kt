@@ -163,7 +163,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         binding.results.visible()
         binding.results.text="Matches ${taskList.size.toString()} tasks"
         recyclerView = binding.recyclerView
-        taskListAdapter = TaskListAdapter(firestoreRepository,requireContext(),taskList)
+        taskListAdapter = TaskListAdapter(firestoreRepository,requireContext(),taskList,db)
         taskListAdapter.setOnClickListener(this)
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         layoutManager.reverseLayout = false
@@ -319,7 +319,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                                         assignee_id = task.assignee,
                                         difficulty = task.difficulty,
                                         timestamp = task.time_STAMP,
-                                        completed = task.completed
+                                        completed = if (SwitchFunctions.getStringStateFromNumState(task.status)=="Completed") true else false,
+                                        tagList = task.tags
                                     )
                                 }.toMutableList()
                                 binding.recyclerView.visible()

@@ -18,6 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AssignedViewModel @Inject constructor(private val firestoreRepository: FirestoreRepository,private val taskRepository: TaskRepository) : ViewModel(){
 
+    var sectionName: String? = null
+
 
     fun getUserTasksId(
         sectionName:String,

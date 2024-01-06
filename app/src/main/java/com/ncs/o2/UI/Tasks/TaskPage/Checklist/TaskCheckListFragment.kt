@@ -25,6 +25,7 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -90,13 +91,6 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTaskChecklistBinding.inflate(inflater, container, false)
-
-        return binding.root
-
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         val moderatorList= activityBinding.moderatorsList
         val assignee = activityBinding.assignee
         val currentUser= FirebaseAuth.getInstance().currentUser?.email
@@ -125,9 +119,19 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             initViews()
         }
 
+        return binding.root
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
     }
 
     private fun initViews(){
+        if (isModerator){
+            binding.btnAddMoreCheckList.visible()
+        }
         getCheckList()
     }
 
@@ -138,9 +142,11 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         }
         if (isModerator && !isAssignee){
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,true,false)
+
         }
         if (isModerator && isAssignee){
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,true,true)
+
         }
         if (!isModerator && !isAssignee){
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,false)
@@ -152,9 +158,15 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             adapter = checkListAdapter
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
+        binding.btnAddMoreCheckList.setOnClickThrottleBounceListener{
+            val number=list.size+1
+            val checkListBottomSheet = CheckListBottomSheet(count = number,this, CheckList(id = ""))
+            checkListBottomSheet.show(requireFragmentManager(), "checkList")
+        }
     }
 
     private fun getCheckList(){
+
 
         CoroutineScope(Dispatchers.Main).launch {
 
@@ -493,6 +505,51 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                                 }
                             }
                             toast("Updated Successfully")
+                            isModerator=true
+                            initViews()
+                        }
+
+                    }
+
+                } catch (e: Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+                    binding.progressbar.gone()
+
+                }
+            }
+        }
+        else{
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val result = withContext(Dispatchers.IO) {
+                        firestoreRepository.createNewCheckList(
+                            taskId = activityBinding.taskId,
+                            projectName = PrefManager.getcurrentProject(),
+                            checkList = checkList)
+
+                    }
+                    when (result) {
+                        is ServerResult.Failure -> {
+
+                            utils.singleBtnDialog(
+                                "Failure",
+                                "Failure in creating a new checklist: ${result.exception.message}",
+                                "Okay"
+                            ) {
+                                requireActivity().finish()
+                            }
+                            binding.progressbar.gone()
+
+                        }
+
+                        is ServerResult.Progress -> {
+                            binding.progressbar.visible()
+                        }
+
+                        is ServerResult.Success -> {
+                            binding.progressbar.gone()
+                            toast("Added a new CheckList")
                             isModerator=true
                             initViews()
                         }

@@ -399,19 +399,45 @@
                 android:background="@drawable/horizontal_scrollview_bg"
                 >
 
-                <TextView
-                    android:id="@+id/summary_tv"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_display_medium"
-                    android:gravity="start"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:paddingStart="15dp"
-                    android:text="Summary"
-                    android:textColor="@color/account"
-                    android:textSize="16dp"
-                    android:visibility="visible" />
+                    android:weightSum="10"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/summary_tv"
+                        android:layout_width="0dp"
+                        android:layout_weight="8.5"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_display_medium"
+                        android:gravity="start"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:paddingStart="15dp"
+                        android:text="Summary"
+                        android:textColor="@color/account"
+                        android:textSize="16dp"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/btnEditSummary"
+                        android:layout_width="0dp"
+                        android:layout_weight="1.5"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_display_medium"
+                        android:gravity="start"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:paddingStart="15dp"
+                        android:text="Edit"
+                        android:textColor="@color/account"
+                        android:textSize="16dp"
+                        android:visibility="invisible" />
+
+                </LinearLayout>
+
+
+
                 <ProgressBar
                     android:id="@+id/description_progressbar"
                     android:layout_width="40dp"

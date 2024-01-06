@@ -6,8 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.versa.Constants.Endpoints
 import java.util.Date
@@ -295,4 +297,39 @@ object PrefManager {
             return listOf("NCSOxygen")
         }
     }
+    fun putDraftTask(task: Task){
+        val gson=Gson()
+        val taskJson=gson.toJson(task)
+        editor.putString("task",taskJson)
+        editor.apply()
+    }
+    fun getDraftTask(): Task? {
+        val taskJson = sharedPreferences.getString("task", null)
+        val gson = Gson()
+        return if (taskJson != null) {
+            gson.fromJson(taskJson, Task::class.java)
+        } else {
+            null
+        }
+    }
+    fun putDraftCheckLists(list: List<CheckList>){
+        val gson=Gson()
+        val taskJson=gson.toJson(list)
+        editor.putString("DraftCheckLists",taskJson)
+        editor.apply()
+    }
+    fun getDraftCheckLists(): List<CheckList>? {
+        val taskJson = sharedPreferences.getString("DraftCheckLists", null)
+        val gson = Gson()
+        return if (taskJson != null) {
+            val type = object : TypeToken<List<CheckList>>() {}.type
+            gson.fromJson(taskJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
+
+
+
 }

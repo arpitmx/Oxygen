@@ -147,6 +147,10 @@ constructor(val notificationApiService: NotificationApiService,
         return firestoreRepository.updateTask(id = taskID, projectName = projectName, newAssignee = NewAssignee, oldAssignee =  OldAssignee)
     }
 
+    suspend fun updateTaskSummary(task: Task,newSummary:String):ServerResult<Boolean>{
+        return firestoreRepository.updateTaskSummary(task = task,newSummary=newSummary)
+    }
+
     suspend fun updateState(taskID:String,userID:String,newState:String,projectName: String):ServerResult<Boolean>{
         return firestoreRepository.updateState(id = taskID, userID = userID,newState=newState, projectName = projectName)
     }
