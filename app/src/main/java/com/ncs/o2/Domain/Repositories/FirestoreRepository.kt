@@ -630,7 +630,7 @@ class FirestoreRepository @Inject constructor(
                         .document(task.assignee)
                         .collection(Endpoints.Workspace.WORKSPACE)
                         .document(task.id)
-                        .set(WorkspaceTaskItem(id = task.id, status = "Assigned"))
+                        .set(WorkspaceTaskItem(id = task.id, status = "Assigned", project_id = task.project_ID))
                 }
 
             }.addOnSuccessListener {
@@ -998,10 +998,10 @@ class FirestoreRepository @Inject constructor(
                     val title = document.getString("title")
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
+                    val tags = document.get("tags")!! as List<String>
+
                     val time: Timestamp =
                         (document.get("time_STAMP") ?: Timestamp.now()) as Timestamp
-
-                    val completed = document.getBoolean("completed")
                     assignerID = if (document.getString("assigner_email") != null) {
                         document.getString("assigner_email")!!
                     } else {
@@ -1013,8 +1013,8 @@ class FirestoreRepository @Inject constructor(
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
                         timestamp = time,
-                        completed = completed.toString().toBoolean(),
                         assignee_id = assignerID,
+                        tagList = tags
                     )
 
                     sectionList.add(taskItem)
@@ -1132,7 +1132,9 @@ class FirestoreRepository @Inject constructor(
                 for (document in querySnapshot.documents) {
                     val id = document.getString(Endpoints.Workspace.ID)
                     val status = document.getString(Endpoints.Workspace.STATUS)
-                    val workspaceTaskItem = WorkspaceTaskItem(id = id!!, status = status!!)
+                    val projectID = document.getString(Endpoints.Workspace.PROJECT_ID)
+
+                    val workspaceTaskItem = WorkspaceTaskItem(id = id!!, status = status!!, project_id = projectID!!)
                     workspaceTaskItemList.add(workspaceTaskItem)
                 }
 
@@ -1253,7 +1255,7 @@ class FirestoreRepository @Inject constructor(
                     val id = querySnapshot.getString("id")
                     val difficulty = querySnapshot.get("difficulty")
                     val time = querySnapshot.get("time_STAMP") as Timestamp
-                    val completed = querySnapshot.getBoolean("completed")
+                    val tags= querySnapshot.get("tags") as List<String>
                     if (querySnapshot.getString("assigner_email") != null) {
                         assignerID = querySnapshot.getString("assigner_email")!!
                     } else {
@@ -1265,8 +1267,8 @@ class FirestoreRepository @Inject constructor(
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
                         timestamp = time,
-                        completed = completed.toString().toBoolean(),
                         assignee_id = assignerID,
+                        tagList = tags
                     )
                     Log.d("taskrepo", taskItem.toString())
                     result(ServerResult.Success(taskItem))
@@ -1449,7 +1451,7 @@ class FirestoreRepository @Inject constructor(
                     transaction.update(documentRef, "assignee", newAssignee)
                     transaction.update(documentRef, "status", 2)
 
-                    val workspaceItem = WorkspaceTaskItem(id = id, status = "Assigned")
+                    val workspaceItem = WorkspaceTaskItem(id = id, status = "Assigned", project_id = projectName)
 
                     if (newAssignee != "None") {
                         val newAssigneeWorkspaceRef =
@@ -1464,6 +1466,32 @@ class FirestoreRepository @Inject constructor(
                 } else {
                     false
                 }
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun updateTaskSummary(
+        task: Task,
+        newSummary:String,
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(task.project_ID)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(task.id)
+
+                transaction.update(projectDocumentRef, "description", newSummary)
+                updateLastUpdated(task.project_ID,transaction)
+                updateTaskLastUpdated(task.project_ID,transaction, task.id)
+
+                true
             }
 
             return ServerResult.Success(true)
@@ -1720,6 +1748,21 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+    override suspend fun createNewCheckList(
+        taskId: String,
+        projectName: String,
+        checkList: CheckList
+    ): ServerResult<Boolean> {
+        try {
+            firestore.collection(Endpoints.PROJECTS).document(projectName)
+                .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
+                .document(checkList.id).set(checkList).await()
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
     override suspend fun updateSection(
         taskId: String,
         projectName: String,
@@ -1955,15 +1998,16 @@ class FirestoreRepository @Inject constructor(
                     val id = document.getString("id")
                     val difficulty = document.get("difficulty")!!
                     val time: Timestamp = (document.get("time_STAMP") ?: Timestamp.now()) as Timestamp
-                    val completed = document.getBoolean("completed")
                     val assignerID = document.getString("assigner_email") ?: "mohit@mail.com"
+                    val tags= document.get("tags") as List<String>
+
                     val taskItem = TaskItem(
                         title = title!!,
                         id = id!!,
                         difficulty = difficulty.toString().toInt(),
                         timestamp = time,
-                        completed = completed.toString().toBoolean(),
                         assignee_id = assignerID,
+                        tagList = tags
                     )
                     sectionList.add(taskItem)
                 }

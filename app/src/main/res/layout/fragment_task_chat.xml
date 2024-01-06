@@ -105,6 +105,60 @@
                 android:indeterminateTint="@color/primary" />
         </LinearLayout>
 
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="#1DE3E1E1"
+            android:elevation="10dp"
+            android:scrollbars="none"
+            >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnCodeBlock"
+                    style="@style/editor_options"
+                    android:text="Codeblock"
+                    android:drawablePadding="10dp"
+                    android:drawableEnd="@drawable/baseline_article_24"
+                    android:drawableTint="@color/black200"
+                    />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLink"
+                    style="@style/editor_options"
+                    android:text="Link"
+                    android:drawableTint="@color/black200"
+                    android:drawableEnd="@drawable/baseline_add_link_24"
+                    />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnChecklist"
+                    style="@style/editor_options"
+                    android:text="Checklist"
+                    android:drawablePadding="5dp"
+                    android:drawableTint="@color/black200"
+                    android:drawableEnd="@drawable/baseline_check_box_outline_blank_24"
+                    />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnBackTick"
+                    style="@style/editor_options"
+                    android:text="Backtick   ( ` )"
+                    android:drawablePadding="10dp"
+                    android:drawableTint="@color/black200"
+                    />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/suggestion_box"
             android:layout_width="match_parent"

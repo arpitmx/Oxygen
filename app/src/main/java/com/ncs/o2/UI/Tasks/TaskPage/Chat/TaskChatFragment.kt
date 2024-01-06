@@ -232,6 +232,37 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }
         }
 
+        binding.btnCodeBlock.setOnClickThrottleBounceListener {
+
+            binding.inputBox.editboxMessage.text?.append(
+                " \n ``` Code_Lang \n Code \n``` "
+            )
+
+        }
+
+        binding.btnChecklist.setOnClickThrottleBounceListener {
+            binding.inputBox.editboxMessage.text?.append(
+                " \n - [ ] List_Text "
+            )
+
+        }
+
+        binding.btnLink.setOnClickThrottleBounceListener {
+
+            binding.inputBox.editboxMessage.text?.append(
+                " [Link Text](Link URL) "
+            )
+
+        }
+
+        binding.btnBackTick.setOnClickThrottleBounceListener {
+
+            binding.inputBox.editboxMessage.text?.append(
+                " ` "
+            )
+
+        }
+
     }
     private fun filterList(query: String,mentionedUsers: List<User>) {
         val filteredList = contributorsData.filter { contributor ->

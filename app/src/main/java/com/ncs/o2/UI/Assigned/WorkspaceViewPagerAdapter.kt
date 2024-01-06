@@ -2,6 +2,7 @@ package com.ncs.o2.UI.Assigned
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 
 class WorkspaceViewPagerAdapter(fragmentActivity: Fragment, private var totalCount: Int) :
     FragmentStateAdapter(fragmentActivity) {
@@ -11,11 +12,13 @@ class WorkspaceViewPagerAdapter(fragmentActivity: Fragment, private var totalCou
     }
 
     override fun createFragment(position: Int): Fragment {
+
         return when(position){
-            0-> WorkspaceFragment("Assigned")
-            1-> WorkspaceFragment("Working On")
-            2-> WorkspaceFragment("Reviewing")
-            else -> WorkspaceFragment("Completed")
+
+            0-> WorkspaceFragment.newInstance("Assigned")
+            1-> WorkspaceFragment.newInstance("Working On")
+            2-> WorkspaceFragment.newInstance("Reviewing")
+            else -> WorkspaceFragment.newInstance("Completed")
         }
     }
 }

@@ -123,6 +123,17 @@
         app:layout_constraintVertical_bias="0.545" />
 
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tagRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:layout_marginBottom="5dp"
+        android:layoutAnimation="@anim/layout_animation_slidedown"
+        android:nestedScrollingEnabled="false"
+        tools:listitem="@layout/tag_item"
+        android:padding="@dimen/padding_start_task_details" />
+
 
     <View
         android:layout_width="match_parent"

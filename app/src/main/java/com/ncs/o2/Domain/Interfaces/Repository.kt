@@ -94,6 +94,11 @@ interface Repository {
         oldAssignee:String,
     ): ServerResult<Boolean>
 
+    suspend fun updateTaskSummary(
+        task:Task,
+        newSummary:String,
+    ): ServerResult<Boolean>
+
     suspend fun updateModerator(
         id: String,
         projectName: String,
@@ -162,6 +167,12 @@ interface Repository {
         taskId: String,
         projectName: String,
         id:String,
+        checkList: CheckList
+    ): ServerResult<Boolean>
+
+    suspend fun createNewCheckList(
+        taskId: String,
+        projectName: String,
         checkList: CheckList
     ): ServerResult<Boolean>
     suspend fun updateSection(

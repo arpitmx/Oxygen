@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
@@ -40,8 +41,17 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.OnClickListener {
+class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
 
+    companion object {
+        fun newInstance(sectionName: String): WorkspaceFragment {
+            val fragment = WorkspaceFragment()
+            val args = Bundle()
+            args.putString("sectionName", sectionName)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
@@ -52,7 +62,9 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
     private lateinit var taskList: ArrayList<TaskItem>
-
+    val sectionName: String? by lazy {
+        viewModel.sectionName
+    }
     private var taskIdsList:MutableList<WorkspaceTaskItem> = mutableListOf()
     private lateinit var projectName: String
     val state = arrayOf(1)
@@ -78,12 +90,19 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(AssignedViewModel::class.java)
+        val sectionName = arguments?.getString("sectionName", "") ?: ""
+        viewModel.sectionName = sectionName
+
         PrefManager.initialize(requireContext())
         projectName = PrefManager.getcurrentProject()
         getTaskIdsList()
+//        activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
+//            getTaskIdsList()
+//        }
         activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
-            getTaskIdsList()
+            requireActivity().recreate()
         }
+
     }
 
 
@@ -94,7 +113,7 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
             "Reviewing" -> "Review"
             else -> sectionName
         }
-        viewModel.getUserTasksId(_sectionName, projectName = PrefManager.getcurrentProject()) { result ->
+        viewModel.getUserTasksId(_sectionName!!, projectName = PrefManager.getcurrentProject()) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     binding.lottieProgressInclude.progressbarBlock.gone()
@@ -157,7 +176,8 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                                     taskListAdapter = TaskListAdapter(
                                         firestoreRepository,
                                         requireContext(),
-                                        taskList.toMutableList()
+                                        taskList.toMutableList(),
+                                        db
                                     )
                                     taskListAdapter.setTaskList(taskList)
                                     taskListAdapter.notifyDataSetChanged()
@@ -248,7 +268,8 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                                     assignee_id = task.assignee,
                                     difficulty = task.difficulty,
                                     timestamp = task.time_STAMP,
-                                    completed = task.completed
+                                    completed = if (SwitchFunctions.getStringStateFromNumState(task.status)=="Completed") true else false,
+                                    tagList = task.tags
                                 )
                             }
                             binding.layout.visible()
@@ -258,7 +279,8 @@ class WorkspaceFragment(var sectionName: String) : Fragment(), TaskListAdapter.O
                             taskListAdapter = TaskListAdapter(
                                 firestoreRepository,
                                 requireContext(),
-                                taskItems.toMutableList()
+                                taskItems.toMutableList(),
+                                db
                             )
                             taskListAdapter.notifyDataSetChanged()
                             taskListAdapter.setOnClickListener(this@WorkspaceFragment)

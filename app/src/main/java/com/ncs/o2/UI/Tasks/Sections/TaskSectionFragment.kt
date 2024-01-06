@@ -13,11 +13,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
@@ -32,6 +37,7 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
+import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -199,7 +205,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
                         } else {
 
                             recyclerView = binding.recyclerView
-                            taskListAdapter = TaskListAdapter(firestoreRepository, requireContext(),taskList)
+                            taskListAdapter = TaskListAdapter(firestoreRepository, requireContext(),taskList,db)
                             taskListAdapter.setOnClickListener(this)
                             val layoutManager =
                                 LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -278,6 +284,8 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 
     }
 
+
+
     fun fetchfromdb(){
         viewModel.getTasksForSegmentFromDB(projectName, segmentName, viewModel.sectionName!!) { result ->
             when (result) {
@@ -306,13 +314,15 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
                                 assignee_id = task.assignee,
                                 difficulty = task.difficulty,
                                 timestamp = task.time_STAMP,
-                                completed = task.completed
+                                completed = if (SwitchFunctions.getStringStateFromNumState(task.status)=="Completed") true else false,
+                                tagList = task.tags
                             )
                         }
                         val taskadapter = TaskListAdapter(
                             firestoreRepository,
                             requireContext(),
-                            taskItems.toMutableList()
+                            taskItems.toMutableList(),
+                            db
                         )
                         taskadapter.setOnClickListener(this)
                         val layoutManager =

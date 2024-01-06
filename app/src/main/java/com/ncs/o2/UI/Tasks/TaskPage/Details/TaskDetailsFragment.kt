@@ -17,6 +17,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,6 +54,7 @@ import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.CreateTask.DescriptionEditorActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
@@ -217,6 +219,13 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             //toast("You are a moderator, can edit this task")
             utils.showSnackbar(binding.root,"You are a moderator and can edit this task",5000)
         }
+
+        binding.btnEditSummary.setOnClickThrottleBounceListener {
+            val intent = Intent(requireActivity(), DescriptionEditorActivity::class.java)
+            intent.putExtra("summary", taskDetails.description)
+            startActivityForResult(intent, 1)
+        }
+
         binding.assignee.setOnClickThrottleBounceListener {
             Log.d("assigne", "passing this list ${selectedAssignee.toString()}")
             val assigneeListBottomSheet =
@@ -323,6 +332,18 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         }
 
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == AppCompatActivity.RESULT_OK) {
+            val summary = data?.getStringExtra("summary")
+            if (!summary.isNull){
+                val description=summary!!.trimIndent()
+                updateTaskSummary(task = taskDetails, newSummary = description)
+            }
+        }
+    }
+
 
     private fun setDefaultViews(task: Task) {
 
@@ -509,6 +530,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         for (moderator in list) {
             if (moderator.firebaseID == PrefManager.getcurrentUserdetails().EMAIL) {
                 isModerator = true
+                binding.btnEditSummary.visible()
                 binding.assignee.isEnabled = true
                 binding.section.isEnabled=true
                 binding.priority.isEnabled=true
@@ -663,6 +685,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                                     moderators.add(user)
                                     activityBinding.moderators.add(user)
                                     moderatorsList.add(user.firebaseID!!)
+
                                     setContributors(users)
                                     pushToReceiver(user)
                                     setTagsView(selectedTags)
@@ -1036,6 +1059,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     Log.d("tagcheckfromDB",result.data.tags.toString())
                     if (result.data.moderators.contains(currentUser?.email)){
                         isModerator=true
+                        binding.btnEditSummary.visible()
                     }
                     manageState(result.data)
                     CoroutineScope(Dispatchers.IO).launch{
@@ -1261,6 +1285,54 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     override fun onAssigneeTListUpdated(TList: MutableList<User>) {
 
+    }
+
+    private fun updateTaskSummary(task: Task,newSummary:String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    viewModel.updateTaskSummary(
+                        task = task,newSummary=newSummary
+                    )
+                }
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in Updating Summary: ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        toast("Updated Task Summary")
+                        binding.markdownView.loadMarkdown(newSummary)
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+
+            }
+        }
     }
 
     override fun updateAssignee(assignee: User) {

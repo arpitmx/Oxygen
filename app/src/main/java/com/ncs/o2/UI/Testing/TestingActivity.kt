@@ -1177,7 +1177,6 @@ See [`LICENSE`](LICENSE) for full of the license text.
                 project_ID = "NCSOxygen",
                 segment = "Backend", //change segments here //like Design
                 section = "CI/CD\uD83C\uDF4D",  //Testing // Completed //Ready //Ongoing
-                completed = false,
                 duration = Random(System.currentTimeMillis()).nextInt(1, 5).toString(),
                 time_STAMP = Timestamp.now(),
             )

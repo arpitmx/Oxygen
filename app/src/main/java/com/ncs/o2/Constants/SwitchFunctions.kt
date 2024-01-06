@@ -1,5 +1,9 @@
 package com.ncs.o2.Constants
 
+import android.content.Context
+import android.graphics.drawable.Drawable
+import com.ncs.o2.R
+
 object SwitchFunctions {
 
     fun getNumStateFromStringState(stringState:String) : Int{
@@ -79,6 +83,14 @@ object SwitchFunctions {
             2 -> "Medium"
             3 -> "Hard"
             else -> "Undefined"
+        }
+    }
+    fun getDrawableDifficultyFromNumDifficulty(numDifficulty:Int,context: Context): Drawable? {
+        return when (numDifficulty) {
+            1 -> context.resources.getDrawable(R.drawable.label_cardview_green)
+            2 -> context.resources.getDrawable(R.drawable.label_cardview_yellow)
+            3 -> context.resources.getDrawable(R.drawable.label_cardview_red)
+            else -> null
         }
     }
 }
