@@ -597,7 +597,7 @@ class FirestoreRepository @Inject constructor(
 
     private fun getSegmentRef(task: Task): DocumentReference {
         return firestore.collection(Endpoints.PROJECTS)
-            .document(task.project_ID)
+            .document(task.project_ID!!)
 
     }
 
@@ -627,10 +627,10 @@ class FirestoreRepository @Inject constructor(
                 }
                 if (task.assignee!="None"){
                     firestore.collection(Endpoints.USERS)
-                        .document(task.assignee)
+                        .document(task.assignee!!)
                         .collection(Endpoints.Workspace.WORKSPACE)
                         .document(task.id)
-                        .set(WorkspaceTaskItem(id = task.id, status = "Assigned", project_id = task.project_ID))
+                        .set(WorkspaceTaskItem(id = task.id, status = "Assigned", project_id = task.project_ID!!))
                 }
 
             }.addOnSuccessListener {
@@ -1483,13 +1483,13 @@ class FirestoreRepository @Inject constructor(
 
 
                 val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
-                    .document(task.project_ID)
+                    .document(task.project_ID!!)
                     .collection(Endpoints.Project.TASKS)
                     .document(task.id)
 
                 transaction.update(projectDocumentRef, "description", newSummary)
-                updateLastUpdated(task.project_ID,transaction)
-                updateTaskLastUpdated(task.project_ID,transaction, task.id)
+                updateLastUpdated(task.project_ID!!,transaction)
+                updateTaskLastUpdated(task.project_ID!!,transaction, task.id)
 
                 true
             }

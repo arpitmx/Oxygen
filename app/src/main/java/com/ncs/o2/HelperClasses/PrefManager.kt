@@ -309,7 +309,7 @@ object PrefManager {
         return if (taskJson != null) {
             gson.fromJson(taskJson, Task::class.java)
         } else {
-            null
+            Task()
         }
     }
     fun putDraftCheckLists(list: List<CheckList>){

@@ -38,26 +38,26 @@ Tasks FUTURE ADDITION :
 @TypeConverters(Convertors::class)
 data class Task(
 
-    val title: String = "",
-    val description: String = "",
+    var title: String = "",
+    var description: String = "",
     @PrimaryKey(autoGenerate = false)
     var id: String="",
-    val difficulty: Int = 0,
-    val priority: Int = 0,
-    val status: Int = -1,
+    var difficulty: Int = 0,
+    var priority: Int = 0,
+    var status: Int = -1,
 
-    val assignee: String = "",
+    var assignee: String = "",
     val assigner: String = "",
     var moderators:List<String> = listOf(),
 
     var time_STAMP: Timestamp? =null,
-    val duration: String = "",
+    var duration: String = "",
     var tags: List<String> = listOf(),
-    val project_ID: String = "",
-    val segment: String = "",
-    val section: String = "",
+    var project_ID: String = "",
+    var segment: String = "",
+    var section: String = "",
     val completed:Boolean=false,
-    val type:Int=0,
+    var type:Int=0,
     val last_updated:Timestamp? = Timestamp.now(),
     val version:Int?=3
     ) {

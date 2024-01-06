@@ -263,12 +263,12 @@ class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
                         } else {
                             val taskItems: List<TaskItem> = tasks.map { task ->
                                 TaskItem(
-                                    title = task.title,
+                                    title = task.title!!,
                                     id = task.id,
-                                    assignee_id = task.assignee,
-                                    difficulty = task.difficulty,
+                                    assignee_id = task.assignee!!,
+                                    difficulty = task.difficulty!!,
                                     timestamp = task.time_STAMP,
-                                    completed = if (SwitchFunctions.getStringStateFromNumState(task.status)=="Completed") true else false,
+                                    completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!)=="Completed") true else false,
                                     tagList = task.tags
                                 )
                             }
