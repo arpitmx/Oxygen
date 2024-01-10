@@ -407,7 +407,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         binding.segment.setOnClickThrottleBounceListener {
 
-            val segment = SegmentSelectionBottomSheet()
+            val segment = SegmentSelectionBottomSheet("Create Task")
             segment.segmentSelectionListener = this
             segment.sectionSelectionListener = this
             segment.show(supportFragmentManager, "Segment Selection")

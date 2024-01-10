@@ -53,7 +53,7 @@ Tasks FUTURE ADDITION :
 
 */
 @AndroidEntryPoint
-class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
+class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFragment(),
     SegmentListAdapter.OnClickCallback {
     @Inject lateinit var firestoreRepository:FirestoreRepository
     private var segments:List<Segment> = emptyList()
@@ -130,10 +130,12 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
 
     override fun onClick(segment: Segment, position: Int) {
         Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
-        PrefManager.setcurrentsegment(segment.segment_NAME)
+        if (type!="Create Task" && type!="Search"){
+            PrefManager.setcurrentsegment(segment.segment_NAME)
+            sendsectionList(PrefManager.getcurrentProject())
+            PrefManager.putsectionsList(sectionList)
+        }
         segmentName=segment.segment_NAME
-        sendsectionList(PrefManager.getcurrentProject())
-        PrefManager.putsectionsList(sectionList)
         segmentSelectionListener?.onSegmentSelected(segment.segment_NAME)
         sectionSelectionListener?.sendSectionsList(sectionList)
         dismiss()

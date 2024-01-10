@@ -266,7 +266,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
 
-            val segment = SegmentSelectionBottomSheet()
+            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
             segment.segmentSelectionListener = this
 
             // Show a segment selection bottom sheet
