@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:padding="15dp"
+    android:padding="5dp"
     android:id="@+id/parent"
     android:background="@color/darkbg_main">
 
@@ -24,8 +24,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userDp"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
             android:gravity="center"
             android:scaleType="centerCrop"
@@ -42,6 +42,7 @@
         android:layout_weight="1"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="1dp"
         android:layout_gravity="center_vertical"
         android:orientation="vertical">
 
@@ -49,14 +50,26 @@
             android:id="@+id/userName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="@color/better_white"
             android:text="UserName"
             android:fontFamily="@font/sf_pro_display_medium"
             />
 
+        <TextView
+            android:id="@+id/id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/edit_text_hint"
+            android:text="Email"
+            android:fontFamily="@font/sf_pro_display_medium"
+            />
+
+
 
     </LinearLayout>
+
 
 
 </LinearLayout>

@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -15,6 +16,9 @@ import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewPropertyAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -22,9 +26,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.marginEnd
+import androidx.core.view.marginStart
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -35,6 +40,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.ncs.o2.R
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -359,6 +365,41 @@ object ExtensionsUtil {
                     duration = animDuration
                 }
         this.startAnimation(animation)
+        this.gone()
+    }
+
+
+
+    fun View.animSlideUpVisible(context: Context, animDuration: Long = 1500L) = run {
+        this.clearAnimation()
+        val animation = AnimationUtils.loadAnimation(context, R.anim.slide_bottom_to_up)
+            .apply {
+                duration = animDuration
+            }
+        this.startAnimation(animation)
+        this.visible()
+    }
+
+    fun View.slideDownAndGone(duration: Long = 300L, onEndAction: (() -> Unit)? = null): ViewPropertyAnimator {
+        return animate()
+            .translationYBy(height.toFloat())
+            .setDuration(duration)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction {
+                visibility = View.GONE
+                onEndAction?.invoke()
+            }
+    }
+
+    fun View.slideUpAndVisible(duration: Long = 300L, onEndAction: (() -> Unit)? = null): ViewPropertyAnimator {
+        visibility = View.VISIBLE
+        return animate()
+            .translationYBy(-height.toFloat())
+            .setDuration(duration)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction {
+                onEndAction?.invoke()
+            }
     }
 
     fun View.animSlideLeft(context: Context, animDuration: Long = 1500L) = run {
@@ -468,6 +509,34 @@ object ExtensionsUtil {
     }
 
 
+    fun TextInputEditText.appendTextAtCursor(textToAppend: String) {
+        val start = selectionStart
+        val end = selectionEnd
+
+        val editable = text
+
+        editable?.replace(start, end, textToAppend)
+        setSelection(start + textToAppend.length)
+    }
+
+
+    fun View.setMargins(left:Int, top: Int , right : Int , bottom : Int){
+        if (this.layoutParams is ViewGroup.MarginLayoutParams) {
+            val params = this.layoutParams as ViewGroup.MarginLayoutParams
+            params.setMargins(left,top,right,bottom);
+        }
+    }
+
+    fun TextInputEditText.appendTextAtCursorMiddleCursor(textToAppend: String, type : Int) {
+            val position = this.selectionStart
+            val text = this.text
+            val newText = StringBuilder(text).insert(position, textToAppend).toString()
+            this.setText(newText)
+            if (type == 2 ) this.setSelection(position + 1)
+            else this.setSelection(position + 2)
+        }
+
+
     fun View.setOnClickThrottleBounceListener(throttleTime: Long = 600L, onClick: () -> Unit) {
 
         this.setOnClickListener(object : View.OnClickListener {
@@ -539,6 +608,20 @@ object ExtensionsUtil {
                 lastClickTime = SystemClock.elapsedRealtime()
             }
         })
+    }
+
+
+    fun View.setBackgroundColorRes(colorResId: Int) {
+        val color = context.resources.getColor(colorResId)
+        setBackgroundColor(color)
+    }
+
+    fun View.setBackgroundColor(color: Int) {
+        background = ColorDrawable(color)
+    }
+
+    fun View.setBackgroundDrawable(drawable: Drawable) {
+        background = drawable
     }
 
 }

@@ -1,6 +1,9 @@
 package com.ncs.o2.UI
 
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -26,7 +29,6 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.gms.tasks.Tasks
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
@@ -49,20 +51,17 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
+import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
-import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
+import com.ncs.o2.UI.SearchScreen.SearchFragment
+import com.ncs.o2.UI.Setting.SettingsActivity
+import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
-import com.ncs.o2.UI.EditProfile.EditProfileActivity
-import com.ncs.o2.UI.SearchScreen.SearchFragment
-import com.ncs.o2.UI.Setting.SettingsActivity
-import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
-import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
-import com.ncs.o2.UI.Tasks.TasksHolderFragment
-import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -72,6 +71,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener  {
@@ -95,7 +95,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
 
 
-
     @Inject
     lateinit var db:TasksDatabase
 
@@ -113,7 +112,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         projects=ArrayList()
+
         if (FirebaseAuth.getInstance().currentUser!=null) {
             if (savedInstanceState == null) {
                 handleDynamicLink(intent)
@@ -121,6 +122,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             }
         }
         else{
+
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, AuthScreenActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -128,10 +130,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
             finish()
             Toast.makeText(this, "Please log in first", Toast.LENGTH_LONG).show()
+
         }
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         setContentView(binding.root)
+
         PrefManager.initialize(this)
         manageViews()
         setUpViews()
@@ -145,9 +149,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 "GoToSearch" -> movetosearch(intent.getStringExtra("tagText"))
             }
         }
-
-
-
     }
     private fun manageViews(){
         if (PrefManager.getcurrentsegment()== "Select Segment") {
@@ -372,7 +373,24 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
     }
+
+
+    fun getVersionName(context: Context): String? {
+        return try {
+            val packageInfo: PackageInfo =
+                context.packageManager.getPackageInfo(context.packageName, 0)
+            packageInfo.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+            null
+        }
+    }
     private fun setupProjectsList(){
+
+
+        //Version tag setup
+        binding.drawerheaderfile.versionCode.text = "Oxygen v${getVersionName(this)} alpha"
+
         projects=PrefManager.getProjectsList().toMutableList()
         val list=ArrayList<String>()
         list.addAll(projects)

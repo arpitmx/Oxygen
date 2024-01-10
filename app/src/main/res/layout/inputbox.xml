@@ -8,22 +8,14 @@
     android:orientation="vertical"
     android:background="@color/darkbg_main">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#1DE3E1E1"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
-
-
 
     <androidx.appcompat.widget.LinearLayoutCompat
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:weightSum="10"
-        android:minHeight="@dimen/input_box_size"
-
-        android:padding="8dp"
+    android:minHeight="@dimen/input_box_size"
+    android:padding="8dp"
     >
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/selected_image_view"
@@ -110,13 +102,16 @@
             >
 
      <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btn_attach_image"
+        android:id="@+id/btn_attach"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="40dp"
         android:layout_weight="1"
+         android:layout_gravity="center_vertical"
         android:layout_marginStart="10dp"
-        android:background="@null"
-        android:src="@drawable/baseline_image_24"
+         android:layout_marginTop="10dp"
+         android:layout_marginBottom="10dp"
+        android:background="@drawable/card_view_chatbox_options"
+        android:src="@drawable/baseline_attach_file_24"
         android:scaleX="1"
         android:scaleY="1"
         android:tint="@color/better_white"

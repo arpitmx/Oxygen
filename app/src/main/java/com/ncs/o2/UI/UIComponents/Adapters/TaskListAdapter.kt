@@ -2,17 +2,8 @@ import android.content.Context
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -25,22 +16,18 @@ import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
-import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.TagAdapterHomeScreen
 import com.ncs.o2.databinding.TaskItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Date
-import javax.inject.Inject
 
-class TaskListAdapter(val repository: FirestoreRepository,val context: Context,val taskList:MutableList<TaskItem>,val db:TasksDatabase) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>(), TagAdapter.OnClick {
+class TaskListAdapter(val repository: FirestoreRepository,val context: Context,val taskList:MutableList<TaskItem>,val db:TasksDatabase) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>(){
 
 
     private val selectedTags = mutableListOf<Tag>()
@@ -82,7 +69,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                     }
                 }
                 withContext(Dispatchers.Main){
-                    Log.d("tagcheckfromDB",selectedTags?.toString()!!)
+                    //Log.d("tagcheckfromDB",selectedTags?.toString()!!)
                     setTagsView(selectedTags,binding,task)
                 }
             }
@@ -105,7 +92,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         tagsRecyclerView.layoutManager = layoutManager
-        val adapter = TagAdapter(finalList, this)
+        val adapter = TagAdapterHomeScreen(finalList)
         tagsRecyclerView.adapter = adapter
     }
 
@@ -224,10 +211,6 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 isChecked = false
             ))
         }
-    }
-
-    override fun onTagClick(tag: Tag) {
-
     }
 
 }

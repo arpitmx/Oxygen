@@ -32,21 +32,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-<!--                <include-->
-<!--                    layout="@layout/circular_progress"-->
-<!--                    android:id="@+id/lottie_progress_include"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:elevation="10dp"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:layout_marginBottom="70dp"-->
-<!--                    app:layout_constraintBottom_toBottomOf="@+id/progressBar"-->
-<!--                    app:layout_constraintEnd_toEndOf="parent"-->
-<!--                    app:layout_constraintHorizontal_bias="0.498"-->
-<!--                    app:layout_constraintStart_toStartOf="parent"-->
-<!--                    app:layout_constraintTop_toTopOf="parent"-->
-<!--                    app:layout_constraintVertical_bias="1.0"-->
-<!--                    />-->
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/nav_host_fragment_activity_main"
@@ -85,7 +70,6 @@
             android:layout_gravity="bottom"
             android:orientation="vertical"
             >
-
 
             <View
                 android:layout_width="match_parent"

@@ -42,7 +42,6 @@ class TasksDetailsHolderFragment : Fragment() {
 
         val adapter = TaskDetailsViewPagerAdpater(this, 3)
         binding.viewPager2.adapter = adapter
-        binding.viewPager2.isUserInputEnabled = false
         setUpTabsLayout()
     }
 

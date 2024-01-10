@@ -117,6 +117,11 @@ object Endpoints {
 
     }
 
+    object TASKDETAILS{
+        const val UNASSIGNED = "Unassigned"
+
+
+    }
 
     object SEGMENT {
         const val TASKS = "TASKS"

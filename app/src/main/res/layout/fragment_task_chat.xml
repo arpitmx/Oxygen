@@ -61,6 +61,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
+        android:nestedScrollingEnabled="false"
         android:clipToPadding="false"
         android:layout_above="@+id/input_box_container"
         android:layoutAnimation="@anim/layout_animation_fadein"
@@ -78,82 +79,116 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginStart="-1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="0dp"
         android:orientation="vertical">
+
         <LinearLayout
             android:id="@+id/mention_users_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/darkbg_main"
+            android:background="@drawable/curvedbggreymentionlist"
             android:orientation="vertical"
+            android:elevation="5dp"
             android:visibility="gone">
 
+            <View
+                android:layout_width="40dp"
+                android:layout_height="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/item_bg_curve"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mention_user_rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                />
+                android:layoutAnimation="@anim/layout_animation_fadein"
+                android:visibility="gone" />
 
             <ProgressBar
                 android:id="@+id/mentionProgressbar"
                 android:layout_width="match_parent"
-                android:visibility="visible"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/margin_top_30dp"
-                android:indeterminateTint="@color/primary" />
+                android:indeterminateTint="@color/primary"
+                android:visibility="visible" />
         </LinearLayout>
 
-        <HorizontalScrollView
+        <View
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="2dp"
             android:background="#1DE3E1E1"
-            android:elevation="10dp"
-            android:scrollbars="none"
-            >
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+        <HorizontalScrollView
+            android:id="@+id/chatbox_option_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/darkbg_main"
+            android:paddingTop="5dp"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:paddingStart="5dp"
+                android:paddingEnd="10dp"
+                android:orientation="horizontal">
 
-                >
+                <ImageButton
+                    android:id="@+id/btnPaste"
+                    android:layout_width="70dp"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/outline_content_paste_24"
+                    />
 
+                <ImageButton
+                    android:id="@+id/btnAttachImage"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_image_24"
+                />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <ImageButton
                     android:id="@+id/btnCodeBlock"
-                    style="@style/editor_options"
-                    android:text="Codeblock"
-                    android:drawablePadding="10dp"
-                    android:drawableEnd="@drawable/baseline_article_24"
-                    android:drawableTint="@color/black200"
-                    />
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_code_24"
+                  />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <ImageButton
                     android:id="@+id/btnLink"
-                    style="@style/editor_options"
-                    android:text="Link"
-                    android:drawableTint="@color/black200"
-                    android:drawableEnd="@drawable/baseline_add_link_24"
-                    />
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_add_link_24" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <ImageButton
                     android:id="@+id/btnChecklist"
-                    style="@style/editor_options"
-                    android:text="Checklist"
-                    android:drawablePadding="5dp"
-                    android:drawableTint="@color/black200"
-                    android:drawableEnd="@drawable/baseline_check_box_outline_blank_24"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_check_box_outline_blank_24" />
+
+                <ImageButton
+                    android:id="@+id/btnAttachBold"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_format_bold_24"
                     />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnBackTick"
-                    style="@style/editor_options"
-                    android:text="Backtick   ( ` )"
-                    android:drawablePadding="10dp"
-                    android:drawableTint="@color/black200"
+                <ImageButton
+                    android:id="@+id/btnAttachItalics"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_format_italic_24"
                     />
+                <ImageButton
+                    android:id="@+id/btnAttachBlockQuote"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_format_quote_24"
+                    />
+
+                <ImageButton
+                    android:id="@+id/btnBackTick"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_highlight_alt_24" />
 
             </LinearLayout>
 
@@ -168,13 +203,12 @@
             android:visibility="visible">
 
 
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/btn_select_image_from_storage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxHeight="250dp"
                 android:maxWidth="250dp"
+                android:maxHeight="250dp"
                 android:orientation="horizontal"
                 android:visibility="gone"
                 android:weightSum="10">
@@ -201,10 +235,7 @@
                             android:layout_width="100dp"
                             android:layout_height="100dp"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/tasknull_placeholder"
-                            />
-
-
+                            android:src="@drawable/tasknull_placeholder" />
 
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -228,7 +259,6 @@
                     />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <include

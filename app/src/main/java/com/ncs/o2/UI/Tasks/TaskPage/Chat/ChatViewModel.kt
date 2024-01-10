@@ -18,6 +18,9 @@ class ChatViewModel @Inject constructor(
     @FirebaseRepository val repository: Repository,
 ) : ViewModel() {
 
+
+    var CHAT_WINDOW_OPTION_BOX_STATUS : Boolean = false
+
     fun getMessages(
         projectName: String,
         taskId:String,
@@ -35,7 +38,6 @@ class ChatViewModel @Inject constructor(
         return repository.postImage(bitmap,projectId,taskId)
     }
     fun getDPUrlThroughRepository(reference: StorageReference): LiveData<ServerResult<String>> {
-
         return repository.getUserDPUrl(reference)
     }
 

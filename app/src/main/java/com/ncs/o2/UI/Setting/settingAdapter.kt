@@ -1,6 +1,5 @@
 package com.ncs.o2.UI.Setting
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Utility.Codes
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 
 class settingAdater(
@@ -31,15 +31,11 @@ class settingAdater(
         var icon: ImageView = itemView.findViewById(R.id.setting_icon)
         var set_ver: TextView = itemView.findViewById(R.id.set_version)
 
-//        init {
-//            itemView.setOnClickListener {
-//
-//            }
-//        }
     }
 
     class settingTitleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.settingName)
+        val line: View = itemView.findViewById<View>(R.id.setting_line)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -55,12 +51,13 @@ class settingAdater(
                     .inflate(R.layout.settings_title_item, parent, false)
                 settingTitleViewHolder(view)
             }
-
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
+
         when (holder.itemViewType) {
             option -> {
                 val item = items[position] as settingOption
@@ -80,6 +77,12 @@ class settingAdater(
                 val item = items[position] as settingTitle
                 val viewHolder = holder as settingTitleViewHolder
                 viewHolder.textView.text = item.text
+
+                if (position ==0){
+                    viewHolder.line.gone()
+                }else {
+                    viewHolder.line.visible()
+                }
             }
         }
     }

@@ -68,6 +68,8 @@ class MentionUsersAdapter constructor(
             .into(holder.binding.userDp)
 
         holder.binding.userName.text=contributor.username
+        holder.binding.id.text = contributor.email
+
         holder.binding.parent.setOnClickThrottleBounceListener{
             callback.onClick(contributor)
         }

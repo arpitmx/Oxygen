@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.databinding.TagItemBinding
+import com.ncs.o2.databinding.TagItemHomeBinding
 
 /*
 File : TagAdapter.kt -> com.ncs.o2.Adapters
-Description : Adapter class for tags 
+Description : Adapter class for tags
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
@@ -20,13 +20,13 @@ From : Bitpolarity x Noshbae (@Project : O2 Android)
 Creation : 11:50 pm on 04/06/23
 
 Todo >
-Tasks CLEAN CODE : 
-Tasks BUG FIXES : 
-Tasks FEATURE MUST HAVE : 
-Tasks FUTURE ADDITION : 
+Tasks CLEAN CODE :
+Tasks BUG FIXES :
+Tasks FEATURE MUST HAVE :
+Tasks FUTURE ADDITION :
 
 */
-class TagAdapter constructor(private val tagList: List<Tag>,private val onClick: OnClick) : RecyclerView.Adapter<TagAdapter.ViewHolder>() {
+class TagAdapterOtherScreens(private val tagList: List<Tag>, private val onClick: OnClick) : RecyclerView.Adapter<TagAdapterOtherScreens.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
