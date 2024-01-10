@@ -712,7 +712,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postMessage(
-                projectName = task.project_ID, taskId = task.id, message = message
+                projectName = task.project_ID!!,
+                taskId = task.id,
+                message = message
+
             ) { result ->
 
                 when (result) {

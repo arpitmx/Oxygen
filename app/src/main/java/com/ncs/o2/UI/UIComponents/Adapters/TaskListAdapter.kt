@@ -107,12 +107,12 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
     fun setTasks(newTaskList: List<Task>) {
         val taskItems: List<TaskItem> = newTaskList.map { task ->
             TaskItem(
-                title = task.title,
+                title = task.title!!,
                 id = task.id,
-                assignee_id = task.assignee,
-                difficulty = task.difficulty,
+                assignee_id = task.assignee!!,
+                difficulty = task.difficulty!!,
                 timestamp = task.time_STAMP,
-                completed = if (SwitchFunctions.getStringStateFromNumState(task.status)=="Completed") true else false,
+                completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!)=="Completed") true else false,
                 tagList = task.tags
             )
         }

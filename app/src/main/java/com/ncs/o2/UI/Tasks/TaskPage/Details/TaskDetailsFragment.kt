@@ -239,7 +239,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
         }
         binding.section.setOnClickThrottleBounceListener {
-            val sections = sectionDisplayBottomSheet(taskDetails.segment)
+            val sections = sectionDisplayBottomSheet(taskDetails.segment!!)
             sections.sectionSelectionListener = this@TaskDetailsFragment
             sections.show(requireFragmentManager(), "Section Selection")
         }
@@ -356,10 +356,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         binding.sectionNameET.text = task.section
         viewModel.task = task
-        val priority = SwitchFunctions.getStringPriorityFromNumPriority(task.priority)
-        val type = SwitchFunctions.getStringTypeFromNumType(task.type)
-        val status = SwitchFunctions.getStringStateFromNumState(task.status)
-        val difficulty = SwitchFunctions.getStringDifficultyFromNumDifficulty(task.difficulty)
+        val priority = SwitchFunctions.getStringPriorityFromNumPriority(task.priority!!)
+        val type = SwitchFunctions.getStringTypeFromNumType(task.type!!)
+        val status = SwitchFunctions.getStringStateFromNumState(task.status!!)
+        val difficulty = SwitchFunctions.getStringDifficultyFromNumDifficulty(task.difficulty!!)
 
         //Priority
         binding.priorityInclude.tagIcon.text = priority.substring(0, 1)
@@ -370,14 +370,14 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         binding.typeInclude.tagText.text = type
 
         // Assigner
-        fetchUserbyId(task.assigner) {
+        fetchUserbyId(task.assigner!!) {
             binding.asigneerDp.loadProfileImg(it?.profileDPUrl.toString())
         }
 
         // Assignee
         if (task.assignee != Endpoints.TaskDetails.EMPTY_MODERATORS) {
-            activityBinding.assignee=task.assignee
-            fetchUserbyId(task.assignee) { user ->
+            activityBinding.assignee=task.assignee!!
+            fetchUserbyId(task.assignee!!) { user ->
                 user?.isChecked = true
                 selectedAssignee.add(user!!)
                 Timber.tag("assigne").d(selectedAssignee.toString())
@@ -625,7 +625,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         binding.titleTv.text = task.title
 
         runDelayed(500) {
-            setUpTaskDescription(taskDetails.description)
+            setUpTaskDescription(taskDetails.description!!)
         }
 
         setCreator(task)
@@ -928,7 +928,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     private fun setCreator(task: Task) {
 
         val timeAgo = DateTimeUtils.getTimeAgo(task.time_STAMP!!.seconds)
-        fetchUserbyId(task.assigner) {
+        fetchUserbyId(task.assigner!!) {
 
             val fullText = "${it?.username} opened this $timeAgo"
             val spannableString = SpannableString(fullText)
@@ -1350,7 +1350,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         taskID = activityBinding.taskId,
                         projectName = PrefManager.getcurrentProject(),
                         NewAssignee = if (assignee.firebaseID == "") "None" else assignee.firebaseID!!,
-                        OldAssignee = if (taskDetails.assignee == "None") "None" else taskDetails.assignee
+                        OldAssignee = if (taskDetails.assignee!! == "None") "None" else taskDetails.assignee!!
                     )
                 }
 
@@ -1491,7 +1491,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         val result = withContext(Dispatchers.IO) {
                             viewModel.updateState(
                                 taskID = activityBinding.taskId,
-                                userID = taskDetails.assignee,
+                                userID = taskDetails.assignee!!,
                                 newState = text,
                                 projectName = PrefManager.getcurrentProject()
                             )
