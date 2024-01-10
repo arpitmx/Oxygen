@@ -1264,6 +1264,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     override fun onSegmentSelected(segmentName: String) {
         binding.segment.text = segmentName
         draft.segment=segmentName
+        draft.section="Section"
         PrefManager.putDraftTask(draft)
         Codes.STRINGS.segmentText = segmentName
         binding.section.text="Section"

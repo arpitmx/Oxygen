@@ -50,7 +50,6 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         super.onViewCreated(view, savedInstanceState)
         segmentName=PrefManager.getcurrentsegment()
 
-
         if (segmentName=="Select Segment"){
             activityBinding.gioActionbar.tabLayout.gone()
             activityBinding.gioActionbar.searchCont.gone()

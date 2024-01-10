@@ -120,6 +120,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 handleDynamicLink(intent)
                 dynamicLinkHandled = true
             }
+
         }
         else{
 
