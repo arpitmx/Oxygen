@@ -17,6 +17,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewParent
 import android.view.ViewPropertyAnimator
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AnimationUtils
@@ -43,6 +44,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.ncs.o2.R
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -279,37 +281,54 @@ object ExtensionsUtil {
     }
 
 
+    fun isValidContext(context: Context?): Boolean {
+        if (context == null) {
+            return false
+        }
+        if (context is Activity) {
+            val activity = context as Activity
+            if (activity.isDestroyed || activity.isFinishing) {
+                return false
+            }
+        }
+        return true
+    }
+
+
     fun ImageView.loadProfileImg(url: Any) {
-        Glide.with(context)
-            .load(url)
-            .listener(object : RequestListener<Drawable> {
+        if (isValidContext(context)) {
 
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    return false
-                }
+            Glide.with(context)
+                .load(url)
+                .listener(object : RequestListener<Drawable> {
 
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    return false
-                }
-            })
-            .encodeQuality(80)
-            .override(40, 40)
-            .apply(
-                RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-            )
-            .error(R.drawable.profile_pic_placeholder)
-            .into(this)
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+                })
+                .encodeQuality(80)
+                .override(40, 40)
+                .apply(
+                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                )
+                .error(R.drawable.profile_pic_placeholder)
+                .into(this)
+        }
     }
 
 
@@ -369,7 +388,6 @@ object ExtensionsUtil {
     }
 
 
-
     fun View.animSlideUpVisible(context: Context, animDuration: Long = 1500L) = run {
         this.clearAnimation()
         val animation = AnimationUtils.loadAnimation(context, R.anim.slide_bottom_to_up)
@@ -380,7 +398,10 @@ object ExtensionsUtil {
         this.visible()
     }
 
-    fun View.slideDownAndGone(duration: Long = 300L, onEndAction: (() -> Unit)? = null): ViewPropertyAnimator {
+    fun View.slideDownAndGone(
+        duration: Long = 300L,
+        onEndAction: (() -> Unit)? = null
+    ): ViewPropertyAnimator {
         return animate()
             .translationYBy(height.toFloat())
             .setDuration(duration)
@@ -391,7 +412,10 @@ object ExtensionsUtil {
             }
     }
 
-    fun View.slideUpAndVisible(duration: Long = 300L, onEndAction: (() -> Unit)? = null): ViewPropertyAnimator {
+    fun View.slideUpAndVisible(
+        duration: Long = 300L,
+        onEndAction: (() -> Unit)? = null
+    ): ViewPropertyAnimator {
         visibility = View.VISIBLE
         return animate()
             .translationYBy(-height.toFloat())
@@ -520,21 +544,21 @@ object ExtensionsUtil {
     }
 
 
-    fun View.setMargins(left:Int, top: Int , right : Int , bottom : Int){
+    fun View.setMargins(left: Int, top: Int, right: Int, bottom: Int) {
         if (this.layoutParams is ViewGroup.MarginLayoutParams) {
             val params = this.layoutParams as ViewGroup.MarginLayoutParams
-            params.setMargins(left,top,right,bottom);
+            params.setMargins(left, top, right, bottom);
         }
     }
 
-    fun TextInputEditText.appendTextAtCursorMiddleCursor(textToAppend: String, type : Int) {
-            val position = this.selectionStart
-            val text = this.text
-            val newText = StringBuilder(text).insert(position, textToAppend).toString()
-            this.setText(newText)
-            if (type == 2 ) this.setSelection(position + 1)
-            else this.setSelection(position + 2)
-        }
+    fun TextInputEditText.appendTextAtCursorMiddleCursor(textToAppend: String, type: Int) {
+        val position = this.selectionStart
+        val text = this.text
+        val newText = StringBuilder(text).insert(position, textToAppend).toString()
+        this.setText(newText)
+        if (type == 2) this.setSelection(position + 1)
+        else this.setSelection(position + 2)
+    }
 
 
     fun View.setOnClickThrottleBounceListener(throttleTime: Long = 600L, onClick: () -> Unit) {
@@ -623,5 +647,5 @@ object ExtensionsUtil {
     fun View.setBackgroundDrawable(drawable: Drawable) {
         background = drawable
     }
-
 }
+

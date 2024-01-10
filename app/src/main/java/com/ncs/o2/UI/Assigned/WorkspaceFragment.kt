@@ -96,10 +96,8 @@ class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
         PrefManager.initialize(requireContext())
         projectName = PrefManager.getcurrentProject()
         getTaskIdsList()
-//        activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
-//            getTaskIdsList()
-//        }
-        activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
+
+        activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener(1000) {
             requireActivity().recreate()
         }
 

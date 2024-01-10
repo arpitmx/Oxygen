@@ -400,7 +400,6 @@
             android:layout_marginEnd="15dp"
             android:layout_marginTop="7dp"
             android:background="@drawable/item_bg_curve"
-
             android:scaleX="0.8"
             android:scaleY="0.8"
             android:layout_marginBottom="7dp"

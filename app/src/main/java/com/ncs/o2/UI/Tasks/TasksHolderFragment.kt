@@ -37,7 +37,6 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
     private var sectionsList: MutableList<String> = mutableListOf()
     private val viewModel : TasksHolderViewModel by viewModels()
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

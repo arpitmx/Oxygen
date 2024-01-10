@@ -4,6 +4,8 @@ import android.graphics.Color
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 
+
+// This model is being used in the home page
 data class TaskItem(
     val title: String = "",
     var id: String="",

@@ -125,7 +125,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tagRecyclerView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:visibility="visible"

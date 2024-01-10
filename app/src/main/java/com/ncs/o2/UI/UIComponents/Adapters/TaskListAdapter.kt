@@ -1,7 +1,9 @@
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
@@ -26,12 +28,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class TaskListAdapter(val repository: FirestoreRepository,val context: Context,val taskList:MutableList<TaskItem>,val db:TasksDatabase) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>(){
 
 
     private val selectedTags = mutableListOf<Tag>()
-
     private var onClickListener: OnClickListener? = null
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -54,13 +56,16 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
             binding.difficulty.text = task.getDifficultyString()
 
             when (task.difficulty){
-                1 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_green)
-                2 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_yellow)
-                3 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_red)
+                1 -> binding.difficulty.background= ResourcesCompat.getDrawable(context.resources,R.drawable.label_cardview_green,null)
+                2 -> binding.difficulty.background= ResourcesCompat.getDrawable(context.resources,R.drawable.label_cardview_yellow,null)
+                3 -> binding.difficulty.background= ResourcesCompat.getDrawable(context.resources,R.drawable.label_cardview_red,null)
             }
 
             CoroutineScope(Dispatchers.IO).launch{
-                for (tagId in task.tagList){
+
+                val iterator = task.tagList.iterator()
+                while (iterator.hasNext()){
+                    val tagId = iterator.next()
                     val tag=db.tagsDao().getTagbyId(tagId)
 
                     if (!tag.isNull) {
@@ -68,27 +73,33 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                         selectedTags.add(tag!!)
                     }
                 }
+
                 withContext(Dispatchers.Main){
-                    //Log.d("tagcheckfromDB",selectedTags?.toString()!!)
+                   // Timber.d("tagcheckfromDB", selectedTags.toString())
                     setTagsView(selectedTags,binding,task)
                 }
             }
-
-
-
         }
     }
 
     private fun setTagsView(list: MutableList<Tag>,binding: TaskItemBinding,task: TaskItem) {
+
         val newList:MutableList<Tag> = mutableListOf()
-        for (tag in list){
-            if (task.tagList.contains(tag.tagID)){
+        val tagIdSet = HashSet(task.tagList)
+
+        val itr = list.iterator()
+
+        while(itr.hasNext()){
+            val tag = itr.next()
+            if(tagIdSet.contains(tag.tagID)){
                 newList.add(tag)
             }
         }
-        val finalList=newList.distinctBy { it.tagID }
+
+        val finalList= newList.distinctBy { it.tagID }
         val tagsRecyclerView = binding.tagRecyclerView
         val layoutManager = FlexboxLayoutManager(context)
+
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         tagsRecyclerView.layoutManager = layoutManager
@@ -104,6 +115,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
         diffResult.dispatchUpdatesTo(this)
         notifyDataSetChanged()
     }
+
     fun setTasks(newTaskList: List<Task>) {
         val taskItems: List<TaskItem> = newTaskList.map { task ->
             TaskItem(
@@ -116,6 +128,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 tagList = task.tags
             )
         }
+
         val diffCallback = TaskDiffCallback(taskList, taskItems)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         taskList.clear()
@@ -145,6 +158,8 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 onClickListener!!.onCLick(position, taskList[position])
             }
         }
+
+
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {

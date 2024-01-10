@@ -414,13 +414,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     }
 
-    private fun refreshActivity() {
 
-        // Refresh the activity by recreating it
-        startActivity(intent)
-        finish()
-
-    }
 
     override fun onSegmentSelected(segmentName: String) {
 

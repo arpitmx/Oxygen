@@ -52,4 +52,5 @@ class TagAdapterHomeScreen(private val tagList: List<Tag>) : RecyclerView.Adapte
         RecyclerView.ViewHolder(binding.root)
 
 
+
 }
