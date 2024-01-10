@@ -130,9 +130,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     }
 
     private fun initViews(){
-        if (isModerator){
-            binding.btnAddMoreCheckList.visible()
-        }
+
         getCheckList()
     }
 
@@ -194,6 +192,9 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                         checkListArray.addAll(result.data)
                         setCheckListRecyclerView(result.data.toMutableList())
                         binding.progressbar.gone()
+                        if (isModerator){
+                            binding.btnAddMoreCheckList.visible()
+                        }
                     }
 
                 }

@@ -125,7 +125,7 @@ class SegmentSelectionBottomSheet : BottomSheetDialogFragment(),
 
     override fun onClick(segment: Segment, position: Int) {
         Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
-
+        PrefManager.setcurrentsegment(segment.segment_NAME)
         segmentName=segment.segment_NAME
         sendsectionList(PrefManager.getcurrentProject())
         PrefManager.putsectionsList(sectionList)

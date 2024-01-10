@@ -327,8 +327,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         draft=PrefManager.getDraftTask()!!
-        draft.project_ID=PrefManager.getcurrentProject()
-        PrefManager.putDraftTask(draft)
+
 
         if (PrefManager.getcurrentUserdetails().ROLE>=3){
             manageViewsforModerators()
@@ -359,24 +358,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 startActivityForResult(intent,1)
             }
         }
-        val handler = Handler()
 
-        binding.title.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-
-            override fun afterTextChanged(editable: Editable?) {
-                val inputText = editable.toString()
-                draft.title = inputText
-                handler.removeCallbacksAndMessages(null)
-                handler.postDelayed({
-                    PrefManager.putDraftTask(draft)
-                }, 2000)
-            }
-        })
 
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -725,7 +707,26 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             binding.difficultyInclude.tagText.text="Easy"
         }
         else{
+            draft.project_ID=PrefManager.getcurrentProject()
+            PrefManager.putDraftTask(draft)
+            val handler = Handler()
 
+            binding.title.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
+                }
+
+                override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+                }
+
+                override fun afterTextChanged(editable: Editable?) {
+                    val inputText = editable.toString()
+                    draft.title = inputText
+                    handler.removeCallbacksAndMessages(null)
+                    handler.postDelayed({
+                        PrefManager.putDraftTask(draft)
+                    }, 2000)
+                }
+            })
             val draftTask=PrefManager.getDraftTask()
 
             val projectName=draftTask?.project_ID
@@ -828,18 +829,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 binding.textView2.visible()
             }
 
-//            val _assignee=draftTask?.assignee
-//            if (_assignee!=null){
-//                fetchUserDetails(_assignee){
-//                    binding.assigneeInclude.tagIcon.loadProfileImg(it.profileDPUrl!!)
-//                    binding.assigneeInclude.normalET.text=it.username
-//                    selectedAssignee= listOf(it).toMutableList()
-//                }
-//            }
-//            else{
-//                binding.assigneeInclude.tagIcon.setImageDrawable(resources.getDrawable(R.drawable.profile_pic_placeholder))
-//                binding.assigneeInclude.normalET.text="Unassigned"
-//            }
 
             val checkLists=PrefManager.getDraftCheckLists()
             if (checkLists.isNullOrEmpty()){
@@ -849,38 +838,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 binding.checkListCount.visible()
                 binding.checkListCount.text= "(${(checkLists.size).toString()})"
                 checkListArray=checkLists.toMutableList()
-            }
-
-//            val moderators=draftTask?.moderators
-//            if (!moderators.isNullOrEmpty()){
-//                setupSelectedMembersRecyclerView()
-//                for (moderator in moderators){
-//                    fetchUserDetails(moderator){
-//                        UserlistBottomSheet.DataHolder.users.add(it)
-//                    }
-//                }
-//            }
-
-            val tags=draftTask?.tags
-            if (!tags.isNullOrEmpty()){
-                CoroutineScope(Dispatchers.IO).launch{
-                    for (tagId in tags){
-                        val tag=db.tagsDao().getTagbyId(tagId)
-
-                        if (!tag.isNull) {
-                            tag?.checked = true
-                            selectedTags.add(tag!!)
-                        }
-                    }
-                    withContext(Dispatchers.Main){
-                        updateChipGroup()
-                    }
-                }
-            }
-
-            utils.showActionSnackbar(binding.root, "Loaded task from draft", 5000, "Clear") {
-                PrefManager.putDraftTask(Task())
-                recreate()
             }
 
         }
@@ -907,6 +864,26 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             binding.taskDurationET.text="5 Hours"
         }
         else{
+            draft.project_ID=PrefManager.getcurrentProject()
+            PrefManager.putDraftTask(draft)
+            val handler = Handler()
+
+            binding.title.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
+                }
+
+                override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+                }
+
+                override fun afterTextChanged(editable: Editable?) {
+                    val inputText = editable.toString()
+                    draft.title = inputText
+                    handler.removeCallbacksAndMessages(null)
+                    handler.postDelayed({
+                        PrefManager.putDraftTask(draft)
+                    }, 2000)
+                }
+            })
             val draftTask=PrefManager.getDraftTask()
 
             val projectName=draftTask?.project_ID
@@ -1010,20 +987,10 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 binding.textView2.visible()
             }
 
-//            val _assignee=draftTask?.assignee
-//            if (_assignee!=null){
-//                fetchUserDetails(_assignee){
-//                    binding.assigneeInclude.tagIcon.loadProfileImg(it.profileDPUrl!!)
-//                    binding.assigneeInclude.normalET.text=it.username
-//                    selectedAssignee= listOf(it).toMutableList()
-//                }
-//            }
-//            else{
-//                binding.assigneeInclude.tagIcon.setImageDrawable(resources.getDrawable(R.drawable.profile_pic_placeholder))
-//                binding.assigneeInclude.normalET.text="Unassigned"
-//            }
+
 
             val checkLists=PrefManager.getDraftCheckLists()
+
             if (checkLists.isNullOrEmpty()){
                 binding.checkListCount.gone()
             }
@@ -1033,15 +1000,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 checkListArray=checkLists.toMutableList()
             }
 
-//            val moderators=draftTask?.moderators
-//            if (!moderators.isNullOrEmpty()){
-//                setupSelectedMembersRecyclerView()
-//                for (moderator in moderators){
-//                    fetchUserDetails(moderator){
-//                        UserlistBottomSheet.DataHolder.users.add(it)
-//                    }
-//                }
-//            }
 
             val tags=draftTask?.tags
             if (!tags.isNullOrEmpty()){
@@ -1059,10 +1017,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     }
                 }
             }
-            utils.showActionSnackbar(binding.root, "Loaded task from draft", 5000, "Clear") {
-                PrefManager.putDraftTask(Task())
-                recreate()
-            }
         }
     }
 
@@ -1071,11 +1025,14 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         val layoutManager = FlexboxLayoutManager(this)
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
-
+        contriRecyclerView.visible()
         contriRecyclerView.layoutManager = layoutManager
         contriAdapter = ContributorAdapter(mutableListOf(), this)
         contriRecyclerView.adapter = contriAdapter
-        contriRecyclerView.visible()
+
+    }
+
+    private fun setUpModerators(list: MutableList<User>){
 
     }
 
@@ -1181,9 +1138,17 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         binding.gioActionbar.btnFav.gone()
         binding.gioActionbar.btnRequestWork.gone()
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
+            UserlistBottomSheet.DataHolder.users.clear()
             onBackPressedDispatcher.onBackPressed()
             finish()
         }
+    }
+
+    override fun onBackPressed() {
+        UserlistBottomSheet.DataHolder.users.clear()
+        onBackPressedDispatcher.onBackPressed()
+        finish()
+        super.onBackPressed()
     }
 
     override fun onProfileClick(user: User, position: Int) {
@@ -1201,13 +1166,12 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             if (!contriAdapter.isUserAdded(contributor)) {
                 contriAdapter.addUser(contributor)
                 contributorList.add(contributor.firebaseID!!)
-
                 if (contributor.profileIDUrl == null){
                     contributorDpList.add("")
                 }else {
                     contributorDpList.add(contributor.profileIDUrl)
-
                 }
+
             }
         } else {
             contriAdapter.removeUser(contributor)
@@ -1256,6 +1220,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         }
         else{
             selectedAssignee.remove(assignee)
+            draft.assignee="None"
             binding.assigneeInclude.normalET.text="Unassigned"
             binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
         }

@@ -10,6 +10,7 @@ import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.versa.Constants.Endpoints
 import java.util.Date
