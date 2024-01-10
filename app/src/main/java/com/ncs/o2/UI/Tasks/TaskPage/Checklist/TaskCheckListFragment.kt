@@ -91,6 +91,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTaskChecklistBinding.inflate(inflater, container, false)
+
         val moderatorList= activityBinding.moderatorsList
         val assignee = activityBinding.assignee
         val currentUser= FirebaseAuth.getInstance().currentUser?.email

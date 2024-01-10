@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -61,7 +63,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TasksDetailsHolderFragment
 import com.ncs.o2.UI.UIComponents.BottomSheets.AssigneeListBottomSheet
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
-import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.TagAdapterOtherScreens
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
@@ -90,7 +92,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
     AddTagsBottomSheet.getSelectedTagsCallback,
-    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapter.OnClick {
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapterOtherScreens.OnClick {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
@@ -163,29 +165,33 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpViews()
-        runDelayed(100) {
-            setDetails(activityBinding.taskId)
-        }
-        val viewpager = tasksHolderBinding.binding.viewPager2
-        if (!activityBinding.index.isNull){
-            when(activityBinding.index){
-                "0"-> viewpager.currentItem=0
-                "1"-> viewpager.currentItem=1
-                "2"-> viewpager.currentItem=2
+
+            setUpViews()
+            runDelayed(100) {
+                setDetails(activityBinding.taskId)
             }
-        }
-        binding.assignee.isEnabled = false
-        binding.section.isEnabled=false
-        binding.priority.isEnabled=false
-        binding.activity.setOnClickThrottleBounceListener {
             val viewpager = tasksHolderBinding.binding.viewPager2
-            val next = viewpager.currentItem + 1
-            if (next < 2) {
-                viewpager.currentItem = next
+            if (!activityBinding.index.isNull){
+                when(activityBinding.index){
+                    "0"-> viewpager.currentItem=0
+                    "1"-> viewpager.currentItem=1
+                    "2"-> viewpager.currentItem=2
+                }
             }
-        }
-        binding.taskDetailLinLay.setOnClickThrottleBounceListener {}
+
+
+            binding.assignee.isEnabled = false
+            binding.section.isEnabled=false
+            binding.priority.isEnabled=false
+            binding.activity.setOnClickThrottleBounceListener {
+                val viewpager = tasksHolderBinding.binding.viewPager2
+                val next = viewpager.currentItem + 1
+                if (next < 2) {
+                    viewpager.currentItem = next
+                }
+            }
+            binding.taskDetailLinLay.setOnClickThrottleBounceListener {}
+
     }
 
     override fun onDestroyView() {
@@ -565,7 +571,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.flexWrap = FlexWrap.WRAP
         tagsRecyclerView.layoutManager = layoutManager
-        val adapter = TagAdapter(newList, this)
+        val adapter = TagAdapterOtherScreens(newList, this)
         tagsRecyclerView.adapter = adapter
 
     }
@@ -1275,7 +1281,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         } else {
             selectedAssignee.remove(assignee)
-            binding.assigneeInclude.normalET.text = "Unassigned"
+            binding.assigneeInclude.normalET.text = Endpoints.TASKDETAILS.UNASSIGNED
             binding.assigneeInclude.tagIcon.setImageResource(R.drawable.profile_pic_placeholder)
 
         }

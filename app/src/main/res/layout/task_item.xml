@@ -5,10 +5,12 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="2dp"
     android:paddingTop="5dp"
     android:background="@color/darkbg_main_a80"
+    android:foreground="@drawable/ripplecustom"
     android:orientation="vertical"
+    android:clickable="true"
+    android:focusable="true"
     android:weightSum="10">
 
     <RelativeLayout
@@ -96,9 +98,7 @@
             android:textSize="14dp"
             app:layout_constraintVertical_bias="0.136" />
 
-
     </RelativeLayout>
-
 
 
     <TextView
@@ -128,11 +128,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
+        android:visibility="visible"
         android:layout_marginBottom="5dp"
-        android:layoutAnimation="@anim/layout_animation_slidedown"
         android:nestedScrollingEnabled="false"
-        tools:listitem="@layout/tag_item"
-        android:padding="@dimen/padding_start_task_details" />
+        tools:listitem="@layout/tag_item_home"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        />
 
 
     <View

@@ -5,13 +5,18 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentResolver
+import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,9 +24,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.ui.text.toLowerCase
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -29,10 +34,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.util.query
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.NotificationType
@@ -45,12 +47,13 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
-import com.ncs.o2.Domain.Repositories.FirebaseAuthRepository
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursor
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursorMiddleCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideUpAndVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
@@ -64,7 +67,6 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
-import com.ncs.o2.UI.UIComponents.Adapters.AssigneeListAdpater
 import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
 import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -90,6 +92,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 import java.io.InputStream
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -97,7 +100,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
-    ChatAdapter.onImageClicked,MentionUsersAdapter.onUserClick {
+    ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
@@ -112,17 +115,23 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     lateinit var task: Task
     private lateinit var mdEditor: MarkwonEditor
     lateinit var chatAdapter: ChatAdapter
-    lateinit var adapter:MentionUsersAdapter
+    lateinit var mentionAdapter: MentionUsersAdapter
     lateinit var recyclerView: RecyclerView
-    lateinit var mentionUserRv:RecyclerView
+    lateinit var mentionUserRv: RecyclerView
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
     private val CAMERA_PERMISSION_REQUEST = 100
     private var bitmap: Bitmap? = null
     lateinit var imageUri: Uri
-    var contributors:MutableList<String> = mutableListOf()
-    var contributorsData:MutableList<User> = mutableListOf()
+    var contributors: MutableList<String> = mutableListOf()
+    var contributorsData: MutableList<User> = mutableListOf()
     private var mentionedUsers = mutableListOf<User>()
+    private val clipboardManager : ClipboardManager by lazy {
+        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
+
+    private val moderatorList : MutableList<String> by lazy { activityBinding.moderatorsList }
+
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
@@ -133,12 +142,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentTaskChatBinding.inflate(inflater, container, false)
         return binding.root
@@ -153,12 +160,17 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun setUpRecyclerview() {
         recyclerView = binding.chatRecyclerview
-        mentionUserRv=binding.mentionUserRv
+        mentionUserRv = binding.mentionUserRv
     }
 
     private fun initViews() {
+
+        val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(binding.inputBox.editboxMessage, InputMethodManager.SHOW_IMPLICIT)
+
+        binding.chatboxOptionBox.gone()
         mentionedUsers.clear()
-        adapter = MentionUsersAdapter(emptyList<User>().toMutableList(),this)
+        mentionAdapter = MentionUsersAdapter(emptyList<User>().toMutableList(), this)
 
         binding.inputBox.progressBarSendMsg.gone()
 
@@ -181,7 +193,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         if (contributorsData.isEmpty() || contributorsData.size != contributors.size) {
                             fetchContributors()
                         } else {
-                            filterList(input.substring(lastAtSymbolIndex + 1),mentionedUsers)
+                            filterList(input.substring(lastAtSymbolIndex + 1), mentionedUsers)
                         }
                     }
                 } else if ('@' in input) {
@@ -193,30 +205,24 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         } else {
                             val mentions = input.split('@').drop(1)
                             for (mention in mentions) {
-                                for (cont in contributorsData){
-                                    if (cont.username.equals(mention.trim(), ignoreCase = true)){
+                                for (cont in contributorsData) {
+                                    if (cont.username.equals(mention.trim(), ignoreCase = true)) {
                                         mentionedUsers.add(cont)
-                                        val list=mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
-                                        Log.d("listcheck",list.toString())
+                                        val list = mentionedUsers.distinctBy { it.firebaseID }
+                                            .toMutableList()
+                                        Log.d("listcheck", list.toString())
                                     }
                                 }
-                                filterList(mention,mentionedUsers)
+                                filterList(mention, mentionedUsers)
                             }
                         }
                     }
                 } else {
                     slideDownAnimation(binding.mentionUsersView)
-                    adapter.updateList(emptyList())
+                    mentionAdapter.updateList(emptyList())
                 }
             }
         })
-
-
-
-
-
-
-
 
         binding.inputBox.btnSend.setOnClickThrottleBounceListener {
 
@@ -228,47 +234,78 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 binding.inputBox.progressBarSendMsg.visible()
                 uploadImageToFirebaseStorage(bitmap!!, PrefManager.getcurrentProject(), task.id)
             } else {
-                toast("Message can't be empty")
+                util.showSnackbar(binding.root,"Message can't be empty", 500)
             }
+        }
+
+        binding.btnPaste.setOnClickThrottleBounceListener {
+            pasteFromClipboard()
         }
 
         binding.btnCodeBlock.setOnClickThrottleBounceListener {
 
-            binding.inputBox.editboxMessage.text?.append(
-                " \n ``` Code_Lang \n Code \n``` "
+            binding.inputBox.editboxMessage.appendTextAtCursor(
+                " ``` Code_Lang \n Code \n``` "
             )
 
         }
 
+        binding.btnAttachBlockQuote.setOnClickThrottleBounceListener {
+            binding.inputBox.editboxMessage.appendTextAtCursor(
+                ">"
+            )
+        }
+
+        binding.btnAttachBold.setOnClickThrottleBounceListener {
+            binding.inputBox.editboxMessage.appendTextAtCursorMiddleCursor(
+                "****", type = 4
+            )
+
+        }
+
+        binding.btnAttachItalics.setOnClickThrottleBounceListener {
+            binding.inputBox.editboxMessage.appendTextAtCursorMiddleCursor(
+                "__", type =  2
+            )
+        }
+
         binding.btnChecklist.setOnClickThrottleBounceListener {
-            binding.inputBox.editboxMessage.text?.append(
-                " \n - [ ] List_Text "
+            binding.inputBox.editboxMessage.appendTextAtCursor(
+                " - [ ] List_Text "
             )
 
         }
 
         binding.btnLink.setOnClickThrottleBounceListener {
-
-            binding.inputBox.editboxMessage.text?.append(
+            binding.inputBox.editboxMessage.appendTextAtCursor(
                 " [Link Text](Link URL) "
             )
-
         }
 
         binding.btnBackTick.setOnClickThrottleBounceListener {
 
-            binding.inputBox.editboxMessage.text?.append(
-                " ` "
+            binding.inputBox.editboxMessage.appendTextAtCursorMiddleCursor(
+                "` `", type = 2
             )
-
         }
-
     }
-    private fun filterList(query: String,mentionedUsers: List<User>) {
+
+    private fun pasteFromClipboard() {
+        val clipData: ClipData? = clipboardManager.primaryClip
+
+        if (clipData != null && clipData.itemCount > 0) {
+            val textToPaste = clipData.getItemAt(0).text.toString()
+            binding.inputBox.editboxMessage.appendTextAtCursor(textToPaste)
+        }else {
+            toast("Nothing to paste..")
+        }
+    }
+
+    private fun filterList(query: String, mentionedUsers: List<User>) {
         val filteredList = contributorsData.filter { contributor ->
             contributor.username!!.contains(query, ignoreCase = true)
         }
-        adapter.updateList(filteredList)
+        mentionAdapter.updateList(filteredList)
     }
 
     private fun sendMessageProcess() {
@@ -284,19 +321,16 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
 
-
     private fun setUpChatbox() {
         val markdownEditor = MarkwonEditor.builder(markwon).build()
 
         binding.inputBox.editboxMessage.addTextChangedListener(
             MarkwonEditorTextWatcher.withPreRender(
-                markdownEditor,
-                Executors.newCachedThreadPool(),
-                binding.inputBox.editboxMessage
+                markdownEditor, Executors.newCachedThreadPool(), binding.inputBox.editboxMessage
             )
         )
 
-        binding.inputBox.btnAttachImage.setOnClickThrottleBounceListener {
+        binding.btnAttachImage.setOnClickThrottleBounceListener {
             selectImage()
             if (bitmap != null) {
                 binding.inputBox.msgBox.gone()
@@ -309,6 +343,16 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 binding.inputBox.selectedImageView.gone()
             }
         }
+
+        binding.inputBox.btnAttach.setOnClickThrottleBounceListener(100) {
+            if (chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS) {
+                toggleChatOptions(false)
+            } else {
+                toggleChatOptions(true)
+            }
+        }
+
+
         binding.crossBtnSelectPdf.setOnClickThrottleBounceListener {
             bitmap = null
             binding.btnSelectImageFromStorage.gone()
@@ -323,6 +367,21 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         }
     }
 
+
+
+    private fun toggleChatOptions(visibility: Boolean) {
+        if (visibility) {
+            binding.chatboxOptionBox.slideUpAndVisible(100){
+                chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS = true
+            }
+
+        } else {
+            binding.chatboxOptionBox.slideDownAndGone(100) {
+                chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS = false
+            }
+
+        }
+    }
 
     private fun uploadImageToFirebaseStorage(bitmap: Bitmap, projectId: String, taskId: String) {
 
@@ -403,19 +462,19 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun selectImage() {
         if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
+                requireContext(), Manifest.permission.CAMERA
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.CAMERA),
-                CAMERA_PERMISSION_REQUEST
+                requireActivity(), arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST
             )
         } else {
             pickImage()
         }
     }
+
+
+    private var capturedImageUri: Uri? = null
 
     private fun pickImage() {
 
@@ -425,13 +484,34 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         builder.setItems(options) { dialog, item ->
             when (options[item]) {
                 "Take Photo" -> {
-                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+
+                    if (ContextCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        // Permission is not granted, request it
+                        ActivityCompat.requestPermissions(
+                            requireActivity(),
+                            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                            100
+                        )
+                    } else {
+
+                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        val dir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                        val output = File(dir, "O2-Snap-${Timestamp.now().seconds}.jpeg")
+
+                        capturedImageUri = Uri.fromFile(output)
+
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+                    }
+
                 }
 
                 "Choose from Gallery" -> {
-                    val intent =
-                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     startActivityForResult(intent, REQUEST_IMAGE_PICK)
                 }
 
@@ -449,7 +529,11 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_IMAGE_CAPTURE -> {
-                    val imageBitmap = data?.extras?.get("data") as Bitmap
+                    val file = File(capturedImageUri?.path)
+                    val imageBitmap: Bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                    Timber.tag("Image bitmap name").d(file.name)
+                    //toast(file.name)
+
                     bitmap = imageBitmap
                     binding.inputBox.msgBox.gone()
                     binding.btnSelectImageFromStorage.visible()
@@ -471,7 +555,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }
         }
     }
-    private fun fetchContributors(){
+
+    private fun fetchContributors() {
         firestoreRepository.getContributors(PrefManager.getcurrentProject()) { serverResult ->
             when (serverResult) {
                 is ServerResult.Success -> {
@@ -479,7 +564,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                     val contributorList = serverResult.data
                     if (contributorList.isNotEmpty()) {
                         contributors.addAll(contributorList)
-                        for (contributor in contributorList ) {
+                        for (contributor in contributorList) {
                             viewModel.getUserbyId(contributor) { result ->
                                 when (result) {
                                     is ServerResult.Success -> {
@@ -487,11 +572,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                         binding.mentionUserRv.visible()
 
                                         val user = result.data
+                                        user?.email = contributor
                                         contributorsData.add(user!!)
-                                        if (contributorsData.size==contributorList.size){
+                                        if (contributorsData.size == contributorList.size) {
                                             setMentionUsersRv(contributorsData)
                                         }
-                                        Log.d("contributorsdata",contributorsData.toString())
+                                        Log.d("contributorsdata", contributorsData.toString())
 
                                     }
 
@@ -518,14 +604,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         }
 
                     }
-
                 }
 
                 is ServerResult.Failure -> {
                     binding.mentionUserRv.visible()
                     binding.mentionProgressbar.gone()
                     val exception = serverResult.exception
-                    utils.showSnackbar(requireView(),"Couldn't fetch Users",2000)
+                    utils.showSnackbar(requireView(), "Couldn't fetch Users", 2000)
 
                 }
 
@@ -537,18 +622,17 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         }
     }
 
-    private fun setMentionUsersRv(list:MutableList<User>){
-        Log.d("rvList",list.toString())
-        adapter = MentionUsersAdapter(list,this)
+    private fun setMentionUsersRv(list: MutableList<User>) {
+        Log.d("rvList", list.toString())
+        mentionAdapter = MentionUsersAdapter(list, this)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         mentionUserRv.layoutManager = linearLayoutManager
-        mentionUserRv.adapter = adapter
+        mentionUserRv.adapter = mentionAdapter
     }
+
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         if (requestCode == CAMERA_PERMISSION_REQUEST) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -565,12 +649,14 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun setMessages() {
         chatAdapter = ChatAdapter(
-            activitybinding=activityBinding,
+            activitybinding = activityBinding,
             repository = firestoreRepository,
             msgList = mutableListOf(),
             context = requireContext(),
             onchatDoubleClickListner = this,
             markwon = markwon,
+            moderatorList = moderatorList,
+            assignee = activityBinding.assignee
         )
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -602,14 +688,11 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 is ServerResult.Failure -> {
                     binding.progress.gone()
                     val errorMessage = result.exception.message
-                    GlobalUtils.EasyElements(requireContext())
-                        .singleBtnDialog(
-                            "Failure",
-                            "Failed to load messages with error: $errorMessage",
-                            "Okay"
-                        ) {
-                            requireActivity().finish()
-                        }
+                    GlobalUtils.EasyElements(requireContext()).singleBtnDialog(
+                        "Failure", "Failed to load messages with error: $errorMessage", "Okay"
+                    ) {
+                        requireActivity().finish()
+                    }
                 }
 
                 is ServerResult.Progress -> {
@@ -629,9 +712,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postMessage(
-                projectName = task.project_ID,
-                taskId = task.id,
-                message = message
+                projectName = task.project_ID, taskId = task.id, message = message
             ) { result ->
 
                 when (result) {
@@ -651,44 +732,47 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
 
                         if (message.messageType == MessageType.NORMAL_MSG) {
-                            Log.d("listcheck",mentionedUsers.toString())
-                            val list=mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
+                            Log.d("listcheck", mentionedUsers.toString())
+                            val list = mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
                             val regex = Regex("@(\\w+)")
                             val matches = regex.findAll(message.content)
                             val mentionedUsersName: MutableList<String> = mutableListOf()
-                            Log.d("listcheckmatches",matches.toString())
+                            Log.d("listcheckmatches", matches.toString())
 
                             for (user in list) {
                                 user.username?.let {
                                     mentionedUsersName.add(it.toLowerCase())
                                 }
                             }
-                            Log.d("listcheckmentioned",mentionedUsersName.toString())
+                            Log.d("listcheckmentioned", mentionedUsersName.toString())
 
                             if (matches.any()) {
-                                val mentioned = matches.map { it.groupValues[1].toLowerCase() }.toList()
-                                Log.d("listcheckmentioned",mentioned.toString())
+                                val mentioned =
+                                    matches.map { it.groupValues[1].toLowerCase() }.toList()
+                                Log.d("listcheckmentioned", mentioned.toString())
                                 if (mentionedUsersName.containsAll(mentioned)) {
                                     binding.inputBox.progressBarSendMsg.gone()
                                     binding.inputBox.editboxMessage.text?.clear()
 
                                     var trimmedMsg = message.content.substring(
-                                        0,
-                                        message.content.length.coerceAtMost(150)
+                                        0, message.content.length.coerceAtMost(150)
                                     )
 
-                                    if (trimmedMsg.length==150) trimmedMsg = "$trimmedMsg..."
+                                    if (trimmedMsg.length == 150) trimmedMsg = "$trimmedMsg..."
 
                                     val notification = composeNotification(
                                         NotificationType.TASK_COMMENT_MENTION_NOTIFICATION,
                                         message = trimmedMsg
                                     )
-                                    val mentionedUserTokenList:List<String> = list.map { it.fcmToken!! }
-                                    Log.d("listcheck",list.toString())
+                                    val mentionedUserTokenList: List<String> =
+                                        list.map { it.fcmToken!! }
+                                    Log.d("listcheck", list.toString())
 
-                                    for (user in list){
+                                    for (user in list) {
 
-                                        chatViewModel.addNotificationToFirebase(user.firebaseID!!, notification = notification!!) { res ->
+                                        chatViewModel.addNotificationToFirebase(
+                                            user.firebaseID!!, notification = notification!!
+                                        ) { res ->
                                             when (res) {
                                                 is ServerResult.Success -> {
                                                     binding.progress.gone()
@@ -722,26 +806,23 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                     list.clear()
                                     mentionedUsers.clear()
                                 }
-                            }
-                            else{
+                            } else {
                                 binding.inputBox.progressBarSendMsg.gone()
                                 binding.inputBox.editboxMessage.text?.clear()
 
                                 var trimmedMsg = message.content.substring(
-                                    0,
-                                    message.content.length.coerceAtMost(150)
+                                    0, message.content.length.coerceAtMost(150)
                                 )
 
-                                if (trimmedMsg.length==150) trimmedMsg = "$trimmedMsg..."
+                                if (trimmedMsg.length == 150) trimmedMsg = "$trimmedMsg..."
 
                                 val notification = composeNotification(
-                                    NotificationType.TASK_COMMENT_NOTIFICATION,
-                                    message = trimmedMsg
+                                    NotificationType.TASK_COMMENT_NOTIFICATION, message = trimmedMsg
                                 )
 
                                 val filteredList = {
                                     val list = activityBinding.sharedViewModel.getList()
-                                    if (list.contains(PrefManager.getUserFCMToken())){
+                                    if (list.contains(PrefManager.getUserFCMToken())) {
                                         list.remove(PrefManager.getUserFCMToken())
                                     }
                                     list
@@ -749,8 +830,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 }
                                 notification?.let {
                                     sendNotification(
-                                        filteredList.invoke(),
-                                        notification
+                                        filteredList.invoke(), notification
                                     )
                                 }
                             }
@@ -768,13 +848,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                             val trimmedMsg = "Shared a pic \uD83C\uDF01"
                             val notification = composeNotification(
-                                NotificationType.TASK_COMMENT_NOTIFICATION,
-                                message = trimmedMsg
+                                NotificationType.TASK_COMMENT_NOTIFICATION, message = trimmedMsg
                             )
 
                             val filteredList = {
                                 val list = activityBinding.sharedViewModel.getList()
-                                if (list.contains(PrefManager.getUserFCMToken())){
+                                if (list.contains(PrefManager.getUserFCMToken())) {
                                     list.remove(PrefManager.getUserFCMToken())
                                 }
                                 list
@@ -782,8 +861,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             }
                             notification?.let {
                                 sendNotification(
-                                    filteredList.invoke(),
-                                    notification
+                                    filteredList.invoke(), notification
                                 )
                             }
                         }
@@ -813,12 +891,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             )
         }
         if (type == NotificationType.TASK_COMMENT_MENTION_NOTIFICATION) {
-            val mentionedUserNames:MutableList<String> = mutableListOf()
-            val list=mentionedUsers.distinctBy { it.firebaseID }
-            for (user in list){
+            val mentionedUserNames: MutableList<String> = mutableListOf()
+            val list = mentionedUsers.distinctBy { it.firebaseID }
+            for (user in list) {
                 mentionedUserNames.add("@${user.username!!}")
             }
-            val usernames=mentionedUserNames.joinToString(", ")
+            val usernames = mentionedUserNames.joinToString(", ")
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name,
@@ -841,8 +919,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             CoroutineScope(Dispatchers.IO).launch {
                 for (receiverToken in receiverList) {
                     NotificationsUtils.sendFCMNotification(
-                        receiverToken,
-                        notification = notification
+                        receiverToken, notification = notification
                     )
                 }
 
@@ -922,12 +999,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
         val activity = requireActivity()
 
-        Markwon.builder(activity)
-            .usePlugin(ImagesPlugin.create())
-            .usePlugin(GlideImagesPlugin.create(activity))
-            .usePlugin(TablePlugin.create(activity))
-            .usePlugin(TaskListPlugin.create(activity))
-            .usePlugin(HtmlPlugin.create())
+        Markwon.builder(activity).usePlugin(ImagesPlugin.create())
+            .usePlugin(GlideImagesPlugin.create(activity)).usePlugin(TablePlugin.create(activity))
+            .usePlugin(TaskListPlugin.create(activity)).usePlugin(HtmlPlugin.create())
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
 
@@ -937,13 +1011,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         imagesPlugin.addSchemeHandler(DataUriSchemeHandler.create())
                     }
                 }
-            })
-            .usePlugin(object : AbstractMarkwonPlugin() {
+            }).usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configureTheme(builder: MarkwonTheme.Builder) {
-                    builder
-                        .blockQuoteColor(requireContext().getColor(R.color.primary))
-                        .linkColor(requireContext().getColor(R.color.primary))
-                        .codeBlockTextSize(30)
+                    builder.blockQuoteColor(requireContext().getColor(R.color.primary))
+                        .linkColor(requireContext().getColor(R.color.primary)).codeBlockTextSize(30)
                 }
             })
 
@@ -952,8 +1023,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
 
     override fun onDoubleClickListner(msg: Message, senderName: String) {
-        val replyFormat =
-            """
+        val replyFormat = """
             >${msg.content}
           
             **@${senderName}**

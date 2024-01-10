@@ -48,7 +48,7 @@
             android:fontFamily="@font/sf_pro_display_semibold"
             android:layout_marginTop="@dimen/margin_top"
             android:gravity="center"
-            android:text="\@Mentioned"
+            android:text="Mentioned"
             android:padding="5dp"
             android:layout_alignParentTop="true"
             android:textColor="@color/better_white"

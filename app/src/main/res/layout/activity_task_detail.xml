@@ -28,6 +28,7 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:tabIndicatorColor="@color/better_white"
         app:tabMode="fixed"
+        android:nestedScrollingEnabled="true"
         android:layoutAnimation="@anim/layout_animation_fadein"
         app:tabIndicatorAnimationMode="fade"
         app:tabRippleColor="@color/item_bg_glow"
@@ -88,10 +89,8 @@
             android:layout_width="match_parent"
             app:defaultNavHost="true"
             app:navGraph="@navigation/task_detail_nav"
-
+            android:nestedScrollingEnabled="true"
             />
-
-
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -118,10 +117,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
-
-
-
-
 
 
 </LinearLayout>

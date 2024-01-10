@@ -67,6 +67,7 @@
             android:id="@+id/linearLayoutCompat2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:nestedScrollingEnabled="true"
             android:orientation="vertical">
 
             <HorizontalScrollView
@@ -76,6 +77,7 @@
                 android:background="@drawable/horizontal_scrollview_bg"
                 android:clipToPadding="false"
                 android:fadeScrollbars="false"
+                android:nestedScrollingEnabled="true"
                 android:layout_margin="10dp"
                 android:paddingEnd="10dp"
                 android:paddingStart="10dp"
@@ -468,7 +470,7 @@
                 android:visibility="gone"
                 android:clipToPadding="false"
                 android:layoutAnimation="@anim/layout_animation_popscale"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="true" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"

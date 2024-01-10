@@ -23,10 +23,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/gio_actionbar"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/border_grey"
-        app:layout_constraintTop_toBottomOf="@id/setting_recycler" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

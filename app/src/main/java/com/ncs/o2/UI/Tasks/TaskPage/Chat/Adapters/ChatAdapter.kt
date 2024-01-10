@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.compose.ui.res.colorResource
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
@@ -19,6 +22,7 @@ import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setMargins
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -56,6 +60,8 @@ class ChatAdapter(
     val repository: FirestoreRepository,
     var msgList: MutableList<Message>,
     val context: Context,
+    val moderatorList : MutableList<String>,
+    val assignee : String,
     private val onchatDoubleClickListner: onChatDoubleClickListner,
     private val markwon: Markwon
 ) :
@@ -104,6 +110,23 @@ class ChatAdapter(
                 }
             }
 
+            binding.parentMessageItem.setOnDoubleClickListener {
+
+                if (localUser != null) {
+                    onchatDoubleClickListner.onDoubleClickListner(
+                        msgList[position],
+                        localUser.USERNAME!!
+                    )
+                } else {
+                    fetchUser(senderId) {
+                        onchatDoubleClickListner.onDoubleClickListner(
+                            msgList[position],
+                            it.USERNAME!!
+                        )
+                    }
+                }
+            }
+
             binding.descriptionTv.setOnDoubleClickListener {
 
                 if (localUser != null) {
@@ -119,7 +142,6 @@ class ChatAdapter(
                         )
                     }
                 }
-
             }
         }
     }
@@ -145,7 +167,7 @@ class ChatAdapter(
             }
         }
 
-        }
+    }
 
 
     fun setImageItem(user: UserInMessage, binding: ChatImageItemBinding, position: Int) {
@@ -153,7 +175,6 @@ class ChatAdapter(
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.tvName.text = user.USERNAME
-        setDPImageItem(position, binding, user)
         binding.imagePreview.load(url,R.drawable.placeholder_image,"")
         binding.imagePreview.visible()
         binding.imageProgressBar.gone()
@@ -165,6 +186,9 @@ class ChatAdapter(
 //            OnImageClicked.onImageClick(0, listOf(url))
             onImageClick(0, listOf(url))
         }
+
+        setDPImageItem(position, binding, user)
+
     }
 
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
@@ -172,7 +196,6 @@ class ChatAdapter(
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.tvName.text = user.USERNAME
-
         setDP(position, binding, user)
 
 
@@ -180,6 +203,7 @@ class ChatAdapter(
 
     private fun setDPImageItem(position: Int, binding: ChatImageItemBinding, user: UserInMessage) {
 
+
         // No changes for the first item
         if (position == 0) {
             binding.msgSeperator.gone()
@@ -187,6 +211,24 @@ class ChatAdapter(
             binding.tvName.visible()
             binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
             binding.imgDp.loadProfileImg(user.DP_URL.toString())
+
+
+            if (moderatorList.contains(user.EMAIL)){
+                binding.modTag.visible()
+                binding.tvName.setTextColor(context.resources.getColor(R.color.light_blue_A200))
+
+            }else {
+                binding.modTag.gone()
+                binding.tvName.setTextColor(context.resources.getColor(R.color.primary))
+
+            }
+
+            if (assignee == user.EMAIL){
+                binding.assigneeTag.visible()
+            }else{
+                binding.assigneeTag.gone()
+            }
+
             return
         }
 
@@ -197,22 +239,44 @@ class ChatAdapter(
             binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
             binding.msgSeperator.gone()
 
+            binding.modTag.gone()
+            binding.assigneeTag.gone()
             return
+
         }
 
         // All the other items
+
         binding.msgSeperator.visible()
         binding.imgDp.visible()
         binding.tvName.visible()
         binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
         binding.msgSeperator.alpha = 1f
         binding.imgDp.loadProfileImg(user.DP_URL.toString())
+
+        if (moderatorList.contains(user.EMAIL)){
+            binding.modTag.visible()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.light_blue_A200))
+
+        }else {
+            binding.modTag.gone()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.primary))
+
+        }
+
+        if (assignee == user.EMAIL){
+            binding.assigneeTag.visible()
+        }else{
+            binding.assigneeTag.gone()
+        }
+
 
 
     }
 
     private fun setDP(position: Int, binding: ChatMessageItemBinding, user: UserInMessage) {
 
+
         // No changes for the first item
         if (position == 0) {
             binding.msgSeperator.gone()
@@ -220,6 +284,22 @@ class ChatAdapter(
             binding.tvName.visible()
             binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
             binding.imgDp.loadProfileImg(user.DP_URL.toString())
+
+            if (moderatorList.contains(user.EMAIL)){
+                binding.modTag.visible()
+                binding.tvName.setTextColor(context.resources.getColor(R.color.light_blue_A200))
+
+            }else {
+                binding.modTag.gone()
+                binding.tvName.setTextColor(context.resources.getColor(R.color.primary))
+            }
+
+            if (assignee == user.EMAIL){
+                binding.assigneeTag.visible()
+            }else{
+                binding.assigneeTag.gone()
+            }
+
             return
         }
 
@@ -228,8 +308,9 @@ class ChatAdapter(
             binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
             binding.tvName.gone()
             binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
-            binding.msgSeperator.alpha = 0.5f
-
+            binding.msgSeperator.gone()
+            binding.modTag.gone()
+            binding.assigneeTag.gone()
             return
         }
 
@@ -241,7 +322,20 @@ class ChatAdapter(
         binding.msgSeperator.alpha = 1f
         binding.imgDp.loadProfileImg(user.DP_URL.toString())
 
+        if (moderatorList.contains(user.EMAIL)){
+            binding.modTag.visible()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.light_blue_A200))
+        }else {
+            binding.modTag.gone()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.primary))
 
+        }
+
+        if (assignee == user.EMAIL){
+            binding.assigneeTag.visible()
+        }else{
+            binding.assigneeTag.gone()
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

@@ -12,18 +12,11 @@ import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -59,36 +52,29 @@ import com.ncs.o2.UI.O2Bot.O2Bot
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
-import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class StartScreen @Inject constructor(): AppCompatActivity() {
+class StartScreen @Inject constructor() : AppCompatActivity() {
 
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
+
     @Inject
     lateinit var db: TasksDatabase
-    private lateinit var MaintainceCheck: maintainceCheck
-    var taskList:MutableList<Task> = mutableListOf()
-
     private val util: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this@StartScreen)
     }
-    private val NOTIFICATION_PERMISSION_REQUEST_CODE = 123
 
-
-    //    private val viewModel: LogCatViewModel by viewModels()
     private val o2Bot: O2Bot by viewModels()
 
 
@@ -111,11 +97,12 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         setContentView(binding.root)
         askNotificationPermission()
         val tasksDAO = db.tasksDao()
-//        setBallAnimator()
-//        setUpViews(TestingConfig.isTesting)
 
+//     setUpViews(TestingConfig.isTesting)
 
     }
+
+
 
     lateinit var scaleAnimation: ScaleAnimation
 
@@ -126,32 +113,44 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
             setBallAnimator()
             setUpViews(TestingConfig.isTesting)
         } else {
-            util.singleBtnDialog(title = "Notification Permission required", msg = "Notification permission is required for better functioning of the app, you can always allow permissions from phone settings", btnText = "I Understand", positive = {
-                setBallAnimator()
-                setUpViews(TestingConfig.isTesting)
-            })
+            util.singleBtnDialog(
+                title = "Notification Permission required",
+                msg = "Notification permission is required for better functioning of the app, you can always allow permissions from phone settings",
+                btnText = "I Understand",
+                positive = {
+                    setBallAnimator()
+                    setUpViews(TestingConfig.isTesting)
+                })
         }
     }
 
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) ==
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) ==
                 PackageManager.PERMISSION_GRANTED
             ) {
                 setBallAnimator()
                 setUpViews(TestingConfig.isTesting)
             } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                util.twoBtnDialog(title = "Notification Permission required", msg = "Notification permission is required for better functioning of the app", positiveBtnText = "OK", positive = {
-                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                }, negativeBtnText = "Cancel", negative = {
-                    setBallAnimator()
-                    setUpViews(TestingConfig.isTesting)
-                })
+                util.twoBtnDialog(
+                    title = "Notification Permission required",
+                    msg = "Notification permission is required for better functioning of the app",
+                    positiveBtnText = "OK",
+                    positive = {
+                        requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    },
+                    negativeBtnText = "Cancel",
+                    negative = {
+                        setBallAnimator()
+                        setUpViews(TestingConfig.isTesting)
+                    })
             } else {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
-        }
-        else{
+        } else {
             setBallAnimator()
             setUpViews(TestingConfig.isTesting)
         }
@@ -196,45 +195,11 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
             }
         }
 
-//        valueAnimator = ValueAnimator.ofFloat(1f, maxsize)
-//        valueAnimator.setDuration(600L)
-//
-//        valueAnimator.addUpdateListener {
-//
-//            val scale = valueAnimator.animatedValue as Float
-//            ball.setScaleX(scale)
-//            ball.setScaleY(scale)
-//
-//        }
-//
-//        valueAnimator.addListener(object : Animator.AnimatorListener {
-//            override fun onAnimationStart(animator: Animator) {
-//            }
-//
-//            override fun onAnimationEnd(animator: Animator) {
-//                startMainActivity()
-//            }
-//
-//            override fun onAnimationCancel(animator: Animator) {
-//            }
-//
-//            override fun onAnimationRepeat(animator: Animator) {
-//            }
-//        })
     }
 
     private fun setBallAnimator() {
 
         ball = binding.fragContainer
-
-//        if (PrefManager.getDpUrl()!=null){
-//        Glide.with(this)
-//            .load(PrefManager.getDpUrl())
-//            .placeholder(R.drawable.profile_pic_placeholder)
-//            .error(R.drawable.logogradhd)
-//            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
-//            .into(binding.ball)
-//        }
 
         ball.rotateInfinity(this)
         val maxsize = 15f
@@ -264,21 +229,21 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
             override fun onAnimationRepeat(animator: Animator) {
             }
-        })}
+        })
+    }
 
 
     private fun startMainActivity() {
 
         viewModel.checkMaintenanceThroughRepository().observe(this) {
 
-            if(Codes.STRINGS.isMaintaining != null){
-                if (Codes.STRINGS.isMaintaining == "true"){
+            if (Codes.STRINGS.isMaintaining != null) {
+                if (Codes.STRINGS.isMaintaining == "true") {
                     Log.d("maintainenceCheck", "maintaining")
                     val intent = Intent(this, MaintainingScreen::class.java)
                     startActivity(intent)
                     finishAffinity()
-                }
-                else{
+                } else {
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     overridePendingTransition(
@@ -292,8 +257,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     }
 
 
-
-    private fun showBallError(error: Errors, logs : Exception) {
+    private fun showBallError(error: Errors, logs: Exception) {
 
         Handler(Looper.getMainLooper()).postDelayed({
             val tintColor = ContextCompat.getColor(this, R.color.redx)
@@ -332,14 +296,12 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                             }
                         }
                     }
-                }
-
-                else if (error.code.contains("NOTIF")) {
+                } else if (error.code.contains("NOTIF")) {
 
                     binding.ball.setColorFilter(tintColor)
                     setUpNotifications()
 
-                }else {
+                } else {
 
                     binding.ball.setColorFilter(tintColor)
 
@@ -380,7 +342,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
     private fun setUpProcesses() {
 
-       // throw RuntimeException("This is a test crash")
+        // throw RuntimeException("This is a test crash")
 
         FirebaseFirestore.getInstance().collection(Endpoints.USERS)
             .document(FirebaseAuth.getInstance().currentUser?.email!!).get(Source.SERVER)
@@ -388,9 +350,9 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                 if (!task.isSuccessful || task.isNull) {
 
-                        showBallError(Errors.NetworkErrors.NO_CONNECTION_ERR, task.exception!!)
-                        val exception = task.exception
-                        exception?.printStackTrace()
+                    showBallError(Errors.NetworkErrors.NO_CONNECTION_ERR, task.exception!!)
+                    val exception = task.exception
+                    exception?.printStackTrace()
 
                     return@addOnCompleteListener
                 }
@@ -398,25 +360,25 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 val document = task.result
 
                 if (!document.exists()) {
-                    showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL,task.exception!!)
+                    showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL, task.exception!!)
                     return@addOnCompleteListener
                 }
 
                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
-                val role=document.get(Endpoints.User.ROLE)
-                val timestamp=document.getTimestamp(Endpoints.User.TIMESTAMP)
+                val role = document.get(Endpoints.User.ROLE)
+                val timestamp = document.getTimestamp(Endpoints.User.TIMESTAMP)
                 PrefManager.setUserRole(role.toString().toLong())
                 PrefManager.setCurrentUserTimeStamp(Timestamp.now())
                 val dp_url = document.getString(Endpoints.User.DP_URL)
                 val dp_url_pref = PrefManager.getDpUrl()
-                val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
-                if (!notification_timestamp.isNull){
+                val notification_timestamp = document.getLong("NOTIFICATION_LAST_SEEN")
+                if (!notification_timestamp.isNull) {
                     PrefManager.setLastSeenTimeStamp(notification_timestamp!!)
                 }
-                if (dp_url_pref==null){
+                if (dp_url_pref == null) {
                     PrefManager.setDpUrl(dp_url)
-                }else if (dp_url_pref!=dp_url) {
+                } else if (dp_url_pref != dp_url) {
                     Timber.tag(TAG).d("New DP is avaialable : ${dp_url}")
                     PrefManager.setDpUrl(dp_url)
                 }
@@ -424,7 +386,10 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 PrefManager.setDpUrl(dp_url)
 
                 if (isDetailsAdded == null) {
-                    showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL, Exception("No details added"))
+                    showBallError(
+                        Errors.AccountErrors.ACCOUNT_FIELDS_NULL,
+                        Exception("No details added")
+                    )
                     return@addOnCompleteListener
                 }
 
@@ -448,23 +413,22 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                 setUpFCMTokenIfRequired(document = document)
                 setUpProjectsList(document = document)
-                val projectsList=PrefManager.getProjectsList()
-                for (projects in projectsList){
+                val projectsList = PrefManager.getProjectsList()
+                for (projects in projectsList) {
                     setUpTasks(projects)
                     setUpTags(projects)
                 }
 
 
-
             }
-            .addOnFailureListener {exception ->
+            .addOnFailureListener { exception ->
 
-                when (exception){
-                    is FirebaseNetworkException ->{
+                when (exception) {
+                    is FirebaseNetworkException -> {
                         showBallError(Errors.NetworkErrors.NO_CONNECTION_ERR, exception)
                     }
 
-                    is FirebaseAuthException ->{
+                    is FirebaseAuthException -> {
                         showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL, exception)
                     }
                 }
@@ -475,7 +439,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
     }
 
-    private fun stopAnimAndStartActivity(){
+    private fun stopAnimAndStartActivity() {
         Handler(Looper.getMainLooper()).postDelayed(
             {
                 ball.animation.cancel()
@@ -486,7 +450,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         )
     }
 
-    private fun setUpTasks(projectName:String) {
+    private fun setUpTasks(projectName: String) {
         val dao = db.tasksDao()
         CoroutineScope(Dispatchers.Main).launch {
             try {
@@ -507,8 +471,8 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                     is ServerResult.Success -> {
 
-                        val tasks=taskResult.data
-                        for (task in tasks){
+                        val tasks = taskResult.data
+                        for (task in tasks) {
                             dao.insert(task)
                         }
 
@@ -527,7 +491,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         }
     }
 
-    private fun setUpTags(projectName:String) {
+    private fun setUpTags(projectName: String) {
         val dao = db.tagsDao()
         CoroutineScope(Dispatchers.Main).launch {
             try {
@@ -548,15 +512,12 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                     is ServerResult.Success -> {
 
-                        val tags=tagResult.data
-                        for (tag in tags){
+                        val tags = tagResult.data
+                        for (tag in tags) {
                             dao.insert(tag)
                         }
                         setUpNotifications()
-
-
                     }
-
                 }
 
             } catch (e: Exception) {
@@ -568,44 +529,54 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
         }
     }
+
     private fun setUpNotifications() {
         viewModel.setUpNewNotifications()
-        viewModel.serverResultLiveData.observe(this){ result->
+        viewModel.serverResultLiveData.observe(this) { result ->
 
-            when(result){
+            when (result) {
                 is ServerResult.Failure -> {
-                    showBallError(Errors.NotificationErrors.NOTIFICATION_FETCH_FAILED,result.exception)
+                    showBallError(
+                        Errors.NotificationErrors.NOTIFICATION_FETCH_FAILED,
+                        result.exception
+                    )
                 }
+
                 ServerResult.Progress -> {
                     //util.showSnackbar(binding.root,"Fetching Notifications", 500)
                 }
+
                 is ServerResult.Success -> {
 
                     val newNotificationsList = result.data
-                    if (newNotificationsList.isNotEmpty()){
+                    if (newNotificationsList.isNotEmpty()) {
 
-                    viewModel.pushNewNotificationsToRoom(newNotificationsList){ pushResult ->
+                        viewModel.pushNewNotificationsToRoom(newNotificationsList) { pushResult ->
 
-                        when(pushResult){
-                            is ServerResult.Failure -> {
-                                showBallError(Errors.NotificationErrors.NOTIFICATION_SAVE_FAILED,pushResult.exception)
+                            when (pushResult) {
+                                is ServerResult.Failure -> {
+                                    showBallError(
+                                        Errors.NotificationErrors.NOTIFICATION_SAVE_FAILED,
+                                        pushResult.exception
+                                    )
+                                }
+
+                                ServerResult.Progress -> {
+                                }
+
+                                is ServerResult.Success -> {
+                                    // Toast.makeText(this, "You have ${pushResult.data} new notifications", Toast.LENGTH_SHORT).show()
+
+                                    util.showSnackbar(binding.root, "O2 is ready", 1000)
+                                    stopAnimAndStartActivity()
+                                }
+
                             }
-                            ServerResult.Progress -> {
-                            }
-                            is ServerResult.Success -> {
-                               // Toast.makeText(this, "You have ${pushResult.data} new notifications", Toast.LENGTH_SHORT).show()
-
-                                util.showSnackbar(binding.root,"O2 is ready",1000)
-                                stopAnimAndStartActivity()
-                            }
-
                         }
-                    }
 
 
-
-                    }else {
-                        util.showSnackbar(binding.root,"O2 is ready",1000)
+                    } else {
+                        util.showSnackbar(binding.root, "O2 is ready", 1000)
                         stopAnimAndStartActivity()
                     }
 
@@ -615,7 +586,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         }
     }
 
-    private fun setUpProjectsList(document : DocumentSnapshot) {
+    private fun setUpProjectsList(document: DocumentSnapshot) {
         val projectsList = document.get("PROJECTS") as List<String>
         PrefManager.putProjectsList(projectsList)
 
@@ -634,7 +605,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
             }
 
             val actualFCM = task.result
-            if (fcmToken != actualFCM){
+            if (fcmToken != actualFCM) {
                 PrefManager.setUserFCMToken(actualFCM)
                 updateFCMToken(actualFCM)
             }
@@ -644,24 +615,28 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     }
 
     private fun updateFCMToken(actualFCM: String?) {
-            CoroutineScope(Dispatchers.Main).launch {
-                repository.setFCMToken(actualFCM!!){ result->
-                    when(result){
-                        is ServerResult.Failure -> {
-                            showBallError(Errors.FCMTokenErrors.FCM_TOKEN_UPDATE_FAILED,result.exception)
-                        }
-                        ServerResult.Progress -> {
+        CoroutineScope(Dispatchers.Main).launch {
+            repository.setFCMToken(actualFCM!!) { result ->
+                when (result) {
+                    is ServerResult.Failure -> {
+                        showBallError(
+                            Errors.FCMTokenErrors.FCM_TOKEN_UPDATE_FAILED,
+                            result.exception
+                        )
+                    }
 
-                        }
-                        is ServerResult.Success -> {
-                            util.showSnackbar(binding.root,"FCM token updated",5000)
-                        }
+                    ServerResult.Progress -> {
+
+                    }
+
+                    is ServerResult.Success -> {
+                        util.showSnackbar(binding.root, "FCM token updated", 5000)
                     }
                 }
             }
+        }
 
     }
-
 
 
 }

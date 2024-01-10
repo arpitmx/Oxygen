@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/searchParent"
+        android:elevation="5dp"
         android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
@@ -186,7 +187,7 @@
             android:text="Clear filters"
             android:visibility="gone"
             android:id="@+id/clear"
-            android:textColor="@color/better_white"
+            android:textColor="@color/redx"
             android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
