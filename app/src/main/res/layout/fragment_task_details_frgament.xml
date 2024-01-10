@@ -397,7 +397,6 @@
                 android:orientation="vertical"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:minHeight="200dp"
                 android:background="@drawable/horizontal_scrollview_bg"
                 >
 
@@ -416,7 +415,7 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp"
                         android:paddingStart="15dp"
-                        android:text="Summary"
+                        android:text="@string/summary_title"
                         android:textColor="@color/account"
                         android:textSize="16dp"
                         android:visibility="visible" />
@@ -430,15 +429,14 @@
                         android:gravity="start"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp"
+                        android:layout_marginEnd="5dp"
                         android:paddingStart="15dp"
                         android:text="Edit"
                         android:textColor="@color/account"
                         android:textSize="16dp"
-                        android:visibility="invisible" />
+                        android:visibility="visible" />
 
                 </LinearLayout>
-
-
 
                 <ProgressBar
                     android:id="@+id/description_progressbar"
@@ -447,6 +445,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/margin_top_task_detail"
                     android:elevation="3dp"
+                    android:layout_marginBottom="10dp"
                     android:indeterminate="true"
                     android:indeterminateTint="#03A9F4"
                     android:visibility="visible"
@@ -458,6 +457,9 @@
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="true"
                     android:visibility="gone"
+
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
                     app:escapeHtml="false" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -466,8 +468,10 @@
                 android:id="@+id/imageRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:visibility="gone"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:visibility="visible"
                 android:clipToPadding="false"
                 android:layoutAnimation="@anim/layout_animation_popscale"
                 android:nestedScrollingEnabled="true" />
@@ -506,7 +510,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginTop="10dp"
-                            android:fontFamily="@font/sf_pro_display_medium"
+                            android:fontFamily="@font/sf_pro_display_regular"
                             android:gravity="start"
                             android:paddingStart="@dimen/_5dp"
                             android:text="No Moderators here..."
@@ -541,11 +545,11 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="0.9"
-                            android:fontFamily="@font/sf_pro_display_medium"
+                            android:fontFamily="@font/sf_pro_display_regular"
                             android:gravity="start|center_vertical"
                             android:paddingStart="@dimen/_5dp"
                             android:text="Become a moderator"
-                            android:textColor="@color/better_white"
+                            android:textColor="@color/account"
                             android:textSize="17dp"
                             />
                         <ImageView

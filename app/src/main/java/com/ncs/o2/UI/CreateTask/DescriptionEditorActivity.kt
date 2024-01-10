@@ -25,6 +25,10 @@ import com.ncs.o2.BuildConfig
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGoneSlide
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisibleSlide
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickSingleTimeBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -67,13 +71,43 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
     private val REQUEST_IMAGE_PICK = 2
     private var bitmap: Bitmap? = null
 
+    private val issueTemplate = "" +
+            "**Description:**\n" +
+            "[Provide a detailed description of the issue. Include any relevant background information, steps to reproduce, and expected vs actual behavior.]\n" +
+            "\n" +
+            "**Steps to Reproduce:**\n" +
+            "1. [Step 1]\n" +
+            "2. [Step 2]\n" +
+            "3. [Step 3]\n" +
+            "   ...\n" +
+            "\n" +
+            "**Expected Result:**\n" +
+            "[Clearly describe what you expected to happen.]\n" +
+            "\n" +
+            "**Actual Result:**\n" +
+            "[Describe what actually happened. Include any error messages or unexpected behavior.]\n" +
+            "\n" +
+            "**Screenshots / Attachments:**\n" +
+            "[If applicable, include screenshots or attachments that help illustrate the issue.]\n" +
+            "\n" +
+            "**Additional Information:**\n" +
+            "[Any additional context, information, or configuration details that might be relevant.]\n" +
+            "\n" +
+            "**Related Issues:**\n" +
+            "[List any related issues or dependencies.]\n" +
+            "\n" +
+            "**Notes for Reviewers:**\n" +
+            "\n"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
         val summary = intent.getStringExtra("summary")
         if (!summary.isNull){
             binding.summaryEt.setText(summary)
         }
+
         setUpViews()
         setUpGemini()
     }
@@ -93,18 +127,29 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
         }
     }
 
+
+    private fun toggleProgress(show: Boolean){
+        if (show){
+            binding.gioActionbar.summaryProgressbar.progressVisible(this,500)
+            binding.summaryEt.isEnabled = false
+        }else{
+            binding.gioActionbar.summaryProgressbar.progressGone(this,500)
+            binding.summaryEt.isEnabled = true
+        }
+    }
+
     private fun setUpViews() {
         binding.btnPreview.visible()
+        toggleProgress(false)
+
         binding.gioActionbar.titleTv.text = getString(R.string.summary)
         binding.gioActionbar.btnDone.visible()
-        binding.gioActionbar.btnFav.gone()
-        binding.gioActionbar.btnRequestWork.gone()
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
             onBackPressed()
         }
         val summary = intent.getStringExtra("summary")
         if (summary.isNull){
-            binding.summaryEt.append("What is kotlin")
+            binding.summaryEt.setText(issueTemplate)
         }
         binding.btnWrite.setOnClickThrottleBounceListener {
             CoroutineScope(Dispatchers.Main).launch {
@@ -117,10 +162,7 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
                     binding.summaryEt.selectionStart,
                     " ${AUTOCOMPLETE_TEMPLATE} "
                 )
-
             }
-
-
         }
 
         binding.btnCodeBlock.setOnClickThrottleBounceListener {
@@ -162,6 +204,7 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
                 finish()
             }
         }
+
         binding.btnPreview.setOnClickThrottleBounceListener {
             binding.btnEdit.visible()
             setUpTaskDescription(binding.summaryEt.text.toString())
@@ -171,7 +214,6 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
             binding.markdownView.gone()
             binding.imageRecyclerView.gone()
         }
-
     }
 
     val regex = Regex("!\\{\\[(.*?)\\]\\}!")
@@ -180,27 +222,24 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
 
     private suspend fun O2Write(prompt: String, position: Int) {
 
-        val filteredPrompt =
-            prompt + "\nMake sure you keep it as simple, short and precise as possible"
+        val filteredPrompt = prompt + "\nMake sure you keep it as simple, short and precise as possible"
 
         CoroutineScope(Dispatchers.Main).launch {
             try {
+                toggleProgress(true)
                 val output = CoroutineScope(Dispatchers.IO).async {
                     generativeModel.generateContent(filteredPrompt)
                 }.await()
                 val lastPos = output.text?.length
                 binding.summaryEt.text.insert(position,output.text)
-
-                //binding.summaryEt.text.clearSpans()
-                //binding.summaryEt.setSelection(position, lastPos!!)
-
+                toggleProgress(false)
             } catch (e: Exception) {
+                toggleProgress(false)
                 withContext(Dispatchers.Main) {
                     utils.singleBtnDialog("Problem", e.message.toString(), "Okay", {})
                 }
             }
         }
-
     }
 
     //                generativeModel.generateContentStream(filteredPrompt).collect { chunk ->
@@ -229,7 +268,7 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
 
             if (prompt == NO_PROMPT_SELECTION) {
 
-                utils.showSnackbar(binding.root, "No prompts found", 3000)
+                utils.showSnackbar(binding.root, "Select prompt text to process..", 3000)
 
             } else {
                 Timber.tag(TAG).d("Prompt : $prompt")
@@ -242,7 +281,6 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
         } catch (e: Exception) {
             utils.singleBtnDialog("Failure", e.message.toString(), "Okay", {})
         }
-
     }
     val script = """
     var allPreTags = document.querySelectorAll('pre');

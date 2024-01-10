@@ -907,18 +907,26 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         fun sendsingleImage(imageUrl: String) {
             requireActivity().runOnUiThread {
                 val recyclerView = binding.imageRecyclerView
-                recyclerView.visible()
                 recyclerView.layoutManager =
                     LinearLayoutManager(
                         requireContext(),
                         LinearLayoutManager.HORIZONTAL,
                         false
                     )
-                Log.d("list", listOf(imageUrl).toMutableList().toString())
-                val adapter =
-                    ImageAdapter(listOf(imageUrl).toMutableList(), this@TaskDetailsFragment)
+
+                var imgList =  listOf(imageUrl).toMutableList()
+
+                Timber.tag("TaskDetailsFragment").d(imgList.toString())
+
+                val adapter = ImageAdapter(listOf(imageUrl).toMutableList(), this@TaskDetailsFragment)
                 recyclerView.adapter = adapter
-//                onImageClicked(0, mutableListOf(imageUrl))
+
+                if(imgList.isNotEmpty()){
+                    recyclerView.visible()
+                }else {
+                    recyclerView.gone()
+                }
+
             }
         }
 

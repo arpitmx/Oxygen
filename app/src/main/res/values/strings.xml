@@ -114,6 +114,7 @@
     <string name="clear_filters">Clear filters</string>
     <string name="summary">Summary</string>
     <string name="create_task">Create Task</string>
+    <string name="summary_title">Summary</string>
 
 
 </resources>

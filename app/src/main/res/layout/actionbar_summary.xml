@@ -48,65 +48,20 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
-        <ImageView
-            android:id="@+id/btnClose"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/baseline_close_24"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/primary" />
 
-
-        <TextView
-            android:id="@+id/done_item"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
+        <ProgressBar
+            android:id="@+id/summary_progressbar"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:indeterminate="true"
             android:layout_marginEnd="15dp"
-            android:fontFamily="@font/sf_pro_display_semibold"
-            android:gravity="center"
-            android:text="Done"
-            android:visibility="gone"
-            android:textColor="@color/primary"
-            android:textSize="20dp"
+            android:indeterminateTint="@color/primary"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.98"
-            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintEnd_toStartOf="@+id/btnDone"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/title_tv"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <ImageButton
-            android:id="@+id/btn_fav"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="52dp"
-            android:background="@null"
-            android:src="@drawable/star_unfilled"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:tint="@color/primary" />
-
-
-        <ImageButton
-            android:id="@+id/btnRequestWork"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:background="@null"
-            android:src="@drawable/baseline_design_services_24"
-            android:visibility="visible"
-            android:layout_marginEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/primary" />
+            app:layout_constraintVertical_bias="0.52" />
 
         <ImageButton
             android:id="@+id/btnDone"
@@ -114,7 +69,7 @@
             android:layout_height="match_parent"
             android:background="@null"
             android:src="@drawable/done"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_marginEnd="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
