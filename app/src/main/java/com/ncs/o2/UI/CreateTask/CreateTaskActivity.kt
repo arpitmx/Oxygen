@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -358,6 +359,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 startActivityForResult(intent,1)
             }
         }
+        val handler = Handler()
+
         binding.title.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -367,9 +370,11 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
             override fun afterTextChanged(editable: Editable?) {
                 val inputText = editable.toString()
-                draft.title=inputText
-                PrefManager.putDraftTask(draft)
-
+                draft.title = inputText
+                handler.removeCallbacksAndMessages(null)
+                handler.postDelayed({
+                    PrefManager.putDraftTask(draft)
+                }, 2000)
             }
         })
 
@@ -428,10 +433,10 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         binding.section.setOnClickThrottleBounceListener {
 
-            if (Codes.STRINGS.segmentText == "") {
+            if (PrefManager.getDraftTask()?.segment!! == "") {
                 Toast.makeText(this, "First please select segment", Toast.LENGTH_SHORT).show()
             } else {
-                val sections = sectionDisplayBottomSheet()
+                val sections = sectionDisplayBottomSheet(PrefManager.getDraftTask()?.segment!!)
                 sections.sectionSelectionListener = this
                 sections.show(supportFragmentManager, "Section Selection")
             }
@@ -720,6 +725,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             binding.difficultyInclude.tagText.text="Easy"
         }
         else{
+
             val draftTask=PrefManager.getDraftTask()
 
             val projectName=draftTask?.project_ID
@@ -789,6 +795,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             val _segment=draftTask?.segment
             if (_segment!=""){
                 binding.segment.text=draftTask.segment
+                Codes.STRINGS.segmentText= draftTask.segment
             }
             else{
                 binding.segment.text="Segment"
@@ -869,6 +876,11 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         updateChipGroup()
                     }
                 }
+            }
+
+            utils.showActionSnackbar(binding.root, "Loaded task from draft", 5000, "Clear") {
+                PrefManager.putDraftTask(Task())
+                recreate()
             }
 
         }
@@ -964,6 +976,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             val _segment=draftTask?.segment
             if (_segment!=""){
                 binding.segment.text=draftTask.segment
+                Codes.STRINGS.segmentText= draftTask.segment
+
             }
             else{
                 binding.segment.text="Segment"
@@ -1045,8 +1059,10 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                     }
                 }
             }
-
-
+            utils.showActionSnackbar(binding.root, "Loaded task from draft", 5000, "Clear") {
+                PrefManager.putDraftTask(Task())
+                recreate()
+            }
         }
     }
 
@@ -1284,8 +1300,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         binding.segment.text = segmentName
         draft.segment=segmentName
         PrefManager.putDraftTask(draft)
-
         Codes.STRINGS.segmentText = segmentName
+        binding.section.text="Section"
     }
 
     override fun sendSectionsList(list: MutableList<String>) {

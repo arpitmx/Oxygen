@@ -27,7 +27,7 @@ import net.datafaker.Faker
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class sectionDisplayBottomSheet(private val segmentName:String = "") : BottomSheetDialogFragment(), sectionListAdapter.OnClickCallback {
+class sectionDisplayBottomSheet(private val segmentName:String) : BottomSheetDialogFragment(), sectionListAdapter.OnClickCallback {
     @Inject lateinit var firestoreRepository: FirestoreRepository
     lateinit var binding: ActivitySectionDisplayBottomSheetBinding
     private val recyclerView: RecyclerView by lazy {
@@ -104,7 +104,7 @@ class sectionDisplayBottomSheet(private val segmentName:String = "") : BottomShe
     }
 
     private fun fetchSegments(projectName: String) {
-        val segment=if (segmentName=="")  segmentText else segmentName
+        val segment=segmentName
         firestoreRepository.getSection(projectName, segment ) { serverResult ->
             when (serverResult) {
                 is ServerResult.Success -> {
