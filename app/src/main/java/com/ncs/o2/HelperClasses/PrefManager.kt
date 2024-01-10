@@ -6,9 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.versa.Constants.Endpoints
+import java.util.Date
 
 /*
 File : SharedPrefHelper -> com.ncs.o2.HelperClasses
@@ -55,6 +59,7 @@ object PrefManager {
     fun clearTimestamp() {
         sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_LAST_SEEN).apply()
     }
+
 
 
     //DP related
@@ -115,13 +120,18 @@ object PrefManager {
         editor.putString(Endpoints.User.EMAIL,user.EMAIL)
         editor.putString(Endpoints.User.BIO,user.BIO)
         editor.putString(Endpoints.User.DP_URL,user.DP_URL)
-
+        editor.putString(Endpoints.User.FCM_TOKEN,user.FCM_TOKEN)
         editor.putString(Endpoints.User.DESIGNATION,user.DESIGNATION)
         editor.putLong(Endpoints.User.ROLE,user.ROLE)
         editor.apply()
     }
 
-
+    fun setUserRole(role:Long){
+        if (role != null){
+            editor.putLong(Endpoints.User.ROLE, role)
+        }
+        editor.apply()
+    }
     fun getcurrentUserdetails():CurrentUser{
 
         val username = sharedPreferences.getString(Endpoints.User.USERNAME, "")
@@ -129,13 +139,25 @@ object PrefManager {
         val bio = sharedPreferences.getString(Endpoints.User.BIO, "")
         val designation = sharedPreferences.getString(Endpoints.User.DESIGNATION, "")
         val role = sharedPreferences.getLong(Endpoints.User.ROLE, 0)
-        return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role)
+        val fcm= sharedPreferences.getString(Endpoints.User.FCM_TOKEN,"")
+        return CurrentUser(EMAIL =  email!!,USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role, FCM_TOKEN = fcm!!)
+    }
+
+    fun setCurrentUserTimeStamp(timestamp: Timestamp){
+        val timestampInMillis = timestamp.toDate().time
+        editor.putLong(Endpoints.User.TIMESTAMP, timestampInMillis)
+        editor.apply()
+    }
+
+    fun getCurrentUserTimeStamp():Timestamp {
+        return Timestamp(Date(sharedPreferences.getLong(Endpoints.User.TIMESTAMP, 0L)))
     }
 
 
     fun getCurrentUserEmail():String{
         return getcurrentUserdetails().EMAIL
     }
+
 
     fun getUserFCMToken(): String {
         return getcurrentUserdetails().FCM_TOKEN
@@ -240,14 +262,74 @@ object PrefManager {
         editor.putString("projects",projectsJson)
         editor.apply()
     }
-    fun getProjectsList():List<String>{
+
+    fun putLastCacheUpdateTimestamp(timestamp: Timestamp){
+        editor.putLong("last_cache_update_timestamp", timestamp.seconds)
+        editor.apply()
+    }
+    fun getLastCacheUpdateTimestamp(): Timestamp {
+        val timestampInSeconds = sharedPreferences.getLong("last_cache_update_timestamp", 0)
+        return Timestamp(timestampInSeconds, 0)
+    }
+    fun putLastTAGCacheUpdateTimestamp(timestamp: Timestamp){
+        editor.putLong("last_tag_cache_update_timestamp", timestamp.seconds)
+        editor.apply()
+    }
+    fun getLastTAGCacheUpdateTimestamp(): Timestamp {
+        val timestampInSeconds = sharedPreferences.getLong("last_tag_cache_update_timestamp", 0)
+        return Timestamp(timestampInSeconds, 0)
+    }
+    fun putLastNotificationCacheUpdateTimestamp(timestamp: Long){
+        editor.putLong("last_notification_cache_update_timestamp", timestamp)
+        editor.apply()
+    }
+    fun getLastNotificationCacheUpdateTimestamp(): Long {
+        val timestampInSeconds = sharedPreferences.getLong("last_notification_cache_update_timestamp", 0)
+        return timestampInSeconds
+    }
+    fun getProjectsList():List<String> {
         val projectsJson = sharedPreferences.getString("projects", null)
         if (projectsJson != null) {
             val gson = Gson()
             val type = object : TypeToken<List<String>>() {}.type
             return gson.fromJson(projectsJson, type)
-        }else{
+        } else {
             return listOf("NCSOxygen")
         }
     }
+    fun putDraftTask(task: Task){
+        val gson=Gson()
+        val taskJson=gson.toJson(task)
+        editor.putString("task",taskJson)
+        editor.apply()
+    }
+    fun getDraftTask(): Task? {
+        val taskJson = sharedPreferences.getString("task", null)
+        val gson = Gson()
+        return if (taskJson != null) {
+            gson.fromJson(taskJson, Task::class.java)
+        } else {
+            null
+        }
+    }
+    fun putDraftCheckLists(list: List<CheckList>){
+        val gson=Gson()
+        val taskJson=gson.toJson(list)
+        editor.putString("DraftCheckLists",taskJson)
+        editor.apply()
+    }
+    fun getDraftCheckLists(): List<CheckList>? {
+        val taskJson = sharedPreferences.getString("DraftCheckLists", null)
+        val gson = Gson()
+        return if (taskJson != null) {
+            val type = object : TypeToken<List<CheckList>>() {}.type
+            gson.fromJson(taskJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
+
+
+
 }

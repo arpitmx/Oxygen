@@ -11,7 +11,10 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Domain.Models.Tag
+import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TaskItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,11 +34,6 @@ constructor(
     companion object {
         val TAG = "StartScreenViewModel"
     }
-
-    init {
-        PrefManager.initialize(application.applicationContext)
-    }
-
 
     private val _serverResultLiveData = MutableLiveData<ServerResult<List<Notification>>>()
     val serverResultLiveData: LiveData<ServerResult<List<Notification>>> get() = _serverResultLiveData
@@ -127,10 +125,10 @@ constructor(
                             PrefManager.setLatestNotificationTimeStamp(latestNotificationTimestamp)
 
                             CoroutineScope(Dispatchers.IO).launch {
-                                val newNotificationCount = getNewNotificationCount(notificationList)
+//                                val newNotificationCount = getNewNotificationCount(notificationList)
 
                                 withContext(Dispatchers.Main) {
-                                    PrefManager.setNotificationCount(PrefManager.getNotificationCount()+newNotificationCount)
+                                    PrefManager.setNotificationCount(PrefManager.getNotificationCount())
                                     _serverResultLiveData.postValue(
                                         ServerResult.Success(
                                             notificationList
@@ -169,5 +167,19 @@ constructor(
 
     fun checkMaintenanceThroughRepository(): LiveData<maintainceCheck> {
         return repository.maintenanceCheck()
+    }
+    suspend fun getTasksinProject(
+        projectName: String,
+    ) : ServerResult<List<Task>>{
+
+        return repository.getTasksinProject(projectName)
+
+    }
+    suspend fun getTagsinProject(
+        projectName: String,
+    ) : ServerResult<List<Tag>>{
+
+        return repository.getTagsinProject(projectName)
+
     }
 }

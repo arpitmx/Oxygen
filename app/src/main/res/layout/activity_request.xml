@@ -16,11 +16,11 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/scrollView2" />
+        app:layout_constraintTop_toTopOf="@+id/parent_scrollview" />
 
 
     <ScrollView
-        android:id="@+id/scrollView2"
+        android:id="@+id/parent_scrollview"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -40,21 +40,17 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-
-
-
-
             <TextView
                 android:id="@+id/taskid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:fontFamily="@font/outfitmedium"
+                android:fontFamily="@font/sf_pro_display_medium"
                 android:gravity="start"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="#ID1234"
+                android:text="#ID11234"
                 android:textColor="@color/yello"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -69,7 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:fontFamily="@font/outfitmedium"
+                android:fontFamily="@font/sf_pro_display_medium"
                 android:gravity="start"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
@@ -97,7 +93,7 @@
                     android:layout_gravity="start"
                     android:layout_marginStart="10dp"
                     android:background="@drawable/card_view_background_black"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="center"
                     android:padding="10dp"
                     android:text="#ID1234"
@@ -118,7 +114,7 @@
                     android:layout_gravity="start"
                     android:layout_marginStart="10dp"
                     android:background="@drawable/card_view_background"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="center"
                     android:padding="10dp"
                     android:text="\@armax"
@@ -138,7 +134,7 @@
                     android:layout_gravity="start"
                     android:layout_marginStart="10dp"
                     android:background="@drawable/card_view_background_yellow"
-                    android:fontFamily="@font/outfitregular"
+                    android:fontFamily="@font/sf_pro_display_regular"
                     android:gravity="center"
                     android:padding="10dp"
                     android:text="Versa"
@@ -159,7 +155,7 @@
                     android:layout_gravity="start"
                     android:layout_marginStart="10dp"
                     android:background="@drawable/card_view_background_purple"
-                    android:fontFamily="@font/outfitregular"
+                    android:fontFamily="@font/sf_pro_display_regular"
                     android:gravity="center"
                     android:padding="10dp"
                     android:text="Development"
@@ -182,7 +178,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:fontFamily="@font/outfitmedium"
+                android:fontFamily="@font/sf_pro_display_medium"
                 android:gravity="start"
                 android:background="@color/secondarybg"
                 android:layout_marginStart="10dp"
@@ -221,7 +217,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
@@ -294,7 +290,7 @@
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:background="@drawable/card_view_background_red"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:text="Reject"
             android:textAllCaps="false"
             android:textColor="@color/starts_in"
@@ -311,7 +307,7 @@
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:background="@drawable/card_view_background_green"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:text="Accept"
             android:textAllCaps="false"
             android:textColor="@color/pureblack"

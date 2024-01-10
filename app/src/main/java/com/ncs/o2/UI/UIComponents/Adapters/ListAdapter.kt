@@ -1,16 +1,22 @@
 package com.ncs.o2.UI.UIComponents.Adapters
 
+import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.versa.Constants.Endpoints
 
 /*
 File : ListAdapter.kt -> com.ncs.o2
@@ -36,7 +42,7 @@ interface ProjectCallback{
 }
 
 
- class ListAdapter(context: Context, val sList : List<String>) : BaseAdapter() {
+ class ListAdapter(private val context: Context, val sList : List<String>) : BaseAdapter() {
     private  val mInflator: LayoutInflater
     private val callback : ProjectCallback by lazy {
         context as MainActivity
@@ -47,7 +53,6 @@ interface ProjectCallback{
 
      init {
         this.mInflator = LayoutInflater.from(context)
-         PrefManager.initialize(context)
          selectedPosition=PrefManager.getcurrentRadioButton()
     }
 
@@ -63,53 +68,70 @@ interface ProjectCallback{
         return position.toLong()
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-        val view: View?
-        val vh: ListRowHolder
-        if(convertView == null) {
-            view = this.mInflator.inflate(R.layout.project_list_item, parent, false)
-            vh = ListRowHolder(view)
-            view.tag = vh
+     // Inside your ListAdapter
+     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
+         val view: View?
+         val vh: ListRowHolder
+         if (convertView == null) {
+             view = mInflator.inflate(R.layout.project_list_item, parent, false)
+             vh = ListRowHolder(view)
+             view.tag = vh
+         } else {
+             view = convertView
+             vh = view.tag as ListRowHolder
+         }
 
-        } else {
-            view = convertView
-            vh = view.tag as ListRowHolder
-        }
+         vh.label.text = sList[position]
 
-        vh.label.text = sList[position]
-        vh.radioButton.isChecked = position == selectedPosition
-        vh.layout.setOnClickListener {
-            selectedPosition = position
-            notifyDataSetChanged()
-            callback.onClick(sList[position], position)
-        }
-        vh.radioButton.setOnClickListener {
-            selectedPosition = position
-            notifyDataSetChanged()
-            callback.onClick(sList[position], position)
-        }
+         FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(sList[position]).get()
+             .addOnSuccessListener { documentSnapshot ->
+                 if (documentSnapshot.exists()) {
+                     val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                     if (imageUrl != null && (context as? Activity)?.isDestroyed != true) {
+                         Glide.with(context)
+                             .load(imageUrl)
+                             .error(R.drawable.placeholder_image)
+                             .into(vh.icon)
+                     }
+                 }
+             }
+             .addOnFailureListener { exception ->
+                 Log.d("failCheck", exception.toString())
+             }
 
-        vh.label.setOnClickListener{
-            selectedPosition = position
-            notifyDataSetChanged()
-            callback.onClick(sList[position], position)
-        }
+         vh.radioButton.isChecked = position == selectedPosition
+         vh.layout.setOnClickListener {
+             selectedPosition = position
+             notifyDataSetChanged()
+             callback.onClick(sList[position], position)
+         }
+         vh.radioButton.setOnClickListener {
+             selectedPosition = position
+             notifyDataSetChanged()
+             callback.onClick(sList[position], position)
+         }
 
-        return view
-    }
-}
+         vh.label.setOnClickListener {
+             selectedPosition = position
+             notifyDataSetChanged()
+             callback.onClick(sList[position], position)
+         }
+
+         return view
+     }
+
+ }
 
 private class ListRowHolder(row: View?) {
      var label: TextView
      var radioButton:RadioButton
      var layout:LinearLayout
+     var icon: ImageView
 
     init {
         this.label = row?.findViewById(R.id.project_title) as TextView
         this.radioButton= row.findViewById(R.id.radioButton) as RadioButton
         this.layout=row.findViewById(R.id.layout) as LinearLayout
+        this.icon= row.findViewById(R.id.project_dp) as ImageView
     }
-
-
-
 }

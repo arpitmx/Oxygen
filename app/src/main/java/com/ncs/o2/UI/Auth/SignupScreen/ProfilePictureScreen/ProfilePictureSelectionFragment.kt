@@ -23,10 +23,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -37,9 +39,15 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.databinding.FragmentProfilePictureSelectionBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.InputStream
 import javax.inject.Inject
@@ -53,7 +61,8 @@ class ProfilePictureSelectionFragment : Fragment() {
         fun newInstance() = ProfilePictureSelectionFragment()
     }
     lateinit var binding: FragmentProfilePictureSelectionBinding
-
+    @Inject
+    lateinit var db:TasksDatabase
     private lateinit var viewModel: ProfilePictureSelectionViewModel
 
     private val REQUEST_IMAGE_CAPTURE = 1
@@ -144,7 +153,6 @@ class ProfilePictureSelectionFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        PrefManager.initialize(requireContext())
     }
     private fun pickImage() {
 
@@ -272,6 +280,65 @@ class ProfilePictureSelectionFragment : Fragment() {
                 FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                     .update(userData)
                     .addOnSuccessListener {
+                        val addCont=mapOf<String, Any>(
+                            "contributors" to FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.email)
+                        )
+                        setUpTasks("NCSOxygen",imageUrl,addCont)
+
+                    }
+                    .addOnFailureListener { e ->
+                        util.singleBtnDialog_InputError("Errors",
+                            "There was an error : ${e.message} \nPlease retry",
+                            "Retry"
+                        ) {
+                            Toast.makeText(requireActivity(), "Retrying", Toast.LENGTH_SHORT).show()
+                           addImageUrlToFirestore(imageUrl)
+                        }
+                    }
+
+
+
+
+            } else {
+
+                    util.singleBtnDialog_InputError("Upload Errors",
+                        "There was an issue in uploading the profile picture,\n\nplease retry",
+                        "Retry"
+                    ) {
+                        setUpLoader(false)
+                    }
+                }
+
+        }
+    }
+
+    private fun setUpTasks(projectName:String,imageUrl: String,addCont:Map<String,Any>) {
+        val dao = db.tasksDao()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    viewModel.getTasksinProject(projectName)
+                }
+
+                Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    is ServerResult.Progress -> {
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tasks=taskResult.data
+                        for (task in tasks){
+                            dao.insert(task)
+                        }
+                        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document("NCSOxygen").update(addCont)
                         FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                             .get(Source.SERVER)
                             .addOnCompleteListener { task ->
@@ -310,7 +377,6 @@ class ProfilePictureSelectionFragment : Fragment() {
                                             ))
 
                                         }
-
                                         requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                         requireActivity().finish()
                                     }
@@ -328,29 +394,17 @@ class ProfilePictureSelectionFragment : Fragment() {
                                     }
                                 }
                             }
-                    }
-                    .addOnFailureListener { e ->
-                        util.singleBtnDialog_InputError("Errors",
-                            "There was an error : ${e.message} \nPlease retry",
-                            "Retry"
-                        ) {
-                            Toast.makeText(requireActivity(), "Retrying", Toast.LENGTH_SHORT).show()
-                           addImageUrlToFirestore(imageUrl)
-                        }
+
                     }
 
-
-
-
-            } else {
-
-                    util.singleBtnDialog_InputError("Upload Errors",
-                        "There was an issue in uploading the profile picture,\n\nplease retry",
-                        "Retry"
-                    ) {
-                        setUpLoader(false)
-                    }
                 }
+
+            } catch (e: java.lang.Exception) {
+
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+            }
 
         }
     }

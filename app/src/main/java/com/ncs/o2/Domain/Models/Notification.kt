@@ -51,5 +51,10 @@ data class Notification(
     val toUser: String,
 
     @ColumnInfo(name = "timeStamp")
-    val timeStamp: Long
+    val timeStamp: Long,
+
+    val lastUpdated:Long?=null,
+
+    @ColumnInfo(name = "projectID")
+    val projectID:String?=null,
 )

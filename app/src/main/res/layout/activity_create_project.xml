@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.CreateProject">
+    tools:context=".UI.createProject.CreateProject">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -59,7 +59,7 @@
                     android:layout_marginTop="36dp"
                     android:background="@drawable/item_bg_curve"
                     android:drawablePadding="15dp"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start|center_vertical"
                     android:hint="Project Title"
                     android:paddingStart="15dp"
@@ -83,7 +83,7 @@
                     android:layout_marginTop="30dp"
                     android:background="@drawable/item_bg_curve"
                     android:drawablePadding="15dp"
-                    android:fontFamily="@font/outfitmedium"
+                    android:fontFamily="@font/sf_pro_display_medium"
                     android:gravity="start|center_vertical"
                     android:hint="Project Description"
                     android:paddingStart="15dp"
@@ -101,7 +101,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:fontFamily="@font/outfitregular"
+                    android:fontFamily="@font/sf_pro_display_regular"
                     android:text="You can add an optional description for the project"
                     android:textColor="@color/account"
                     android:textSize="14dp"
@@ -110,80 +110,18 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/project_desc" />
 
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/contributors_parent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="35dp"
-                    android:orientation="vertical"
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="36dp"
+                    android:indeterminateTint="@color/purple"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.473"
+                    app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView">
-
-                                        <TextView
-                                            android:id="@+id/dddd"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginBottom="10dp"
-                                            android:fontFamily="@font/outfitmedium"
-                                            android:gravity="start"
-                                            android:paddingStart="5dp"
-                                            android:paddingEnd="5dp"
-                                            android:text="Moderators:"
-                                            android:textColor="@color/white"
-                                            android:textSize="18dp"
-                                            app:layout_constraintBottom_toBottomOf="parent"
-                                            app:layout_constraintEnd_toEndOf="parent"
-                                            app:layout_constraintHorizontal_bias="0.0"
-                                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                                            app:layout_constraintTop_toTopOf="parent"
-                                            app:layout_constraintVertical_bias="0.0" />
-
-                                        <androidx.recyclerview.widget.RecyclerView
-                                            android:id="@+id/moderatorsRecyclerView"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginBottom="15dp"
-                                            android:clipToPadding="false"
-                                            android:layoutAnimation="@anim/layout_animation_popscale"
-                                            android:nestedScrollingEnabled="false"
-                                            android:visibility="gone" />
-
-
-                                        <androidx.appcompat.widget.AppCompatButton
-                                            android:id="@+id/add_moderators_btn"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-
-                                            android:background="@drawable/card_view_background_purple"
-                                            android:drawableEnd="@drawable/outline_add_24"
-                                            android:drawablePadding="-50dp"
-                                            android:drawableTint="@color/white"
-                                            android:elevation="6dp"
-                                            android:fontFamily="@font/outfitmedium"
-                                            android:minHeight="50dp"
-                                            android:orientation="vertical"
-                                            android:paddingStart="20dp"
-                                            android:paddingEnd="20dp"
-                                            android:text="Add Moderators"
-                                            android:textAllCaps="false"
-                                            android:textColor="@color/white"
-                                            android:textSize="18dp"
-                                            app:layout_constraintBottom_toBottomOf="parent"
-                                            app:layout_constraintEnd_toEndOf="parent"
-                                            app:layout_constraintStart_toStartOf="parent" />
-
-                    <ProgressBar
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:indeterminateTint="@color/purple"
-                        android:visibility="gone"
-                        android:layout_marginTop="20dp"
-                        android:id="@+id/progress_bar"/>
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                    app:layout_constraintTop_toBottomOf="@+id/textView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

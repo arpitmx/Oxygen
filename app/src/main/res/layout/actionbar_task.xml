@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:elevation="5dp"
-    >
+    android:layout_height="wrap_content"
+    android:elevation="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
@@ -16,6 +15,18 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progress_actionbar"
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
+            android:indeterminate="true"
+            android:layout_marginEnd="12dp"
+            android:visibility="gone"
+            android:indeterminateTint="@color/primary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_fav"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <TextView
@@ -67,17 +78,29 @@
             app:layout_constraintStart_toEndOf="@+id/btnBack"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
+        <ImageButton
+            android:id="@+id/btnModerator"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="95dp"
+            android:background="@null"
+            android:src="@drawable/baseline_assignment_ind_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
 
         <ImageButton
             android:id="@+id/btn_fav"
             android:layout_width="30dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="52dp"
+            android:layout_marginEnd="12dp"
             android:background="@null"
             android:src="@drawable/star_unfilled"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnRequestWork"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
             app:tint="@color/primary" />
@@ -86,10 +109,22 @@
             android:id="@+id/btnRequestWork"
             android:layout_width="30dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_design_services_24"
-            android:visibility="visible"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/baseline_more_vert_24"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -111,30 +146,15 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        style="@style/CustomTabLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/darkbg_main"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-        app:tabIndicatorColor="@color/better_white"
-        app:tabMode="fixed"
-        android:layoutAnimation="@anim/layout_animation_fadein"
-        app:tabIndicatorAnimationMode="fade"
-        app:tabRippleColor="@color/item_bg_glow"
-        app:tabSelectedTextColor="@color/primary"
-        app:tabTextColor="@color/account" />
 
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="3dp"-->
-<!--        android:background="@color/secondaryBlue"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/tabLayout"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent" />-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:visibility="gone"
+        android:background="@color/border_grey"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

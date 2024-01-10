@@ -1,7 +1,9 @@
+import android.content.Context
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -11,81 +13,100 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.ncs.o2.Constants.SwitchFunctions
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
 import com.ncs.o2.R
+import com.ncs.o2.UI.UIComponents.Adapters.TagAdapter
 import com.ncs.o2.databinding.TaskItemBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
+import javax.inject.Inject
 
-class TaskListAdapter(val repository: FirestoreRepository) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>() {
+class TaskListAdapter(val repository: FirestoreRepository,val context: Context,val taskList:MutableList<TaskItem>,val db:TasksDatabase) : RecyclerView.Adapter<TaskListAdapter.TaskItemViewHolder>(), TagAdapter.OnClick {
+
+
+    private val selectedTags = mutableListOf<Tag>()
 
     private var onClickListener: OnClickListener? = null
-    private var taskList: ArrayList<TaskItem> = ArrayList()
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: TaskItem,user: User) {
-            Glide.with(binding.root)
-                .load(user.profileDPUrl)
-                .listener(object : RequestListener<Drawable> {
+            if (user.profileDPUrl!=null) {
+                binding.asigneeDp.loadProfileImg(user.profileDPUrl.toString())
+            }else{
+                binding.asigneeDp.setImageDrawable(context.getDrawable(R.drawable.profile_pic_placeholder))
+            }
 
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        binding.progressBar.gone()
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        binding.progressBar.gone()
-                        return false
-                    }
-                })
-                .encodeQuality(80)
-                .override(40,40)
-                .apply(
-                    RequestOptions().
-                    diskCacheStrategy(DiskCacheStrategy.ALL)
-                )
-                .error(R.drawable.profile_pic_placeholder)
-                .into(binding.asigneeDp)
-
-            if (task.completed!!){
+            if (task.completed){
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.taskTitle.paintFlags=binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
-            val timeDifference = Date().time - task.timestamp!!.toDate().time
-            val minutes = (timeDifference / (1000 * 60)).toInt()
-            val hours = minutes / 60
-            val days = hours / 24
 
-            val timeAgo: String = when {
-                days > 0 -> "about $days days ago"
-                hours > 0 -> "about $hours hours ago"
-                minutes > 0 -> "about $minutes minutes ago"
-                else -> "just now"
-            }
-
-            binding.taskDuration.text = "$timeAgo"
+            binding.taskDuration.text = DateTimeUtils.getTimeAgo(task.timestamp!!.seconds)
             binding.taskId.text = task.id
             binding.taskTitle.text = task.title
             binding.difficulty.text = task.getDifficultyString()
-            binding.difficulty.setBackgroundColor(task.getDifficultyColor())
+
+            when (task.difficulty){
+                1 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_green)
+                2 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_yellow)
+                3 -> binding.difficulty.background=context.resources.getDrawable(R.drawable.label_cardview_red)
+            }
+
+            CoroutineScope(Dispatchers.IO).launch{
+                for (tagId in task.tagList){
+                    val tag=db.tagsDao().getTagbyId(tagId)
+
+                    if (!tag.isNull) {
+                        tag?.checked = true
+                        selectedTags.add(tag!!)
+                    }
+                }
+                withContext(Dispatchers.Main){
+                    Log.d("tagcheckfromDB",selectedTags?.toString()!!)
+                    setTagsView(selectedTags,binding,task)
+                }
+            }
+
+
+
         }
+    }
+
+    private fun setTagsView(list: MutableList<Tag>,binding: TaskItemBinding,task: TaskItem) {
+        val newList:MutableList<Tag> = mutableListOf()
+        for (tag in list){
+            if (task.tagList.contains(tag.tagID)){
+                newList.add(tag)
+            }
+        }
+        val finalList=newList.distinctBy { it.tagID }
+        val tagsRecyclerView = binding.tagRecyclerView
+        val layoutManager = FlexboxLayoutManager(context)
+        layoutManager.flexDirection = FlexDirection.ROW
+        layoutManager.flexWrap = FlexWrap.WRAP
+        tagsRecyclerView.layoutManager = layoutManager
+        val adapter = TagAdapter(finalList, this)
+        tagsRecyclerView.adapter = adapter
     }
 
     fun setTaskList(newTaskList: List<TaskItem>) {
@@ -94,7 +115,28 @@ class TaskListAdapter(val repository: FirestoreRepository) : RecyclerView.Adapte
         taskList.clear()
         taskList.addAll(newTaskList)
         diffResult.dispatchUpdatesTo(this)
+        notifyDataSetChanged()
     }
+    fun setTasks(newTaskList: List<Task>) {
+        val taskItems: List<TaskItem> = newTaskList.map { task ->
+            TaskItem(
+                title = task.title,
+                id = task.id,
+                assignee_id = task.assignee,
+                difficulty = task.difficulty,
+                timestamp = task.time_STAMP,
+                completed = if (SwitchFunctions.getStringStateFromNumState(task.status)=="Completed") true else false,
+                tagList = task.tags
+            )
+        }
+        val diffCallback = TaskDiffCallback(taskList, taskItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        taskList.clear()
+        taskList.addAll(taskItems)
+        diffResult.dispatchUpdatesTo(this)
+        notifyDataSetChanged()
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemViewHolder {
         val binding = TaskItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -110,6 +152,7 @@ class TaskListAdapter(val repository: FirestoreRepository) : RecyclerView.Adapte
         fetchAssigneeDetails(taskList[position].assignee_id) { user ->
             holder.bind(taskList[position], user)
         }
+
         holder.itemView.setOnClickFadeInListener {
             if (onClickListener != null) {
                 onClickListener!!.onCLick(position, taskList[position])
@@ -148,22 +191,43 @@ class TaskListAdapter(val repository: FirestoreRepository) : RecyclerView.Adapte
         }
     }
     private fun fetchAssigneeDetails(assigneeId: String, onUserFetched: (User) -> Unit) {
-        repository.getUserInfobyId(assigneeId) { result ->
-            when (result) {
-                is ServerResult.Success -> {
-                    val user = result.data
-                    if (user != null) {
-                        onUserFetched(user)
+        if (assigneeId!="None" && assigneeId!="") {
+            repository.getUserInfobyId(assigneeId) { result ->
+                when (result) {
+                    is ServerResult.Success -> {
+                        val user = result.data
+                        if (user != null) {
+                            onUserFetched(user)
+                        }
+                    }
+
+                    is ServerResult.Failure -> {
+
+                    }
+
+                    is ServerResult.Progress -> {
+
                     }
                 }
-                is ServerResult.Failure -> {
-
-                }
-                is ServerResult.Progress->{
-
-                }
             }
+        }else{
+            onUserFetched(User(
+                firebaseID = null,
+                profileDPUrl = null,
+                profileIDUrl = null,
+                post = null,
+                username = null,
+                role = null,
+                timestamp = null,
+                designation = null,
+                fcmToken = null,
+                isChecked = false
+            ))
         }
+    }
+
+    override fun onTagClick(tag: Tag) {
+
     }
 
 }

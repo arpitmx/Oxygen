@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.navigation.NavInflater
+import androidx.work.WorkManager
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.O2Application
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -46,7 +47,7 @@ Tasks FUTURE ADDITION :
 object UtilModule {
 
     @Provides
-    fun providesEasyElements( context : Activity):
+    fun providesEasyElements(@ApplicationContext context : Context):
             GlobalUtils.EasyElements{
         return GlobalUtils.EasyElements(context)
     }

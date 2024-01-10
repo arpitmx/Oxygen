@@ -9,8 +9,8 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.ncs.o2.Constants.NotificationType
-import com.ncs.o2.HelperClasses.LocalNotificationUtil
-import com.ncs.o2.Domain.Models.FCNotification
+import com.ncs.o2.HelperClasses.NotificationBuilderUtil
+import com.ncs.o2.Domain.Models.FCMNotification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Services.NotificationApiService
 import dagger.assisted.Assisted
@@ -89,11 +89,11 @@ class FCMWorker @AssistedInject constructor(
          catch (e:Exception){
             Timber.tag(TAG).d("Failed : ${e.message}")
             _resultLiveData.postValue(ServerResult.Failure(e))
-             val failedNotif = FCNotification(
+             val failedNotif = FCMNotification(
                  NotificationType.REQUEST_FAILED_NOTIFICATION,
                  "Request Sending Failed for #12345","Click here for resending request",
                  "Cause due to -> ${e.message}")
-            LocalNotificationUtil.showNotification(notification = failedNotif, context = applicationContext)
+            NotificationBuilderUtil.showNotification(notification = failedNotif, context = applicationContext)
             Result.failure()
         }
     }

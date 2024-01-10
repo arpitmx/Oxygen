@@ -20,9 +20,9 @@ Tasks FUTURE ADDITION :
 
 */
 sealed class ServerResult<out T> {
-    data class Success<out T>(val data : T) : ServerResult<T>()
-    object Progress : ServerResult<Nothing>()
-    data class Failure(val exception: Exception) : ServerResult<Nothing>()
+    data class Success<out T>(val data : T) : com.ncs.o2.Domain.Models.ServerResult<T>()
+    object Progress : com.ncs.o2.Domain.Models.ServerResult<Nothing>()
+    data class Failure(val exception: Exception) : com.ncs.o2.Domain.Models.ServerResult<Nothing>()
 
 
 }

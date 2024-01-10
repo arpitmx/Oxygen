@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/segment_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/darkbg_main">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#1DE3E1E1"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="10"
+        android:minHeight="@dimen/input_box_size"
+
+        android:padding="8dp"
+    >
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/selected_image_view"
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            >
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:gravity="center_vertical"
+                android:background="@drawable/suggestion_box_bg"
+
+                >
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+                    android:weightSum="10"
+                    >
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/baseline_image_24"
+                        app:tint="@color/orange"
+                        android:layout_marginStart="10dp"
+                        />
+
+                    <TextView
+                        android:id="@+id/tv_selected_image_name"
+                        android:layout_width="0dp"
+                        android:layout_weight="8"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:text="Image is here!"
+                        android:textSize="14dp"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/sfregular"
+                        android:gravity="center_vertical"
+                        />
+
+                    <ImageButton
+                        android:id="@+id/cross_btn_selected_image"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:src="@drawable/baseline_clear_24"
+                        android:background="@null"
+                        android:layout_gravity="center"
+                        app:tint="@color/account"
+                        android:paddingTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:scaleY="0.8"
+                        android:scaleX="0.8"
+
+                        />
+
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/msg_box"
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:background="@drawable/input_box_bg"
+            >
+
+     <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btn_attach_image"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:background="@null"
+        android:src="@drawable/baseline_image_24"
+        android:scaleX="1"
+        android:scaleY="1"
+        android:tint="@color/better_white"
+
+        />
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutMessage"
+                android:layout_width="0dp"
+                android:layout_weight="9"
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="none"
+                app:hintEnabled="false"
+                app:endIconMode="clear_text"
+                app:endIconTint="@color/better_white"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editboxMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Message goes here..."
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:textCursorDrawable="@drawable/oxygen_curson"
+                    android:textColorHint="@color/account"
+                    android:visibility="visible"
+                    android:maxHeight="200dp"
+                    android:padding="20dp"
+                    android:gravity="top"
+                    android:textColor="@color/better_white"
+                    android:textSize="17sp"
+                    android:inputType="textMultiLine" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+<!--     <EditText-->
+<!--         android:id="@+id/editbox_message"-->
+<!--         style="@style/body_regular"-->
+<!--         android:layout_width="0dp"-->
+<!--         android:layout_weight="9"-->
+<!--         android:layout_height="wrap_content"-->
+<!--         android:minHeight="55dp"-->
+<!--         android:maxHeight="200dp"-->
+<!--         android:hint="Message"-->
+<!--         android:paddingTop="10dp"-->
+<!--         android:paddingBottom="10dp"-->
+<!--         android:visibility="visible"-->
+<!--         android:gravity="center_vertical"-->
+<!--         android:paddingStart="10dp"-->
+<!--         android:paddingEnd="10dp"-->
+<!--         android:background="@null"-->
+<!--         android:textColor="@color/better_white"-->
+<!--         android:textSize="18dp"-->
+<!--         android:textColorHint="@color/account"-->
+<!--         />-->
+
+
+
+     <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_file_attach"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:src="@drawable/baseline_attach_file_24"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:layout_marginEnd="10dp"
+            app:tint="@color/better_white"
+            android:visibility="gone"
+            />
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <ProgressBar
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:layout_weight="1"
+            android:id="@+id/progress_bar_send_msg"
+            android:layout_marginEnd="5dp"
+            android:visibility="visible"
+            android:layout_marginStart="8dp"
+            android:indeterminateTint="@color/primary"/>
+        <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_send"
+                android:visibility="visible"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/arrow_circle_right"
+                android:scaleX="2"
+                android:scaleY="2"
+                android:tint="@color/primary"
+                />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+

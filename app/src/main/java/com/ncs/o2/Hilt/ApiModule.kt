@@ -1,6 +1,5 @@
 package com.ncs.o2.Hilt
 
-import android.app.Application
 import com.ncs.o2.BuildConfig
 import com.ncs.o2.Services.NotificationApiService
 import dagger.Module
@@ -39,7 +38,7 @@ object ApiModule {
 
     @Provides
     @Singleton
-    fun provideOkHTTPClient():OkHttpClient{
+    fun provideOkHTTPClient(): OkHttpClient {
         val interceptor = HttpLoggingInterceptor()
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder().addInterceptor(interceptor)
@@ -52,7 +51,7 @@ object ApiModule {
 
     @Provides
     @Singleton
-    fun getApiService (okkHttpClient: OkHttpClient): NotificationApiService {
+    fun getApiService(okkHttpClient: OkHttpClient): NotificationApiService {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.FCM_BASE_URL)
             .client(okkHttpClient)

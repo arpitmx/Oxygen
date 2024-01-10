@@ -219,7 +219,7 @@ class EditProfileActivity : AppCompatActivity() {
                 }
             }
         }else{
-            Toast.makeText(this, "Updated", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "No changes", Toast.LENGTH_SHORT)
                 .show()
             onBackPressed()
         }
@@ -281,7 +281,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun setUpView() {
 
-        PrefManager.initialize(this)
 
         binding.ivPicPreview.setOnClickThrottleBounceListener{
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {

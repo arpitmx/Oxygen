@@ -1,0 +1,175 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/darkbg_main"
+    android:minHeight="200dp"
+    >
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/purple"
+        />
+
+    <RelativeLayout
+        android:background="@color/secondary_bg_black"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        >
+
+        <ImageButton
+            android:id="@+id/close_btn"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:src="@drawable/baseline_close_24"
+            app:tint="@color/red" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@+id/submit_btn"
+            android:layout_toEndOf="@+id/close_btn"
+            android:gravity="center"
+            android:id="@+id/sheet_title"
+            android:textColor="@color/better_white"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:textSize="16dp"
+            android:text="Select Members" />
+
+
+        <ImageButton
+            android:id="@+id/submit_btn"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:background="@null"
+            android:layout_marginEnd="10dp"
+            app:tint="@color/green"
+            app:srcCompat ="@drawable/baseline_done_24"
+            />
+
+    </RelativeLayout>
+
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/card_bg"
+        />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:id="@+id/searchBox"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/item_bg_curve"
+        android:drawableStart="@drawable/ic_searchico"
+        android:paddingStart="15dp"
+        android:paddingBottom="1dp"
+        android:gravity="start|center_vertical"
+        android:hint="Search"
+        android:textAllCaps="false"
+        android:textColorHint="@color/account"
+        android:drawablePadding="15dp"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:transitionName="searchActivityTransition"
+        android:textSize="18dp"
+        android:textColor="#DEE3E3E3"
+        android:drawableTint="#DEE3E3E3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:inputType="textAutoCorrect" />
+
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/s3bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:visibility="gone"
+        android:id="@+id/unassign_layout"
+        android:background="@color/primarybg">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/better_white"
+                android:text="Unassigned"
+                android:fontFamily="@font/sf_pro_display_medium"
+                />
+
+
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/unassign_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:foregroundTint="@color/purple"
+            android:buttonTint="@color/primary"
+            />
+
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewDevelopers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="false"
+        android:visibility="gone"
+        android:layoutAnimation="@anim/layout_animation_fadein"
+        android:animationCache="true"
+        />
+
+
+
+
+</LinearLayout>

@@ -33,7 +33,10 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION :
 
 */
-class UserListAdapter constructor(private val contriList: MutableList<User>, private val onClickCallback: OnClickCallback) : RecyclerView.Adapter<UserListAdapter.ViewHolder>(){
+class UserListAdapter constructor(
+    private var contriList: MutableList<User>,
+    private val onClickCallback: OnClickCallback
+) : RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -71,10 +74,9 @@ class UserListAdapter constructor(private val contriList: MutableList<User>, pri
                 }
             })
             .encodeQuality(80)
-            .override(40,40)
+            .override(40, 40)
             .apply(
-                RequestOptions().
-                diskCacheStrategy(DiskCacheStrategy.ALL)
+                RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
 
             )
             .error(R.drawable.profile_pic_placeholder)
@@ -84,18 +86,18 @@ class UserListAdapter constructor(private val contriList: MutableList<User>, pri
         holder.binding.userName.text = contributor.username
         holder.binding.userPost.text = contributor.post
 
-        holder.binding.checkbox.setOnCheckedChangeListener{ btn,isChecked->
+        holder.binding.checkbox.setOnCheckedChangeListener { btn, isChecked ->
             contriList[position].isChecked = isChecked
             onClickCallback.onClick(contributor, position, isChecked)
         }
 
         holder.binding.root.setOnClickListener {
             val isCheckedC = holder.binding.checkbox.isChecked
-            if (isCheckedC){
+            if (isCheckedC) {
                 holder.binding.checkbox.isChecked = false
                 contributor.isChecked = false
                 onClickCallback.onClick(contributor, position, false)
-            }else {
+            } else {
                 holder.binding.checkbox.isChecked = true
                 contributor.isChecked = true
                 onClickCallback.onClick(contributor, position, true)
@@ -106,7 +108,10 @@ class UserListAdapter constructor(private val contriList: MutableList<User>, pri
 
 
     }
-
+    fun updateList(newList: List<User>) {
+        contriList = newList.toMutableList()
+        notifyDataSetChanged()
+    }
     override fun getItemCount(): Int {
         return contriList.size
     }
@@ -114,7 +119,7 @@ class UserListAdapter constructor(private val contriList: MutableList<User>, pri
     inner class ViewHolder(val binding: ContributorListItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    interface OnClickCallback{
-        fun onClick(contributor : User, position : Int, isChecked : Boolean)
+    interface OnClickCallback {
+        fun onClick(contributor: User, position: Int, isChecked: Boolean)
     }
 }

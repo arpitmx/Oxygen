@@ -41,7 +41,7 @@ class CreateSectionsBottomSheet : BottomSheetDialogFragment(){
     override fun onViewCreated( view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupView()
-        PrefManager.initialize(requireContext())
+
         binding.submit.setOnClickThrottleBounceListener{
             val segment=PrefManager.getSegmentDetails()
             binding.validationsTxt.gone()

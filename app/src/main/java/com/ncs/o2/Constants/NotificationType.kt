@@ -17,9 +17,21 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION : 
 
 */
-enum class NotificationType {
-    REQUEST_FAILED_NOTIFICATION ,
-    TASK_REQUEST_RECIEVED_NOTIFICATION,
-    TASK_CREATION_NOTIFICATION,
-    TASK_COMMENT_MENTION_NOTIFICATION,
+enum class NotificationType(val title: String, val priority : Int) {
+    REQUEST_FAILED_NOTIFICATION("Request failed", 3),
+    TASK_REQUEST_RECIEVED_NOTIFICATION("Work Request",3),
+    TASK_CREATION_NOTIFICATION("Task Created",3),
+    TASK_COMMENT_MENTION_NOTIFICATION("Mentioned",3),
+    TASK_COMMENT_NOTIFICATION("Comment",1) ,
+    TASK_ASSIGNED_NOTIFICATION("Task Assigned",3),
+    WORKSPACE_TASK_UPDATE("Workspace task updated",3),
+    TASK_CHECKLIST_UPDATE("Task checklist updated",3)
+
+
+
+
+
+
+
+
 }

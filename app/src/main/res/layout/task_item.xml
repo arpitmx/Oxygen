@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="2dp"
     android:paddingTop="5dp"
-    android:background="@color/darkbg_main"
+    android:background="@color/darkbg_main_a80"
     android:orientation="vertical"
     android:weightSum="10">
 
@@ -29,7 +29,7 @@
             android:layout_toEndOf="@+id/difficulty"
             android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
-            android:text="#12345"
+            android:text="Loading..."
             android:textColor="#858585"
             android:textSize="14dp"
             app:layout_constraintTop_toTopOf="parent" />
@@ -40,17 +40,17 @@
             android:layout_height="22dp"
             android:layout_alignParentStart="true"
             android:background="@drawable/rounded_corner_shape"
-            android:fontFamily="@font/outfitbold"
+            android:fontFamily="@font/sf_pro_display_semibold"
             android:layout_marginTop="@dimen/margin_top"
             android:gravity="center"
-            android:text="H"
+            android:text=".."
             android:layout_alignParentTop="true"
             android:textColor="@color/darkTheme_bg"
             android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.207" />
+          />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/progress_bar"
@@ -71,7 +71,7 @@
             android:layout_height="25dp"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="@dimen/margin_top"
-            android:src="@drawable/remove"
+            android:src="@drawable/logovedika"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="false"
             app:layout_constraintEnd_toEndOf="parent"
@@ -91,7 +91,7 @@
             android:layout_toStartOf="@+id/asignee_dp"
             android:fontFamily="@font/sf_pro_display_regular"
             android:gravity="center"
-            android:text="about 5 hours ago"
+            android:text="Processing"
             android:textColor="#858585"
             android:textSize="14dp"
             app:layout_constraintVertical_bias="0.136" />
@@ -110,7 +110,7 @@
         android:maxLines="3"
         android:ellipsize="end"
         android:minLines="1"
-        android:text="Appbar integration on to be redesigned"
+        android:text="Processing..."
         android:textColor="@color/better_white"
         android:textSize="16dp"
         android:paddingLeft="16dp"
@@ -122,6 +122,17 @@
         app:layout_constraintTop_toBottomOf="@+id/difficulty"
         app:layout_constraintVertical_bias="0.545" />
 
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tagRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:layout_marginBottom="5dp"
+        android:layoutAnimation="@anim/layout_animation_slidedown"
+        android:nestedScrollingEnabled="false"
+        tools:listitem="@layout/tag_item"
+        android:padding="@dimen/padding_start_task_details" />
 
 
     <View

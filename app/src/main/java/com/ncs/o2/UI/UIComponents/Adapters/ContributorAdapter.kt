@@ -12,10 +12,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.ncs.o2.Domain.Models.User
-import com.ncs.o2.R
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.R
 import com.ncs.o2.databinding.ContriItemBinding
 import timber.log.Timber
 
@@ -54,7 +54,11 @@ Tasks FUTURE ADDITION :
 
 
 */
-class ContributorAdapter constructor(private var contriList: MutableList<User>, private val onProfileClickCallback: OnProfileClickCallback,private val showButton: Boolean = true) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>(){
+class ContributorAdapter constructor(
+    private var contriList: MutableList<User>,
+    private val onProfileClickCallback: OnProfileClickCallback,
+    private val showButton: Boolean = true
+) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -98,10 +102,9 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
 
             })
             .encodeQuality(80)
-            .override(80,80)
+            .override(80, 80)
             .apply(
-                RequestOptions().
-                diskCacheStrategy(DiskCacheStrategy.ALL)
+                RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
             )
             .error(R.drawable.profile_pic_placeholder)
             .into(holder.binding.contriProfileImage)
@@ -110,21 +113,22 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
             onProfileClickCallback.onProfileClick(contributor, position)
         }
         holder.binding.remove.setOnClickListener {
-            onProfileClickCallback.removeClick(contributor,position)
+            onProfileClickCallback.removeClick(contributor, position)
         }
 
     }
 
-    fun addUser(user: User){
+    fun addUser(user: User) {
         this.contriList.add(user)
         Timber.tag(TAG).d(user.profileDPUrl)
         notifyDataSetChanged()
     }
 
-    fun removeUser(user: User){
+    fun removeUser(user: User) {
         this.contriList.remove(user)
         notifyDataSetChanged()
     }
+
     fun isUserAdded(contributor: User): Boolean {
         return contriList.contains(contributor)
     }
@@ -137,13 +141,13 @@ class ContributorAdapter constructor(private var contriList: MutableList<User>, 
     inner class ViewHolder(val binding: ContriItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    interface OnProfileClickCallback{
-        fun onProfileClick(user : User, position : Int)
-        fun removeClick(user : User, position : Int)
+    interface OnProfileClickCallback {
+        fun onProfileClick(user: User, position: Int)
+        fun removeClick(user: User, position: Int)
 
     }
 
-    companion object{
+    companion object {
         const val TAG = "ConstributorAdapter"
     }
 }

@@ -1,14 +1,22 @@
 package com.ncs.o2.UI.CreateTask
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Constants.IDType
+import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.UseCases.CreateTaskUseCase
+import com.ncs.o2.Domain.Utility.FirebaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,7 +41,7 @@ Tasks FUTURE ADDITION :
 
 @HiltViewModel
 class CreateTaskViewModel @Inject constructor
-    (val createTaskUseCase: CreateTaskUseCase) : ViewModel(), ServerErrorCallback
+    (val createTaskUseCase: CreateTaskUseCase, @FirebaseRepository val repository: Repository) : ViewModel(), ServerErrorCallback
     {
 
         private val _serverExceptionLiveData = MutableLiveData<String>()
@@ -51,6 +59,26 @@ class CreateTaskViewModel @Inject constructor
             createTaskUseCase.repository.setCallback(this)
         }
 
+//        fun publishTask(task: Task, result: (ServerResult<Int>) -> Unit) {
+//
+//            repository.createUniqueID(idType = IDType.TaskID, task.project_ID) { taskID ->
+//
+//                CoroutineScope(Dispatchers.IO).launch {
+//                    task.id = taskID
+//                    repository.postTask(task) { repoResult ->
+//                        Timber.tag(CreateTaskUseCase.TAG).d(repoResult.toString())
+//                        result(repoResult)
+//                    }
+//
+//                }
+//            }
+//        }
+
+        fun addTaskThroughRepository(task: Task) {
+            viewModelScope.launch {
+                repository.addTask(task)
+            }
+        }
         fun createTask(task : Task){
           viewModelScope.launch{
               try {
@@ -84,6 +112,13 @@ class CreateTaskViewModel @Inject constructor
           }
 
         }
+        fun getTagsbyId(
+            id:String,
+            projectName: String,
+            resultCallback: (ServerResult<Tag>) -> Unit
+        ) {
+            repository.getTagbyId(id,projectName, resultCallback)
+        }
 
         override fun handleServerException(exceptionMessage: String) {
             Timber.tag(TAG).d("Exception : $exceptionMessage")
@@ -94,5 +129,12 @@ class CreateTaskViewModel @Inject constructor
 
         companion object{
             const val TAG = "CreateTaskViewModel"
+        }
+
+        fun uploadImagethroughRepository(bitmap: Bitmap, taskID:String): LiveData<ServerResult<StorageReference>> {
+            return repository.uploadImage(bitmap, taskID)
+        }
+        fun getImageUrlThroughRepository(reference: StorageReference): LiveData<ServerResult<String>> {
+            return repository.getImageUrl(reference)
         }
     }

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".UI.SearchScreen.SearchFragment">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchParent"
+        android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="10"
+        android:orientation="horizontal">
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/search_bar"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_weight="8.5"
+        android:layout_marginBottom="7dp"
+        android:layout_marginStart="15dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/item_bg_curve"
+        android:paddingStart="15dp"
+        android:paddingBottom="1dp"
+        android:gravity="start|center_vertical"
+        android:hint="Search tasks, tags, etc."
+        android:textAllCaps="false"
+        android:textColorHint="@color/account"
+        android:drawablePadding="15dp"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:transitionName="searchActivityTransition"
+        android:textSize="18dp"
+        android:textColor="#DEE3E3E3"
+        android:drawableTint="#DEE3E3E3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:inputType="textAutoCorrect" />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:layout_height="50dp"
+            android:padding="15dp"
+            android:background="@drawable/item_bg_curve"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="15dp"
+            android:id="@+id/searchButton"
+            android:src="@drawable/ic_searchico"/>
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:scrollbars="none"
+        android:layout_height="wrap_content"
+        >
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:text="Tags"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:drawablePadding="@dimen/_5dp"
+            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+            android:drawableTint="@color/better_white"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            android:layout_height="40dp"
+            android:layout_marginStart="15dp"
+            android:id="@+id/tags"
+            android:background="@drawable/item_bg_curve"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:text="State"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:drawablePadding="@dimen/_5dp"
+            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+            android:drawableTint="@color/better_white"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:id="@+id/state"
+            android:background="@drawable/item_bg_curve"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:text="Assignee"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:drawablePadding="@dimen/_5dp"
+            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+            android:drawableTint="@color/better_white"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:id="@+id/assignee"
+            android:background="@drawable/item_bg_curve"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:text="Segment"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:drawablePadding="@dimen/_5dp"
+            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+            android:drawableTint="@color/better_white"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:id="@+id/segment"
+            android:background="@drawable/item_bg_curve"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:text="Type"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:drawablePadding="@dimen/_5dp"
+            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+            android:drawableTint="@color/better_white"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:id="@+id/type"
+            android:background="@drawable/item_bg_curve"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:text="Created by"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:drawablePadding="@dimen/_5dp"
+            android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
+            android:drawableTint="@color/better_white"
+            android:textAllCaps="false"
+            android:textColor="@color/better_white"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:id="@+id/created"
+            android:background="@drawable/item_bg_curve"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+    </HorizontalScrollView>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resultsParent"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_display_semibold"
+            android:text="Matches 20 issues"
+            android:textColor="@color/better_white"
+            android:textSize="14dp"
+            android:id="@+id/results"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_display_light"
+            android:text="Clear filters"
+            android:visibility="gone"
+            android:id="@+id/clear"
+            android:textColor="@color/better_white"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:id="@+id/searchPlaceholder"
+        android:textColor="@color/better_white"
+        android:text="Search Something..."
+        android:background="@color/darkbg_main"
+        />
+    <ProgressBar
+        android:layout_width="75dp"
+        android:layout_gravity="center"
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        android:layout_height="match_parent"
+        android:indeterminateTint="@color/colorAccent"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:background="@color/darkbg_main"
+        android:gravity="center"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:src="@drawable/tasks_placeholder_grey"
+            />
+
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="No tasks found..."
+            android:textColor="@color/account"
+            android:textSize="16dp"
+            android:translationY="-30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:layoutAnimation="@anim/layout_animation_popscale"
+        android:visibility="gone"
+        android:layout_marginBottom="50dp"
+        android:elevation="2dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

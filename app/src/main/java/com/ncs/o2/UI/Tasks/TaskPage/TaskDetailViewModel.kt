@@ -12,16 +12,21 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.gson.JsonObject
 import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Repositories.TaskRepository
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Services.NotificationApiService
 import com.ncs.o2.Domain.Workers.FCMWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.datafaker.Faker
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -48,7 +53,8 @@ Tasks FUTURE ADDITION :
 @HiltViewModel
 class TaskDetailViewModel @Inject
 constructor(val notificationApiService: NotificationApiService,
-            @FirebaseRepository val repository: Repository, val app: Application,private val firestoreRepository: FirestoreRepository
+            @FirebaseRepository val repository: Repository, val app: Application,private val firestoreRepository: FirestoreRepository,
+    val taskRepository: TaskRepository
 ) : AndroidViewModel(app) {
 
     companion object{
@@ -57,6 +63,7 @@ constructor(val notificationApiService: NotificationApiService,
 
     private val _notificationStatusLiveData = MutableLiveData<ServerResult<Int>>()
     val notificationStatusLiveData: LiveData<ServerResult<Int>> = _notificationStatusLiveData
+    var task: Task? = null
 
     suspend fun sendNotificationToReceiverFirebase(notification: Notification, fcmToken: String){
 
@@ -84,6 +91,7 @@ constructor(val notificationApiService: NotificationApiService,
     }
 
     fun sendFCMNotification(fcmToken : String){
+
         val payloadJsonObject = buildNotificationPayload(fcmToken)
 
         val payloadInputData = Data.Builder()
@@ -135,7 +143,48 @@ constructor(val notificationApiService: NotificationApiService,
         firestoreRepository.getUserInfobyId(id,resultCallback)
     }
 
+    suspend fun updateTask(taskID:String,projectName: String,NewAssignee:String,OldAssignee:String):ServerResult<Boolean>{
+        return firestoreRepository.updateTask(id = taskID, projectName = projectName, newAssignee = NewAssignee, oldAssignee =  OldAssignee)
+    }
 
+    suspend fun updateTaskSummary(task: Task,newSummary:String):ServerResult<Boolean>{
+        return firestoreRepository.updateTaskSummary(task = task,newSummary=newSummary)
+    }
+
+    suspend fun updateState(taskID:String,userID:String,newState:String,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updateState(id = taskID, userID = userID,newState=newState, projectName = projectName)
+    }
+    suspend fun updatePriority(taskID:String,newPriority:String,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updatePriority(id = taskID, newPriority = newPriority, projectName = projectName)
+    }
+    suspend fun updateModerators(taskID:String,projectName: String,moderator:String):ServerResult<Unit>{
+        return firestoreRepository.updateModerator(id = taskID, projectName = projectName,moderator=moderator)
+    }
+
+    suspend fun updateSection(taskID:String,projectName: String,newSection:String):ServerResult<Boolean>{
+        return firestoreRepository.updateSection(taskId = taskID, projectName = projectName,newSection=newSection)
+    }
+    suspend fun addNewModerators(taskID:String,projectName: String,moderator:MutableList<String>,unselected:MutableList<String>):ServerResult<Boolean>{
+        return firestoreRepository.addNewModerator(id = taskID, projectName = projectName, newModerators =moderator,unselected=unselected)
+    }
+
+    suspend fun updateTags(newTags:List<String>,projectName: String,taskID: String):ServerResult<Boolean>{
+        return firestoreRepository.updateTags(newTags = newTags, projectName = projectName, taskId = taskID)
+    }
+
+    fun getTaskbyIdFromDB(
+        projectName: String,
+        taskId:String,
+        resultCallback: (DBResult<Task>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTaskbyID(projectName,taskId,resultCallback)
+        }
+    }
+
+    fun addNotificationToFirebase(user_id: String,notification: Notification,resultCallback: (ServerResult<Int>) -> Unit){
+        repository.insertNotification(userID=user_id, notification = notification, result = resultCallback)
+    }
 
 
 }

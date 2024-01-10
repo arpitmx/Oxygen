@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/darkbg_main"
+    tools:context=".UI.CreateTask.DescriptionEditorActivity">
+
+    <include
+        android:id="@+id/gio_actionbar"
+        layout="@layout/actionbar_create_task"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_53dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/gemProg"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        />
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/card_view_white"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@color/black_overlay"
+        android:layout_margin="5dp"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:visibility="gone"
+                android:indeterminateTint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+
+                <EditText
+                    android:id="@+id/summary_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:gravity="top|start"
+                    android:hint="Write Task Summary here..."
+                    android:inputType="textMultiLine"
+                    android:minHeight="600dp"
+                    android:padding="10dp"
+                    android:scrollbarThumbVertical="@color/primary"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/darkbg_main"
+                    android:textColorHint="@color/account"
+                    android:textSize="16dp" />
+
+                <br.tiagohm.markdownview.MarkdownView
+                    android:id="@+id/markdownView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:nestedScrollingEnabled="true"
+                    android:paddingTop="10dp"
+                    android:visibility="gone"
+                    app:escapeHtml="false" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/imageRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_animation_popscale"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/secondarybg"
+        android:background="@drawable/card_view_white"
+        android:text="Preview"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+    />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="#1DE3E1E1"
+        android:elevation="10dp"
+        android:scrollbars="none"
+        >
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnWrite"
+            style="@style/editor_options"
+            android:text="O2Mate"
+            android:drawableEnd="@drawable/baseline_auto_awesome_24"
+            android:drawablePadding="5dp"
+            android:drawableTint="@color/light_blue_600"
+            />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnPreview"
+            style="@style/editor_options"
+            android:text="Preview"
+            android:visibility="visible"
+            android:drawableEnd="@drawable/baseline_assistant_24"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/light_blue_600"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnEdit"
+            style="@style/editor_options"
+            android:text="Edit"
+            android:visibility="visible"
+            android:drawableEnd="@drawable/round_edit_24"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/light_blue_600"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAutoBlock"
+            style="@style/editor_options"
+            android:text="![Block]!"
+            android:drawableEnd="@drawable/baseline_arrow_back_ios_24"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/light_blue_600"
+            />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCodeBlock"
+            style="@style/editor_options"
+            android:text="Codeblock"
+            android:drawablePadding="10dp"
+            android:drawableEnd="@drawable/baseline_article_24"
+            android:drawableTint="@color/black200"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLink"
+            style="@style/editor_options"
+            android:text="Link"
+            android:drawableTint="@color/black200"
+            android:drawableEnd="@drawable/baseline_add_link_24"
+             />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnImg"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            style="@style/editor_options"
+            android:text="Image"
+            android:drawablePadding="5dp"
+            android:drawableTint="@color/black200"
+            android:drawableEnd="@drawable/baseline_image_24"
+            />
+
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnChecklist"
+            style="@style/editor_options"
+            android:text="Checklist"
+            android:drawablePadding="5dp"
+            android:drawableTint="@color/black200"
+            android:drawableEnd="@drawable/baseline_check_box_outline_blank_24"
+            />
+
+    </LinearLayout>
+
+    </HorizontalScrollView>
+
+
+</LinearLayout>
+
+
+<!--<com.google.android.material.textfield.TextInputLayout-->
+<!--android:id="@+id/title_editor"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_margin="10dp"-->
+<!--android:layout_marginTop="10dp"-->
+<!--android:layout_weight="7"-->
+<!--android:visibility="gone"-->
+<!--android:hint="Write a summary prompt..."-->
+<!--app:endIconMode="clear_text"-->
+<!--app:hintEnabled="true"-->
+<!--app:hintTextColor="@color/edit_text_hint">-->
+
+<!--<com.google.android.material.textfield.TextInputEditText-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:id="@+id/title"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:fontFamily="@font/sf_pro_display_medium"-->
+<!--    android:maxLines="2"-->
+<!--    android:textAlignment="textStart"-->
+<!--    android:textColor="@color/darkbg_main"-->
+<!--    android:textSize="17dp" />-->
+
+<!--</com.google.android.material.textfield.TextInputLayout>-->
+

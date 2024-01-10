@@ -22,6 +22,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -139,7 +140,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                 val role = document.getLong(Endpoints.User.ROLE)
                                 val dp: String? = document.getString(Endpoints.User.DP_URL)
                                 var fcmToken = document.getString(Endpoints.User.FCM_TOKEN)
-
+                                val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
                                 if (fcmToken == null) {
                                     fcmToken { token->
                                         fcmToken = token
@@ -153,8 +154,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                     with(PrefManager){
 
                                         initialize(requireContext())
-
-                                        setLastSeenTimeStamp(0)
+                                        setLastSeenTimeStamp(notification_timestamp!!)
                                         setLatestNotificationTimeStamp(0)
                                         setNotificationCount(0)
 

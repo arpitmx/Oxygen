@@ -1,9 +1,17 @@
 package com.ncs.o2.Domain.Models
 
 import android.graphics.Color
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
-import com.google.firebase.firestore.FieldValue
+import com.ncs.o2.Domain.Utility.Version
+import com.ncs.o2.HelperClasses.Convertors
+import com.ncs.versa.Constants.Endpoints
+import java.sql.Time
 
 /*
 File : Task.kt -> com.ncs.o2.Models
@@ -22,28 +30,36 @@ Tasks FEATURE MUST HAVE :
 Tasks FUTURE ADDITION :
 
 */
+
+// Todo Remove deprecated fields like assigner
+
+@Version("3")
+@Entity(tableName = Endpoints.ROOM.TASKS.TASKS_TABLE)
+@TypeConverters(Convertors::class)
 data class Task(
 
     val title: String = "",
     val description: String = "",
+    @PrimaryKey(autoGenerate = false)
     var id: String="",
     val difficulty: Int = 0,
-    val links: List<String> = emptyList(),
     val priority: Int = 0,
     val status: Int = -1,
-    val assignee: List<String> = emptyList(),
+
+    val assignee: String = "",
     val assigner: String = "",
-    val assigner_email:String="",
-    val deadline: String = "",
+    var moderators:List<String> = listOf(),
+
     var time_STAMP: Timestamp? =null,
-//    val timestamp: FieldValue= FieldValue.serverTimestamp(),
     val duration: String = "",
-    val tags: List<String> = listOf(),
+    var tags: List<String> = listOf(),
     val project_ID: String = "",
     val segment: String = "",
     val section: String = "",
-    val assignee_DP_URL: String = "",
-    val completed:Boolean=false
+    val completed:Boolean=false,
+    val type:Int=0,
+    val last_updated:Timestamp? = Timestamp.now(),
+    val version:Int?=3
     ) {
 
     @Exclude
@@ -52,7 +68,18 @@ data class Task(
             1 -> return Color.GREEN
             2 -> return Color.YELLOW
             3 -> return Color.RED
+            4 -> return Color.WHITE
             else -> return Color.BLACK
+        }
+    }
+    @Exclude
+    fun getPriorityString(): String {
+        when (priority) {
+            1 -> return "LOW"
+            2 -> return "MEDIUM"
+            3 -> return "HIGH"
+            4 -> return "CRITICAL"
+            else -> return ""
         }
     }
 

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer"
+    android:background="@color/darkbg_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -31,21 +32,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <include
-                    layout="@layout/circular_progress"
-                    android:id="@+id/lottie_progress_include"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:elevation="10dp"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="70dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/progressBar"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.498"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0"
-                    />
+<!--                <include-->
+<!--                    layout="@layout/circular_progress"-->
+<!--                    android:id="@+id/lottie_progress_include"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:elevation="10dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:layout_marginBottom="70dp"-->
+<!--                    app:layout_constraintBottom_toBottomOf="@+id/progressBar"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.498"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"-->
+<!--                    app:layout_constraintVertical_bias="1.0"-->
+<!--                    />-->
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/nav_host_fragment_activity_main"
@@ -53,7 +54,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:defaultNavHost="true"
+                    android:visibility="visible"
                     app:navGraph="@navigation/nav_graph" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAlignment="center"
+                    android:padding="10dp"
+                    android:visibility="gone"
+                    android:id="@+id/placeholder_text"
+                    android:text="Select a segment\n to continue"
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textSize="30dp"
+                    android:textColor="@color/edit_text_hint"/>
 
             </FrameLayout>
 
@@ -65,6 +81,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:id="@+id/bottomNavParent"
             android:layout_gravity="bottom"
             android:orientation="vertical"
             >

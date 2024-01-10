@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:background="@color/darkbg_main"
-
+    android:id="@+id/actionbar"
     android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -105,8 +105,9 @@
             android:id="@+id/create_task_button"
             android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="48dp"
+            android:layout_marginEnd="80dp"
             android:background="@null"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -114,26 +115,28 @@
             app:srcCompat="@android:drawable/ic_input_add"
             app:tint="@color/primary" />
 
+        <ImageButton
+            android:id="@+id/new_changes_btn"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/create_task_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/baseline_new_releases_24"
+            app:tint="@color/primary" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="40dp"
+            android:id="@+id/notification_cont"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/create_task_button"
+            app:layout_constraintEnd_toStartOf="@+id/btnMore"
             app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:layout_width="40dp"
-                android:id="@+id/notifications"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:background="@null"
-                android:src="@drawable/notifications"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/notificationCountET"
@@ -155,7 +158,173 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
+
+            <ImageButton
+                android:id="@+id/notifications"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:src="@drawable/notifications"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/primary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/baseline_more_vert_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutworkspace"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="@dimen/action_bar"
+        android:elevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/padding_bottom_offset"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnHam_workspace"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
+
+
+            <!--            <de.hdodenhof.circleimageview.CircleImageView-->
+            <!--                android:id="@+id/asignee_dp"-->
+            <!--                android:layout_width="40dp"-->
+            <!--                android:scaleY="0.8"-->
+            <!--                android:layout_marginStart="2dp"-->
+            <!--                android:scaleX="0.8"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:layout_alignParentTop="true"-->
+            <!--                android:layout_alignParentEnd="true"-->
+            <!--                android:layout_alignParentBottom="false"-->
+            <!--                android:src="@drawable/apphd"-->
+            <!--                app:layout_constraintEnd_toStartOf="@+id/create_task_button"-->
+            <!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+
+            <TextView
+                android:id="@+id/workspace"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:paddingBottom="@dimen/padding_bottom_offset"
+                android:text="Workspace"
+                android:textColor="@color/primary"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnHam"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <ImageView
+            android:id="@+id/btnHam_workspace"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ham"
+            android:paddingTop="@dimen/padding_bottom_offset"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutsearch"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="@dimen/action_bar"
+        android:elevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/titleSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/padding_bottom_offset"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnHam_search"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
+
+
+            <!--            <de.hdodenhof.circleimageview.CircleImageView-->
+            <!--                android:id="@+id/asignee_dp"-->
+            <!--                android:layout_width="40dp"-->
+            <!--                android:scaleY="0.8"-->
+            <!--                android:layout_marginStart="2dp"-->
+            <!--                android:scaleX="0.8"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:layout_alignParentTop="true"-->
+            <!--                android:layout_alignParentEnd="true"-->
+            <!--                android:layout_alignParentBottom="false"-->
+            <!--                android:src="@drawable/apphd"-->
+            <!--                app:layout_constraintEnd_toStartOf="@+id/create_task_button"-->
+            <!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+
+            <TextView
+                android:id="@+id/search"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:paddingBottom="@dimen/padding_bottom_offset"
+                android:text="Search"
+                android:textColor="@color/primary"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnHam"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <ImageView
+            android:id="@+id/btnHam_search"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ham"
+            android:paddingTop="@dimen/padding_bottom_offset"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -164,6 +333,7 @@
         style="@style/CustomTabLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:visibility="gone"
         app:tabGravity="center"
         android:background="@color/darkbg_main"
         app:layout_constraintEnd_toEndOf="parent"
@@ -182,6 +352,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/search_cont"
+        android:visibility="gone"
         android:orientation="horizontal"
         android:layout_height="55dp">
 
@@ -198,6 +369,8 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="7dp"
             android:layout_marginStart="15dp"
+            android:focusable="false"
+            android:editable="false"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="7dp"
             android:background="@drawable/item_bg_curve"
@@ -232,8 +405,8 @@
             android:scaleY="0.8"
             android:layout_marginBottom="7dp"
             android:layout_height="match_parent"
-            android:src="@drawable/filter"
-            android:id="@+id/filterBtn"
+            android:src="@drawable/baseline_refresh_24"
+            android:id="@+id/refresh"
             app:tint="@color/primary" />
 
 

@@ -152,14 +152,11 @@
                 android:paddingStart="10dp"
                 android:layout_marginBottom="7dp"
                 android:layout_marginEnd="15dp"
-                android:fontFamily="@font/outfitmedium"
                 android:gravity="center"
                 android:drawableTint="@color/white"
                 android:orientation="vertical"
                 android:textAllCaps="false"
                 android:drawableStart="@drawable/baseline_check_24"
-                android:textColor="@color/better_white"
-                android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -185,6 +182,15 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -261,4 +267,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+    </ScrollView>
 </androidx.appcompat.widget.LinearLayoutCompat>

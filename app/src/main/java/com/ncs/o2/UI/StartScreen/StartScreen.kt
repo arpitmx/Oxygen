@@ -3,6 +3,8 @@ package com.ncs.o2.UI.StartScreen
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,10 +14,18 @@ import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.DocumentSnapshot
@@ -23,15 +33,21 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Constants.Errors
+import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Constants.TestingConfig
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
@@ -40,12 +56,16 @@ import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.O2Bot.O2Bot
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
+import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
@@ -57,14 +77,18 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
+    @Inject
+    lateinit var db: TasksDatabase
     private lateinit var MaintainceCheck: maintainceCheck
-
+    var taskList:MutableList<Task> = mutableListOf()
 
     private val util: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this@StartScreen)
     }
+    private val NOTIFICATION_PERMISSION_REQUEST_CODE = 123
 
-//    private val viewModel: LogCatViewModel by viewModels()
+
+    //    private val viewModel: LogCatViewModel by viewModels()
     private val o2Bot: O2Bot by viewModels()
 
 
@@ -85,16 +109,53 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        askNotificationPermission()
+        val tasksDAO = db.tasksDao()
+//        setBallAnimator()
+//        setUpViews(TestingConfig.isTesting)
 
-        PrefManager.initialize(this)
-
-
-        setBallAnimator()
-        setUpViews(TestingConfig.isTesting)
 
     }
 
     lateinit var scaleAnimation: ScaleAnimation
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            setBallAnimator()
+            setUpViews(TestingConfig.isTesting)
+        } else {
+            util.singleBtnDialog(title = "Notification Permission required", msg = "Notification permission is required for better functioning of the app, you can always allow permissions from phone settings", btnText = "I Understand", positive = {
+                setBallAnimator()
+                setUpViews(TestingConfig.isTesting)
+            })
+        }
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                setBallAnimator()
+                setUpViews(TestingConfig.isTesting)
+            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                util.twoBtnDialog(title = "Notification Permission required", msg = "Notification permission is required for better functioning of the app", positiveBtnText = "OK", positive = {
+                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }, negativeBtnText = "Cancel", negative = {
+                    setBallAnimator()
+                    setUpViews(TestingConfig.isTesting)
+                })
+            } else {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+        else{
+            setBallAnimator()
+            setUpViews(TestingConfig.isTesting)
+        }
+    }
 
     private fun setBallTouchAnimator() {
 
@@ -165,7 +226,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     private fun setBallAnimator() {
 
         ball = binding.fragContainer
-        PrefManager.initialize(this)
 
 //        if (PrefManager.getDpUrl()!=null){
 //        Glide.with(this)
@@ -173,7 +233,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 //            .placeholder(R.drawable.profile_pic_placeholder)
 //            .error(R.drawable.logogradhd)
 //            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
-//            .into(ball)
+//            .into(binding.ball)
 //        }
 
         ball.rotateInfinity(this)
@@ -282,6 +342,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 }else {
 
                     binding.ball.setColorFilter(tintColor)
+
                     setUpNotifications()
                 }
 
@@ -343,16 +404,24 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
-
+                val role=document.get(Endpoints.User.ROLE)
+                val timestamp=document.getTimestamp(Endpoints.User.TIMESTAMP)
+                PrefManager.setUserRole(role.toString().toLong())
+                PrefManager.setCurrentUserTimeStamp(Timestamp.now())
                 val dp_url = document.getString(Endpoints.User.DP_URL)
                 val dp_url_pref = PrefManager.getDpUrl()
-
+                val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
+                if (!notification_timestamp.isNull){
+                    PrefManager.setLastSeenTimeStamp(notification_timestamp!!)
+                }
                 if (dp_url_pref==null){
                     PrefManager.setDpUrl(dp_url)
-                }else if (dp_url_pref!=dp_url){
+                }else if (dp_url_pref!=dp_url) {
                     Timber.tag(TAG).d("New DP is avaialable : ${dp_url}")
                     PrefManager.setDpUrl(dp_url)
                 }
+
+                PrefManager.setDpUrl(dp_url)
 
                 if (isDetailsAdded == null) {
                     showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL, Exception("No details added"))
@@ -379,7 +448,11 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
 
                 setUpFCMTokenIfRequired(document = document)
                 setUpProjectsList(document = document)
-                setUpNotifications()
+                val projectsList=PrefManager.getProjectsList()
+                for (projects in projectsList){
+                    setUpTasks(projects)
+                    setUpTags(projects)
+                }
 
 
 
@@ -413,6 +486,88 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
         )
     }
 
+    private fun setUpTasks(projectName:String) {
+        val dao = db.tasksDao()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    viewModel.getTasksinProject(projectName)
+                }
+
+                Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+                    }
+
+                    is ServerResult.Progress -> {
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tasks=taskResult.data
+                        for (task in tasks){
+                            dao.insert(task)
+                        }
+
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+            }
+
+        }
+    }
+
+    private fun setUpTags(projectName:String) {
+        val dao = db.tagsDao()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val tagResult = withContext(Dispatchers.IO) {
+                    viewModel.getTagsinProject(projectName)
+                }
+
+                Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
+
+                when (tagResult) {
+
+                    is ServerResult.Failure -> {
+                    }
+
+                    is ServerResult.Progress -> {
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tags=tagResult.data
+                        for (tag in tags){
+                            dao.insert(tag)
+                        }
+                        setUpNotifications()
+
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+            }
+
+        }
+    }
     private fun setUpNotifications() {
         viewModel.setUpNewNotifications()
         viewModel.serverResultLiveData.observe(this){ result->
@@ -427,7 +582,6 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                 is ServerResult.Success -> {
 
                     val newNotificationsList = result.data
-
                     if (newNotificationsList.isNotEmpty()){
 
                     viewModel.pushNewNotificationsToRoom(newNotificationsList){ pushResult ->
@@ -440,12 +594,15 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
                             }
                             is ServerResult.Success -> {
                                // Toast.makeText(this, "You have ${pushResult.data} new notifications", Toast.LENGTH_SHORT).show()
+
                                 util.showSnackbar(binding.root,"O2 is ready",1000)
                                 stopAnimAndStartActivity()
                             }
 
                         }
                     }
+
+
 
                     }else {
                         util.showSnackbar(binding.root,"O2 is ready",1000)
@@ -461,6 +618,7 @@ class StartScreen @Inject constructor(): AppCompatActivity() {
     private fun setUpProjectsList(document : DocumentSnapshot) {
         val projectsList = document.get("PROJECTS") as List<String>
         PrefManager.putProjectsList(projectsList)
+
     }
 
 

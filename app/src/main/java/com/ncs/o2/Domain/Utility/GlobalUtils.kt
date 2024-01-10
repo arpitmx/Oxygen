@@ -1,9 +1,11 @@
 package com.ncs.o2.Domain.Utility
 
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.graphics.Color
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
@@ -32,41 +34,117 @@ object GlobalUtils {
         }
 
 
-        fun singleBtnDialog_ServerError(title: String="Failure", msg: String="Failed to get results, please try again", btnText: String="Okay", positive: () -> Unit) {
-            val builder = android.app.AlertDialog.Builder(context)
-            builder.setIcon(com.google.android.material.R.drawable.mtrl_ic_error)
-            builder.setTitle(title)
-            builder.setMessage(msg)
-            builder.setPositiveButton(btnText) { dialog, which ->
-                positive()
+        fun singleBtnDialog_ServerError(
+            title: String = "Failure",
+            msg: String = "Failed to get results, please try again",
+            btnText: String = "Okay",
+            positive: () -> Unit
+        ) {
+            if (context is Activity) {
+                val activity = context
+
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    val builder = android.app.AlertDialog.Builder(context)
+                    builder.setIcon(com.google.android.material.R.drawable.mtrl_ic_error)
+                    builder.setTitle(title)
+                    builder.setMessage(msg)
+                    builder.setCancelable(false)
+                    builder.setPositiveButton(btnText) { dialog, which ->
+                        positive()
+                    }
+
+                    try {
+                        val dialog = builder.create()
+                        dialog.show()
+                    } catch (e: WindowManager.BadTokenException) {
+                        // Handle the exception, e.g., log an error
+                        e.printStackTrace()
+                    }
+                }
             }
-            val dialog = builder.create()
-            dialog.show()
         }
 
+
         fun singleBtnDialog(title: String, msg: String, btnText: String, positive: () -> Unit) {
-            val builder = android.app.AlertDialog.Builder(context)
-            builder.setIcon(R.drawable.logogradhd)
-            builder.setTitle(title)
-            builder.setMessage(msg)
-            builder.setPositiveButton(btnText) { dialog, which ->
-                positive()
+            if (context is Activity) {
+                val activity = context
+
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    val builder = android.app.AlertDialog.Builder(context)
+                    builder.setIcon(R.drawable.logogradhd)
+                    builder.setTitle(title)
+                    builder.setMessage(msg)
+                    builder.setCancelable(false)
+                    builder.setPositiveButton(btnText) { dialog, which ->
+                        positive()
+                    }
+
+                    try {
+                        val dialog = builder.create()
+                        dialog.show()
+                    } catch (e: WindowManager.BadTokenException) {
+                        e.printStackTrace()
+                    }
+                }
             }
-            val dialog = builder.create()
-            dialog.show()
         }
 
         fun singleBtnDialog_InputError(title: String, msg: String, btnText: String, positive: () -> Unit) {
-            val builder = android.app.AlertDialog.Builder(context)
-            builder.setIcon(R.drawable.logogradhd)
-            builder.setTitle(title)
-            builder.setMessage(msg)
-            builder.setPositiveButton(btnText) { dialog, which ->
-                positive()
+            if (context is Activity) {
+                val activity = context
+
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    val builder = android.app.AlertDialog.Builder(context)
+                    builder.setIcon(R.drawable.logogradhd)
+                    builder.setTitle(title)
+                    builder.setMessage(msg)
+                    builder.setCancelable(false)
+                    builder.setPositiveButton(btnText) { dialog, which ->
+                        positive()
+                    }
+
+                    try {
+                        val dialog = builder.create()
+                        dialog.show()
+                    } catch (e: WindowManager.BadTokenException) {
+                        e.printStackTrace()
+                    }
+                }
             }
-            val dialog = builder.create()
-            dialog.show()
         }
+
+        fun twoBtnDialog(
+            title: String,
+            msg: String,
+            positiveBtnText: String,
+            negativeBtnText: String,
+            positive: () -> Unit,
+            negative: () -> Unit
+        ) {
+            if (context is Activity) {
+                val activity = context
+
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setIcon(R.drawable.logogradhd)
+                    builder.setTitle(title)
+                    builder.setMessage(msg)
+                    builder.setPositiveButton(positiveBtnText) { dialog, which ->
+                        positive()
+                    }
+                    builder.setNegativeButton(negativeBtnText) { dialog, which ->
+                        negative()
+                    }
+                    try {
+                        val dialog = builder.create()
+                        dialog.show()
+                    } catch (e: WindowManager.BadTokenException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+
 
         fun singleBtnDialog_ErrorConnection(title: String, msg: String, btnText: String, positive: () -> Unit) {
             val builder = android.app.AlertDialog.Builder(context)
@@ -89,15 +167,10 @@ object GlobalUtils {
         }
 
         fun showSnackbar(rootView: View, msg: String, duration: Int) {
-
-
             val snackbar = Snackbar.make(rootView, msg, duration)
             snackbar.setTextColor(Color.BLACK)
             snackbar.setBackgroundTint(Color.WHITE)
             snackbar.show()
-
-
-
         }
 
 

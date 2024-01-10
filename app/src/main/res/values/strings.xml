@@ -9,7 +9,7 @@
 
     <string name="bottom_nav_item_assigned">Assigned</string>
     <string name="bottom_nav_item_done">Completed</string>
-    <string name="bottom_nav_item_project_stats">Project Stats</string>
+    <string name="bottom_nav_search">Search</string>
     <string name="new_task">New Task</string>
     <string name="select_members">Select Members</string>
     <string name="select_segment">Select Segment</string>
@@ -89,6 +89,31 @@
     <string name="segment_title">Segment title</string>
     <string name="segment_description">Segment Description</string>
     <string name="set_description_here">Set Description here...</string>
+    <string name="section">Section</string>
+    <string name="segment">Segment</string>
+    <string name="project">Project</string>
+    <string name="status">Status</string>
+    <string name="state">State</string>
+    <string name="type">Type</string>
+    <string name="difficulty">Difficulty</string>
+
+    <string name="shared_image_transition">shared_image_transition_%1$d</string>
+    <string name="max_zoom">Max Zoom : %1$f</string>
+    <string name="fling_animation_duration">Fling Animation Duration : %1$d</string>
+    <string name="scale_animation_duration">Scale Animation Duration : %1$d</string>
+    <string name="over_scale_animation_duration">Over Scale Animation Duration : %1$d</string>
+    <string name="over_scroll_animation_duration">Over Scroll Animation Duration : %1$d</string>
+    <string name="dismiss_animation_duration">Dismiss Animation Duration : %1$d</string>
+    <string name="restore_animation_duration">Restore Animation Duration : %1$d</string>
+    <string name="view_drag_friction">View Drag Friction : %1$f</string>
+    <string name="moderators">Moderators</string>
+    <string name="state_filter">State</string>
+    <string name="assignee_filter">Assignee</string>
+    <string name="segment_filter">Segment</string>
+    <string name="type_filter">Type</string>
+    <string name="clear_filters">Clear filters</string>
+    <string name="summary">Summary</string>
+    <string name="create_task">Create Task</string>
 
 
 </resources>

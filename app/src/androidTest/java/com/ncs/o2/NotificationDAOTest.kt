@@ -7,8 +7,8 @@ import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.Room.NotificationRepository.NotificationDao
-import com.ncs.o2.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDao
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.runBlocking
 import net.datafaker.Faker

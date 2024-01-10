@@ -4,18 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/darkbg_main_a80"
     android:orientation="vertical"
-    tools:context=".UI.Tasks.TaskPage.Details.TaskDetailsFragment"
-    >
+    tools:context=".UI.Tasks.TaskPage.Details.TaskDetailsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progress_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F5131313"
+        android:background="#F5000000"
         android:elevation="5dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ProgressBar
             android:id="@+id/progressBar2"
@@ -24,324 +23,639 @@
             android:layout_gravity="center"
             android:elevation="3dp"
             android:indeterminate="true"
-            android:indeterminateTint="#03A9F4"
+            android:indeterminateTint="@color/primary"
             android:scaleX="0.2"
             android:scaleY="0.2"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/progressbar_block"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:elevation="10dp"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/blockloaderanim"
+            app:lottie_speed="1" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <ScrollView
-        android:id="@+id/scrollView2"
+        android:id="@+id/parent_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="true"
         android:elevation="2dp"
-        android:paddingTop="10dp"
-        android:visibility="visible"
+        android:scrollbarSize="4dp"
+        android:nestedScrollingEnabled="true"
         android:scrollbarThumbVertical="@color/border_grey"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        android:visibility="visible">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearLayoutCompat2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <HorizontalScrollView
+                android:id="@+id/details_scrollview"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@drawable/horizontal_scrollview_bg"
+                android:clipToPadding="false"
+                android:fadeScrollbars="false"
+                android:layout_margin="10dp"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:scrollbarSize="2dp"
+                android:scrollbarThumbHorizontal="@color/primary">
 
 
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/section"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/section" />
+
+                        <TextView
+                            android:id="@+id/sectionNameET"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:gravity="top"
+                            android:maxLines="1"
+                            android:padding="5dp"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Section Ui Tinkering"
+                            android:textColor="@color/better_white"
+                            android:textSize="15dp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/priority"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Priority" />
+
+
+                        <include
+                            android:id="@+id/priorityInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/taskType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/type"
+
+                            />
+
+                        <include
+                            android:id="@+id/typeInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/assignee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Assignee"
+                            android:textSize="15dp" />
+
+                        <include
+                            android:id="@+id/assigneeInclude"
+                            layout="@layout/task_creation_detail_item_assignee"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/state"
+                            android:textSize="15dp" />
+
+                        <include
+                            android:id="@+id/stateInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/difficulty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="start|bottom"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="@string/difficulty"
+                            android:textSize="15dp" />
+
+                        <include
+                            android:id="@+id/difficultyInclude"
+                            layout="@layout/task_creation_detail_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/taskDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/selector_gap"
+                        android:orientation="vertical"
+                        android:weightSum="10">
+
+                        <TextView
+                            style="@style/LabelStyleTaskTab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:paddingEnd="10dp"
+                            android:text="Duration" />
+
+                        <TextView
+                            android:id="@+id/taskDurationET"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:gravity="top"
+                            android:maxLines="1"
+                            android:padding="5dp"
+                            android:paddingStart="@dimen/padding_start_task_create"
+                            android:text="Select"
+                            android:textColor="@color/better_white"
+                            android:textSize="15dp" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </HorizontalScrollView>
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/linearLayoutCompat2"
+                android:id="@+id/task_detail_lin_lay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/horizontal_scrollview_bg"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title_tv"
+                    style="@style/CustomTabTextAppearance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_top_task_detail"
+                    android:gravity="start"
+                    android:paddingStart="@dimen/padding_start_task_details"
+                    android:paddingEnd="10dp"
+                    android:text="Versa needs revamp for its appbar design"
+                    android:textColor="@color/better_white"
+                    android:textSize="22dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:paddingStart="@dimen/padding_start_task_details">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/asigneer_dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/profile_pic_placeholder" />
+
+                    <TextView
+                        android:id="@+id/openedBy"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/sf_pro_display_regular"
+                        android:gravity="start|center"
+                        android:paddingStart="10dp"
+                        android:text="Alok created this task 2 days ago"
+                        android:textColor="@color/better_white"
+                        android:textSize="15dp" />
+                </LinearLayout>
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tagRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="true"
+                    android:clipToPadding="false"
+                    android:layout_marginBottom="5dp"
                     android:layoutAnimation="@anim/layout_animation_slidedown"
-                    android:nestedScrollingEnabled="false" />
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/tag_item"
+                    android:padding="@dimen/padding_start_task_details" />
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="3dp"
+                android:layout_gravity="center"
+                 android:layout_marginTop="5dp"
+                android:layout_marginBottom="2dp"
+                android:visibility="gone"
+                android:background="#56838383" />
+
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:minHeight="200dp"
+                android:background="@drawable/horizontal_scrollview_bg"
+                >
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-
-
+                    android:weightSum="10"
+                    android:orientation="horizontal">
                     <TextView
-                        android:id="@+id/title_tv"
-                        style="@style/CustomTabTextAppearance"
-                        android:layout_width="match_parent"
+                        android:id="@+id/summary_tv"
+                        android:layout_width="0dp"
+                        android:layout_weight="8.5"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="start"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:text="Versa needs revamp for its appbar design"
-                        android:textColor="@color/better_white"
-                        android:textSize="22dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toEndOf="@+id/btnBack"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
-
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/taskStatus"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginStart="10dp"
-                            android:background="@drawable/card_view_background"
-                            android:fontFamily="@font/sf_pro_display_medium"
-                            android:gravity="center"
-                            android:padding="10dp"
-                            android:text="Unassigned"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
-
-                        <TextView
-                            android:id="@+id/duration"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginStart="10dp"
-                            android:background="@drawable/card_view_background_yellow"
-                            android:fontFamily="@font/sf_pro_display_regular"
-                            android:gravity="center"
-                            android:padding="10dp"
-                            android:text="3Hr+"
-                            android:textColor="#000000"
-                            android:textSize="14dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
-
-
-                        <TextView
-                            android:id="@+id/difficulty"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_marginStart="10dp"
-                            android:background="@drawable/card_view_background_purple"
-                            android:fontFamily="@font/sf_pro_display_regular"
-                            android:gravity="center"
-                            android:padding="10dp"
-                            android:text="Easy"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
-
-
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-                    <TextView
-                        android:id="@+id/openedBy"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="10dp"
                         android:fontFamily="@font/sf_pro_display_medium"
                         android:gravity="start"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:text="Alok created this task 2 days ago"
-                        android:textColor="@color/better_white"
-                        android:textSize="15dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toEndOf="@+id/btnBack"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:paddingStart="15dp"
+                        android:text="Summary"
+                        android:textColor="@color/account"
+                        android:textSize="16dp"
+                        android:visibility="visible" />
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                    <TextView
+                        android:id="@+id/btnEditSummary"
+                        android:layout_width="0dp"
+                        android:layout_weight="1.5"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_display_medium"
+                        android:gravity="start"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:paddingStart="15dp"
+                        android:text="Edit"
+                        android:textColor="@color/account"
+                        android:textSize="16dp"
+                        android:visibility="invisible" />
+
+                </LinearLayout>
 
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="15dp"
-                    android:background="#56838383" />
 
-                <TextView
-                    android:id="@+id/description_tv"
+                <ProgressBar
+                    android:id="@+id/description_progressbar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_top_task_detail"
+                    android:elevation="3dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint="#03A9F4"
+                    android:visibility="visible"
+                   />
+
+                <br.tiagohm.markdownview.MarkdownView
+                    android:id="@+id/markdownView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_display_regular"
-                    android:gravity="start"
-                    android:padding="10dp"
-                    android:textColor="#CEFFFFFF"
-                    android:textSize="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/btnBack"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    android:nestedScrollingEnabled="true"
+                    android:visibility="gone"
+                    app:escapeHtml="false" />
 
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="15dp"
-                    android:background="#56838383" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/imageRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:visibility="gone"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_animation_popscale"
+                android:nestedScrollingEnabled="false" />
 
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/horizontal_scrollview_bg"
+                android:orientation="vertical">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
                     android:orientation="vertical">
 
-                    <androidx.appcompat.widget.LinearLayoutCompat
+                    <TextView
+                        android:id="@+id/contributors_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:fontFamily="@font/sf_pro_display_medium"
+                        android:gravity="start"
+                        android:paddingStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/moderators"
+                        android:textColor="@color/account"
+                        android:textSize="16dp"
+                        android:visibility="visible" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
                         <TextView
-                            android:id="@+id/contributors_tv"
+                            android:id="@+id/noContributors"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="10dp"
                             android:fontFamily="@font/sf_pro_display_medium"
                             android:gravity="start"
-                            android:visibility="visible"
-                            android:text="Contributors :"
-                            android:textColor="@color/account"
+                            android:paddingStart="@dimen/_5dp"
+                            android:text="No Moderators here..."
+                            android:textColor="@color/better_white"
                             android:textSize="16dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintStart_toEndOf="@+id/btnBack"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
+                            android:layout_margin="10dp"
+                            android:visibility="gone" />
 
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/contributorsRecyclerView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="10dp"
                             android:clipToPadding="false"
                             android:layoutAnimation="@anim/layout_animation_popscale"
                             android:nestedScrollingEnabled="false" />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginEnd="15dp"
-                        android:background="#56838383" />
-
-                    <TextView
-                        android:id="@+id/link"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="5dp"
-                        android:fontFamily="@font/outfitmedium"
-                        android:gravity="start"
-                        android:text="Link :"
-                        android:visibility="gone"
-                        android:textColor="@color/account"
-                        android:textSize="16dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toEndOf="@+id/btnBack"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
+                    </RelativeLayout>
 
                     <LinearLayout
-                        android:id="@+id/links_cont"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-
+                        android:id="@+id/becomeModerator"
+                        android:layout_margin="10dp"
+                        android:visibility="visible"
+                        android:orientation="horizontal"
                         >
-
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.9"
+                            android:fontFamily="@font/sf_pro_display_medium"
+                            android:gravity="start|center_vertical"
+                            android:paddingStart="@dimen/_5dp"
+                            android:text="Become a moderator"
+                            android:textColor="@color/better_white"
+                            android:textSize="17dp"
+                            />
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="30dp"
+                            android:layout_weight=".1"
+                            android:src="@drawable/outline_add_24"
+                            app:tint="@color/primary" />
                     </LinearLayout>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/linksRecyclerView"
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/add_contributors_btn"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:layout_margin="10dp"
-                        android:clipToPadding="false"
-                        android:layoutAnimation="@anim/layout_animation_popscale"
-                        android:nestedScrollingEnabled="false"
-                        android:visibility="gone" />
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="10">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_weight="1"
+                            android:paddingStart="0dp"
+                            android:src="@drawable/baseline_assignment_ind_24"
+                            app:tint="@color/better_white" />
 
 
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="9"
+                            android:fontFamily="@font/sf_pro_display_regular"
+                            android:gravity="start|center_vertical"
+                            android:orientation="vertical"
+                            android:text="Add Moderators + "
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="16dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>
-                <TextView
-                    android:id="@+id/activity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_display_semibold"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="30dp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="View comments and other activity"
-                    android:textColor="@color/secondaryBlue"
-                    android:textSize="16dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/linearLayoutCompat2"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
 
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="5dp"
-                    android:layout_gravity="center"
-                    android:background="@color/orange"
-                    android:paddingStart="10dp"
-                    android:gravity="center"
-                    android:alpha="0.9"
+                <View
                     android:visibility="gone"
-                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="15dp"
+                    android:background="#56838383" />
+
+                <TextView
+                    android:id="@+id/link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="5dp"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:gravity="start"
+                    android:text="Link :"
                     android:textColor="@color/account"
-                    />
+                    android:textSize="16dp"
+                    android:visibility="gone" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/linksRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_animation_popscale"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+
             </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <TextView
+                android:id="@+id/activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="View comments and other activity"
+                android:textColor="@color/secondaryBlue"
+                android:textSize="16dp" />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_gravity="center"
+                android:alpha="0.9"
+                android:background="@color/orange"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:textColor="@color/account"
+                android:visibility="gone" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

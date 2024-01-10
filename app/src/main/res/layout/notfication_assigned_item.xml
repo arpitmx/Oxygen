@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:paddingTop="5dp"
+    android:background="@color/darkbg_main_a80"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:paddingLeft="16dp"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:paddingRight="16dp"
+        >
+
+        <TextView
+            android:id="@+id/task_id"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignTop="@+id/difficulty"
+            android:layout_alignBottom="@+id/difficulty"
+            android:layout_marginStart="15dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_toEndOf="@+id/difficulty"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:gravity="center"
+            android:background="@drawable/item_bg_curve"
+            android:text="#12345"
+            android:textColor="#858585"
+            android:textSize="14dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/difficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/label_cardview_green"
+            android:fontFamily="@font/sf_pro_display_semibold"
+            android:layout_marginTop="@dimen/margin_top"
+            android:gravity="center"
+            android:text="\@Assigned"
+            android:padding="5dp"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/darkbg_main"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.207" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/progress_bar"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="22dp"
+            />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/newNotifMark"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_alignStart="@+id/progress_bar"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="12dp"
+            android:scaleX="0.6"
+            android:scaleY="0.6"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="12dp"
+            android:layout_toStartOf="@+id/duration_tv"
+            android:src="@color/green"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/duration_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/task_id"
+            android:layout_alignBottom="@+id/task_id"
+            android:layout_alignParentEnd="true"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:gravity="center"
+            android:paddingBottom="2dp"
+            android:text="about 5 hours ago"
+            android:textColor="#858585"
+            android:textSize="14dp"
+            app:layout_constraintVertical_bias="0.136" />
+
+
+    </RelativeLayout>
+
+
+
+    <TextView
+        android:id="@+id/msg_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:maxLines="3"
+        android:minLines="1"
+        android:text="You have been assigned in task ID #T12345"
+        android:textColor="@color/better_white"
+        android:textSize="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/difficulty"
+        app:layout_constraintTop_toBottomOf="@+id/difficulty"
+        app:layout_constraintVertical_bias="0.545" />
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/border_grey"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+    <!--        <TextView-->
+    <!--        android:id="@+id/priority"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_weight="0.4"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:layout_alignParentStart="true"-->
+    <!--        android:layout_alignParentTop="true"-->
+    <!--        android:padding="2dp"-->
+    <!--        android:layout_alignParentBottom="true"-->
+    <!--        android:layout_marginTop="0dp"-->
+    <!--        android:layout_marginBottom="0dp"-->
+    <!--        android:layout_marginEnd="12dp"-->
+    <!--        android:fontFamily="@font/outfitbold"-->
+    <!--        android:gravity="center"-->
+    <!--        android:text="3"-->
+    <!--        android:textColor="@color/darkbg_main"-->
+    <!--        android:textSize="14dp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:layout_constraintVertical_bias="0.235" />-->
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+

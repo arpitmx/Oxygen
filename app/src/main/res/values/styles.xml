@@ -1,5 +1,60 @@
 <resources>
 
+
+    <style name="editor_options" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@drawable/card_view_white</item>
+        <item name="android:textColor">@color/darkbg_main</item>
+        <item name="android:fontFamily">@font/sf_pro_display_semibold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:textAllCaps">false</item>
+
+    </style>
+
+    <style name="body_regular">
+        <item name="android:textSize">17sp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:fontFamily">@font/sfregular</item>
+
+    </style>
+
+    <style name="body_bold">
+        <item name="android:textSize">17sp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:fontFamily">@font/sf_pro_display_semibold</item>
+
+    </style>
+
+    <style name="headline_regular">
+        <item name="android:textSize">17sp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:fontFamily">@font/sfregular</item>
+
+    </style>
+
+    <style name="headline_bold">
+        <item name="android:textSize">17sp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:fontFamily">@font/sfbold</item>
+
+    </style>
+
+    <style name="footnote_bo">
+        <item name="android:textSize">13sp</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:fontFamily">@font/sfbold</item>
+
+    </style>
+
     <style name="Widget.Theme.O2.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
     </style>
@@ -16,7 +71,15 @@
         <item name="android:textSize">28sp</item>
         <item name="android:fontFamily">@font/sf_pro_display_regular</item>
         <item name="android:textColor">@color/better_white</item>
-.
+    </style>
+
+    <style name="LabelStyleTaskTab">
+        <item name="android:textSize">15dp</item>
+        <item name="android:gravity">start|bottom</item>
+        <item name="android:fontFamily">@font/sf_pro_display_medium</item>
+        <item name="android:textColor">@color/account</item>
+
+
     </style>
 
     <style name="SolidButtonStyle" parent="Widget.AppCompat.Button.Borderless">

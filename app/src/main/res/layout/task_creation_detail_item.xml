@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.appcompat.widget.LinearLayoutCompat
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="5dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/tagIcon"
+        android:layout_width="15dp"
+        android:layout_height="17dp"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="N"
+        android:textAlignment="center"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/card_view_background_purple"
+        android:textColor="@color/negativeButtonTextColor"
+        android:textSize="12dp"
+        />
+
+    <TextView
+        android:id="@+id/tagText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:gravity="top"
+        android:paddingStart="@dimen/padding_start_task_create"
+        android:paddingEnd="@dimen/padding_start_task_create"
+        android:maxLines="1"
+        android:text="Normal"
+        android:ellipsize="end"
+        android:textColor="@color/better_white"
+        android:textSize="15dp"
+        />
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+
+
+

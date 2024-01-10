@@ -1,19 +1,245 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.Tasks.TaskPage.Chat.TaskChatFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/darkbg_main_a80"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+
+
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btn_scrolldown"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/input_box_container"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/scroll_down_bg"
+        android:elevation="5dp"
+        android:src="@drawable/baseline_keyboard_arrow_down_24"
+        android:tint="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="171dp"
+        android:layout_marginTop="292dp"
+        android:visibility="gone"
+        android:layout_marginEnd="170dp"
+        android:layout_marginBottom="297dp"
+        android:indeterminateTint="@color/colorAccent" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_gravity="center"
-        android:gravity="center"
         android:layout_height="match_parent"
-        android:text="Chat Fragment"
-        android:fontFamily="@font/outfitbold"
-        android:textSize="25sp"
-        android:textColor="@color/green"
-        />
+        android:layout_marginBottom="70dp"
+        android:gravity="center"
+        android:id="@+id/placeholder"
+        android:visibility="gone"
+        android:text="No Messages here..."
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:textColor="@color/better_white"/>
 
-</FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chat_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:clipToPadding="false"
+        android:layout_above="@+id/input_box_container"
+        android:layoutAnimation="@anim/layout_animation_fadein"
+        android:paddingBottom="20dp"
+        android:scrollbarSize="3dp"
+        android:scrollbarThumbVertical="@color/primary"
+        android:scrollbars="vertical"
+        android:visibility="visible" />
+
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/input_box_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/mention_users_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/darkbg_main"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/mention_user_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                />
+
+            <ProgressBar
+                android:id="@+id/mentionProgressbar"
+                android:layout_width="match_parent"
+                android:visibility="visible"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_top_30dp"
+                android:indeterminateTint="@color/primary" />
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="#1DE3E1E1"
+            android:elevation="10dp"
+            android:scrollbars="none"
+            >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                >
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnCodeBlock"
+                    style="@style/editor_options"
+                    android:text="Codeblock"
+                    android:drawablePadding="10dp"
+                    android:drawableEnd="@drawable/baseline_article_24"
+                    android:drawableTint="@color/black200"
+                    />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLink"
+                    style="@style/editor_options"
+                    android:text="Link"
+                    android:drawableTint="@color/black200"
+                    android:drawableEnd="@drawable/baseline_add_link_24"
+                    />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnChecklist"
+                    style="@style/editor_options"
+                    android:text="Checklist"
+                    android:drawablePadding="5dp"
+                    android:drawableTint="@color/black200"
+                    android:drawableEnd="@drawable/baseline_check_box_outline_blank_24"
+                    />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnBackTick"
+                    style="@style/editor_options"
+                    android:text="Backtick   ( ` )"
+                    android:drawablePadding="10dp"
+                    android:drawableTint="@color/black200"
+                    />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/suggestion_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/btn_select_image_from_storage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="250dp"
+                android:maxWidth="250dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="10">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:padding="2dp"
+
+                    >
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/imagePreview"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/tasknull_placeholder"
+                            />
+
+
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <ImageButton
+                    android:id="@+id/cross_btn_select_pdf"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:paddingTop="5dp"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:src="@drawable/baseline_clear_24"
+                    app:tint="@color/account"
+
+                    />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <include
+            android:id="@+id/input_box"
+            layout="@layout/inputbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</RelativeLayout>

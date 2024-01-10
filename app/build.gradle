@@ -4,6 +4,16 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.firebase.firebase-perf'
+    id 'kotlin-parcelize'
+
+
+}
+
+
+configurations {
+    cleanedAnnotations
+    implementation.exclude group: 'org.jetbrains' , module:'annotations'
 }
 
 android {
@@ -41,7 +51,7 @@ android {
             buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")
 // This code enables minification and resource shrinking, and applies ProGuard rules to optimize the Android app.
             buildConfigField("String", "FCM_SERVER_KEY", "\"AAAAmReJ314:APA91bGdEcp1FOt43szF1N7xbG-Pdjuct_0gZzhuDP5GvpSt_ECeXV3mQhKq3Gqq1Rgqa6FGcUwTlCyJYqbo0f89Flb5Y6X44nNMVkqW5Q1XsXZZXwE-77N3bORGbEdQ1TbM24Cb90Dw\"")
-
+            buildConfigField("String","GEMINI_API_KEY","\"AIzaSyDVca4I2Jk5heUGS_0Jry1721VC8M32ATg\"")
         }
 
         release {
@@ -72,11 +82,40 @@ android {
 
 dependencies {
 
+    //Gemini
+    implementation "com.google.ai.client.generativeai:generativeai:0.1.1"
+
+
+    //Markdown view
+    implementation 'com.github.tiagohm.MarkdownView:library:0.19.0'
+
+    //Codeviewer
+    implementation 'com.github.kbiakov:CodeView-Android:1.3.2'
+    implementation 'com.google.firebase:firebase-dynamic-links-ktx:21.2.0'
+
+
+    final def markwon_version = '4.6.2'
+
+    //Markdown Markwon library
+    implementation"io.noties.markwon:ext-tables:$markwon_version"
+    implementation"io.noties.markwon:core:$markwon_version"
+    implementation"io.noties.markwon:editor:$markwon_version"
+    implementation"io.noties.markwon:html:$markwon_version"
+    implementation"io.noties.markwon:image:$markwon_version"
+    implementation"io.noties.markwon:image-glide:$markwon_version"
+    implementation"io.noties.markwon:syntax-highlight:$markwon_version"
+    implementation"io.noties.markwon:ext-tasklist:$markwon_version"
+    implementation"io.noties.markwon:ext-strikethrough:$markwon_version"
+
+    //Prism 4j
+    implementation "io.noties:prism4j:2.0.0"
+    kapt 'io.noties:prism4j-bundler:2.0.0'
+
 
     //Cloudnary
     implementation 'com.cloudinary:kotlin-url-gen:1.6.0'
 
-    // Room
+    //Room
     def room_version = "2.6.0"
 
     implementation "androidx.room:room-ktx:$room_version"
@@ -165,6 +204,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:20.3.0'
     //Firebase messaging
     implementation 'com.google.firebase:firebase-messaging-ktx'
+    //Firebase performance
+    implementation("com.google.firebase:firebase-perf")
+
 
 
     //Utils library
@@ -199,6 +241,15 @@ dependencies {
     //color picker
     implementation 'com.github.Dhaval2404:ColorPicker:2.3'
 
+    implementation 'io.github.igreenwood.loupe:loupe:1.2.2'
+    implementation 'io.github.igreenwood.loupe:extensions:1.0.1'
+
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation 'com.google.firebase:firebase-dynamic-links-ktx'
+
+    implementation 'pub.devrel:easypermissions:3.0.0'
+    implementation 'pub.devrel:easypermissions:2.0.1'
+
 
 
     implementation 'androidx.core:core-ktx:1.10.1'
@@ -208,6 +259,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+
 }
 
 kapt {

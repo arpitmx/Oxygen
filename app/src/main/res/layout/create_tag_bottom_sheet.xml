@@ -39,7 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="9"
-            android:fontFamily="@font/outfitbold"
+            android:fontFamily="@font/sf_pro_display_semibold"
             android:gravity="center"
             android:layout_gravity="center"
             android:text="Create Tags"
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="3"
-            android:fontFamily="@font/outfitmedium"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="start"
             android:layout_marginTop="5dp"
             android:paddingStart="15dp"
@@ -158,7 +158,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/outfitmedium"
+                android:fontFamily="@font/sf_pro_display_medium"
                 android:gravity="start"
                 android:layout_marginTop="5dp"
                 android:paddingStart="15dp"
@@ -191,13 +191,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/outfitmedium"
+                android:fontFamily="@font/sf_pro_display_medium"
                 android:gravity="start"
                 android:layout_marginTop="5dp"
                 android:paddingStart="15dp"
                 android:layout_gravity="center"
                 android:paddingEnd="15dp"
-                android:text="Text Background"
+                android:text="Text Color"
                 android:textColor="@color/better_white"
                 android:textSize="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -206,26 +206,54 @@
                 app:layout_constraintStart_toEndOf="@+id/btnBack"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
-            <androidx.cardview.widget.CardView
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center"
                 android:id="@+id/textbg"
                 android:layout_width="50dp"
-                android:background="@drawable/roundedbackground"
+                android:background="@drawable/roundedbg_black"
                 app:cardCornerRadius="5dp"
                 android:layout_height="50dp"/>
         </LinearLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/tagPreview"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:gravity="center"
+        android:textColor="@color/better_white"
+        android:textSize="14dp"
+        android:text="Tag would like this"
+        android:padding="5dp"
+        android:visibility="visible"
+        />
+
+    <com.google.android.material.chip.Chip
+        android:layout_gravity="center"
+        android:id="@+id/previewChip"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="Tag Text"/>
+
+    </LinearLayout>
     <TextView
         android:id="@+id/validations_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="3"
-        android:fontFamily="@font/outfitmedium"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:gravity="center"
         android:layout_marginBottom="10dp"
         android:textColor="@color/secondaryPink"
@@ -265,7 +293,7 @@
         android:gravity="center"
         android:textColor="@color/better_white"
         android:textAllCaps="false"
-        android:fontFamily="@font/outfitmedium"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:textSize="18dp"
         android:background="@drawable/card_view_background_purple"
         app:layout_constraintBottom_toBottomOf="parent"

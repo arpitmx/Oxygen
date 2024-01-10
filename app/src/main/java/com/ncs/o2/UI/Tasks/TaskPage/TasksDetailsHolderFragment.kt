@@ -42,6 +42,7 @@ class TasksDetailsHolderFragment : Fragment() {
 
         val adapter = TaskDetailsViewPagerAdpater(this, 3)
         binding.viewPager2.adapter = adapter
+        binding.viewPager2.isUserInputEnabled = false
         setUpTabsLayout()
     }
 
@@ -49,7 +50,7 @@ class TasksDetailsHolderFragment : Fragment() {
 
 
         TabLayoutMediator(
-            activityBinding.binding.gioActionbar.tabLayout, binding.viewPager2
+            activityBinding.binding.tabLayout, binding.viewPager2
         ) { tab, position ->
             when(position){
                 0-> tab.text="Details"
