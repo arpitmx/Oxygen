@@ -4,6 +4,7 @@ object Endpoints {
 
     const val USERS = "Users"
     const val PROJECTS = "Projects"
+    const val APP_CONFIG = "AppConfig"
     const val USERID = "userid1"
     const val new_changes_des = "Certainly! In order to provide you with a more personalized description, could you please specify what kind of description you are looking for? Are you interested in a description of a person, a place, an event, or something else? Additionally, if you have any specific details or preferences in mind, feel free to share them, so I can tailor the description to your needs.```xml    <application>        <meta-data          android:name=\"firebase_performance_logcat_enabled\"          android:value=\"true\" />    </application>```"
 
@@ -29,6 +30,16 @@ object Endpoints {
         const val EMPTY_MODERATORS = "None"
 
     }
+
+    object Updates{
+        val update = "updates"
+        val DOWNLOAD_SIZE: String = "DOWNLOAD_SIZE"
+        val RELEASE_NOTES: String = "RELEASE_NOTES"
+        val UPDATE_URL: String = "UPDATE_URL"
+        val VERSION_CODE: String = "VERSION_CODE"
+        val VERSION_NAME: String = "VERSION_NAME"
+    }
+
 
 
     object User {

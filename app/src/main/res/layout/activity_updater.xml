@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingStart="30dp"
+    android:paddingEnd="30dp"
+    android:paddingTop="20dp"
+    android:background="@drawable/bg_gradient_update">
+
+    <!-- Lottie Animation at the top -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimationView"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/update"
+        app:lottie_loop="true"
+        app:lottie_speed="1.0"
+        android:scaleX="1.4"
+        android:scaleY="1.4"
+
+        />
+
+    <!-- Update Version TextView -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="5dp"
+        >
+
+    <!-- Release Notes TextView -->
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal"
+       >
+
+       <ImageView
+           android:layout_width="45dp"
+           android:layout_height="45dp"
+           android:src="@drawable/apphd"
+           android:layout_marginEnd="10dp"
+           android:layout_gravity="center_vertical"
+           />
+
+       <TextView
+           android:id="@+id/textViewUpdateVersion"
+           android:layout_width="wrap_content"
+           android:layout_height="match_parent"
+           android:text="Oxygen"
+           android:textSize="25sp"
+           android:layout_marginStart="5dp"
+           android:gravity="center_vertical"
+           android:layout_gravity="center_vertical"
+           android:fontFamily="@font/sf_pro_display_semibold"
+           android:textColor="@color/primary"
+           />
+
+       <TextView
+           android:id="@+id/version_title"
+           android:layout_width="wrap_content"
+           android:layout_height="match_parent"
+           android:text="| v 0.0.0"
+           android:textSize="22sp"
+           android:paddingTop="3dp"
+           android:layout_marginStart="8dp"
+           android:gravity="center_vertical"
+           android:layout_gravity="center_vertical"
+           android:fontFamily="@font/sf_pro_display_medium"
+           android:textColor="#C1C1C1"
+           />
+
+   </LinearLayout>
+    <!-- Download Size TextView -->
+    <TextView
+        android:id="@+id/textViewDownloadSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Download Size: 0 MB"
+        android:textSize="14sp"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:textColor="#CACACA"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="5dp"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:id="@+id/progress_bar_layout"
+        >
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="10"
+            android:indeterminate="false"
+            android:indeterminateTint="@color/white"
+            android:max="100"
+            android:paddingTop="3dp"
+            android:progress="0"
+            android:progressBackgroundTint="@color/white"
+            android:progressTint="@color/better_white"
+            android:scaleX="1"
+            android:scaleY="1" />
+
+        <TextView
+            android:id="@+id/progress_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="0%"
+            android:textSize="15dp"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/sf_pro_display_semibold"
+            android:textColor="@color/divider_or"
+            />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonDownload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Download"
+        android:textSize="18sp"
+        android:visibility="gone"
+        android:drawableEnd="@drawable/rounded_download_24"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:backgroundTint="@color/better_white"
+        android:textColor="@color/darkbg_main"
+        android:textAllCaps="false"
+        android:layout_marginTop="8dp"
+        />
+
+
+    <LinearLayout
+        android:id="@+id/install_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonInstall"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Install"
+        android:textSize="18sp"
+        android:visibility="visible"
+        android:drawableEnd="@drawable/baseline_install_mobile_24"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:backgroundTint="@color/primary"
+        android:textColor="@color/darkbg_main"
+        android:textAllCaps="false"
+        android:layout_marginTop="8dp"
+        />
+
+        <TextView
+            android:id="@+id/manual_install"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:text="Manually install from release page"
+            android:textColor="#AECDFF"
+            android:gravity="start"
+            android:paddingStart="5dp"
+            android:paddingTop="5dp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/sf_pro_display_regular"
+            />
+
+    </LinearLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1E767676"
+        android:layout_marginTop="15dp"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="180dp">
+
+        <TextView
+            android:id="@+id/textViewReleaseNotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:padding="5dp"
+            android:text="Release Notes:\n- New features and improvements\n- Bug fixes"
+            android:textColor="@color/better_white"
+            android:textSize="16sp" />
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="30dp"
+        >
+    <TextView
+        android:id="@+id/version_code_current"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:gravity="center"
+        android:text="Version 2024.1.1 α"
+        android:textColor="#686666"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:text="Crafted with ❤️ By Nibble Computer Society"
+        android:textColor="#898787"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/version_code" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

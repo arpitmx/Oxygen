@@ -2,12 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
 
     <application
@@ -21,10 +27,12 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/O2SplashTheme"
-        tools:targetApi="31"
-        tools:replace="android:name"
-        android:testOnly="false"
-        >
+        tools:targetApi="31">
+        <activity
+            android:name=".UI.UpdateScreen.UpdaterActivity"
+            android:exported="true">
+
+        </activity>
 
         <activity
             android:name=".UI.CreateTask.ChecklistActivity"
@@ -63,11 +71,13 @@
             android:name=".UI.StartScreen.StartScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".UI.CreateTask.CreateTaskActivity"
@@ -86,15 +96,16 @@
             android:exported="false" />
         <activity
             android:name=".UI.MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="https"
                     android:host="oxy2.page.link"
-                     />
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 
@@ -106,6 +117,7 @@
             </intent-filter>
         </service>
 
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
@@ -116,6 +128,8 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+
+
     </application>
 
 </manifest>

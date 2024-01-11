@@ -3,7 +3,9 @@ package com.ncs.o2.Domain.Utility
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.app.Activity
+import android.app.DownloadManager
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.ColorDrawable
@@ -28,6 +30,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
@@ -596,6 +599,38 @@ object ExtensionsUtil {
 
             lastClickTime = clickTime
         }
+    }
+
+    fun deleteDownloadedFile(downloadID : Long, context: Context) {
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.remove(downloadID)
+    }
+
+    fun getVersionName(context: Context): String? {
+        return try {
+            val packageInfo: PackageInfo =
+                context.packageManager.getPackageInfo(context.packageName, 0)
+            packageInfo.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun String.isGreaterThanVersion(otherVersion: String): Boolean {
+        val thisParts = this.split(".").map { it.toInt() }
+        val otherParts = otherVersion.split(".").map { it.toInt() }
+
+        for (i in 0 until maxOf(thisParts.size, otherParts.size)) {
+            val thisPart = thisParts.getOrNull(i) ?: 0
+            val otherPart = otherParts.getOrNull(i) ?: 0
+
+            if (thisPart != otherPart) {
+                return thisPart > otherPart
+            }
+        }
+
+        return false
     }
 
 

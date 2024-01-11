@@ -1,7 +1,9 @@
 package com.ncs.o2.HelperClasses
 
+import android.app.DownloadManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
@@ -55,11 +57,9 @@ object PrefManager {
     }
 
 
-
     fun clearTimestamp() {
         sharedPreferences.edit().remove(Endpoints.Notifications.NOTIFICATION_LAST_SEEN).apply()
     }
-
 
 
     //DP related
@@ -75,6 +75,26 @@ object PrefManager {
     fun getDpUrl(): String? {
         return sharedPreferences.getString(Endpoints.User.DP_URL, null)
     }
+
+    fun setDownloadedUpdateUri(uri : Uri?){
+        editor.putString("UPDATE_URI", uri.toString())
+        editor.apply()
+    }
+
+  fun getDownloadedUpdateUri(): Uri? {
+        val uriString = sharedPreferences.getString("UPDATE_URI", null)
+        return if (uriString != null) Uri.parse(uriString) else null
+    }
+
+    fun setDownloadID(downloadID: Long){
+        editor.putLong("DOWNLOAD_ID", downloadID)
+        editor.apply()
+    }
+
+    fun getDownloadID(): Long {
+        return sharedPreferences.getLong("DOWNLOAD_ID",-1L)
+    }
+
 
 
     // Project related

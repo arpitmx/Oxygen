@@ -19,13 +19,12 @@ configurations {
 android {
     namespace 'com.ncs.o2'
     compileSdk 34
-    compileSdkPreview 'UpsideDownCake'
     defaultConfig {
         applicationId "com.ncs.o2"
         minSdk 26
-        targetSdk 34
-        versionCode 1
-        versionName "1.0.8"
+        targetSdkVersion 34
+        versionCode 12
+        versionName "24.1.12"
         multiDexEnabled true
 
 
@@ -83,8 +82,9 @@ android {
 
 dependencies {
 
-//    //Updater Bitscuit
-//    implementation 'com.github.arpitmx:bitscuit:1.0.5'
+    //Easy Permission
+    implementation 'pub.devrel:easypermissions:3.0.0'
+
 
     //Gemini
     implementation "com.google.ai.client.generativeai:generativeai:0.1.2"

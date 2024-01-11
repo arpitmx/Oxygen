@@ -35,11 +35,13 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.Update
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.o2.HelperClasses.PrefManager
@@ -231,7 +233,26 @@ class FirestoreRepository @Inject constructor(
         } catch (e: Exception) {
             serverResult(ServerResult.Failure(e))
         }
+    }
 
+
+    override fun checkForUpdates(): LiveData<Update> {
+        val liveData = MutableLiveData<Update>()
+
+        firestore.collection(Endpoints.APP_CONFIG)
+            .document(Endpoints.Updates.update)
+            .get(Source.SERVER)
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val update = snapshot.toObject(Update::class.java)
+                    liveData.postValue(update!!)
+                }
+            }
+            .addOnFailureListener {
+                Timber.tag("Update").e(it)
+            }
+
+        return liveData
     }
 
     override suspend fun postNotification(
@@ -600,6 +621,8 @@ class FirestoreRepository @Inject constructor(
             .document(task.project_ID!!)
 
     }
+
+
 
 
     override suspend fun postTask(

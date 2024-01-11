@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.core.updateTransition
 import androidx.core.content.ContextCompat
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.Timestamp
@@ -36,8 +37,12 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.deleteDownloadedFile
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isGreaterThanVersion
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.popInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -45,11 +50,13 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.Services.Updater.UpdateDownloaderService
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.O2Bot.O2Bot
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
+import com.ncs.o2.UI.UpdateScreen.UpdaterActivity
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,10 +81,7 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
     private val util: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this@StartScreen)
     }
-
     private val o2Bot: O2Bot by viewModels()
-
-
     private val viewModel: StartScreenViewModel by viewModels()
 
     private val binding: ActivitySplashScreenBinding by lazy {
@@ -95,13 +99,53 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        askNotificationPermission()
-        val tasksDAO = db.tasksDao()
-
-//     setUpViews(TestingConfig.isTesting)
-
+        initialise()
     }
 
+    private fun initialise() {
+
+        binding.fragContainer.popInfinity(this)
+        binding.fragContainer.rotateInfinity(this)
+
+        //Check for updates
+        viewModel.getUpdateDocumentLiveData().observe(this) { update ->
+            val currentVersion = getVersionName(this)
+
+            currentVersion?.let {
+                if (update.VERSION_CODE.isGreaterThanVersion(currentVersion)) {
+                    util.singleBtnDialog(
+                        getString(R.string.new_update),
+                        getString(R.string.a_new_version_of_o2_has_been_released_proceed_to_install),
+                        "Proceed"
+                    ) {
+                        val intent = Intent(this, UpdaterActivity::class.java)
+                        intent.putExtra("UPDATE", update)
+                        startActivity(intent)
+                        finishAffinity()
+                    }
+                    return@let
+
+                } else {
+
+                    binding.fragContainer.clearAnimation()
+
+                    removeRedundantUpdatePackages()
+                    askNotificationPermission()
+                }
+            }
+        }
+    }
+
+    private fun removeRedundantUpdatePackages() {
+        if (PrefManager.getDownloadID()!= -1L){
+            val downloadID = PrefManager.getDownloadID()
+            deleteDownloadedFile(downloadID, this)
+            Timber.tag(TAG).d("Removed file with download id :${downloadID}")
+            util.showSnackbar(binding.root,"Removed old update files", 500)
+            PrefManager.setDownloadID(-1)
+            PrefManager.setDownloadedUpdateUri(null)
+        }
+    }
 
 
     lateinit var scaleAnimation: ScaleAnimation
@@ -125,6 +169,7 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
     }
 
     private fun askNotificationPermission() {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -265,7 +310,6 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
             util.showActionSnackbar(binding.root, error.description, 150000, error.actionText) {
 
-
                 val tintColor = ContextCompat.getColor(this, R.color.pureblack)
 
                 if (error.actionText.equals("Send report")) {
@@ -342,7 +386,6 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
     private fun setUpProcesses() {
 
-        // throw RuntimeException("This is a test crash")
 
         FirebaseFirestore.getInstance().collection(Endpoints.USERS)
             .document(FirebaseAuth.getInstance().currentUser?.email!!).get(Source.SERVER)
@@ -418,8 +461,6 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
                     setUpTasks(projects)
                     setUpTags(projects)
                 }
-
-
             }
             .addOnFailureListener { exception ->
 

@@ -15,6 +15,7 @@ import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.Update
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +47,11 @@ constructor(
             .useLines { lines ->
                 lines.forEach { line -> emit(line) }
             }
+    }
+
+
+    fun getUpdateDocumentLiveData(): LiveData<Update>{
+        return repository.checkForUpdates()
     }
 
 

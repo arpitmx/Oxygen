@@ -389,7 +389,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
 
         //Version tag setup
-        binding.drawerheaderfile.versionCode.text = "Oxygen v${getVersionName(this)} alpha"
+        binding.drawerheaderfile.versionCode.text = "Oxygen v${getVersionName(this)}"
 
         projects=PrefManager.getProjectsList().toMutableList()
         val list=ArrayList<String>()

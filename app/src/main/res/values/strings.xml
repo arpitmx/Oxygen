@@ -115,6 +115,13 @@
     <string name="summary">Summary</string>
     <string name="create_task">Create Task</string>
     <string name="summary_title">Summary</string>
+    <string name="rationale_ask_permission">O2 requires permissions to install update packages, please allow to proceed...</string>
+    <string name="yes">Yes</string>
+    <string name="allow_o2_to_install_updates">Allow Install</string>
+    <string name="o2_requires_install_package_permission_to_install_the_updates_please_allow_to_proceed_with_update">O2 requires `Install Package` permission to install the updates, please allow to proceed with the update.</string>
+    <string name="proceed">Proceed</string>
+    <string name="a_new_version_of_o2_has_been_released_proceed_to_install">A new version of O2 has been released, proceed to install.</string>
+    <string name="new_update">New Update 🚀</string>
 
 
 </resources>

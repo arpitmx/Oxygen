@@ -1,87 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/secondary_bg_black"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/secondary_bg_black"
     android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/profile"
-            android:layout_width="match_parent"
-            android:layout_height="110dp"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            android:weightSum="10"
-            >
+    <LinearLayout
+        android:id="@+id/profile"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:background="@color/black_overlay"
+        android:elevation="5dp"
+        android:orientation="horizontal"
+        android:weightSum="10">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/userDp"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_margin="15dp"
-                android:src="@drawable/default_pp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userDp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:gravity="center"
+            android:src="@drawable/default_pp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_weight="8"
-                >
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/username"
-                android:fontFamily="@font/sf_pro_display_semibold"
                 android:layout_marginTop="5dp"
+                android:fontFamily="@font/sf_pro_display_semibold"
                 android:text="Alok Ranjan"
                 android:textColor="#D8D8D8"
                 android:textSize="20dp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:id="@+id/designation"
-                    android:fontFamily="@font/sf_pro_display_regular"
-                    android:text="Android Developer"
-                    android:textColor="@color/green"
-                    android:textSize="14dp" />
+            <TextView
+                android:id="@+id/designation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/sf_pro_display_regular"
+                android:text="Android Developer"
+                android:textColor="@color/green"
+                android:textSize="14dp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_display_regular"
-                    android:text="sudoarmax@gmail.com"
-                    android:id="@+id/email"
-                    android:textColor="#97CDCDCD"
-                    android:textSize="14dp" />
-
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_display_regular"
+                android:text="sudoarmax@gmail.com"
+                android:textColor="#97CDCDCD"
+                android:textSize="14dp" />
 
 
-           <ImageButton
-               android:id="@+id/ibEditProfile"
-               android:layout_width="0dp"
-               android:layout_weight="2"
-               android:layout_height="50dp"
-               android:layout_marginEnd="5dp"
-               android:layout_gravity="center"
-               android:background="@null"
-               android:src="@drawable/round_edit_24"
-               app:tint="@color/better_white"
-               />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <ImageButton
+            android:id="@+id/ibEditProfile"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="2"
+            android:background="@null"
+            android:src="@drawable/round_edit_24"
+            app:tint="@color/better_white" />
 
     </LinearLayout>
 
@@ -94,55 +92,41 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <ListView
+        android:id="@+id/projectlistView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ListView
-            android:id="@+id/projectlistView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="6dp"
-            android:clipToPadding="false"
-            tools:listitem="@layout/project_list_item"
-            />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/add_project_btn"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Add a project"
-            android:paddingStart="10dp"
-            android:textSize="15dp"
-            android:gravity="start|center_vertical"
-            android:fontFamily="@font/sf_pro_display_regular"
-            android:background="@null"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:textAllCaps="false"
-            android:textColor="#C5C5C5"
-            android:drawableStart="@drawable/outline_add_24"
-            android:drawableTint="#C5C5C5"
-            android:drawablePadding="10dp"
-            />
+        android:clipToPadding="false"
+        android:paddingTop="6dp"
+        android:visibility="visible"
+        tools:listitem="@layout/project_list_item" />
 
 
-
-    </LinearLayout>
-
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/add_project_btn"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="5dp"
+        android:background="@null"
+        android:drawableStart="@drawable/outline_add_24"
+        android:drawablePadding="10dp"
+        android:drawableTint="#C5C5C5"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:gravity="start|center_vertical"
+        android:paddingStart="10dp"
+        android:text="Add a project"
+        android:textAllCaps="false"
+        android:textColor="#C5C5C5"
+        android:textSize="15dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="#4A3F4041"
         android:layout_margin="10dp"
+        android:background="#4A3F4041"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
@@ -151,28 +135,27 @@
         android:id="@+id/setting_btn"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="Settings"
-        android:paddingStart="10dp"
-        android:textSize="15dp"
-        android:gravity="start|center_vertical"
-        android:fontFamily="@font/sf_pro_display_regular"
-        android:background="@null"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="15dp"
         android:layout_marginTop="5dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="5dp"
+        android:background="@null"
+        android:drawableStart="@drawable/baseline_settings_24"
+        android:drawablePadding="10dp"
+        android:drawableTint="@color/green"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:gravity="start|center_vertical"
+        android:paddingStart="10dp"
+        android:text="Settings"
         android:textAllCaps="false"
         android:textColor="#C5C5C5"
-        android:drawableStart="@drawable/baseline_settings_24"
-        android:drawableTint="@color/green"
-        android:drawablePadding="10dp"
-        />
+        android:textSize="15dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="#4A3F4041"
         android:layout_margin="10dp"
+        android:background="#4A3F4041"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
@@ -182,8 +165,8 @@
         android:layout_height="80dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:src="@drawable/logo_grad"
         android:scaleType="fitCenter"
+        android:src="@drawable/logo_grad"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -193,8 +176,8 @@
         android:id="@+id/version_code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:fontFamily="@font/sf_pro_display_medium"
+        android:gravity="center"
         android:text="Oxygen 1.0"
         android:textColor="#686666"
         app:layout_constraintEnd_toEndOf="parent"
@@ -204,8 +187,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_gravity="center"
+        android:layout_marginTop="8dp"
         android:fontFamily="@font/sf_pro_display_medium"
         android:text="Crafted with ❤️ By NCS"
         android:textColor="#686666"
@@ -214,4 +197,9 @@
         app:layout_constraintTop_toBottomOf="@+id/version_code" />
 
 
+
 </LinearLayout>
+
+
+
+

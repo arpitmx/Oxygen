@@ -13,6 +13,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.Update
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.UserInfo
@@ -235,4 +236,5 @@ interface Repository {
         result: (ServerResult<List<CheckList>>) -> Unit
     )
 
+    fun checkForUpdates(): LiveData<Update>
 }

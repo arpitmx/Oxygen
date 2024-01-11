@@ -33,7 +33,7 @@ Tasks FUTURE ADDITION :
 
 // Todo Remove deprecated fields like assigner
 
-@Version("3")
+@Version("4")
 @Entity(tableName = Endpoints.ROOM.TASKS.TASKS_TABLE)
 @TypeConverters(Convertors::class)
 data class Task(
@@ -56,63 +56,9 @@ data class Task(
     var project_ID: String = "",
     var segment: String = "",
     var section: String = "",
-    val completed:Boolean=false,
+
     var type:Int=0,
     val last_updated:Timestamp? = Timestamp.now(),
-    val version:Int?=3
-    ) {
+    val version:Int?=4
+    )
 
-    @Exclude
-    fun getPriorityColor(): Int {
-        when (priority) {
-            1 -> return Color.GREEN
-            2 -> return Color.YELLOW
-            3 -> return Color.RED
-            4 -> return Color.WHITE
-            else -> return Color.BLACK
-        }
-    }
-    @Exclude
-    fun getPriorityString(): String {
-        when (priority) {
-            1 -> return "LOW"
-            2 -> return "MEDIUM"
-            3 -> return "HIGH"
-            4 -> return "CRITICAL"
-            else -> return ""
-        }
-    }
-
-    @Exclude
-    fun getDifficultyColor(): Int {
-        when (difficulty) {
-            1 -> return Color.GREEN
-            2 -> return Color.YELLOW
-            3 -> return Color.RED
-            else -> return Color.BLACK
-        }
-    }
-
-    @Exclude
-    fun getDifficultyString(): String {
-        when (difficulty) {
-            1 -> return "E"
-            2 -> return "M"
-            3 -> return "H"
-            else -> return "N/A"
-        }
-    }
-
-    @Exclude
-    fun getStatusString(): String {
-        when (status) {
-            0 -> return "Unassigned"
-            1 -> return "Assigned"
-            2 -> return "In Progress"
-            3 -> return "Finished"
-            else -> return "N/A"
-        }
-    }
-
-
-}

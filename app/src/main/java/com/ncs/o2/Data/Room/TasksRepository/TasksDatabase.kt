@@ -7,7 +7,7 @@ import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.HelperClasses.Convertors
 
-@Database(entities = [Task::class, Tag::class], version = 1)
+@Database(entities = [Task::class, Tag::class], version = 4)
 @TypeConverters(Convertors::class)
 abstract class TasksDatabase : RoomDatabase() {
     abstract fun tasksDao(): TasksDao
