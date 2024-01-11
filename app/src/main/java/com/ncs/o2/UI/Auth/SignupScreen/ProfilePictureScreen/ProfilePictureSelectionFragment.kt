@@ -365,6 +365,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                             putProjectsList(listOf("NCSOxygen"))
 
                                             setLastSeenTimeStamp(0)
+                                            setProjectTimeStamp("NCSOxygen",0)
                                             setLatestNotificationTimeStamp(0)
 
                                             setcurrentUserdetails(CurrentUser(

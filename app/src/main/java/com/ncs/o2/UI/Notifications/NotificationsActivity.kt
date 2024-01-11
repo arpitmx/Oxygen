@@ -23,6 +23,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.ActivityNotificationsBinding
@@ -54,7 +55,6 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
         setUpView()
         viewModel.fetchNotifications()
     }
@@ -69,6 +69,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         with(PrefManager) {
             val newLastSeen = Timestamp.now().seconds
             setNotificationCount(0)
+            setProjectTimeStamp(getcurrentProject(),newLastSeen)
             setLastSeenTimeStamp(newLastSeen)
             Timber.tag(TAG).d("Timestamp updated : Last seen timestamp ${newLastSeen}")
         }
@@ -78,6 +79,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
                 overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
                 finish()
             }
@@ -89,7 +91,9 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         setUpNotificationRV()
 
         backBtn.setOnClickThrottleBounceListener {
-            onBackPressed()
+            startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
+            finish()
         }
 
     }
@@ -133,7 +137,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     else{
                         binding.notificationRV.visible()
                         binding.noNotificationTv.gone()
-                        adapter = NotificationAdapter(this,PrefManager.getLastSeenTimeStamp(),list,this)
+                        adapter = NotificationAdapter(this,PrefManager.getProjectTimeStamp(PrefManager.getcurrentProject()),list,this)
                         adapter.notifyDataSetChanged()
                         notificationRV.adapter = adapter
                         FirebaseFirestore.getInstance().collection(Endpoints.USERS)
@@ -152,9 +156,10 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+        startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
+        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
+        finish()
         super.onBackPressed()
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-        //finish()
     }
 
     override fun onClick(notification: Notification) {

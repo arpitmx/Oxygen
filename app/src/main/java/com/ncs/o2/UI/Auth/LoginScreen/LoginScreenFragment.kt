@@ -155,6 +155,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
                                         initialize(requireContext())
                                         setLastSeenTimeStamp(notification_timestamp!!)
+                                        setProjectTimeStamp(PrefManager.getcurrentProject(),notification_timestamp)
                                         setLatestNotificationTimeStamp(0)
                                         setNotificationCount(0)
 

@@ -375,6 +375,7 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
                 val notification_timestamp = document.getLong("NOTIFICATION_LAST_SEEN")
                 if (!notification_timestamp.isNull) {
                     PrefManager.setLastSeenTimeStamp(notification_timestamp!!)
+                    PrefManager.setProjectTimeStamp(PrefManager.getcurrentProject(),notification_timestamp)
                 }
                 if (dp_url_pref == null) {
                     PrefManager.setDpUrl(dp_url)

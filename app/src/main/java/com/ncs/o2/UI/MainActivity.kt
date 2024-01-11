@@ -34,11 +34,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
@@ -97,6 +100,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     @Inject
     lateinit var db:TasksDatabase
+    @Inject
+    lateinit var notifdb:NotificationDatabase
 
     // Navigation drawer toggle
     private lateinit var toggle: ActionBarDrawerToggle
@@ -165,6 +170,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.invisible()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -178,6 +184,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.visible()
+            setNotificationCountOnActionBar()
         }
     }
 
@@ -195,6 +203,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.invisible()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -208,6 +217,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.visible()
+            setNotificationCountOnActionBar()
         }
     }
 
@@ -329,15 +340,24 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
     private fun setNotificationCountOnActionBar() {
-        val notificationCount = PrefManager.getNotificationCount()
-        if (notificationCount>0){
-
-            binding.gioActionbar.notificationCountET.text = notificationCount.toString()
-            binding.gioActionbar.notificationCountET.visible()
-
-        }else {
-            binding.gioActionbar.notificationCountET.gone()
+        CoroutineScope(Dispatchers.IO).launch {
+            val notifications=notifdb.notificationDao().getAllNotificationsForProject(PrefManager.getcurrentProject())
+            var count=0
+            for(notification in notifications){
+                if (notification.timeStamp>PrefManager.getProjectTimeStamp(PrefManager.getcurrentProject())){
+                    count++
+                }
+            }
+            withContext(Dispatchers.Main){
+                if (count>0){
+                    binding.gioActionbar.notificationCountET.text = count.toString()
+                    binding.gioActionbar.notificationCountET.visible()
+                }else {
+                    binding.gioActionbar.notificationCountET.gone()
+                }
+            }
         }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
