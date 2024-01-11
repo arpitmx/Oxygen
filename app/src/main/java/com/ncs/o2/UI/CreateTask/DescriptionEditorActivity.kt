@@ -8,7 +8,10 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
@@ -23,6 +26,7 @@ import com.google.ai.client.generativeai.GenerativeModel
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.BuildConfig
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
@@ -35,6 +39,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.CodeViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageAdapter
@@ -65,6 +70,8 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
     private val utils by lazy {
         GlobalUtils.EasyElements(this)
     }
+    lateinit var draft: Task
+
     private val viewModel: CreateTaskViewModel by viewModels()
 
     private val REQUEST_IMAGE_CAPTURE = 1
@@ -102,6 +109,7 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        draft=PrefManager.getDraftTask()!!
 
         val summary = intent.getStringExtra("summary")
         if (!summary.isNull){
@@ -138,14 +146,24 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
         }
     }
 
+    override fun onBackPressed() {
+        val resultIntent = Intent()
+        resultIntent.putExtra("summary", binding.summaryEt.text.toString())
+        setResult(RESULT_OK, resultIntent)
+        finish()
+        super.onBackPressed()
+    }
+
     private fun setUpViews() {
         binding.btnPreview.visible()
         toggleProgress(false)
 
         binding.gioActionbar.titleTv.text = getString(R.string.summary)
-        binding.gioActionbar.btnDone.visible()
         binding.gioActionbar.btnBack.setOnClickThrottleBounceListener {
-            onBackPressed()
+            val resultIntent = Intent()
+            resultIntent.putExtra("summary", binding.summaryEt.text.toString())
+            setResult(RESULT_OK, resultIntent)
+            finish()
         }
         val summary = intent.getStringExtra("summary")
         if (summary.isNull){
@@ -191,18 +209,39 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
 
         }
 
+        val handler = Handler()
+
+        binding.summaryEt.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                val inputText = editable.toString()
+                draft.description = inputText
+                handler.removeCallbacksAndMessages(null)
+                handler.postDelayed({
+                    PrefManager.putDraftTask(draft)
+                }, 2000)
+            }
+        })
+
+
+
         binding.btnImg.setOnClickThrottleBounceListener {
             pickImage()
         }
         binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
-            if (binding.summaryEt.text.toString().isEmpty()) {
-                utils.showSnackbar(binding.root, "Enter something in summary first", 3000)
-            } else {
-                val resultIntent = Intent()
-                resultIntent.putExtra("summary", binding.summaryEt.text.toString())
-                setResult(RESULT_OK, resultIntent)
-                finish()
-            }
+//            if (binding.summaryEt.text.toString().isEmpty()) {
+//                utils.showSnackbar(binding.root, "Enter something in summary first", 3000)
+//            } else {
+//                val resultIntent = Intent()
+//                resultIntent.putExtra("summary", binding.summaryEt.text.toString())
+//                setResult(RESULT_OK, resultIntent)
+//                finish()
+//            }
         }
 
         binding.btnPreview.setOnClickThrottleBounceListener {

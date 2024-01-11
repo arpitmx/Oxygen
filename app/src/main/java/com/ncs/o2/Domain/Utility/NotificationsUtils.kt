@@ -82,6 +82,7 @@ object NotificationsUtils {
             data.addProperty(N.BODY, notification.message)
             data.addProperty(N.TYPE, notification.notificationType)
             data.addProperty(N.TASKID, notification.taskID)
+            data.addProperty(N.project_id,notification.projectID)
 
             payload.add(N.DATA, data)
 
@@ -98,6 +99,7 @@ object NotificationsUtils {
             data.addProperty(N.BODY, notification.message)
             data.addProperty(N.TYPE, notification.notificationType)
             data.addProperty(N.TASKID, notification.taskID)
+            data.addProperty(N.project_id,notification.projectID)
 
             payload.add(N.DATA, data)
 
@@ -114,6 +116,7 @@ object NotificationsUtils {
             data.addProperty(N.BODY, notification.message)
             data.addProperty(N.TYPE, notification.notificationType)
             data.addProperty(N.TASKID, notification.taskID)
+            data.addProperty(N.project_id,notification.projectID)
 
             payload.add(N.DATA, data)
 
@@ -130,6 +133,7 @@ object NotificationsUtils {
             data.addProperty(N.BODY, notification.message)
             data.addProperty(N.TYPE, notification.notificationType)
             data.addProperty(N.TASKID, notification.taskID)
+            data.addProperty(N.project_id,notification.projectID)
 
             payload.add(N.DATA, data)
 
@@ -146,6 +150,7 @@ object NotificationsUtils {
             data.addProperty(N.BODY, notification.message)
             data.addProperty(N.TYPE, notification.notificationType)
             data.addProperty(N.TASKID, notification.taskID)
+            data.addProperty(N.project_id,notification.projectID)
 
             payload.add(N.DATA, data)
 

@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <LinearLayout
             android:id="@+id/segment_parent"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -74,7 +74,7 @@
                 app:srcCompat="@android:drawable/arrow_down_float"
                 app:tint="@color/primary" />
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/btnBack"

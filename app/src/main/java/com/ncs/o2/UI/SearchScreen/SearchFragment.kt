@@ -379,7 +379,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
         }
         binding.segment.setOnClickThrottleBounceListener {
-            val segment = SegmentSelectionBottomSheet()
+            val segment = SegmentSelectionBottomSheet("Search")
             segment.segmentSelectionListener = this
             segment.sectionSelectionListener = this
             segment.show(requireFragmentManager(), "Segment Selection")

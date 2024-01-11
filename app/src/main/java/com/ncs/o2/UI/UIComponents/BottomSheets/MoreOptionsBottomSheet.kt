@@ -73,31 +73,60 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
     }
 
     private fun createTaskLink(taskId: String){
-        val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-            .setLink(Uri.parse("https://oxy2.page.link/share/${taskId.substring(2)}/${PrefManager.getcurrentProject()}"))
-            .setDomainUriPrefix("https://oxy2.page.link")
-            .setAndroidParameters(
-                DynamicLink.AndroidParameters.Builder("com.ncs.o2")
-                    .setMinimumVersion(1)
-                    .build()
-            )
-            .buildDynamicLink()
-        FirebaseDynamicLinks.getInstance().createDynamicLink()
-            .setLongLink(dynamicLink.uri)
-            .buildShortDynamicLink()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    binding.progressBar.gone()
-                    binding.buttons.visible()
-                    val shortLink = task.result?.shortLink
-                    dismiss()
-                    shareTaskLink(shortLink.toString())
-                } else {
-                    binding.progressBar.gone()
-                    binding.buttons.visible()
-                    utils.showSnackbar(requireView(),"Error Creating task link",2000)
+        if (taskId[0]=='#' && taskId[1]=='T' && taskId.split(" ").size==1 && !taskId.contains('-')) {
+            val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://oxy2.page.link/share/${taskId.substring(2)}/${PrefManager.getcurrentProject()}"))
+                .setDomainUriPrefix("https://oxy2.page.link")
+                .setAndroidParameters(
+                    DynamicLink.AndroidParameters.Builder("com.ncs.o2")
+                        .setMinimumVersion(1)
+                        .build()
+                )
+                .buildDynamicLink()
+            FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLongLink(dynamicLink.uri)
+                .buildShortDynamicLink()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        binding.progressBar.gone()
+                        binding.buttons.visible()
+                        val shortLink = task.result?.shortLink
+                        dismiss()
+                        shareTaskLink(shortLink.toString())
+                    } else {
+                        binding.progressBar.gone()
+                        binding.buttons.visible()
+                        utils.showSnackbar(requireView(), "Error Creating task link", 2000)
+                    }
                 }
-            }
+        }
+        else{
+            val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://oxy2.page.link/share/${taskId.substringAfter('-', taskId)}/${PrefManager.getcurrentProject()}/${taskId.substringBefore('-').substring(1)}"))
+                .setDomainUriPrefix("https://oxy2.page.link")
+                .setAndroidParameters(
+                    DynamicLink.AndroidParameters.Builder("com.ncs.o2")
+                        .setMinimumVersion(1)
+                        .build()
+                )
+                .buildDynamicLink()
+            FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLongLink(dynamicLink.uri)
+                .buildShortDynamicLink()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        binding.progressBar.gone()
+                        binding.buttons.visible()
+                        val shortLink = task.result?.shortLink
+                        dismiss()
+                        shareTaskLink(shortLink.toString())
+                    } else {
+                        binding.progressBar.gone()
+                        binding.buttons.visible()
+                        utils.showSnackbar(requireView(), "Error Creating task link", 2000)
+                    }
+                }
+        }
     }
 
     private fun setBottomSheetConfig() {

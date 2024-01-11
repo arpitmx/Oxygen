@@ -34,11 +34,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
@@ -97,6 +100,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     @Inject
     lateinit var db:TasksDatabase
+    @Inject
+    lateinit var notifdb:NotificationDatabase
 
     // Navigation drawer toggle
     private lateinit var toggle: ActionBarDrawerToggle
@@ -120,6 +125,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 handleDynamicLink(intent)
                 dynamicLinkHandled = true
             }
+
         }
         else{
 
@@ -164,6 +170,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.invisible()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -177,6 +184,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.visible()
+            setNotificationCountOnActionBar()
         }
     }
 
@@ -194,6 +203,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.invisible()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -207,6 +217,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.notificationCont.visible()
+            setNotificationCountOnActionBar()
         }
     }
 
@@ -265,7 +277,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
 
-            val segment = SegmentSelectionBottomSheet()
+            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
             segment.segmentSelectionListener = this
 
             // Show a segment selection bottom sheet
@@ -328,15 +340,24 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
     private fun setNotificationCountOnActionBar() {
-        val notificationCount = PrefManager.getNotificationCount()
-        if (notificationCount>0){
-
-            binding.gioActionbar.notificationCountET.text = notificationCount.toString()
-            binding.gioActionbar.notificationCountET.visible()
-
-        }else {
-            binding.gioActionbar.notificationCountET.gone()
+        CoroutineScope(Dispatchers.IO).launch {
+            val notifications=notifdb.notificationDao().getAllNotificationsForProject(PrefManager.getcurrentProject())
+            var count=0
+            for(notification in notifications){
+                if (notification.timeStamp>PrefManager.getProjectTimeStamp(PrefManager.getcurrentProject())){
+                    count++
+                }
+            }
+            withContext(Dispatchers.Main){
+                if (count>0){
+                    binding.gioActionbar.notificationCountET.text = count.toString()
+                    binding.gioActionbar.notificationCountET.visible()
+                }else {
+                    binding.gioActionbar.notificationCountET.gone()
+                }
+            }
         }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -510,8 +531,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             val operationType = pathSegments[0]
             val id = pathSegments[1]
             var project:String=""
+            var projectPrefix:String=""
             if (pathSegments.size>=3){
                 project=pathSegments[2]
+            }
+            if (pathSegments.size>=4){
+                projectPrefix=pathSegments[3]
             }
             Log.d("shareLinkTest",operationType.toString())
             Log.d("shareLinkTest",id.toString())
@@ -532,48 +557,97 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     }
                 }
                 "share" -> {
-                    val taskId="#T${id}"
-                    CoroutineScope(Dispatchers.Main).launch {
-                        if (PrefManager.getProjectsList().contains(project)) {
-                            if (db.tasksDao().getTasksbyId(taskId, project)?.isNull!!) {
+                    if (pathSegments.size==3){
+                        val taskId="#T${id}"
+                        CoroutineScope(Dispatchers.Main).launch {
+                            if (PrefManager.getProjectsList().contains(project)) {
+                                if (db.tasksDao().getTasksbyId(taskId, project)?.isNull!!) {
+                                    easyElements.showSnackbar(
+                                        binding.root,
+                                        "No Task found, check the link",
+                                        2000
+                                    )
+                                } else {
+                                    PrefManager.setcurrentsegment("Select Segment")
+                                    viewModel.updateCurrentSegment("Select Segment")
+                                    binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
+                                    val list = PrefManager.getProjectsList()
+                                    var position:Int=0
+                                    for (i in 0 until list.size){
+                                        if (list[i]==project){
+                                            position=i
+                                        }
+                                    }
+                                    Log.d("position",position.toString())
+                                    PrefManager.setcurrentProject(project)
+                                    PrefManager.setRadioButton(position)
+                                    PrefManager.selectedPosition.value = position
+                                    projectListAdapter.notifyDataSetChanged()
+                                    setupProjectsList()
+                                    val intent =
+                                        Intent(this@MainActivity, TaskDetailActivity::class.java)
+                                    intent.putExtra("task_id", taskId)
+                                    startActivity(intent)
+                                    overridePendingTransition(
+                                        R.anim.slide_in_left,
+                                        R.anim.slide_out_left
+                                    )
+                                }
+                            }
+                            else{
                                 easyElements.showSnackbar(
                                     binding.root,
-                                    "No Task found, check the link",
+                                    "Can't view task you are not enrolled in this project",
                                     2000
-                                )
-                            } else {
-                                PrefManager.setcurrentsegment("Select Segment")
-                                viewModel.updateCurrentSegment("Select Segment")
-                                binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
-                                val list = PrefManager.getProjectsList()
-                                var position:Int=0
-                                for (i in 0 until list.size){
-                                    if (list[i]==project){
-                                        position=i
-                                    }
-                                }
-                                Log.d("position",position.toString())
-                                PrefManager.setcurrentProject(project)
-                                PrefManager.setRadioButton(position)
-                                PrefManager.selectedPosition.value = position
-                                projectListAdapter.notifyDataSetChanged()
-                                setupProjectsList()
-                                val intent =
-                                    Intent(this@MainActivity, TaskDetailActivity::class.java)
-                                intent.putExtra("task_id", taskId)
-                                startActivity(intent)
-                                overridePendingTransition(
-                                    R.anim.slide_in_left,
-                                    R.anim.slide_out_left
                                 )
                             }
                         }
-                        else{
-                            easyElements.showSnackbar(
-                                binding.root,
-                                "Can't view task you are not enrolled in this project",
-                                2000
-                            )
+                    }
+                    if (pathSegments.size==4){
+                        val taskId="#${projectPrefix}-${id}"
+                        Log.d("shareLinkTest",taskId.toString())
+                        CoroutineScope(Dispatchers.Main).launch {
+                            if (PrefManager.getProjectsList().contains(project)) {
+                                if (db.tasksDao().getTasksbyId(taskId, project)?.isNull!!) {
+                                    easyElements.showSnackbar(
+                                        binding.root,
+                                        "No Task found, check the link",
+                                        2000
+                                    )
+                                } else {
+                                    PrefManager.setcurrentsegment("Select Segment")
+                                    viewModel.updateCurrentSegment("Select Segment")
+                                    binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
+                                    val list = PrefManager.getProjectsList()
+                                    var position:Int=0
+                                    for (i in 0 until list.size){
+                                        if (list[i]==project){
+                                            position=i
+                                        }
+                                    }
+                                    Log.d("position",position.toString())
+                                    PrefManager.setcurrentProject(project)
+                                    PrefManager.setRadioButton(position)
+                                    PrefManager.selectedPosition.value = position
+                                    projectListAdapter.notifyDataSetChanged()
+                                    setupProjectsList()
+                                    val intent =
+                                        Intent(this@MainActivity, TaskDetailActivity::class.java)
+                                    intent.putExtra("task_id", taskId)
+                                    startActivity(intent)
+                                    overridePendingTransition(
+                                        R.anim.slide_in_left,
+                                        R.anim.slide_out_left
+                                    )
+                                }
+                            }
+                            else{
+                                easyElements.showSnackbar(
+                                    binding.root,
+                                    "Can't view task you are not enrolled in this project",
+                                    2000
+                                )
+                            }
                         }
                     }
                 }

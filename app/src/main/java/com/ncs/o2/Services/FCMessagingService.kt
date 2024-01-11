@@ -51,6 +51,8 @@ class FCMessagingService : FirebaseMessagingService() {
             val title = receivedNotification.data[N.TITLE]
             val body = receivedNotification.data[N.BODY]
             val taskID = receivedNotification.data[N.TASKID]
+            val projectID = receivedNotification.data[N.project_id]
+
 
             type?.let {
                 if (type == NotificationType.TASK_COMMENT_NOTIFICATION.name){
@@ -59,6 +61,7 @@ class FCMessagingService : FirebaseMessagingService() {
                         title =  title.orEmpty(),
                         message = body.orEmpty(),
                         taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
                     )
                     showNotification(notification = notif, context = applicationContext)
                 }
@@ -68,6 +71,8 @@ class FCMessagingService : FirebaseMessagingService() {
                         title =  title.orEmpty(),
                         message = body.orEmpty(),
                         taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
+
                     )
 
                     showNotification(notification = notif, context = applicationContext)
@@ -78,6 +83,7 @@ class FCMessagingService : FirebaseMessagingService() {
                         title =  title.orEmpty(),
                         message = body.orEmpty(),
                         taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
                     )
                     showNotification(notification = notif, context = applicationContext)
                 }
@@ -87,6 +93,7 @@ class FCMessagingService : FirebaseMessagingService() {
                         title =  title.orEmpty(),
                         message = body.orEmpty(),
                         taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
                     )
                     showNotification(notification = notif, context = applicationContext)
                 }
@@ -96,6 +103,8 @@ class FCMessagingService : FirebaseMessagingService() {
                         title =  title.orEmpty(),
                         message = body.orEmpty(),
                         taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
+
                     )
                     showNotification(notification = notif, context = applicationContext)
                 }

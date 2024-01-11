@@ -130,13 +130,11 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     }
 
     private fun initViews(){
-        if (isModerator){
-            binding.btnAddMoreCheckList.visible()
-        }
+
         getCheckList()
     }
 
-    private fun setCheckListRecyclerView(_list: MutableList<CheckList>) {
+    private fun setCheckListRecyclerView(_list: List<CheckList>) {
         val  list = _list.sortedBy { it.index }.toMutableList()
         if (isAssignee && !isModerator){
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,true, )
@@ -192,8 +190,11 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                     is ServerResult.Success -> {
                         checkListArray.clear()
                         checkListArray.addAll(result.data)
-                        setCheckListRecyclerView(result.data.toMutableList())
+                        setCheckListRecyclerView(result.data)
                         binding.progressbar.gone()
+                        if (isModerator){
+                            binding.btnAddMoreCheckList.visible()
+                        }
                     }
 
                 }

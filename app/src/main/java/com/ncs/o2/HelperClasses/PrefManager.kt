@@ -7,11 +7,13 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.versa.Constants.Endpoints
 import java.util.Date
@@ -40,11 +42,37 @@ object PrefManager {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor : SharedPreferences.Editor
     val list=MutableLiveData<List<String>>()
+    private val projectTimestampMapKey = "project_timestamp_map"
+    private lateinit var projectTimestampMap: MutableMap<String, Long>
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(Endpoints.SharedPref.SHAREDPREFERENCES, Context.MODE_PRIVATE)
         editor= sharedPreferences.edit()
+        val savedHashMapString = sharedPreferences.getString(projectTimestampMapKey, null)
+        projectTimestampMap = savedHashMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Long>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
     }
 
+
+
+    fun setProjectTimeStamp(projectName: String, timestamp: Long) {
+        projectTimestampMap[projectName] = timestamp
+        saveHashMapToPreferences()
+    }
+
+    fun getProjectTimeStamp(projectName: String): Long {
+        return projectTimestampMap[projectName] ?: 0
+    }
+
+    private fun saveHashMapToPreferences() {
+        val hashMapString = Gson().toJson(projectTimestampMap)
+        editor.putString(projectTimestampMapKey, hashMapString)
+        editor.apply()
+    }
 
     //Notification View Timestamp
 
