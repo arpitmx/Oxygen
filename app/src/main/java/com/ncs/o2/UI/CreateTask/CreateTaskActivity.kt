@@ -51,6 +51,7 @@ import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -328,7 +329,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         draft=PrefManager.getDraftTask()!!
-
+        Log.d("draftissue",draft.toString())
 
         if (PrefManager.getcurrentUserdetails().ROLE>=3){
             manageViewsforModerators()
@@ -343,6 +344,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
         setUpViews()
         setUpLiveData()
+        Log.d("draftissue","value of description $description")
+
         if (description.isNull){
             binding.description.isClickable=true
             binding.description.setOnClickThrottleBounceListener {
@@ -367,6 +370,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         if (requestCode == 1 && resultCode == RESULT_OK) {
             val summary = data?.getStringExtra("summary")
             if (!summary.isNull){
+                Log.d("draftissue","summary is not null $summary")
                 description=summary!!.trimIndent()
                 draft.description=description!!
                 PrefManager.putDraftTask(draft)
@@ -694,8 +698,12 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     private fun setDefaultViewsforModerators(){
         if (PrefManager.getDraftTask()== Task()){
-
+            Log.d("draftissue","Running if of moderator")
+            draft.project_ID=PrefManager.getcurrentProject()
+            PrefManager.putDraftTask(draft)
+            PrefManager.putDraftCheckLists(emptyList())
             binding.projectNameET.text=PrefManager.getcurrentProject()
+
             binding.priorityInclude.tagIcon.text="L"
             binding.priorityInclude.tagText.text="Low"
 
@@ -717,162 +725,167 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
             binding.title.text!!.clear()
 
-            description=""
+            description=null
             binding.markdownView.gone()
             binding.textView2.visible()
+            binding.description.isClickable=true
+
             checkListArray.clear()
             binding.checkListCount.gone()
         }
         else{
+            Log.d("draftissue","Running Else")
             Log.d("projectIDIssueDraft",draft.project_ID)
             Log.d("projectIDIssue",PrefManager.getcurrentProject())
-            if (draft.project_ID!=PrefManager.getcurrentProject()){
-                PrefManager.putDraftTask(Task(project_ID = PrefManager.getcurrentProject()))
-                PrefManager.putDraftCheckLists(emptyList())
-                finish()
-                startActivity(intent)
-            }
-            else {
-                draft.project_ID = PrefManager.getcurrentProject()
-                PrefManager.putDraftTask(draft)
-                val handler = Handler()
 
-                binding.title.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
+                if (draft.project_ID!=PrefManager.getcurrentProject()){
+                    PrefManager.putDraftTask(Task(project_ID = PrefManager.getcurrentProject()))
+                    PrefManager.putDraftCheckLists(emptyList())
+                    finish()
+                    startActivity(intent)
+                }
+                else {
+                    draft.project_ID = PrefManager.getcurrentProject()
+                    PrefManager.putDraftTask(draft)
+                    val handler = Handler()
+
+                    binding.title.addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(
+                            charSequence: CharSequence?,
+                            start: Int,
+                            count: Int,
+                            after: Int
+                        ) {
+                        }
+
+                        override fun onTextChanged(
+                            charSequence: CharSequence?,
+                            start: Int,
+                            before: Int,
+                            count: Int
+                        ) {
+                        }
+
+                        override fun afterTextChanged(editable: Editable?) {
+                            val inputText = editable.toString()
+                            draft.title = inputText
+                            handler.removeCallbacksAndMessages(null)
+                            handler.postDelayed({
+                                PrefManager.putDraftTask(draft)
+                            }, 2000)
+                        }
+                    })
+                    val draftTask = PrefManager.getDraftTask()
+
+                    val projectName = draftTask?.project_ID
+                    if (projectName != "") {
+                        binding.projectNameET.text = draftTask?.project_ID
+                    } else {
+                        binding.projectNameET.text = PrefManager.getcurrentProject()
                     }
 
-                    override fun onTextChanged(
-                        charSequence: CharSequence?,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
+                    val _priority = draftTask?.priority
+                    if (_priority != 0) {
+                        val priority =
+                            SwitchFunctions.getStringPriorityFromNumPriority(draftTask?.priority!!)
+                        binding.priorityInclude.tagIcon.text = priority.substring(0, 1)
+                        binding.priorityInclude.tagText.text = priority
+                    } else {
+                        binding.priorityInclude.tagIcon.text = "L"
+                        binding.priorityInclude.tagText.text = "Low"
                     }
 
-                    override fun afterTextChanged(editable: Editable?) {
-                        val inputText = editable.toString()
-                        draft.title = inputText
-                        handler.removeCallbacksAndMessages(null)
-                        handler.postDelayed({
-                            PrefManager.putDraftTask(draft)
-                        }, 2000)
+                    val _type = draftTask?.type
+                    if (_type != 0) {
+                        val type = SwitchFunctions.getStringTypeFromNumType(draftTask.type!!)
+                        binding.typeInclude.tagIcon.text = type.substring(0, 1)
+                        binding.typeInclude.tagText.text = type
+                    } else {
+                        binding.typeInclude.tagIcon.text = "T"
+                        binding.typeInclude.tagText.text = "Task"
                     }
-                })
-                val draftTask = PrefManager.getDraftTask()
 
-                val projectName = draftTask?.project_ID
-                if (projectName != "") {
-                    binding.projectNameET.text = draftTask?.project_ID
-                } else {
-                    binding.projectNameET.text = PrefManager.getcurrentProject()
+                    val _state = draftTask?.status
+                    if (_state != -1) {
+                        val state = SwitchFunctions.getStringStateFromNumState(draftTask.status!!)
+                        binding.stateInclude.tagIcon.text = state.substring(0, 1)
+                        binding.stateInclude.tagText.text = state
+                    } else {
+                        binding.stateInclude.tagIcon.text = "S"
+                        binding.stateInclude.tagText.text = "Submitted"
+                    }
+
+                    val _difficulty = draftTask?.difficulty
+                    if (_difficulty != 0) {
+                        val difficulty =
+                            SwitchFunctions.getStringDifficultyFromNumDifficulty(draftTask.difficulty!!)
+                        val difficultyDrawable = SwitchFunctions.getDrawableDifficultyFromNumDifficulty(
+                            draftTask.difficulty!!,
+                            this
+                        )
+                        binding.difficultyInclude.tagIcon.text = difficulty.substring(0, 1)
+                        binding.difficultyInclude.tagIcon.background = difficultyDrawable
+                        binding.difficultyInclude.tagText.text = difficulty
+                    } else {
+                        binding.difficultyInclude.tagIcon.text = "E"
+                        binding.difficultyInclude.tagIcon.background =
+                            resources.getDrawable(R.drawable.label_cardview_green)
+                        binding.difficultyInclude.tagText.text = "Easy"
+                    }
+
+                    val _duration = draftTask?.duration
+                    if (_duration != "") {
+                        val duration = draftTask.duration
+                        binding.taskDurationET.text = duration
+                    } else {
+                        binding.taskDurationET.text = "Select"
+                    }
+
+                    val _segment = draftTask?.segment
+                    if (_segment != "") {
+                        binding.segment.text = draftTask.segment
+                        Codes.STRINGS.segmentText = draftTask.segment
+                    } else {
+                        binding.segment.text = "Segment"
+                    }
+
+                    val _section = draftTask?.section
+                    if (_section != "") {
+                        binding.section.text = draftTask.section
+                    } else {
+                        binding.section.text = "Section"
+                    }
+
+                    val _title = draftTask?.title
+                    if (_title != "") {
+                        binding.title.setText(draftTask.title)
+                    } else {
+                        binding.title.text?.clear()
+                    }
+
+                    val _desc = draftTask?.description
+                    if (_desc != "") {
+                        val summary = draftTask.description
+                        description = summary
+                        setUpTaskDescription(summary!!)
+                    } else {
+                        binding.markdownView.gone()
+                        binding.textView2.visible()
+                        binding.description.isClickable=true
+                    }
+
+
+                    val checkLists = PrefManager.getDraftCheckLists()
+                    if (checkLists.isNullOrEmpty()) {
+                        binding.checkListCount.gone()
+                    } else {
+                        binding.checkListCount.visible()
+                        binding.checkListCount.text = "(${(checkLists.size).toString()})"
+                        checkListArray = checkLists.toMutableList()
+                    }
+
                 }
 
-                val _priority = draftTask?.priority
-                if (_priority != 0) {
-                    val priority =
-                        SwitchFunctions.getStringPriorityFromNumPriority(draftTask?.priority!!)
-                    binding.priorityInclude.tagIcon.text = priority.substring(0, 1)
-                    binding.priorityInclude.tagText.text = priority
-                } else {
-                    binding.priorityInclude.tagIcon.text = "L"
-                    binding.priorityInclude.tagText.text = "Low"
-                }
-
-                val _type = draftTask?.type
-                if (_type != 0) {
-                    val type = SwitchFunctions.getStringTypeFromNumType(draftTask.type!!)
-                    binding.typeInclude.tagIcon.text = type.substring(0, 1)
-                    binding.typeInclude.tagText.text = type
-                } else {
-                    binding.typeInclude.tagIcon.text = "T"
-                    binding.typeInclude.tagText.text = "Task"
-                }
-
-                val _state = draftTask?.status
-                if (_state != -1) {
-                    val state = SwitchFunctions.getStringStateFromNumState(draftTask.status!!)
-                    binding.stateInclude.tagIcon.text = state.substring(0, 1)
-                    binding.stateInclude.tagText.text = state
-                } else {
-                    binding.stateInclude.tagIcon.text = "S"
-                    binding.stateInclude.tagText.text = "Submitted"
-                }
-
-                val _difficulty = draftTask?.difficulty
-                if (_difficulty != 0) {
-                    val difficulty =
-                        SwitchFunctions.getStringDifficultyFromNumDifficulty(draftTask.difficulty!!)
-                    val difficultyDrawable = SwitchFunctions.getDrawableDifficultyFromNumDifficulty(
-                        draftTask.difficulty!!,
-                        this
-                    )
-                    binding.difficultyInclude.tagIcon.text = difficulty.substring(0, 1)
-                    binding.difficultyInclude.tagIcon.background = difficultyDrawable
-                    binding.difficultyInclude.tagText.text = difficulty
-                } else {
-                    binding.difficultyInclude.tagIcon.text = "E"
-                    binding.difficultyInclude.tagIcon.background =
-                        resources.getDrawable(R.drawable.label_cardview_green)
-                    binding.difficultyInclude.tagText.text = "Easy"
-                }
-
-                val _duration = draftTask?.duration
-                if (_duration != "") {
-                    val duration = draftTask.duration
-                    binding.taskDurationET.text = duration
-                } else {
-                    binding.taskDurationET.text = "Select"
-                }
-
-                val _segment = draftTask?.segment
-                if (_segment != "") {
-                    binding.segment.text = draftTask.segment
-                    Codes.STRINGS.segmentText = draftTask.segment
-                } else {
-                    binding.segment.text = "Segment"
-                }
-
-                val _section = draftTask?.section
-                if (_section != "") {
-                    binding.section.text = draftTask.section
-                } else {
-                    binding.section.text = "Section"
-                }
-
-                val _title = draftTask?.title
-                if (_title != "") {
-                    binding.title.setText(draftTask.title)
-                } else {
-                    binding.title.text?.clear()
-                }
-
-                val _desc = draftTask?.description
-                if (_desc != "") {
-                    val summary = draftTask.description
-                    description = summary
-                    setUpTaskDescription(summary!!)
-                } else {
-                    binding.markdownView.gone()
-                    binding.textView2.visible()
-                }
-
-
-                val checkLists = PrefManager.getDraftCheckLists()
-                if (checkLists.isNullOrEmpty()) {
-                    binding.checkListCount.gone()
-                } else {
-                    binding.checkListCount.visible()
-                    binding.checkListCount.text = "(${(checkLists.size).toString()})"
-                    checkListArray = checkLists.toMutableList()
-                }
-
-
-            }
         }
 
     }
@@ -880,6 +893,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private fun setDefaultViewsforNormalUsers(){
 
         if (PrefManager.getDraftTask()== Task()){
+            draft.project_ID=PrefManager.getcurrentProject()
+            PrefManager.putDraftTask(draft)
+            PrefManager.putDraftCheckLists(emptyList())
             binding.projectNameET.text=PrefManager.getcurrentProject()
             binding.priorityInclude.tagIcon.text="L"
             binding.priorityInclude.tagText.text="Low"
@@ -902,9 +918,10 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
             binding.title.text!!.clear()
 
-            description=""
+            description=null
             binding.markdownView.gone()
             binding.textView2.visible()
+            binding.description.isClickable=true
             checkListArray.clear()
             binding.checkListCount.gone()
         }
@@ -1040,6 +1057,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             else{
                 binding.markdownView.gone()
                 binding.textView2.visible()
+                binding.description.isClickable=true
             }
 
 
