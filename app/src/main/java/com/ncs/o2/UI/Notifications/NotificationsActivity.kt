@@ -55,8 +55,84 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        val projectID=intent.getStringExtra("projectID")
+        val taskID=intent.getStringExtra("taskID")
+        val type=intent.getStringExtra("type")
+        if (projectID!=null && taskID!=null && type!=null){
+            when(type){
+                NotificationType.TASK_COMMENT_NOTIFICATION.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, TaskDetailActivity::class.java)
+                    intent.putExtra("task_id", taskID)
+                    intent.putExtra("index", "1")
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
+                NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, TaskDetailActivity::class.java)
+                    intent.putExtra("task_id", taskID)
+                    intent.putExtra("index", "1")
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
+                NotificationType.TASK_ASSIGNED_NOTIFICATION.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, TaskDetailActivity::class.java)
+                    intent.putExtra("task_id", taskID)
+                    intent.putExtra("index", "0")
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
+                NotificationType.WORKSPACE_TASK_UPDATE.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, TaskDetailActivity::class.java)
+                    intent.putExtra("task_id", taskID)
+                    intent.putExtra("index", "0")
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
+                NotificationType.TASK_CHECKLIST_UPDATE.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, TaskDetailActivity::class.java)
+                    intent.putExtra("task_id", taskID)
+                    intent.putExtra("index", "2")
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
+                else->{
+                    toast("Something went wrong")
+                }
+            }
+        }
         setUpView()
         viewModel.fetchNotifications()
+    }
+    private fun updateProjectCache(projectName:String){
+        PrefManager.setcurrentProject(projectName)
+        val segments=PrefManager.getProjectSegments(projectName)
+        if (segments.isNotEmpty()){
+            PrefManager.setcurrentsegment(segments[0].segment_NAME)
+            PrefManager.putsectionsList(segments[0].sections.distinct())
+        }
+        else{
+            PrefManager.setcurrentsegment("Select Segment")
+        }
+        val list = PrefManager.getProjectsList()
+        var position:Int=0
+        for (i in 0 until list.size){
+            if (list[i]==projectName){
+                position=i
+            }
+        }
+        PrefManager.setcurrentProject(projectName)
+        PrefManager.setRadioButton(position)
+        PrefManager.selectedPosition.value = position
     }
 
     private fun updateNotificationLastSeen() {

@@ -31,6 +31,7 @@ import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.popInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -363,23 +364,31 @@ class ProfilePictureSelectionFragment : Fragment() {
                                         with(PrefManager){
 
                                             putProjectsList(listOf("NCSOxygen"))
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                for (project in getProjectsList()){
+                                                    val list=getSegments(project)
+                                                    saveProjectSegments(project,list)
+                                                }
+                                                withContext(Dispatchers.Main){
+                                                    setLastSeenTimeStamp(0)
+                                                    setProjectTimeStamp("NCSOxygen",0)
+                                                    setLatestNotificationTimeStamp(0)
 
-                                            setLastSeenTimeStamp(0)
-                                            setProjectTimeStamp("NCSOxygen",0)
-                                            setLatestNotificationTimeStamp(0)
-
-                                            setcurrentUserdetails(CurrentUser(
-                                                EMAIL = email!!,
-                                                USERNAME = username!!,
-                                                BIO = bio!!,
-                                                DESIGNATION = designation!!,
-                                                ROLE = role!!,
-                                                FCM_TOKEN = fcm,
-                                            ))
+                                                    setcurrentUserdetails(CurrentUser(
+                                                        EMAIL = email!!,
+                                                        USERNAME = username!!,
+                                                        BIO = bio!!,
+                                                        DESIGNATION = designation!!,
+                                                        ROLE = role!!,
+                                                        FCM_TOKEN = fcm,
+                                                    ))
+                                                    requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+                                                    requireActivity().finish()
+                                                }
+                                            }
 
                                         }
-                                        requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-                                        requireActivity().finish()
+
                                     }
                                 } else {
 
@@ -409,6 +418,29 @@ class ProfilePictureSelectionFragment : Fragment() {
 
         }
     }
+    suspend fun getSegments(project: String): List<SegmentItem> {
+        val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)
+        val list = mutableListOf<SegmentItem>()
+
+        try {
+            val projectsSnapshot = projectsCollection.get().await()
+            for (projectDocument in projectsSnapshot.documents) {
+                val projectName = projectDocument.id
+                val segmentsCollection = projectsCollection.document(project).collection(Endpoints.Project.SEGMENT)
+                val segmentsSnapshot = segmentsCollection.get().await()
+                for (segmentDocument in segmentsSnapshot.documents) {
+                    val segmentName = segmentDocument.id
+                    val sections=segmentDocument.get("sections") as MutableList<String>
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections))
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        return list
+    }
+
 
     fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
         var bitmap: Bitmap? = null

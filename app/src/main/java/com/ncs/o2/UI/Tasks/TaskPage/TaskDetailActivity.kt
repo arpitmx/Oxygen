@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Tasks.TaskPage
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +13,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsBottomSheet
@@ -66,9 +68,10 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+        startActivity(Intent(this@TaskDetailActivity, MainActivity::class.java))
+        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
         finish()
+        super.onBackPressed()
     }
     private fun setActionbar() {
         binding.gioActionbar.titleTv.text = taskId
