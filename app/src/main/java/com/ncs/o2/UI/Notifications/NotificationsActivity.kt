@@ -233,8 +233,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
-        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
-        finish()
+        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
         super.onBackPressed()
     }
 
