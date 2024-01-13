@@ -411,59 +411,76 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
-                val role = document.get(Endpoints.User.ROLE)
-                val timestamp = document.getTimestamp(Endpoints.User.TIMESTAMP)
-                PrefManager.setUserRole(role.toString().toLong())
-                PrefManager.setCurrentUserTimeStamp(Timestamp.now())
-                val dp_url = document.getString(Endpoints.User.DP_URL)
-                val dp_url_pref = PrefManager.getDpUrl()
-                val notification_timestamp = document.getLong("NOTIFICATION_LAST_SEEN")
-                if (!notification_timestamp.isNull) {
-                    PrefManager.setLastSeenTimeStamp(notification_timestamp!!)
-                    PrefManager.setProjectTimeStamp(PrefManager.getcurrentProject(),notification_timestamp)
+                var isEmailVerified=document.getBoolean(Endpoints.User.EMAIL_VERIFIED)
+                if (isEmailVerified==null){
+                    isEmailVerified=true
                 }
-                if (dp_url_pref == null) {
-                    PrefManager.setDpUrl(dp_url)
-                } else if (dp_url_pref != dp_url) {
-                    Timber.tag(TAG).d("New DP is avaialable : ${dp_url}")
-                    PrefManager.setDpUrl(dp_url)
+                if (isEmailVerified){
+                    if (isDetailsAdded!! && isPhotoAdded!!){
+                        val role = document.get(Endpoints.User.ROLE)
+                        val timestamp = document.getTimestamp(Endpoints.User.TIMESTAMP)
+                        PrefManager.setUserRole(role.toString().toLong())
+                        PrefManager.setCurrentUserTimeStamp(Timestamp.now())
+                        val dp_url = document.getString(Endpoints.User.DP_URL)
+                        val dp_url_pref = PrefManager.getDpUrl()
+                        val notification_timestamp = document.getLong("NOTIFICATION_LAST_SEEN")
+                        if (!notification_timestamp.isNull) {
+                            PrefManager.setLastSeenTimeStamp(notification_timestamp!!)
+                            PrefManager.setProjectTimeStamp(PrefManager.getcurrentProject(),notification_timestamp)
+                        }
+                        if (dp_url_pref == null) {
+                            PrefManager.setDpUrl(dp_url)
+                        } else if (dp_url_pref != dp_url) {
+                            Timber.tag(TAG).d("New DP is avaialable : ${dp_url}")
+                            PrefManager.setDpUrl(dp_url)
+                        }
+
+                        PrefManager.setDpUrl(dp_url)
+                        setUpFCMTokenIfRequired(document = document)
+                        setUpProjectsList(document = document)
+                        val projectsList = PrefManager.getProjectsList()
+                        for (projects in projectsList) {
+                            setUpTasks(projects)
+                            setUpTags(projects)
+                        }
+                    }
+
+
+                    if (isDetailsAdded == null) {
+                        showBallError(
+                            Errors.AccountErrors.ACCOUNT_FIELDS_NULL,
+                            Exception("No details added")
+                        )
+                        return@addOnCompleteListener
+                    }
+
+                    if (isDetailsAdded == false) {
+
+                        val intent = Intent(this, AuthScreenActivity::class.java)
+                        intent.putExtra("isDetailsAdded", "false")
+                        intent.putExtra("showchooser", "false")
+                        startActivity(intent)
+                        finishAffinity()
+
+                    } else if (isPhotoAdded == false) {
+                        val intent = Intent(this, AuthScreenActivity::class.java)
+                        intent.putExtra("isPhotoAdded", "false")
+                        intent.putExtra("showchooser", "false")
+                        startActivity(intent)
+                        finishAffinity()
+
+                    }
+
+
+
                 }
-
-                PrefManager.setDpUrl(dp_url)
-
-                if (isDetailsAdded == null) {
-                    showBallError(
-                        Errors.AccountErrors.ACCOUNT_FIELDS_NULL,
-                        Exception("No details added")
-                    )
-                    return@addOnCompleteListener
-                }
-
-                if (isDetailsAdded == false) {
-
+                else{
                     val intent = Intent(this, AuthScreenActivity::class.java)
-                    intent.putExtra("isDetailsAdded", "false")
-                    intent.putExtra("showchooser", "false")
+                    intent.putExtra("isEmailVerified", "false")
                     startActivity(intent)
                     finishAffinity()
-
-                } else if (isPhotoAdded == false) {
-                    val intent = Intent(this, AuthScreenActivity::class.java)
-                    intent.putExtra("isPhotoAdded", "false")
-                    intent.putExtra("showchooser", "false")
-                    startActivity(intent)
-                    finishAffinity()
-
                 }
 
-
-                setUpFCMTokenIfRequired(document = document)
-                setUpProjectsList(document = document)
-                val projectsList = PrefManager.getProjectsList()
-                for (projects in projectsList) {
-                    setUpTasks(projects)
-                    setUpTags(projects)
-                }
             }
             .addOnFailureListener { exception ->
 

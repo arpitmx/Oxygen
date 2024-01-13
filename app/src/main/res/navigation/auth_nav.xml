@@ -43,8 +43,18 @@
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left" />
         <action
+            android:id="@+id/action_loginScreenFragment_to_EmailConfirmationFragment"
+            app:destination="@id/emailConfirmationFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
             android:id="@+id/action_loginScreenFragment_to_profilePictureSelectionFragment"
             app:destination="@id/profilePictureSelectionFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_loginScreenFragment_to_resetPasswordFragment"
+            app:destination="@id/resetPasswordFragment"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left" />
     </fragment>
@@ -68,6 +78,9 @@
         <action
             android:id="@+id/action_signUpScreenFragment_to_userDetailsFragment"
             app:destination="@id/userDetailsFragment" />
+        <action
+            android:id="@+id/action_signUpScreenFragment_to_emailConfirmationFragment"
+            app:destination="@id/emailConfirmationFragment" />
     </fragment>
     <fragment
         android:id="@+id/userDetailsFragment"
@@ -81,4 +94,24 @@
         android:id="@+id/profilePictureSelectionFragment"
         android:name="com.ncs.o2.UI.Auth.SignupScreen.ProfilePictureScreen.ProfilePictureSelectionFragment"
         android:label="ProfilePictureSelectionFragment" />
+    <fragment
+        android:id="@+id/emailConfirmationFragment"
+        android:name="com.ncs.o2.UI.Auth.SignupScreen.EmailConfirmationFragment"
+        android:label="EmailConfirmationFragment" >
+        <action
+            android:id="@+id/action_emailConfirmationFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+        <action
+            android:id="@+id/action_emailConfirmationFragment_to_loginScreenFragment"
+            app:destination="@id/loginScreenFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resetPasswordFragment"
+        tools:layout="@layout/fragment_reset_password"
+        android:name="com.ncs.o2.UI.Auth.SignupScreen.ResetPasswordFragment"
+        android:label="ResetPasswordFragment" >
+        <action
+            android:id="@+id/action_resetPasswordFragment_to_loginScreenFragment"
+            app:destination="@id/loginScreenFragment" />
+    </fragment>
 </navigation>

@@ -337,9 +337,6 @@ var imgArray = [];
 
 allImgTags.forEach(function(imgTag) {
   if (imgTag.tagName.toLowerCase() === 'img' && imgTag.parentElement.tagName.toLowerCase() !== 'pre') {
-    imgTag.addEventListener('click', function() {
-      send.sendsingleImage(imgTag.src);
-    });
     imgArray.push(imgTag.src);
   }
 });

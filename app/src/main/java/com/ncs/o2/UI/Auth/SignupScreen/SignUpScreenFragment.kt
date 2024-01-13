@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Auth.SignupScreen
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +14,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.dynamiclinks.DynamicLink
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Domain.Models.ServerResult
@@ -130,33 +134,36 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
             is ServerResult.Success -> {
 
                 binding.progressbar.gone()
-                Toast.makeText(
-                    activity,
-                    "Registration success",
-                    Toast.LENGTH_SHORT
-                ).show()
-                Timber.tag(TAG).d(
-                    "Registration success : ${result.data.uid}"
-                )
-                val userData = hashMapOf(
-                    Endpoints.User.EMAIL to binding.etEmail.text.toString(),
-                    Endpoints.User.DETAILS_ADDED to false,
-                    Endpoints.User.PHOTO_ADDED to false,
-                    Endpoints.User.DP_URL to "",
-                    )
+                sendVerificationEmail(result.data)
 
-                fcmToken { token->
-                    userData.set(Endpoints.User.FCM_TOKEN,token)
 
-                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
-                        .set(userData)
-                        .addOnSuccessListener {
-                            findNavController().navigate(R.id.action_signUpScreenFragment_to_userDetailsFragment)
-                        }
-                        .addOnFailureListener { e ->
-
-                        }
-                }
+//                Toast.makeText(
+//                    activity,
+//                    "Registration success",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                Timber.tag(TAG).d(
+//                    "Registration success : ${result.data.uid}"
+//                )
+//                val userData = hashMapOf(
+//                    Endpoints.User.EMAIL to binding.etEmail.text.toString(),
+//                    Endpoints.User.DETAILS_ADDED to false,
+//                    Endpoints.User.PHOTO_ADDED to false,
+//                    Endpoints.User.DP_URL to "",
+//                    )
+//
+//                fcmToken { token->
+//                    userData.set(Endpoints.User.FCM_TOKEN,token)
+//
+//                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+//                        .set(userData)
+//                        .addOnSuccessListener {
+//                            findNavController().navigate(R.id.action_signUpScreenFragment_to_userDetailsFragment)
+//                        }
+//                        .addOnFailureListener { e ->
+//
+//                        }
+//                }
 
 
 
@@ -176,6 +183,44 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
 //            }
             else -> {}
         }
+    }
+
+    private fun sendVerificationEmail(user: FirebaseUser?) {
+
+        user?.sendEmailVerification()
+            ?.addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(
+                        requireContext(), "Verification email sent",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    val userData = hashMapOf(
+                        Endpoints.User.EMAIL to binding.etEmail.text.toString(),
+                        Endpoints.User.DETAILS_ADDED to false,
+                        Endpoints.User.PHOTO_ADDED to false,
+                        Endpoints.User.DP_URL to "",
+                        Endpoints.User.EMAIL_VERIFIED to false,
+                    )
+
+                    fcmToken { token->
+                        userData.set(Endpoints.User.FCM_TOKEN,token)
+
+                        FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                            .set(userData)
+                            .addOnSuccessListener {
+                                findNavController().navigate(R.id.action_signUpScreenFragment_to_emailConfirmationFragment)
+                            }
+                            .addOnFailureListener { e ->
+
+                            }
+                    }
+                } else {
+                    Toast.makeText(
+                        requireContext(), "Failed to send verification email.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
     }
 
     private fun fcmToken(token: (String)->Unit) {

@@ -167,7 +167,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 
                                                         uploadImageToFirebaseStorage(
                                                             bitmap!!,
-                                                            project_id,
+                                                            title.trim(),
                                                             title
                                                         )
 
