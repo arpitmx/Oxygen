@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,7 @@ import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
@@ -63,6 +65,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentLoginScreenBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -71,6 +74,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpViews()
         setUpValidation()
+
     }
 
 
@@ -137,32 +141,37 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
                                 val isDetailsAdded = document.getBoolean(Endpoints.User.DETAILS_ADDED)
                                 val isPhotoAdded = document.getBoolean(Endpoints.User.PHOTO_ADDED)
-                                val bio = document.getString(Endpoints.User.BIO)
-                                val designation = document.getString(Endpoints.User.DESIGNATION)
-                                val email = document.getString(Endpoints.User.EMAIL)
-                                val username = document.getString(Endpoints.User.USERNAME)
-                                val role = document.getLong(Endpoints.User.ROLE)
-                                val dp: String? = document.getString(Endpoints.User.DP_URL)
-                                var fcmToken = document.getString(Endpoints.User.FCM_TOKEN)
-                                val projects = document.get("PROJECTS") as List<String>
+                                var isEmailVerified=document.getBoolean(Endpoints.User.EMAIL_VERIFIED)
+                                if (isEmailVerified==null){
+                                    isEmailVerified=true
+                                }
+
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    for (project in projects){
-                                        val list=getProjectSegments(project)
-                                        PrefManager.saveProjectSegments(project,list)
-                                    }
+
                                     withContext(Dispatchers.Main){
-                                        val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
-                                        if (fcmToken == null) {
-                                            fcmToken { token->
-                                                fcmToken = token
+
+
+
+                                        if (isDetailsAdded == true && isPhotoAdded == true && isEmailVerified==true) {
+
+                                            val bio = document.getString(Endpoints.User.BIO)
+                                            val designation = document.getString(Endpoints.User.DESIGNATION)
+                                            val email = document.getString(Endpoints.User.EMAIL)
+                                            val username = document.getString(Endpoints.User.USERNAME)
+                                            val role = document.getLong(Endpoints.User.ROLE)
+                                            val dp: String? = document.getString(Endpoints.User.DP_URL)
+                                            var fcmToken = document.getString(Endpoints.User.FCM_TOKEN)
+                                            val projects = document.get("PROJECTS") as List<String>
+                                            for (project in projects){
+                                                val list=getProjectSegments(project)
+                                                PrefManager.saveProjectSegments(project,list)
                                             }
-                                        }
-
-
-                                        if (isDetailsAdded == true && isPhotoAdded == true) {
-
-
-
+                                            val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
+                                            if (fcmToken == null) {
+                                                fcmToken { token->
+                                                    fcmToken = token
+                                                }
+                                            }
                                             with(PrefManager){
 
                                                 initialize(requireContext())
@@ -202,9 +211,13 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
                                             requireActivity().finishAffinity()
 
-                                        } else if (isDetailsAdded == false) {
+                                        }else if (isEmailVerified==false){
+                                            sendVerificationEmail(FirebaseAuth.getInstance().currentUser)
+                                        }
+                                        else if (isDetailsAdded == false) {
                                             findNavController().navigate(R.id.action_loginScreenFragment_to_userDetailsFragment)
-                                        } else if (isPhotoAdded == false) {
+                                        }
+                                        else if (isPhotoAdded == false) {
                                             findNavController().navigate(R.id.action_loginScreenFragment_to_profilePictureSelectionFragment)
                                         }
                                     }
@@ -230,6 +243,44 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
             }
         }
+    }
+
+    private fun sendVerificationEmail(user: FirebaseUser?) {
+
+        user?.sendEmailVerification()
+            ?.addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(
+                        requireContext(), "Verification email sent",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    val userData = hashMapOf(
+                        Endpoints.User.EMAIL to binding.etEmail.text.toString(),
+                        Endpoints.User.DETAILS_ADDED to false,
+                        Endpoints.User.PHOTO_ADDED to false,
+                        Endpoints.User.DP_URL to "",
+                        Endpoints.User.EMAIL_VERIFIED to false,
+                    )
+
+                    fcmToken { token->
+                        userData.set(Endpoints.User.FCM_TOKEN,token)
+
+                        FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                            .set(userData)
+                            .addOnSuccessListener {
+                                findNavController().navigate(R.id.action_loginScreenFragment_to_EmailConfirmationFragment)
+                            }
+                            .addOnFailureListener { e ->
+
+                            }
+                    }
+                } else {
+                    Toast.makeText(
+                        requireContext(), "Failed to send verification email.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
     }
 
     suspend fun getProjectSegments(project: String): List<SegmentItem> {
@@ -289,6 +340,10 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
         setUpVisibilities()
 
+        binding.forgotPassword.setOnClickThrottleBounceListener {
+            findNavController().navigate(R.id.action_loginScreenFragment_to_resetPasswordFragment)
+        }
+
         binding.signUp.setOnClickListener {
             findNavController().navigate(R.id.action_loginScreenFragment_to_signUpScreenFragment)
 
@@ -317,6 +372,8 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
         }
 
     }
+
+
 
     private fun setUpVisibilities() {
         binding.progressbar.gone()

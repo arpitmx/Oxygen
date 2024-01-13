@@ -62,6 +62,7 @@ class UserDetailsFragment : Fragment() {
                 Endpoints.User.DESIGNATION to designation,
                 Endpoints.User.BIO to bio,
                 Endpoints.User.ROLE to 1,
+                Endpoints.User.EMAIL_VERIFIED to true,
                 Endpoints.User.DETAILS_ADDED to true,
                 Endpoints.User.PHOTO_ADDED to false,
                 Endpoints.User.NOTIFICATION_TIME_STAMP to 0,

@@ -23,6 +23,26 @@ object Endpoints {
     object Storage {
         const val DP_PATH = "/DP/dp"
         const val IMAGE_PATH = "/icon/img"
+        ////Project Related\\\\
+        //Project Logo
+        const val PROJECTS="PROJECTS"
+        const val LOGO="LOGO"
+
+        //Task related
+        const val TASKS="TASKS"
+        //Task Chat related
+        const val CHATS="CHATS"
+
+        //Summary related
+        const val COMMONS="COMMONS"
+
+
+        ////User Related\\\\
+        const val USERS="USERS"
+        const val DP="DP"
+
+
+
     }
 
     object TaskDetails{
@@ -54,6 +74,7 @@ object Endpoints {
         const val ROLE = "ROLE"
         const val PHOTO_ADDED = "PHOTO_ADDED"
         const val DETAILS_ADDED = "DETAILS_ADDED"
+        const val EMAIL_VERIFIED="EMAIL_VERIFIED"
         const val NOTIFICATION_TIME_STAMP = "NOTIFICATION_LAST_SEEN"
         const val TIMESTAMP="TIMESTAMP"
         const val LAST_NOTIFICATION_UPDATED="LAST_NOTIFICATION_UPDATED"
