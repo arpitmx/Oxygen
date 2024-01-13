@@ -80,33 +80,74 @@
             android:textColor="@color/orange"
             android:textSize="16sp" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_login"
-            style="@style/SolidButtonStyle"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_below="@id/forgot_password"
-            android:layout_marginTop="25dp"
-            android:background="@drawable/solid_bg_orange"
-            android:text="@string/login_btn_label"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="22dp" />
-
-
-        <ProgressBar
-            android:id="@+id/progressbar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_below="@+id/btn_login"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:indeterminate="true"
-            android:layout_marginTop="40dp"
-            android:indeterminateTint="@color/primary"
+            android:id="@+id/buttonParent"
             android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_login"
+                style="@style/SolidButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/solid_bg_orange"
+                android:text="@string/login_btn_label"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="22dp" />
+
+
+            <ProgressBar
+                android:id="@+id/progressbar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/btn_login"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:indeterminate="true"
+                android:layout_marginTop="40dp"
+                android:indeterminateTint="@color/primary"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/timerParent"
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/margin_top_30dp"
+            android:layout_below="@id/forgot_password"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/timer"
+                style="@style/LabelStyle"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:textSize="20dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/sfbold"
+                android:text="59 sec"
+                android:textColor="@color/orange" />
+
+            <TextView
+                android:id="@+id/msg"
+                android:layout_width="match_parent"
+                style="@style/LabelStyle"
+                android:textSize="14dp"
+                android:gravity="center"
+                android:layout_below="@id/login_title"
+                android:text="Please wait, before retrying again" />
+
+
+        </LinearLayout>
+
+
+
 
         <RelativeLayout
             android:id="@+id/sign_up_nav"

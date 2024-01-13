@@ -383,7 +383,6 @@ class ProfilePictureSelectionFragment : Fragment() {
                                                         FCM_TOKEN = fcm,
                                                     ))
                                                     requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
-                                                    requireActivity().finish()
                                                 }
                                             }
 

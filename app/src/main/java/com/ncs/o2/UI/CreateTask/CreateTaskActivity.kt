@@ -1601,7 +1601,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION.name,
                 taskID = taskID,
                 message = message,
-                title = "You are assigned in the task $taskID",
+                title = "${PrefManager.getcurrentProject()} | You are assigned in the task $taskID",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = assignee ,
                 timeStamp = Timestamp.now().seconds,

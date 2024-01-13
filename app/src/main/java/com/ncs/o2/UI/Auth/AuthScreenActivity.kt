@@ -45,7 +45,15 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity() {
         if (isEmailVerified=="false"){
             val user=FirebaseAuth.getInstance().currentUser
             Log.d("userCheck",user!!.email.toString())
-            sendVerificationEmail(user,navController)
+            if (user.isEmailVerified){
+                navController.navigate(R.id.userDetailsFragment)
+            }
+            else if(!user.isEmailVerified){
+                navController.navigate(R.id.loginScreenFragment)
+            }
+            else{
+                sendVerificationEmail(user,navController)
+            }
         }
         else{
             if (isDetailsAdded=="false" && showchooser=="false"){

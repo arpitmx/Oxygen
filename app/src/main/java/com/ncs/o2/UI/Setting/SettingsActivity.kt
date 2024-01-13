@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Setting
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
+import com.ncs.o2.Constants.TestingConfig
 import com.ncs.o2.Domain.Interfaces.AuthRepository
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -19,16 +21,19 @@ import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.NewChanges
 import com.ncs.o2.databinding.ActivitySettingsBinding
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
 
     private lateinit var binding:ActivitySettingsBinding
     private lateinit var auth: FirebaseAuth
-    @Inject
-    lateinit var util : GlobalUtils.EasyElements
+    private val util: GlobalUtils.EasyElements by lazy {
+        GlobalUtils.EasyElements(this@SettingsActivity)
+    }
     private val TAG = "SettingsActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,9 +102,9 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
                         startActivity(intent)
                         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                         toast("Logged out..")
-                },{
+                    },{
 
-                })
+                    })
 
             } catch (e: Exception) {
                 Timber.tag(TAG).e("onClick: Exception + ${e}")

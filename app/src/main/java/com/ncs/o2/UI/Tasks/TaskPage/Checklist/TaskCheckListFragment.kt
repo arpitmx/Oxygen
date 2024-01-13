@@ -603,7 +603,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 notificationType = NotificationType.TASK_CHECKLIST_UPDATE.name,
                 taskID = activityBinding.taskId,
                 message = message,
-                title = "Checklist updated in ${activityBinding.taskId}",
+                title = "${PrefManager.getcurrentProject()} | Checklist updated in ${activityBinding.taskId}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,
@@ -620,8 +620,8 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 taskID = activityBinding.taskId,
                 message = message,
                 title =
-                if (isComplete) "Marked as completed"
-                else "Marked as not completed",
+                if (isComplete) "${PrefManager.getcurrentProject()} | Marked as completed"
+                else "${PrefManager.getcurrentProject()} | Marked as not completed",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,
