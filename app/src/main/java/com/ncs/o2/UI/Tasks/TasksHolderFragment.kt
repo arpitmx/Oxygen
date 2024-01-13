@@ -104,6 +104,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
         val adapter = TaskSectionViewPagerAdapter(this, list.size,list)
         binding.viewPager2.adapter = adapter
+        binding.viewPager2.offscreenPageLimit = 4
         setUpTabsLayout(list)
     }
 
