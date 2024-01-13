@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -96,6 +97,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -125,7 +129,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private val CAMERA_PERMISSION_REQUEST = 100
     private var bitmap: Bitmap? = null
     lateinit var imageUri: Uri
-
+    private val CAMERA_PERMISSION_CODE = 101
+    private var currentPhotoPath: String? = null
     private var replyingTo: String? = null
 
 
@@ -510,16 +515,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
 
     private var capturedImageUri: Uri? = null
-
     private fun pickImage() {
-
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Choose an option")
         builder.setItems(options) { dialog, item ->
             when (options[item]) {
                 "Take Photo" -> {
-
                     if (ContextCompat.checkSelfPermission(
                             requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE
                         ) != PackageManager.PERMISSION_GRANTED
@@ -531,18 +533,18 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             100
                         )
                     } else {
-
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        val dir: File =
-                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-                        val output = File(dir, "O2-Snap-${Timestamp.now().seconds}.jpeg")
 
-                        capturedImageUri = Uri.fromFile(output)
+                        // Generate a content URI using FileProvider
+                        capturedImageUri = FileProvider.getUriForFile(
+                            requireContext(),
+                            "${requireContext().packageName}.provider",
+                            createImageFile()
+                        )
 
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri)
                         startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
                     }
-
                 }
 
                 "Choose from Gallery" -> {
@@ -559,24 +561,32 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         builder.show()
     }
 
+    private fun createImageFile(): File {
+        val dir: File = File(requireContext().externalCacheDir, "images")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        return File(dir, "O2-Snap-${Timestamp.now().seconds}.jpeg")
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_IMAGE_CAPTURE -> {
-                    val file = File(capturedImageUri?.path)
-                    val imageBitmap: Bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                    Timber.tag("Image bitmap name").d(file.name)
-                    //toast(file.name)
+                    val imageBitmap: Bitmap = BitmapFactory.decodeStream(
+                        requireContext().contentResolver.openInputStream(capturedImageUri!!)
+                    )
+                    Timber.tag("Image bitmap name").d(createImageFile().name)
 
                     bitmap = imageBitmap
                     binding.inputBox.msgBox.gone()
                     binding.btnSelectImageFromStorage.visible()
                     binding.inputBox.selectedImageView.visible()
                     binding.imagePreview.setImageBitmap(imageBitmap)
-
                 }
+
 
                 REQUEST_IMAGE_PICK -> {
                     val selectedImage = data?.data
@@ -591,7 +601,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }
         }
     }
-
     private fun fetchContributors() {
         firestoreRepository.getContributors(PrefManager.getcurrentProject()) { serverResult ->
             when (serverResult) {
