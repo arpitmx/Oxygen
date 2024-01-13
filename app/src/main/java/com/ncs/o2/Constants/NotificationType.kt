@@ -26,12 +26,4 @@ enum class NotificationType(val title: String, val priority : Int) {
     TASK_ASSIGNED_NOTIFICATION("Task Assigned",3),
     WORKSPACE_TASK_UPDATE("Workspace task updated",3),
     TASK_CHECKLIST_UPDATE("Task checklist updated",3)
-
-
-
-
-
-
-
-
 }

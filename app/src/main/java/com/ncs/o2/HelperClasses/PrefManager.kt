@@ -15,6 +15,7 @@ import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.versa.Constants.Endpoints
 import java.util.Date
 
@@ -376,6 +377,24 @@ object PrefManager {
             emptyList()
         }
     }
+    fun saveProjectSegments(projectName: String, segments: List<SegmentItem>) {
+        val gson = Gson()
+        val segmentsJson = gson.toJson(segments)
+        editor.putString("project_$projectName", segmentsJson)
+        editor.apply()
+    }
+
+    fun getProjectSegments(projectName: String): List<SegmentItem> {
+        val segmentsJson = sharedPreferences.getString("project_$projectName", null)
+        val gson = Gson()
+        val type = object : TypeToken<List<SegmentItem>>() {}.type
+        return if (segmentsJson != null) {
+            gson.fromJson(segmentsJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
 
 
 

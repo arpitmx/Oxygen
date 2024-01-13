@@ -1606,7 +1606,6 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 toUser = assignee ,
                 timeStamp = Timestamp.now().seconds,
                 projectID = PrefManager.getcurrentProject(),
-
                 )
         }
         return null

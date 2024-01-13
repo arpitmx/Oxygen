@@ -37,7 +37,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.Notification
+import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -66,6 +68,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -154,6 +157,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             when (searchFragment) {
                 "GoToSearch" -> movetosearch(intent.getStringExtra("tagText"))
             }
+        }
+        for (project in PrefManager.getProjectsList()){
+            Log.d("projectSegments",PrefManager.getProjectSegments(project).toString())
         }
     }
     private fun manageViews(){
@@ -299,7 +305,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.notifications.setOnClickThrottleBounceListener {
 
             // Start the notifications activity with a slide animation
-            navigator.startSingleTopActivity(NotificationsActivity::class.java)
+            startActivity(Intent(this,NotificationsActivity::class.java))
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
 
         }
@@ -568,8 +574,19 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                                         2000
                                     )
                                 } else {
-                                    PrefManager.setcurrentsegment("Select Segment")
-                                    viewModel.updateCurrentSegment("Select Segment")
+                                    val segments=PrefManager.getProjectSegments(project)
+                                    Log.d("segment check",segments.toString())
+
+                                    if (segments.isNotEmpty()){
+                                        PrefManager.setcurrentsegment(segments[0].segment_NAME)
+                                        PrefManager.putsectionsList(segments[0].sections.distinct())
+                                        viewModel.updateCurrentSegment(segments[0].segment_NAME)
+
+                                    }
+                                    else{
+                                        PrefManager.setcurrentsegment("Select Segment")
+                                        viewModel.updateCurrentSegment("Select Segment")
+                                    }
                                     binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
                                     val list = PrefManager.getProjectsList()
                                     var position:Int=0
@@ -615,8 +632,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                                         2000
                                     )
                                 } else {
-                                    PrefManager.setcurrentsegment("Select Segment")
-                                    viewModel.updateCurrentSegment("Select Segment")
+                                    val segments=PrefManager.getProjectSegments(project)
+                                    Log.d("segment check",segments.toString())
+
+                                    if (segments.isNotEmpty()){
+                                        PrefManager.setcurrentsegment(segments[0].segment_NAME)
+                                        PrefManager.putsectionsList(segments[0].sections.distinct())
+                                        viewModel.updateCurrentSegment(segments[0].segment_NAME)
+                                    }
+                                    else{
+                                        PrefManager.setcurrentsegment("Select Segment")
+                                        viewModel.updateCurrentSegment("Select Segment")
+                                    }
                                     binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
                                     val list = PrefManager.getProjectsList()
                                     var position:Int=0
@@ -704,7 +731,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     PrefManager.putProjectsList(result.data)
                     projectListAdapter.notifyDataSetChanged()
                     setupProjectsList()
-                    easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val list = getProjectSegments(PrefManager.getlastaddedproject())
+                        PrefManager.saveProjectSegments(PrefManager.getlastaddedproject(), list)
+                        withContext(Dispatchers.Main){
+                            easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)
+                        }
+                    }
                 }
                 is ServerResult.Failure -> {
                     Toast.makeText(this@MainActivity, "Failed to add project: ${result.exception.message}", Toast.LENGTH_SHORT).show()
@@ -750,4 +783,27 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             doubleBackPress = false
         }, 2000)
     }
+    suspend fun getProjectSegments(project: String): List<SegmentItem> {
+        val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)
+        val list = mutableListOf<SegmentItem>()
+
+        try {
+            val projectsSnapshot = projectsCollection.get().await()
+            for (projectDocument in projectsSnapshot.documents) {
+                val projectName = projectDocument.id
+                val segmentsCollection = projectsCollection.document(project).collection(Endpoints.Project.SEGMENT)
+                val segmentsSnapshot = segmentsCollection.get().await()
+                for (segmentDocument in segmentsSnapshot.documents) {
+                    val segmentName = segmentDocument.id
+                    val sections=segmentDocument.get("sections") as MutableList<String>
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections))
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        return list
+    }
+
 }

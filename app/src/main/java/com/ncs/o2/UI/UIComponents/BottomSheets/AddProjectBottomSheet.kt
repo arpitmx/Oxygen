@@ -10,6 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -17,6 +18,11 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.createProject.CreateProject
 import com.ncs.o2.databinding.ProjectAddBottomSheetBinding
 import com.ncs.versa.Constants.Endpoints
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class AddProjectBottomSheet : BottomSheetDialogFragment(){
 
@@ -99,18 +105,25 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                                                     )
                                                     FirebaseFirestore.getInstance().collection(
                                                         Endpoints.PROJECTS).document(projectData!!).update(addCont)
+                                                    CoroutineScope(Dispatchers.IO).launch {
+                                                        for (project in PrefManager.getProjectsList()) {
+                                                            val list = getProjectSegments(project)
+                                                            PrefManager.saveProjectSegments(project, list)
+                                                        }
+                                                        withContext(Dispatchers.Main){
+                                                            PrefManager.lastaddedproject(projectData!!)
+                                                            userProjects?.add(projectData!!.trim())
+                                                            sendcallBack(userProjects!!)
+                                                            Toast.makeText(
+                                                                requireContext(),
+                                                                "Project Added Successfully",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                            projectAddedListener?.onProjectAdded(userProjects!!)
+                                                            dismiss()
+                                                        }
+                                                    }
 
-
-                                                    PrefManager.lastaddedproject(projectData!!)
-                                                    userProjects?.add(projectData!!.trim())
-                                                    sendcallBack(userProjects!!)
-                                                    Toast.makeText(
-                                                        requireContext(),
-                                                        "Project Added Successfully",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                    projectAddedListener?.onProjectAdded(userProjects!!)
-                                                    dismiss()
                                                 }
                                                 .addOnFailureListener { e ->
                                                 }
@@ -133,7 +146,28 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
         }
 
     }
+    suspend fun getProjectSegments(project: String): List<SegmentItem> {
+        val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)
+        val list = mutableListOf<SegmentItem>()
 
+        try {
+            val projectsSnapshot = projectsCollection.get().await()
+            for (projectDocument in projectsSnapshot.documents) {
+                val projectName = projectDocument.id
+                val segmentsCollection = projectsCollection.document(project).collection(Endpoints.Project.SEGMENT)
+                val segmentsSnapshot = segmentsCollection.get().await()
+                for (segmentDocument in segmentsSnapshot.documents) {
+                    val segmentName = segmentDocument.id
+                    val sections=segmentDocument.get("sections") as MutableList<String>
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections))
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        return list
+    }
     private fun setBottomSheetConfig() {
         this.isCancelable = true
     }
