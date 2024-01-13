@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkbg_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+
+
+
+    <ImageView
+        android:id="@+id/splashBg"
+        android:layout_width="200dp"
+        android:layout_height="250dp"
+        android:layout_alignParentEnd="true"
+        android:scaleType="fitXY"
+        android:translationX="50dp"
+        android:translationY="-60dp"
+        android:src="@drawable/curves"
+        app:tint="@color/darkTheme_bg" />
+
+    <RelativeLayout
+        android:id="@+id/containerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/container_layout_margin"
+        android:layout_marginTop="@dimen/container_layout_margin"
+        android:layout_marginEnd="@dimen/container_layout_margin"
+        android:layout_marginBottom="@dimen/container_layout_margin">
+
+        <TextView
+            android:id="@+id/signup_title"
+            style="@style/LabelStyle"
+            android:layout_marginTop="0dp"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:text="Verify your Email"
+            android:textColor="@color/orange" />
+
+        <TextView
+            android:id="@+id/signup_welcome_msg"
+            style="@style/LabelStyle"
+            android:layout_below="@id/signup_title"
+            android:layout_marginTop="16dp"
+            android:textSize="20dp"
+            android:text="Hi, we are awaiting\n confirmation of your Email" />
+
+        <TextView
+            style="@style/LabelStyle"
+            android:id="@+id/emailLabel"
+            android:layout_below="@id/signup_welcome_msg"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:gravity="start"
+            android:fontFamily="@font/sfbold"
+            android:textSize="16dp"
+            android:text="Check your email mohit@gmail.com\n for a confirmation mail" />
+
+
+
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:visibility="visible"
+            android:indeterminate="true"
+            android:layout_marginTop="60dp"
+            android:layout_below="@id/emailLabel"
+            android:indeterminateTint="@color/primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/progressbar"
+            android:id="@+id/resend"
+            android:visibility="invisible"
+            android:layout_marginTop="60dp"
+            android:orientation="vertical"
+            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                android:gravity="center">
+
+                <TextView
+                    style="@style/LabelStyle"
+                    android:id="@+id/resendLabel"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:text="Didn't recieve Email ? "
+                    android:textColor="@color/account"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/btnresend"
+                    style="@style/LabelStyle"
+                    android:layout_marginStart="0dp"
+                    android:layout_toEndOf="@id/resendLabel"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:text=" Resend Email"
+                    android:textColor="@color/primary"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/check"
+            style="@style/SolidButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_below="@id/resend"
+            android:layout_marginTop="20dp"
+            android:visibility="invisible"
+            android:background="@drawable/solid_bg_orange"
+            android:text="Check Verification"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="22dp" />
+
+
+
+        <RelativeLayout
+            android:id="@+id/login_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/have_account"
+                style="@style/LabelStyle"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:text="@string/have_account"
+                android:textColor="@color/account"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/login"
+                style="@style/LabelStyle"
+                android:layout_marginStart="0dp"
+                android:layout_toEndOf="@id/have_account"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:onClick="login"
+                android:text="@string/login_label"
+                android:textColor="@color/primary"
+                android:textSize="16sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>

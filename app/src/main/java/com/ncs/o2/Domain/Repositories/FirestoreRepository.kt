@@ -44,6 +44,7 @@ import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.versa.Constants.Endpoints
@@ -278,8 +279,8 @@ class FirestoreRepository @Inject constructor(
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
         val imageFileName =
-            "${Endpoints.User.PROJECTS}/${projectId}${Endpoints.Storage.IMAGE_PATH}"
-//            "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
+            "${Endpoints.Storage.PROJECTS}/${projectId}/${Endpoints.Storage.LOGO}/logo"
+
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
@@ -317,7 +318,8 @@ class FirestoreRepository @Inject constructor(
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
         val imageFileName =
-            "${Endpoints.Project.TASKS}/${taskId}${Endpoints.Storage.IMAGE_PATH}"
+            "${Endpoints.Storage.PROJECTS}/${PrefManager.getcurrentProject()}/${Endpoints.Storage.COMMONS}/images/${RandomIDGenerator.generateRandomId()}"
+
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
@@ -396,7 +398,8 @@ class FirestoreRepository @Inject constructor(
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
         val imageFileName =
-            "${FirebaseAuth.getInstance().currentUser?.email}${Endpoints.Storage.DP_PATH}"
+            "${Endpoints.Storage.USERS}/${FirebaseAuth.getInstance().currentUser?.email!!}/${Endpoints.Storage.DP}/dp"
+
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos)
@@ -1431,8 +1434,11 @@ class FirestoreRepository @Inject constructor(
     override fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>> {
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
-        val imageFileName = generateRandomID(IDType.SegmentID)
-        val imageRef = storageReference.child(projectId).child("TASKS").child(taskId).child(imageFileName)
+        val imageFileName =
+            "${Endpoints.Storage.PROJECTS}/${projectId}/${Endpoints.Storage.TASKS}/$taskId/${Endpoints.Storage.CHATS}/images/${RandomIDGenerator.generateRandomId()}"
+
+        val imageRef = storageReference.child(imageFileName)
+
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
         val data = baos.toByteArray()
