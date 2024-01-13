@@ -39,11 +39,11 @@
         android:id="@+id/checkList_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="40dp"
         android:clipToPadding="false"
         android:layoutAnimation="@anim/layout_animation_fadein"
         android:padding="10dp"
         android:scrollbarSize="3dp"
-        android:layout_marginBottom="30dp"
         android:scrollbarThumbVertical="@color/primary"
         android:scrollbars="vertical"
         android:visibility="visible"
@@ -59,8 +59,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:background="@color/darkbg_main"
+        android:elevation="2dp"
         android:orientation="horizontal"
         android:visibility="visible"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -76,12 +80,12 @@
             android:id="@+id/addText"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:fontFamily="@font/sf_pro_display_medium"
-            android:gravity="start"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:gravity="center"
             android:paddingStart="@dimen/_5dp"
             android:text="Add CheckList"
             android:textColor="@color/better_white"
-            android:textSize="20dp" />
+            android:textSize="15dp" />
     </LinearLayout>
 
 

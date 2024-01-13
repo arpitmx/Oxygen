@@ -16,8 +16,7 @@
     <View
         android:id="@+id/msg_seperator"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginTop="15dp"
+        android:layout_height="1dp"
         android:layout_marginStart="45dp"
         android:background="@color/border_grey"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
@@ -120,7 +119,7 @@
         android:layout_marginStart="25dp"
         android:layout_marginEnd="@dimen/chat_margin"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:orientation="vertical"
         >
         <androidx.appcompat.widget.AppCompatTextView
@@ -133,7 +132,7 @@
             android:fontFamily="@font/sf_pro_display_regular"
             android:text="*This is a test message*, I wanted to talk about yesterday's match, but let's see what the heck is going on..."
             android:textColor="@color/better_white"
-            android:textSize="16dp"
+            android:textSize="@dimen/chat_msg_text_size"
             android:textAlignment="textStart"
             />
 

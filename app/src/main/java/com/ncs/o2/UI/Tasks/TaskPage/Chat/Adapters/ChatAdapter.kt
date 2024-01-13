@@ -6,9 +6,6 @@ import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import androidx.compose.ui.res.colorResource
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
@@ -22,7 +19,6 @@ import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.setMargins
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -31,6 +27,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.ChatImageItemBinding
 import com.ncs.o2.databinding.ChatMessageItemBinding
+import com.ncs.o2.databinding.ChatMessageReplyItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
 import timber.log.Timber
@@ -71,7 +68,6 @@ class ChatAdapter(
     var users: MutableList<UserInMessage> = mutableListOf()
     private var lastTimestamp: Date? = null
 
-
     init {
         messageDatabase = Room.databaseBuilder(
             context,
@@ -80,7 +76,6 @@ class ChatAdapter(
         ).build()
         db = messageDatabase.usersDao()
         msgList.sortBy { it.timestamp?.toDate() }
-
         msgList.sortBy { it.timestamp!!.seconds }
 
     }
@@ -88,7 +83,8 @@ class ChatAdapter(
     companion object {
         const val NORMAL_MSG = 0
         const val IMAGE_MSG = 1
-        const val FILE_MSG = 2
+        const val REPLY_MSG = 2
+        const val FILE_MSG = 3
     }
 
     private inner class UserMessage_ViewHolder(val binding: ChatMessageItemBinding) :
@@ -107,6 +103,71 @@ class ChatAdapter(
                     users.add(newUser)
                     Log.d("DB", "fetching from db")
                     setChatItem(newUser, binding, position)
+                }
+            }
+
+            binding.parentMessageItem.setOnDoubleClickListener {
+
+                if (localUser != null) {
+                    onchatDoubleClickListner.onDoubleClickListner(
+                        msgList[position],
+                        localUser.USERNAME!!
+                    )
+                } else {
+                    fetchUser(senderId) {
+                        onchatDoubleClickListner.onDoubleClickListner(
+                            msgList[position],
+                            it.USERNAME!!
+                        )
+                    }
+                }
+            }
+
+            binding.descriptionTv.setOnDoubleClickListener {
+
+                if (localUser != null) {
+                    onchatDoubleClickListner.onDoubleClickListner(
+                        msgList[position],
+                        localUser.USERNAME!!
+                    )
+                } else {
+                    fetchUser(senderId) {
+                        onchatDoubleClickListner.onDoubleClickListner(
+                            msgList[position],
+                            it.USERNAME!!
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private inner class UserMessage_Reply_ViewHolder(val binding: ChatMessageReplyItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+
+        fun bind(position: Int) {
+
+            val senderId = msgList[position].senderId
+            val localUser = users.find { it.EMAIL == senderId }
+
+            val replyingToMessageID : String = msgList[position].additionalData?.get("replyingTo").toString()
+            val replyingToMessage = msgList.find { it.messageId == replyingToMessageID }
+
+
+            binding.referenceToUsername.text = replyingToMessage?.senderId
+            binding.referenceText.text = replyingToMessage?.content
+
+
+            if (localUser != null) {
+                setChatReplyItem(localUser, binding, position)
+                Timber.tag("DB").d("fetching from local")
+
+            } else {
+                fetchUser(senderId) { newUser ->
+                    users.add(newUser)
+                    Timber.tag("DB").d("fetching from db")
+                    setChatReplyItem(newUser, binding, position)
                 }
             }
 
@@ -187,7 +248,7 @@ class ChatAdapter(
             onImageClick(0, listOf(url))
         }
 
-        setDPImageItem(position, binding, user)
+        setImgMsgDPHeader(position, binding, user)
 
     }
 
@@ -196,12 +257,18 @@ class ChatAdapter(
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.tvName.text = user.USERNAME
-        setDP(position, binding, user)
-
-
+        setNormalMsgDPHeader(position, binding, user)
     }
 
-    private fun setDPImageItem(position: Int, binding: ChatImageItemBinding, user: UserInMessage) {
+    fun setChatReplyItem(user: UserInMessage, binding: ChatMessageReplyItemBinding, position: Int) {
+        setMessageReplyView(msgList[position], binding)
+        val time = msgList[position].timestamp!!
+        binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
+        binding.tvName.text = user.USERNAME
+        setReplyDPHeader(position, binding, user)
+    }
+
+    private fun setImgMsgDPHeader(position: Int, binding: ChatImageItemBinding, user: UserInMessage) {
 
 
         // No changes for the first item
@@ -274,7 +341,7 @@ class ChatAdapter(
 
     }
 
-    private fun setDP(position: Int, binding: ChatMessageItemBinding, user: UserInMessage) {
+    private fun setNormalMsgDPHeader(position: Int, binding: ChatMessageItemBinding, user: UserInMessage) {
 
 
         // No changes for the first item
@@ -337,6 +404,44 @@ class ChatAdapter(
             binding.assigneeTag.gone()
         }
     }
+
+    private fun setReplyDPHeader(position: Int, binding: ChatMessageReplyItemBinding, user: UserInMessage) {
+
+        // Removing dp and changing some layout if the previous message is sent from same user
+        if (msgList[position - 1].senderId == msgList[position].senderId) {
+            binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
+            binding.tvName.gone()
+            binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
+            binding.msgSeperator.gone()
+            binding.modTag.gone()
+            binding.assigneeTag.gone()
+            return
+        }
+
+        // All the other items
+        binding.msgSeperator.visible()
+        binding.imgDp.visible()
+        binding.tvName.visible()
+        binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
+        binding.msgSeperator.alpha = 1f
+        binding.imgDp.loadProfileImg(user.DP_URL.toString())
+
+        if (moderatorList.contains(user.EMAIL)){
+            binding.modTag.visible()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.light_blue_A200))
+        }else {
+            binding.modTag.gone()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.primary))
+
+        }
+
+        if (assignee == user.EMAIL){
+            binding.assigneeTag.visible()
+        }else{
+            binding.assigneeTag.gone()
+        }
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -344,6 +449,16 @@ class ChatAdapter(
             NORMAL_MSG -> {
                 UserMessage_ViewHolder(
                     ChatMessageItemBinding.inflate(
+                        LayoutInflater.from(context),
+                        parent,
+                        false
+                    )
+                )
+            }
+
+            REPLY_MSG -> {
+                UserMessage_Reply_ViewHolder(
+                    ChatMessageReplyItemBinding.inflate(
                         LayoutInflater.from(context),
                         parent,
                         false
@@ -367,12 +482,19 @@ class ChatAdapter(
         }
     }
 
-    private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
 
+
+    private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
+        markwon.setMarkdown(binding.descriptionTv, message.content)
+        binding.descriptionTv.visible()
+    }
+
+    private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
         markwon.setMarkdown(binding.descriptionTv, message.content)
         binding.descriptionTv.visible()
 
     }
+
 
     override fun getItemCount(): Int {
         return msgList.size
@@ -381,13 +503,17 @@ class ChatAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (msgList[position].messageType == MessageType.NORMAL_MSG) {
             (holder as UserMessage_ViewHolder).bind(position)
-        } else if (msgList[position].messageType == MessageType.IMAGE_MSG) {
+        }
+        else if (msgList[position].messageType == MessageType.REPLY_MSG){
+            (holder as UserMessage_Reply_ViewHolder).bind(position)
+        }
+        else if (msgList[position].messageType == MessageType.IMAGE_MSG) {
             (holder as ImageMessage_ViewHolder).bind(position)
         }
 
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewType(position: Int): Int{
         return msgList[position].messageType.ordinal
     }
 

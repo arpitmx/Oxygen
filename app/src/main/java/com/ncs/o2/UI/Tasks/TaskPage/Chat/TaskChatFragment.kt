@@ -48,9 +48,11 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursorMiddleCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideUpAndVisible
@@ -123,14 +125,18 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private val CAMERA_PERMISSION_REQUEST = 100
     private var bitmap: Bitmap? = null
     lateinit var imageUri: Uri
+
+    private var replyingTo: String? = null
+
+
     var contributors: MutableList<String> = mutableListOf()
     var contributorsData: MutableList<User> = mutableListOf()
     private var mentionedUsers = mutableListOf<User>()
-    private val clipboardManager : ClipboardManager by lazy {
+    private val clipboardManager: ClipboardManager by lazy {
         requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
 
-    private val moderatorList : MutableList<String> by lazy { activityBinding.moderatorsList }
+    private val moderatorList: MutableList<String> by lazy { activityBinding.moderatorsList }
 
 
     @Inject
@@ -171,7 +177,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         binding.chatboxOptionBox.gone()
         mentionedUsers.clear()
         mentionAdapter = MentionUsersAdapter(emptyList<User>().toMutableList(), this)
-
         binding.inputBox.progressBarSendMsg.gone()
 
         binding.inputBox.editboxMessage.addTextChangedListener(object : TextWatcher {
@@ -228,14 +233,17 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
             if (binding.inputBox.editboxMessage.text.toString().trim().isNotEmpty()) {
                 sendMessageProcess()
-                binding.inputBox.editboxMessage.text?.clear()
 
             } else if (bitmap != null) {
                 binding.inputBox.progressBarSendMsg.visible()
                 uploadImageToFirebaseStorage(bitmap!!, PrefManager.getcurrentProject(), task.id)
+                clearReplying()
+
             } else {
-                util.showSnackbar(binding.root,"Message can't be empty", 500)
+                util.showSnackbar(binding.root, "Message can't be empty", 500)
             }
+
+
         }
 
         binding.btnPaste.setOnClickThrottleBounceListener {
@@ -265,7 +273,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
         binding.btnAttachItalics.setOnClickThrottleBounceListener {
             binding.inputBox.editboxMessage.appendTextAtCursorMiddleCursor(
-                "__", type =  2
+                "__", type = 2
             )
         }
 
@@ -296,7 +304,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         if (clipData != null && clipData.itemCount > 0) {
             val textToPaste = clipData.getItemAt(0).text.toString()
             binding.inputBox.editboxMessage.appendTextAtCursor(textToPaste)
-        }else {
+        } else {
             toast("Nothing to paste..")
         }
     }
@@ -310,18 +318,50 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun sendMessageProcess() {
 
-        val message = Message(
-            messageId = RandomIDGenerator.generateRandomId(),
-            senderId = PrefManager.getcurrentUserdetails().EMAIL,
-            content = binding.inputBox.editboxMessage.text?.trim().toString(),
-            messageType = MessageType.NORMAL_MSG,
-            timestamp = Timestamp.now()
-        )
-        postMessage(message)
+        if (replyingTo == null) {
+            val message = Message(
+                messageId = RandomIDGenerator.generateRandomId(),
+                senderId = PrefManager.getcurrentUserdetails().EMAIL,
+                content = binding.inputBox.editboxMessage.text?.trim().toString(),
+                messageType = MessageType.NORMAL_MSG,
+                timestamp = Timestamp.now()
+            )
+            postMessage(message)
+        } else {
+
+            val additionalData: HashMap<String, String> = hashMapOf(
+                "replyingTo" to replyingTo!!
+            )
+
+            val message = Message(
+                messageId = RandomIDGenerator.generateRandomId(),
+                senderId = PrefManager.getcurrentUserdetails().EMAIL,
+                content = binding.inputBox.editboxMessage.text?.trim().toString(),
+                messageType = MessageType.REPLY_MSG,
+                timestamp = Timestamp.now(),
+                additionalData = additionalData
+
+            )
+            postMessage(message)
+
+        }
+
+
     }
 
 
+    private fun clearReplying() {
+        binding.inputBox.replyViewParent.gone()
+        replyingTo = null
+    }
+
     private fun setUpChatbox() {
+
+        binding.inputBox.btnCancelReply.setOnClickThrottleBounceListener {
+            clearReplying()
+        }
+
+        binding.inputBox.replyViewParent.gone()
         val markdownEditor = MarkwonEditor.builder(markwon).build()
 
         binding.inputBox.editboxMessage.addTextChangedListener(
@@ -352,13 +392,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }
         }
 
-
         binding.crossBtnSelectPdf.setOnClickThrottleBounceListener {
             bitmap = null
             binding.btnSelectImageFromStorage.gone()
             binding.inputBox.selectedImageView.gone()
             binding.inputBox.msgBox.visible()
         }
+
         binding.inputBox.crossBtnSelectedImage.setOnClickThrottleBounceListener {
             bitmap = null
             binding.btnSelectImageFromStorage.gone()
@@ -368,10 +408,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
 
-
     private fun toggleChatOptions(visibility: Boolean) {
         if (visibility) {
-            binding.chatboxOptionBox.slideUpAndVisible(100){
+            binding.chatboxOptionBox.slideUpAndVisible(100) {
                 chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS = true
             }
 
@@ -396,7 +435,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                     ) {
                         binding.inputBox.progressBarSendMsg.gone()
                     }
-
                 }
 
                 ServerResult.Progress -> {
@@ -440,8 +478,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                 }
             }
-
-
         }
 
     }
@@ -456,7 +492,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             timestamp = Timestamp.now()
         )
         postMessage(message)
-
     }
 
 
@@ -486,8 +521,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 "Take Photo" -> {
 
                     if (ContextCompat.checkSelfPermission(
-                            requireContext(),
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE
                         ) != PackageManager.PERMISSION_GRANTED
                     ) {
                         // Permission is not granted, request it
@@ -499,7 +533,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                     } else {
 
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        val dir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                        val dir: File =
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
                         val output = File(dir, "O2-Snap-${Timestamp.now().seconds}.jpeg")
 
                         capturedImageUri = Uri.fromFile(output)
@@ -511,7 +546,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 }
 
                 "Choose from Gallery" -> {
-                    val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    val intent =
+                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     startActivityForResult(intent, REQUEST_IMAGE_PICK)
                 }
 
@@ -578,7 +614,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                             setMentionUsersRv(contributorsData)
                                         }
                                         Log.d("contributorsdata", contributorsData.toString())
-
                                     }
 
                                     is ServerResult.Failure -> {
@@ -712,9 +747,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postMessage(
-                projectName = task.project_ID!!,
-                taskId = task.id,
-                message = message
+                projectName = task.project_ID!!, taskId = task.id, message = message
 
             ) { result ->
 
@@ -732,9 +765,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
+                        clearReplying()
 
+                        if (message.messageType == MessageType.NORMAL_MSG || message.messageType == MessageType.REPLY_MSG) {
 
-                        if (message.messageType == MessageType.NORMAL_MSG) {
                             Log.d("listcheck", mentionedUsers.toString())
                             val list = mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
                             val regex = Regex("@(\\w+)")
@@ -747,12 +781,15 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                     mentionedUsersName.add(it.toLowerCase())
                                 }
                             }
+
                             Log.d("listcheckmentioned", mentionedUsersName.toString())
 
                             if (matches.any()) {
                                 val mentioned =
                                     matches.map { it.groupValues[1].toLowerCase() }.toList()
+
                                 Log.d("listcheckmentioned", mentioned.toString())
+
                                 if (mentionedUsersName.containsAll(mentioned)) {
                                     binding.inputBox.progressBarSendMsg.gone()
                                     binding.inputBox.editboxMessage.text?.clear()
@@ -886,7 +923,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 notificationType = NotificationType.TASK_COMMENT_NOTIFICATION.name,
                 taskID = task.id,
                 message = message,
-                title = "@${PrefManager.getcurrentUserdetails().USERNAME} commented ${task.id}",
+                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} commented ${task.id}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
@@ -1026,16 +1063,14 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
 
     override fun onDoubleClickListner(msg: Message, senderName: String) {
-        val replyFormat = """
-            >${msg.content}
-          
-            **@${senderName}**
-            
-            """.trimIndent()
-        binding.inputBox.editboxMessage.setText(replyFormat)
-        binding.inputBox.editboxMessage.setSelection(replyFormat.length)
-
+        binding.inputBox.replyingToUserTv.text = "Replying to @${senderName}"
+        binding.inputBox.referenceMsgTv.text = msg.content
+        binding.inputBox.replyViewParent.visible()
+        binding.inputBox.replyViewParent.animFadein(requireContext(), 150)
+        requireActivity().performHapticFeedback()
+        replyingTo = msg.messageId
     }
+
 
     fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
         var bitmap: Bitmap? = null

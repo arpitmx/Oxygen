@@ -25,8 +25,8 @@
     <dimen name="padding_start_task_details">15dp</dimen>
 
     <dimen name="margin_start_80">80dp</dimen>
-    <dimen name="input_box_size">70dp</dimen>
-    <dimen name="chat_msg_text_size">14dp</dimen>
+    <dimen name="input_box_size">55dp</dimen>
+    <dimen name="chat_msg_text_size">16dp</dimen>
     <dimen name="msg_font_size">15dp</dimen>
     <dimen name="designation_textsize">16sp</dimen>
     <dimen name="margin_top_task_detail">15dp</dimen>

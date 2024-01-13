@@ -48,6 +48,6 @@ data class Message(
     val content: String,
     val timestamp: Timestamp?=null,
     val messageType: MessageType,
-    val additionalData: Map<String, Any> = emptyMap()
+    val additionalData: Map<String, Any>? = emptyMap()
 )
 
