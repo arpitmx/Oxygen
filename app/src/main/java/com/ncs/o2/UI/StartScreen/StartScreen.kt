@@ -60,9 +60,11 @@ import com.ncs.o2.UI.UpdateScreen.UpdaterActivity
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.internal.util.HalfSerializer.onComplete
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.lang.Exception
@@ -633,6 +635,7 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
         PrefManager.putProjectsList(projectsList)
 
     }
+
 
 
     private fun setUpFCMTokenIfRequired(document: DocumentSnapshot) {

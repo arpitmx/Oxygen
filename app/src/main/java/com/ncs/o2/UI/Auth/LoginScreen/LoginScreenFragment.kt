@@ -21,6 +21,7 @@ import com.google.firebase.firestore.Source
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -36,7 +37,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -140,61 +144,72 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                 val role = document.getLong(Endpoints.User.ROLE)
                                 val dp: String? = document.getString(Endpoints.User.DP_URL)
                                 var fcmToken = document.getString(Endpoints.User.FCM_TOKEN)
-                                val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
-                                if (fcmToken == null) {
-                                    fcmToken { token->
-                                        fcmToken = token
+                                val projects = document.get("PROJECTS") as List<String>
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    for (project in projects){
+                                        val list=getProjectSegments(project)
+                                        PrefManager.saveProjectSegments(project,list)
                                     }
-                                }
+                                    withContext(Dispatchers.Main){
+                                        val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
+                                        if (fcmToken == null) {
+                                            fcmToken { token->
+                                                fcmToken = token
+                                            }
+                                        }
 
-                                if (isDetailsAdded == true && isPhotoAdded == true) {
+
+                                        if (isDetailsAdded == true && isPhotoAdded == true) {
 
 
 
-                                    with(PrefManager){
+                                            with(PrefManager){
 
-                                        initialize(requireContext())
-                                        setLastSeenTimeStamp(notification_timestamp!!)
-                                        setProjectTimeStamp(PrefManager.getcurrentProject(),notification_timestamp)
-                                        setLatestNotificationTimeStamp(0)
-                                        setNotificationCount(0)
+                                                initialize(requireContext())
+                                                setLastSeenTimeStamp(notification_timestamp!!)
+                                                setProjectTimeStamp(PrefManager.getcurrentProject(),notification_timestamp)
+                                                setLatestNotificationTimeStamp(0)
+                                                setNotificationCount(0)
 
-                                        setcurrentUserdetails(
-                                            CurrentUser(
-                                                EMAIL = email!!,
-                                                USERNAME = username!!,
-                                                BIO = bio!!,
-                                                DESIGNATION = designation!!,
-                                                ROLE = role!!,
-                                                DP_URL = dp,
-                                                FCM_TOKEN = fcmToken!!
+                                                setcurrentUserdetails(
+                                                    CurrentUser(
+                                                        EMAIL = email!!,
+                                                        USERNAME = username!!,
+                                                        BIO = bio!!,
+                                                        DESIGNATION = designation!!,
+                                                        ROLE = role!!,
+                                                        DP_URL = dp,
+                                                        FCM_TOKEN = fcmToken!!
+                                                    )
+                                                )
+                                            }
+
+
+
+                                            Toast.makeText(activity, "Power to you now", Toast.LENGTH_SHORT).show()
+                                            binding.progressbar.gone()
+
+                                            Timber.tag(SignUpScreenFragment.TAG).d(
+                                                "Login success : ${result.data.uid}"
                                             )
-                                        )
+
+                                            startActivity(
+                                                Intent(
+                                                    requireContext(),
+                                                    StartScreen::class.java
+                                                )
+                                            )
+
+                                            requireActivity().finishAffinity()
+
+                                        } else if (isDetailsAdded == false) {
+                                            findNavController().navigate(R.id.action_loginScreenFragment_to_userDetailsFragment)
+                                        } else if (isPhotoAdded == false) {
+                                            findNavController().navigate(R.id.action_loginScreenFragment_to_profilePictureSelectionFragment)
+                                        }
                                     }
-
-
-
-                                    Toast.makeText(activity, "Power to you now", Toast.LENGTH_SHORT).show()
-                                    binding.progressbar.gone()
-
-                                    Timber.tag(SignUpScreenFragment.TAG).d(
-                                        "Login success : ${result.data.uid}"
-                                    )
-
-                                    startActivity(
-                                        Intent(
-                                            requireContext(),
-                                            StartScreen::class.java
-                                        )
-                                    )
-
-                                    requireActivity().finishAffinity()
-
-                                } else if (isDetailsAdded == false) {
-                                    findNavController().navigate(R.id.action_loginScreenFragment_to_userDetailsFragment)
-                                } else if (isPhotoAdded == false) {
-                                    findNavController().navigate(R.id.action_loginScreenFragment_to_profilePictureSelectionFragment)
                                 }
+
 
                             }
                         }
@@ -215,6 +230,29 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
             }
         }
+    }
+
+    suspend fun getProjectSegments(project: String): List<SegmentItem> {
+        val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)
+        val list = mutableListOf<SegmentItem>()
+
+        try {
+            val projectsSnapshot = projectsCollection.get().await()
+            for (projectDocument in projectsSnapshot.documents) {
+                val projectName = projectDocument.id
+                val segmentsCollection = projectsCollection.document(project).collection(Endpoints.Project.SEGMENT)
+                val segmentsSnapshot = segmentsCollection.get().await()
+                for (segmentDocument in segmentsSnapshot.documents) {
+                    val segmentName = segmentDocument.id
+                    val sections=segmentDocument.get("sections") as MutableList<String>
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections))
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        return list
     }
 
 
