@@ -423,5 +423,20 @@ object PrefManager {
     }
 
 
+    fun getReadCount(): Int {
+        return sharedPreferences.getInt("readCount", 0)
+    }
+
+    fun setReadCount(count: Int) {
+        val oldCount= getReadCount()
+        editor.putInt("readCount", oldCount+count)
+        editor.apply()
+    }
+    fun resetReadCount() {
+        editor.putInt("readCount", 0)
+        editor.apply()
+    }
+
+
 
 }
