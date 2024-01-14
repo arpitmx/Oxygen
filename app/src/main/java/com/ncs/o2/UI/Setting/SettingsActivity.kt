@@ -18,6 +18,7 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
+import com.ncs.o2.UI.LogsActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.NewChanges
 import com.ncs.o2.databinding.ActivitySettingsBinding
@@ -55,7 +56,9 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
             settingTitle("what's new"),
             settingOption("What's New", R.drawable.baseline_info_24, "Version 1.1.0"),
             settingTitle("Account"),
-            settingOption("Log Out", R.drawable.logout, "")
+            settingOption("Log Out", R.drawable.logout, "") ,
+            settingTitle("Logs"),
+            settingOption("Logs", R.drawable.baseline_assistant_24, "")
         )
 
 
@@ -89,6 +92,10 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
         else if (Codes.STRINGS.clickedSetting == "What's New"){
             startActivity(Intent(this, NewChanges::class.java))
             overridePendingTransition(R.anim.faster_slide_bottom_to_up, R.anim.faster_slide_bottom_to_up)
+        }
+        else if (Codes.STRINGS.clickedSetting == "Logs"){
+            startActivity(Intent(this, LogsActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
         else if (Codes.STRINGS.clickedSetting == "Log Out"){
             try {

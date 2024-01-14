@@ -48,6 +48,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseUtils.awaitt
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ServerLogger
 import com.ncs.o2.UI.StartScreen.maintainceCheck
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
@@ -99,6 +100,7 @@ class FirestoreRepository @Inject constructor(
     @Inject
     lateinit var msgDB:MessageDatabase
 
+
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
                 "/${task.project_ID}" +
@@ -131,6 +133,7 @@ class FirestoreRepository @Inject constructor(
         return try {
             serverResult(ServerResult.Progress)
             firestore.document(getNotificationTimeStampPath()).update(currentTimeStamp).await()
+            ServerLogger().addRead(1)
             serverResult(ServerResult.Success(currentTime))
         } catch (e: Exception) {
             serverResult(ServerResult.Failure(e))
@@ -144,6 +147,7 @@ class FirestoreRepository @Inject constructor(
             val lastSeenTimeStamp = firestore.document(getNotificationTimeStampPath()).get().await()
                 .getLong(Endpoints.User.NOTIFICATION_TIME_STAMP)
             serverResult(ServerResult.Success(lastSeenTimeStamp!!))
+            ServerLogger().addRead(1)
 
         } catch (e: Exception) {
             serverResult(ServerResult.Failure(e))
@@ -158,6 +162,8 @@ class FirestoreRepository @Inject constructor(
             .get(Source.SERVER)
             .addOnSuccessListener { data ->
                 if (data.exists()) {
+                    ServerLogger().addRead(1)
+
                     val maintanenceChecks = data.data?.get("isMaintaining").toString()
                     val maintainceDesc = data.data?.get("Description").toString()
 
@@ -198,6 +204,7 @@ class FirestoreRepository @Inject constructor(
             val newNotifications = CoroutineScope(Dispatchers.IO).async {
                 query.documents.map { documentSnapshot ->
 
+                    ServerLogger().addRead(documentSnapshot.data!!.size)
 
                     val notificationID: String =
                         documentSnapshot.getString(Endpoints.Notifications.notificationID)!!
@@ -249,6 +256,7 @@ class FirestoreRepository @Inject constructor(
             .get(Source.SERVER)
             .addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {
+                    ServerLogger().addRead(1)
                     val update = snapshot.toObject(Update::class.java)
                     liveData.postValue(update!!)
                 }
@@ -301,6 +309,7 @@ class FirestoreRepository @Inject constructor(
                 .document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
+                    ServerLogger().addRead(1)
                     liveData.postValue(ServerResult.Success(imageRef))
                 }
                 .addOnFailureListener { e ->
@@ -387,6 +396,7 @@ class FirestoreRepository @Inject constructor(
             .document(projectName)
             .update("ICON_URL", IconUrl)
             .addOnSuccessListener {
+                ServerLogger().addRead(1)
                 liveData.postValue(true)
             }
             .addOnFailureListener { exception ->
@@ -420,6 +430,7 @@ class FirestoreRepository @Inject constructor(
                 .document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData)
                 .addOnSuccessListener {
+                    ServerLogger().addRead(1)
                     liveData.postValue(ServerResult.Success(imageRef))
                 }
                 .addOnFailureListener { e ->
@@ -457,6 +468,7 @@ class FirestoreRepository @Inject constructor(
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
             .update("DP_URL", DPUrl)
             .addOnSuccessListener {
+                ServerLogger().addRead(1)
                 liveData.postValue(true)
             }
             .addOnFailureListener { exception ->
@@ -550,6 +562,7 @@ class FirestoreRepository @Inject constructor(
             firestore.collection(Endpoints.USERS)
                 .document(FirebaseAuth.getInstance().currentUser?.email!!)
                 .update(userData).awaitt()
+            ServerLogger().addRead(1)
             serverResult(ServerResult.Success(200))
 
         } catch (e: Exception) {
@@ -586,6 +599,8 @@ class FirestoreRepository @Inject constructor(
                         bgColor = bgColor!!,
                         projectName = projectName!!
                     )
+                    ServerLogger().addRead(1)
+
                     result(ServerResult.Success(tag))
                 } else {
                     result(ServerResult.Failure(Exception("Document not found for title: $id")))
@@ -626,6 +641,7 @@ class FirestoreRepository @Inject constructor(
     private fun getSegmentRef(task: Task): DocumentReference {
         return firestore.collection(Endpoints.PROJECTS)
             .document(task.project_ID!!)
+
 
     }
 
@@ -702,6 +718,7 @@ class FirestoreRepository @Inject constructor(
                     .addOnSuccessListener { snap ->
                         if (snap != null && snap.exists()) {
                             currentUser = snap.toObject(CurrentUser::class.java)
+                            ServerLogger().addRead(1)
 
                             if (currentUser != null) {
                                 Timber.tag(TAG).d(currentUser?.USERNAME)
@@ -735,6 +752,7 @@ class FirestoreRepository @Inject constructor(
 
                 if (snap.exists()) {
                     userInfo = snap.toObject(UserInfo::class.java)
+                    ServerLogger().addRead(1)
 
                     Timber.tag(TAG).d(userInfo?.USERNAME)
                     Timber.tag(TAG).d(userInfo?.DESIGNATION)
@@ -768,6 +786,7 @@ class FirestoreRepository @Inject constructor(
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
             .update(userUpdate)
             .addOnSuccessListener { snap ->
+                ServerLogger().addRead(1)
                 serverResult(ServerResult.Success(userInfo))
             }
             .addOnFailureListener { error ->
@@ -831,6 +850,7 @@ class FirestoreRepository @Inject constructor(
             .addOnSuccessListener { snapshot ->
 
                 CoroutineScope(Dispatchers.IO).launch {
+                    ServerLogger().addRead(snapshot.size())
                     for (document in snapshot.documents) {
                         val fieldValue = document.getString("segment_NAME")
                         if (fieldValue == fieldName) {
@@ -857,6 +877,8 @@ class FirestoreRepository @Inject constructor(
             .collection(Endpoints.Project.SEGMENT)
             .get(Source.SERVER)
             .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
+
                 val segment_list = mutableListOf<Segment>()
 
                 CoroutineScope(Dispatchers.IO).launch {
@@ -894,6 +916,7 @@ class FirestoreRepository @Inject constructor(
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val sectionList = mutableListOf<Task>()
+                ServerLogger().addRead(querySnapshot.size())
 
                 CoroutineScope(Dispatchers.IO).launch {
                     for (document in querySnapshot.documents) {
@@ -923,6 +946,7 @@ class FirestoreRepository @Inject constructor(
                     .get().await()
 
             val snapShot = task
+            ServerLogger().addRead(snapShot.size())
 
             if (!snapShot.isEmpty) {
 
@@ -930,6 +954,7 @@ class FirestoreRepository @Inject constructor(
                 for (document in snapShot.documents){
                     val taskData = document.toObject(Task::class.java)
                     list.add(taskData!!)
+
                 }
 
                 list?.let {
@@ -950,7 +975,7 @@ class FirestoreRepository @Inject constructor(
         projectName: String,
     ): ServerResult<List<Tag>> {
 
-        return try {
+         try {
 
             val task =
                 firestore.collection(Endpoints.PROJECTS)
@@ -959,11 +984,13 @@ class FirestoreRepository @Inject constructor(
                     .get().await()
 
             val snapShot = task
+            ServerLogger().addRead(snapShot.size())
 
             if (!snapShot.isEmpty) {
 
                 val list:MutableList<Tag> = mutableListOf()
                 for (document in snapShot.documents){
+
                     val tagText = document.getString("tagText")
                     val tagID = document.getString("tagID")
                     val textColor = document.getString("textColor")!!
@@ -1016,6 +1043,7 @@ class FirestoreRepository @Inject constructor(
                 .whereEqualTo("section", sectionName)
                 .whereEqualTo("segment", segmentName)
                 .get().await()
+            ServerLogger().addRead(snapshots.size())
 
 
             val sectionList = mutableListOf<TaskItem>()
@@ -1069,6 +1097,8 @@ class FirestoreRepository @Inject constructor(
             .collection(Endpoints.Project.TAGS)
             .get()
             .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
+
                 val tags_list = mutableListOf<Tag>()
                 for (document in querySnapshot.documents) {
                     val tag = document.toObject(Tag::class.java)
@@ -1087,9 +1117,11 @@ class FirestoreRepository @Inject constructor(
             .whereEqualTo("PROJECT_NAME", projectName)
             .get()
             .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
                 if (!querySnapshot.isEmpty) {
                     val document = querySnapshot.documents[0]
                     val contributors=document.get("contributors") as List<String>
+
                     result(ServerResult.Success(contributors))
                 }
             }
@@ -1104,6 +1136,7 @@ class FirestoreRepository @Inject constructor(
             .whereEqualTo("EMAIL", id)
             .get()
             .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
                 if (!querySnapshot.isEmpty) {
 
                     val document = querySnapshot.documents[0]
@@ -1157,6 +1190,7 @@ class FirestoreRepository @Inject constructor(
 
             .get()
             .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
                 val workspaceTaskItemList = mutableListOf<WorkspaceTaskItem>()
 
                 for (document in querySnapshot.documents) {
@@ -1165,6 +1199,7 @@ class FirestoreRepository @Inject constructor(
                     val projectID = document.getString(Endpoints.Workspace.PROJECT_ID)
 
                     val workspaceTaskItem = WorkspaceTaskItem(id = id!!, status = status!!, project_id = projectID!!)
+
                     workspaceTaskItemList.add(workspaceTaskItem)
                 }
 
@@ -1194,6 +1229,7 @@ class FirestoreRepository @Inject constructor(
                 .document(projectName)
                 .update(Endpoints.Project.LAST_TAG_UPDATED, Timestamp.now())
                 .await()
+            ServerLogger().addRead(1)
             PrefManager.putLastTAGCacheUpdateTimestamp(Timestamp.now())
             CoroutineScope(Dispatchers.IO).launch {
                 db.tagsDao().insert(tag)
@@ -1221,6 +1257,7 @@ class FirestoreRepository @Inject constructor(
                     .get().await()
 
             val snapShot = task
+            ServerLogger().addRead(snapShot.size())
 
             if (!snapShot.isEmpty) {
 
@@ -1252,6 +1289,7 @@ class FirestoreRepository @Inject constructor(
             .get()
             .addOnSuccessListener {
 //                val section_list = mutableListOf<String>()
+                ServerLogger().addRead(it.data!!.size)
                 if (it.exists()) {
                     val section_list = it.get("sections") as List<*>
                     result(ServerResult.Success(section_list))
@@ -1274,6 +1312,8 @@ class FirestoreRepository @Inject constructor(
             .whereEqualTo("id", id)
             .get()
             .addOnSuccessListener { querySnapshot1 ->
+                ServerLogger().addRead(querySnapshot1.size())
+
                 if (querySnapshot1.documents.isEmpty()) {
                     // Log or handle the case where no document is found
                     Log.d("debuf", "No document found with ID: $id")
@@ -1300,6 +1340,7 @@ class FirestoreRepository @Inject constructor(
                         assignee_id = assignerID,
                         tagList = tags
                     )
+
                     Log.d("taskrepo", taskItem.toString())
                     result(ServerResult.Success(taskItem))
                 }
@@ -1349,6 +1390,7 @@ class FirestoreRepository @Inject constructor(
             .document(taskId)
             .collection(Endpoints.Project.MESSAGES)
             .addSnapshotListener { querySnapshot, exception ->
+                ServerLogger().addRead(querySnapshot!!.size())
 
                 if (exception != null) {
                     result(ServerResult.Failure(exception))
@@ -1407,6 +1449,8 @@ class FirestoreRepository @Inject constructor(
             .collection(Endpoints.Project.MESSAGES)
             .whereGreaterThan("timestamp",PrefManager.getTaskTimestamp(projectName,taskId))
             .addSnapshotListener { querySnapshot, exception ->
+                ServerLogger().addRead(querySnapshot!!.size())
+
 
                 if (exception != null) {
                     result(ServerResult.Failure(exception))
@@ -1447,6 +1491,7 @@ class FirestoreRepository @Inject constructor(
                         }
                         messageData.let { messageList.add(it) }
 
+
                     }
                 }
 
@@ -1463,7 +1508,9 @@ class FirestoreRepository @Inject constructor(
             .document(projectName)
             .get()
             .addOnSuccessListener { documentSnapshot ->
+                ServerLogger().addRead(documentSnapshot.data!!.size)
                 val link = documentSnapshot.getString("PROJECT_LINK")
+
                 result(ServerResult.Success(link!!))
             }
             .addOnFailureListener {
@@ -1483,6 +1530,7 @@ class FirestoreRepository @Inject constructor(
             .whereEqualTo("EMAIL", id)
             .get()
             .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
                 if (!querySnapshot.isEmpty) {
                     val document = querySnapshot.documents[0]
                     val EMAIL = document.getString("EMAIL")
@@ -1492,6 +1540,7 @@ class FirestoreRepository @Inject constructor(
                     val user = UserInMessage(
                         EMAIL = EMAIL!!, USERNAME = USERNAME, DP_URL = DP_URL, FCM_TOKEN = FCM_TOKEN
                     )
+
                     serverResult(ServerResult.Success(user))
                 } else {
                     serverResult(ServerResult.Failure(Exception("Document not found for title: $id")))
@@ -1546,10 +1595,12 @@ class FirestoreRepository @Inject constructor(
                             firestore.collection(Endpoints.USERS).document(oldAssignee)
                                 .collection(Endpoints.Workspace.WORKSPACE).document(id)
                         transaction.delete(oldAssigneeWorkspaceRef)
+
                     }
 
                     transaction.update(documentRef, "assignee", newAssignee)
                     transaction.update(documentRef, "status", 2)
+                    ServerLogger().addRead(2)
 
                     val workspaceItem = WorkspaceTaskItem(id = id, status = "Assigned", project_id = projectName)
 
@@ -1558,6 +1609,8 @@ class FirestoreRepository @Inject constructor(
                             firestore.collection(Endpoints.USERS).document(newAssignee)
                                 .collection(Endpoints.Workspace.WORKSPACE).document(id)
                         transaction.set(newAssigneeWorkspaceRef, workspaceItem)
+                        ServerLogger().addRead(1)
+
                     }
 
                     updateLastUpdated(projectName, transaction)
@@ -1586,8 +1639,9 @@ class FirestoreRepository @Inject constructor(
                     .document(task.project_ID!!)
                     .collection(Endpoints.Project.TASKS)
                     .document(task.id)
-
                 transaction.update(projectDocumentRef, "description", newSummary)
+                ServerLogger().addRead(1)
+
                 updateLastUpdated(task.project_ID!!,transaction)
                 updateTaskLastUpdated(task.project_ID!!,transaction, task.id)
 
@@ -1621,7 +1675,7 @@ class FirestoreRepository @Inject constructor(
                 val updateData = mapOf(
                     "moderators" to FieldValue.arrayUnion(moderator)
                 )
-
+                ServerLogger().addRead(1)
                 transaction.update(documentRef, updateData)
                 updateLastUpdated(projectName, transaction)
                 updateTaskLastUpdated(projectName, transaction, id)
@@ -1648,6 +1702,8 @@ class FirestoreRepository @Inject constructor(
                     .collection(Endpoints.Project.TASKS)
                     .document(taskId)
                     .update("tags", newTags)
+                ServerLogger().addRead(1)
+
                 updateLastUpdated(projectName, transaction)
                 updateTaskLastUpdated(projectName, transaction, taskId)
                 true
@@ -1683,6 +1739,7 @@ class FirestoreRepository @Inject constructor(
                 val finalModeratorsList = existingModeratorsList.distinct()
 
                 transaction.update(documentRef, "moderators", finalModeratorsList)
+                ServerLogger().addRead(1)
 
                 updateLastUpdated(projectName,transaction)
                 updateTaskLastUpdated(projectName,transaction,id)
@@ -1718,6 +1775,8 @@ class FirestoreRepository @Inject constructor(
                 val userDocumentSnapshot = transaction.get(userDocumentRef)
 
                 if (userDocumentSnapshot.exists()) {
+                    ServerLogger().addRead(2)
+
                     val status = when (newState) {
                         "Submitted" -> 1
                         "Open" -> 2
@@ -1730,6 +1789,7 @@ class FirestoreRepository @Inject constructor(
 
                     transaction.update(userDocumentRef, "status", newState)
                     transaction.update(projectDocumentRef, "status", status)
+
                     updateLastUpdated(projectName,transaction)
                     updateTaskLastUpdated(projectName,transaction,id)
 
@@ -1744,6 +1804,7 @@ class FirestoreRepository @Inject constructor(
                     }
 
                     transaction.update(projectDocumentRef, "status", status)
+                    ServerLogger().addRead(1)
 
                     updateLastUpdated(projectName,transaction)
                     updateTaskLastUpdated(projectName,transaction,id)
@@ -1775,6 +1836,7 @@ class FirestoreRepository @Inject constructor(
 
                 val priority = SwitchFunctions.getNumPriorityFromStringPriority(newPriority)
                 transaction.update(projectDocumentRef, "priority", priority)
+                ServerLogger().addRead(1)
                 updateLastUpdated(projectName,transaction)
                 updateTaskLastUpdated(projectName,transaction,id)
 
@@ -1797,12 +1859,14 @@ class FirestoreRepository @Inject constructor(
             .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
             .get()
             .addOnSuccessListener {
+                ServerLogger().addRead(it.size())
                 val CheckListArray = mutableListOf<CheckList>()
                 for (document in it.documents) {
                     val checkList = document.toObject(CheckList::class.java)
                     checkList?.let {
                         CheckListArray.add(checkList)
                     }
+
                 }
                 result(ServerResult.Success(CheckListArray))
             }
@@ -1825,6 +1889,8 @@ class FirestoreRepository @Inject constructor(
                 "done" to done
             )
             documentRef.update(updateData).await()
+            ServerLogger().addRead(1)
+
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
@@ -1842,6 +1908,8 @@ class FirestoreRepository @Inject constructor(
             firestore.collection(Endpoints.PROJECTS).document(projectName)
                 .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST)
                 .document(id).set(checkList).await()
+            ServerLogger().addRead(1)
+
             return ServerResult.Success(true)
         } catch (e: Exception) {
             return ServerResult.Failure(e)
@@ -1874,6 +1942,7 @@ class FirestoreRepository @Inject constructor(
                     .document(projectName)
                     .collection(Endpoints.Project.TASKS)
                     .document(taskId)
+                ServerLogger().addRead(1)
 
                 transaction.update(documentRef, "section", newSection)
 
@@ -1902,6 +1971,8 @@ class FirestoreRepository @Inject constructor(
                     .document(taskId)
                     .collection(Endpoints.Project.MESSAGES)
                     .document(message.messageId)
+                ServerLogger().addRead(1)
+
                 transaction.update(documentRef, "projectId", projectName)
                 transaction.update(documentRef, "taskID", taskId)
 
@@ -1919,14 +1990,16 @@ class FirestoreRepository @Inject constructor(
             if (exception != null) {
                 return@addSnapshotListener
             }
+            ServerLogger().addRead(1)
+
             if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.Project.LAST_UPDATED)) {
-                val lastUpdatedValue = snapshot.get(Endpoints.Project.LAST_UPDATED)
                 firestore.collection(Endpoints.PROJECTS)
                     .document(projectName)
                     .collection(Endpoints.Project.TASKS)
                     .whereGreaterThan(Endpoints.Project.LAST_UPDATED, PrefManager.getLastCacheUpdateTimestamp())
                     .get()
                     .addOnSuccessListener { querySnapshot ->
+                        ServerLogger().addRead(querySnapshot.size())
                         val sectionList = mutableListOf<Task>()
                         CoroutineScope(Dispatchers.IO).launch {
                             for (document in querySnapshot.documents) {
@@ -1959,6 +2032,7 @@ class FirestoreRepository @Inject constructor(
             if (exception != null) {
                 return@addSnapshotListener
             }
+            ServerLogger().addRead(1)
             if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.Project.LAST_TAG_UPDATED)) {
                 val lastUpdatedValue = snapshot.get(Endpoints.Project.LAST_TAG_UPDATED)
                 firestore.collection(Endpoints.PROJECTS)
@@ -1967,6 +2041,7 @@ class FirestoreRepository @Inject constructor(
                     .whereGreaterThan(Endpoints.Project.LAST_TAG_UPDATED, PrefManager.getLastTAGCacheUpdateTimestamp())
                     .get()
                     .addOnSuccessListener { querySnapshot ->
+                        ServerLogger().addRead(querySnapshot.size())
                         val tagList = mutableListOf<Tag>()
                         CoroutineScope(Dispatchers.IO).launch {
                             for (document in querySnapshot.documents) {
@@ -2018,6 +2093,7 @@ class FirestoreRepository @Inject constructor(
             if (exception != null) {
                 return@addSnapshotListener
             }
+            ServerLogger().addRead(1)
             if (snapshot != null && snapshot.exists() && snapshot.contains(Endpoints.User.LAST_NOTIFICATION_UPDATED)) {
                 val lastUpdatedValue = snapshot.get(Endpoints.User.LAST_NOTIFICATION_UPDATED)
                 firestore.collection(Endpoints.USERS)
@@ -2026,6 +2102,8 @@ class FirestoreRepository @Inject constructor(
                     .whereGreaterThan(Endpoints.Notifications.lastUpdated, PrefManager.getLastNotificationCacheUpdateTimestamp())
                     .get()
                     .addOnSuccessListener { querySnapshot ->
+                        ServerLogger().addRead(querySnapshot.size())
+
                         val notificationsList = mutableListOf<Notification>()
                         CoroutineScope(Dispatchers.IO).launch {
                             for (document in querySnapshot.documents) {
@@ -2152,52 +2230,69 @@ class FirestoreRepository @Inject constructor(
             Endpoints.Project.LAST_UPDATED to last_updated
         )
         transaction.update(projectDocRef, projectData)
+        ServerLogger().addRead(1)
+
     }
     fun updateTaskLastUpdated(projectName: String,transaction:Transaction,taskId: String){
         val projectDocRef = firestore.collection(Endpoints.PROJECTS)
             .document(projectName).collection(Endpoints.Project.TASKS).document(taskId)
+
         val last_updated=Timestamp.now()
         val projectData = mapOf(
             Endpoints.Project.LAST_UPDATED to last_updated
         )
         transaction.update(projectDocRef, projectData)
+        ServerLogger().addRead(1)
+
     }
 
     fun updateLastUserNotificationUpdated(userID: String,transaction:Transaction){
         val userDocRef = firestore.collection(Endpoints.USERS)
             .document(userID)
+
         val last_updated=Timestamp.now().seconds
         val userData = mapOf(
             Endpoints.User.LAST_NOTIFICATION_UPDATED to last_updated
         )
         transaction.update(userDocRef, userData)
+        ServerLogger().addRead(1)
+
     }
     fun updateNotifactionLastUpdated(userID: String,transaction:Transaction,notificationID: String){
         val userDocRef = firestore.collection(Endpoints.USERS)
             .document(userID).collection(Endpoints.Notifications.NOTIFICATIONS).document(notificationID)
+
         val last_updated=Timestamp.now().seconds
         val userData = mapOf(
             Endpoints.Notifications.lastUpdated to last_updated
         )
         transaction.update(userDocRef, userData)
+        ServerLogger().addRead(1)
+
     }
     fun updateLastProjectTagUpdated(projectName: String,transaction:Transaction){
         val projectDocRef = firestore.collection(Endpoints.PROJECTS)
             .document(projectName)
+
         val last_updated=Timestamp.now()
         val projectData = mapOf(
             Endpoints.Project.LAST_TAG_UPDATED to last_updated
         )
         transaction.update(projectDocRef, projectData)
+        ServerLogger().addRead(1)
+
     }
     fun updateTagLastUpdated(projectName: String,transaction:Transaction,tagId:String){
         val projectDocRef = firestore.collection(Endpoints.PROJECTS)
             .document(projectName).collection(Endpoints.Project.TAGS).document(tagId)
+
         val last_updated=Timestamp.now()
         val projectData = mapOf(
             Endpoints.Project.LAST_TAG_UPDATED to last_updated
         )
         transaction.update(projectDocRef, projectData)
+        ServerLogger().addRead(1)
+
     }
     suspend fun addProjectToUser(projectLink: String): ServerResult<ArrayList<String>> {
         return try {
@@ -2214,6 +2309,7 @@ class FirestoreRepository @Inject constructor(
 
                     userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData))
                         .await()
+                    ServerLogger().addRead(1)
 
                     updateProjectContributors(projectData)
                     PrefManager.lastaddedproject(projectData)
@@ -2235,6 +2331,7 @@ class FirestoreRepository @Inject constructor(
     private suspend fun getUserDocument(): DocumentReference {
         return firebaseFirestore.collection("Users")
             .document(FirebaseAuth.getInstance().currentUser?.email!!)
+
     }
 
     private suspend fun getProjectData(projectLink: String): String? {
@@ -2243,9 +2340,13 @@ class FirestoreRepository @Inject constructor(
             .whereEqualTo("PROJECT_DEEPLINK", projectLink.toLowerCase())
             .get()
             .await()
+        ServerLogger().addRead(1)
+
 
         return if (!documents.isEmpty) {
+            ServerLogger().addRead(1)
             documents.documents.firstOrNull()?.getString("PROJECT_NAME")
+
         } else {
             null
         }
@@ -2257,6 +2358,8 @@ class FirestoreRepository @Inject constructor(
     ): Boolean {
         val userSnapshot = userDocument.get().await()
         val userProjects = userSnapshot.get("PROJECTS") as ArrayList<String>?
+        ServerLogger().addRead(1)
+
         return userProjects != null && userProjects.contains(projectData)
     }
 
@@ -2268,10 +2371,14 @@ class FirestoreRepository @Inject constructor(
         firebaseFirestore.collection(Endpoints.PROJECTS)
             .document(projectData)
             .update(addContributors)
+        ServerLogger().addRead(1)
+
     }
 
     private suspend fun getUserProjects(userDocument: DocumentReference): ArrayList<String> {
         val userSnapshot = userDocument.get().await()
+        ServerLogger().addRead(1)
+
         return userSnapshot.get("PROJECTS") as ArrayList<String>? ?: ArrayList()
     }
 
