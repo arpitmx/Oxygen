@@ -1,9 +1,12 @@
 package com.ncs.o2.Domain.Repositories
 
+import androidx.lifecycle.MediatorLiveData
+import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDao
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.TasksRepository
 import com.ncs.o2.Domain.Models.DBResult
+import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
@@ -11,9 +14,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class TaskRepository @Inject constructor(private val db: TasksDatabase):TasksRepository {
+class TaskRepository @Inject constructor(private val db: TasksDatabase,private val msgDB:MessageDatabase):TasksRepository {
     val taskDao=db.tasksDao()
     val tagsDao=db.tagsDao()
+    private val messagesLiveData = MediatorLiveData<DBResult<List<Message>>>()
+
     override suspend fun getTasksItemsForSegment(
         projectName: String,
         segmentName: String,
@@ -102,5 +107,25 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase):TasksRep
             }
         }
     }
+    override suspend fun getMessagesforTask(
+        projectName: String,
+        taskID: String,
+        resultCallback: (DBResult<List<Message>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val messages = msgDB.messagesDao().getMessagesForTask(projectName, taskID)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(messages))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
+
+
 
 }

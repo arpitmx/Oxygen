@@ -36,4 +36,22 @@ class Convertors {
     fun toTimestamp(value: Long?): Timestamp? {
         return value?.let { Timestamp(Date(it)) }
     }
+    @TypeConverter
+    fun mapfromString(value: String?): Map<String, Any>? {
+        if (value == null) {
+            return null
+        }
+
+        val mapType = object : TypeToken<Map<String, Any>>() {}.type
+        return Gson().fromJson(value, mapType)
+    }
+
+    @TypeConverter
+    fun maptoString(value: Map<String, Any>?): String? {
+        if (value == null) {
+            return null
+        }
+
+        return Gson().toJson(value)
+    }
 }

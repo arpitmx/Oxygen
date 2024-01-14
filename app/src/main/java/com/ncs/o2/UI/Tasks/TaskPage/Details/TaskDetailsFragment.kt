@@ -975,65 +975,66 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     private fun setDetails(id: String) {
 
         binding.becomeModerator.gone()
-        if (db.tasksDao().isNull) {
-            Log.d("detailsFetch","Fetch from firestore")
+        CoroutineScope(Dispatchers.Main).launch {
+            if (db.tasksDao().getTasksbyId(id,PrefManager.getcurrentProject()).isNull) {
+                Log.d("detailsFetch","Fetch from firestore")
 
-            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
 
-                try {
+                    try {
 
-                    val taskResult = withContext(Dispatchers.IO) {
-                        viewModel.getTasksById(id, PrefManager.getcurrentProject())
-                    }
-
-                    Timber.tag(TAG).d("Fetched task result : ${taskResult}")
-
-                    when (taskResult) {
-
-                        is ServerResult.Failure -> {
-
-                            utils.singleBtnDialog(
-                                "Failure",
-                                "Failure in task fetching : ${taskResult.exception.message}",
-                                "Okay"
-                            ) {
-                                requireActivity().finish()
-                            }
-
-                            binding.progressBar.gone()
-
+                        val taskResult = withContext(Dispatchers.IO) {
+                            viewModel.getTasksById(id, PrefManager.getcurrentProject())
                         }
 
-                        is ServerResult.Progress -> {
-                            binding.progressBar.visible()
-                        }
+                        Timber.tag(TAG).d("Fetched task result : ${taskResult}")
 
-                        is ServerResult.Success -> {
+                        when (taskResult) {
 
-                            val currentUser = FirebaseAuth.getInstance().currentUser
-                            val localUserObj = PrefManager.getcurrentUserdetails()
+                            is ServerResult.Failure -> {
 
-                            currentUser?.let { userObj ->
-
-                                if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
-                                    binding.becomeModerator.visible()
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in task fetching : ${taskResult.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
                                 }
+
+                                binding.progressBar.gone()
+
                             }
 
-                            binding.progressBar.gone()
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
 
-                            setDefaultViews(taskResult.data)
-                            setTaskDetails(taskResult.data)
+                            is ServerResult.Success -> {
 
+                                val currentUser = FirebaseAuth.getInstance().currentUser
+                                val localUserObj = PrefManager.getcurrentUserdetails()
+
+                                currentUser?.let { userObj ->
+
+                                    if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                        binding.becomeModerator.visible()
+                                    }
+                                }
+
+                                binding.progressBar.gone()
+
+                                setDefaultViews(taskResult.data)
+                                setTaskDetails(taskResult.data)
+                                db.tasksDao().insert(taskResult.data)
+
+                            }
 
                         }
 
-                    }
+                    } catch (e: Exception) {
 
-                } catch (e: Exception) {
-
-                    Timber.tag(TAG).e(e)
-                    binding.progressBar.gone()
+                        Timber.tag(TAG).e(e)
+                        binding.progressBar.gone()
 
 //                utils.singleBtnDialog(
 //                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
@@ -1041,14 +1042,17 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 //                    requireActivity().finish()
 //                }
 
-                }
+                    }
 
+                }
+            }
+            else{
+                Log.d("detailsFetch","Fetch from db")
+                fetchFromDB(id)
             }
         }
-        else{
-            Log.d("detailsFetch","Fetch from db")
-            fetchFromDB(id)
-        }
+
+
     }
 
     private fun fetchFromDB(id: String){

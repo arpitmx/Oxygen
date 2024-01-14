@@ -95,11 +95,14 @@ object Endpoints {
         const val SEGMENT = "SEGMENTS"
         const val CONTRIBUTERS = "CONTRIBUTERS"
         const val PROJECTID = "PROJECT_ID"
+        const val TASKID = "TASKID"
+
         const val PROJECTNAME = "PROJECT_NAME"
         const val TAGS = "TAGS"
         const val CHECKLIST="CHECKLIST"
         const val LAST_UPDATED="last_updated"
         const val LAST_TAG_UPDATED="last_tag_updated"
+        const val LAST_MESSAGE_AT="last_message_at"
     }
 
 
@@ -184,6 +187,8 @@ object Endpoints {
         object MESSAGES{
             const val USERLIST_TABLE="users_in_messages"
             const val USERLIST_DB="users_in_messages_db"
+            const val MESSAGES_DB="message_db"
+            const val MESSAGES_TABLE="message_table"
         }
         object TASKS{
             const val TASKS_TABLE="tasks"
