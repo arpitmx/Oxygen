@@ -27,8 +27,9 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
 
     private lateinit var binding:ActivitySettingsBinding
     private lateinit var auth: FirebaseAuth
-    @Inject
-    lateinit var util : GlobalUtils.EasyElements
+    private val util : GlobalUtils.EasyElements by lazy {
+        GlobalUtils.EasyElements(this)
+    }
     private val TAG = "SettingsActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
