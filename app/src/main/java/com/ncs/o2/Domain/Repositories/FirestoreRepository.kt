@@ -22,6 +22,8 @@ import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Constants.SwitchFunctions
+import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
+import com.ncs.o2.Data.Room.MessageRepository.MessageProjectTaskAssociation
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -94,6 +96,8 @@ class FirestoreRepository @Inject constructor(
     lateinit var db:TasksDatabase
     @Inject
     lateinit var notificationDB:NotificationDatabase
+    @Inject
+    lateinit var msgDB:MessageDatabase
 
     fun getTaskPath(task: Task): String {
         return Endpoints.PROJECTS +
@@ -1371,11 +1375,78 @@ class FirestoreRepository @Inject constructor(
                             content!!,
                             timestamp!!,
                             com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!,
-                            additionalData
+                            additionalData,
                         )
                         Timber.tag(TAG).d("NM123 : $messageData")
-
+                        CoroutineScope(Dispatchers.IO).launch {
+                            msgDB.messagesDao().insertAssociation(
+                                MessageProjectTaskAssociation(
+                                    messageId = messageId,
+                                    projectId = projectName,
+                                    taskId =  taskId)
+                            )
+                            msgDB.messagesDao().insert(messageData)
+                        }
                         messageData.let { messageList.add(it) }
+
+                    }
+                }
+
+                result(ServerResult.Success(messageList))
+            }
+    }
+    override fun getNewMessages(
+        projectName: String,
+        taskId: String,
+        result: (ServerResult<List<Message>>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.TASKS)
+            .document(taskId)
+            .collection(Endpoints.Project.MESSAGES)
+            .whereGreaterThan("timestamp",PrefManager.getTaskTimestamp(projectName,taskId))
+            .addSnapshotListener { querySnapshot, exception ->
+
+                if (exception != null) {
+                    result(ServerResult.Failure(exception))
+                    return@addSnapshotListener
+                }
+
+                val messageList = mutableListOf<Message>()
+
+                querySnapshot?.let { snapshot ->
+                    for (newDocs in snapshot.documentChanges) {
+
+                        val document = newDocs.document
+
+                        val messageId = document.getString("messageId")
+                        val senderId = document.getString("senderId")
+                        val content = document.getString("content")
+                        val timestamp = document.getTimestamp("timestamp")
+                        val messageType = document.getString("messageType")
+                        val additionalData = document.get("additionalData") as HashMap<String, Any>
+
+                        val messageData = Message(
+                            messageId!!,
+                            senderId!!,
+                            content!!,
+                            timestamp!!,
+                            com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!,
+                            additionalData,
+                        )
+                        Timber.tag(TAG).d("NM123 : $messageData")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            msgDB.messagesDao().insertAssociation(
+                                MessageProjectTaskAssociation(
+                                    messageId = messageId,
+                                    projectId = projectName,
+                                    taskId =  taskId)
+                            )
+                            msgDB.messagesDao().insert(messageData)
+                        }
+                        messageData.let { messageList.add(it) }
+
                     }
                 }
 
@@ -1817,6 +1888,31 @@ class FirestoreRepository @Inject constructor(
             return ServerResult.Failure(e)
         }
     }
+    override suspend fun updateMessage(
+        taskId: String,
+        projectName: String,
+        message: Message,
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(taskId)
+                    .collection(Endpoints.Project.MESSAGES)
+                    .document(message.messageId)
+                transaction.update(documentRef, "projectId", projectName)
+                transaction.update(documentRef, "taskID", taskId)
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
     override suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit) {
         val projectDocument = FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName)
         val listenerRegistration = projectDocument.addSnapshotListener { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->
@@ -1994,6 +2090,8 @@ class FirestoreRepository @Inject constructor(
             }
         }
     }
+
+
 
     override suspend fun getSearchedTasks(
         assignee: String,

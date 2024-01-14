@@ -55,6 +55,11 @@ interface Repository {
         taskId:String,
         result: (ServerResult<List<Message>>) -> Unit
     )
+    fun getNewMessages(
+        projectName: String,
+        taskId:String,
+        result: (ServerResult<List<Message>>) -> Unit
+    )
     fun insertNotification(
         userID: String,
         notification: Notification,
@@ -180,6 +185,12 @@ interface Repository {
         taskId: String,
         projectName: String,
         newSection:String,
+    ): ServerResult<Boolean>
+
+    suspend fun updateMessage(
+        taskId: String,
+        projectName: String,
+        message: Message,
     ): ServerResult<Boolean>
 
     suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit)

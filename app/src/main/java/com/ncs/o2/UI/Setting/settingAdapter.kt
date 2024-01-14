@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 
@@ -67,7 +68,7 @@ class settingAdater(
 
                 item.Image?.let { viewHolder.icon.setImageResource(it) }
 
-                viewHolder.itemView.setOnClickListener {
+                viewHolder.itemView.setOnClickThrottleBounceListener {
                     Codes.STRINGS.clickedSetting = item.text
                     OnSettingClick.onClick(position)
                 }

@@ -45,6 +45,8 @@ object PrefManager {
     val list=MutableLiveData<List<String>>()
     private val projectTimestampMapKey = "project_timestamp_map"
     private lateinit var projectTimestampMap: MutableMap<String, Long>
+    private val projectIdTaskIdMapKey = "project_id_task_id_map"
+    private lateinit var projectIdTaskIdMap: MutableMap<String, Timestamp>
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(Endpoints.SharedPref.SHAREDPREFERENCES, Context.MODE_PRIVATE)
         editor= sharedPreferences.edit()
@@ -52,6 +54,14 @@ object PrefManager {
         projectTimestampMap = savedHashMapString?.let {
             try {
                 Gson().fromJson(it, object : TypeToken<MutableMap<String, Long>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+        val savedProjectIdTaskIdMapString = sharedPreferences.getString(projectIdTaskIdMapKey, null)
+        projectIdTaskIdMap = savedProjectIdTaskIdMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
             } catch (e: JsonSyntaxException) {
                 mutableMapOf()
             }
@@ -394,8 +404,23 @@ object PrefManager {
             emptyList()
         }
     }
+    fun setTaskTimestamp(projectId: String, taskId: String, timestamp: Timestamp) {
+        val id = "$projectId$taskId"
+        projectIdTaskIdMap[id] = timestamp
+        saveProjectIdTaskIdMapToPreferences()
+    }
 
 
+    fun getTaskTimestamp(projectId: String, taskId: String): Timestamp {
+        val id = "$projectId$taskId"
+        return projectIdTaskIdMap[id] ?: Timestamp(0, 0)
+    }
+
+    private fun saveProjectIdTaskIdMapToPreferences() {
+        val projectIdTaskIdMapString = Gson().toJson(projectIdTaskIdMap)
+        editor.putString(projectIdTaskIdMapKey, projectIdTaskIdMapString)
+        editor.apply()
+    }
 
 
 
