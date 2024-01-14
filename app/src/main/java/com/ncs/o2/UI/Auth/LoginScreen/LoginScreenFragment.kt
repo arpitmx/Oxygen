@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -212,7 +213,12 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                             requireActivity().finishAffinity()
 
                                         }else if (isEmailVerified==false){
-                                            sendVerificationEmail(FirebaseAuth.getInstance().currentUser)
+                                            if (FirebaseAuth.getInstance().currentUser!!.isEmailVerified){
+                                                findNavController().navigate(R.id.action_loginScreenFragment_to_userDetailsFragment)
+                                            }
+                                            else{
+                                                sendVerificationEmail(FirebaseAuth.getInstance().currentUser)
+                                            }
                                         }
                                         else if (isDetailsAdded == false) {
                                             findNavController().navigate(R.id.action_loginScreenFragment_to_userDetailsFragment)
@@ -276,9 +282,28 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                     }
                 } else {
                     Toast.makeText(
-                        requireContext(), "Failed to send verification email.",
+                        requireContext(), "Please wait a moment",
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.buttonParent.gone()
+                    binding.timerParent.visible()
+                    val countdownTimer = object : CountDownTimer(60*1000, 1000) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            val secondsRemaining = millisUntilFinished / 1000
+                            binding.timer.text="$secondsRemaining sec"
+                        }
+
+                        override fun onFinish() {
+                            binding.buttonParent.visible()
+                            binding.timerParent.gone()
+                            binding.progressbar.gone()
+                            binding.btnLogin.text="Login"
+                            binding.btnLogin.isEnabled=true
+                            binding.btnLogin.isClickable=true
+                        }
+                    }
+
+                    countdownTimer.start()
                 }
             }
     }

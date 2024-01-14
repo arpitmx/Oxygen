@@ -1,8 +1,12 @@
 package com.ncs.o2.Domain.Models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.google.firebase.Timestamp
 import com.ncs.o2.Domain.Models.Enums.MessageType
 import com.ncs.o2.Domain.Utility.Version
+import com.ncs.o2.HelperClasses.Convertors
 
 
 /*
@@ -42,12 +46,15 @@ Tasks FUTURE ADDITION :
 */
 
 @Version("1")
+@Entity(tableName = "message_table")
+@TypeConverters(Convertors::class)
 data class Message(
+    @PrimaryKey(autoGenerate = false)
     val messageId: String,
     val senderId: String,
     val content: String,
     val timestamp: Timestamp?=null,
     val messageType: MessageType,
-    val additionalData: Map<String, Any>? = emptyMap()
+    val additionalData: Map<String, Any>? = emptyMap(),
 )
 
