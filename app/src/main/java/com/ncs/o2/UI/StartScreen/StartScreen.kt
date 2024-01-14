@@ -102,6 +102,7 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initialise()
+        PrefManager.resetReadCount()
     }
 
     private fun initialise() {
