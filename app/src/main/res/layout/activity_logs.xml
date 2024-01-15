@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/darkbg_main_a80"
-    tools:context=".UI.LogsActivity">
+    tools:context=".UI.Logs.LogsActivity">
 
 
     <include
@@ -18,30 +18,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_logs"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:gravity="center"
-        android:text="No. of reads:"
-        android:textColor="@color/white"
-        android:textSize="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gio_actionbar" />
-
-    <TextView
-        android:id="@+id/readcount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="112dp"
-        android:gravity="center"
-        android:text="0"
-        android:fontFamily="@font/sf_pro_display_semibold"
-        android:textColor="@color/colorAccent"
-        android:textSize="28dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="54dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

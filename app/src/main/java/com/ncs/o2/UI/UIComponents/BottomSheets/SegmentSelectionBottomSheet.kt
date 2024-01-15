@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mifmif.common.regex.Main
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -115,8 +116,8 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
         this.isCancelable = true
     }
 
-    private fun setRecyclerView(segments: List<Segment>) {
-
+    private fun setRecyclerView(segments: List<SegmentItem>) {
+        Log.d("segments",segments.toString())
         val adapter = SegmentListAdapter(segments, this@SegmentSelectionBottomSheet)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -128,10 +129,11 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
 
     }
 
-    override fun onClick(segment: Segment, position: Int) {
+    override fun onClick(segment: SegmentItem, position: Int) {
         Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
         if (type!="Create Task" && type!="Search"){
             PrefManager.setcurrentsegment(segment.segment_NAME)
+            segmentName=segment.segment_NAME
             sendsectionList(PrefManager.getcurrentProject())
             PrefManager.putsectionsList(sectionList)
         }
@@ -149,58 +151,69 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
     }
 
     private fun fetchSegments(projectName: String) {
-        firestoreRepository.getSegments(projectName) { serverResult ->
-            when (serverResult) {
-                is ServerResult.Success -> {
-                    binding.progressbar.gone()
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val segList = serverResult.data
-                        if (segList.isNotEmpty()) {
-                            withContext(Dispatchers.Main) {
-                                setRecyclerView(segList)
-                            }
-                        }
-
-                    }
-                }
-                is ServerResult.Failure -> {
-                    val exception = serverResult.exception
-                }
-                is ServerResult.Progress -> {
-                    binding.progressbar.visible()
-                }
-            }
-        }
+//        firestoreRepository.getSegments(projectName) { serverResult ->
+//            when (serverResult) {
+//                is ServerResult.Success -> {
+//                    binding.progressbar.gone()
+//                    CoroutineScope(Dispatchers.IO).launch {
+//                        val segList = serverResult.data
+//                        if (segList.isNotEmpty()) {
+//                            withContext(Dispatchers.Main) {
+//                                setRecyclerView(segList)
+//                            }
+//                        }
+//
+//                    }
+//                }
+//                is ServerResult.Failure -> {
+//                    val exception = serverResult.exception
+//                }
+//                is ServerResult.Progress -> {
+//                    binding.progressbar.visible()
+//                }
+//            }
+//        }
+        setRecyclerView(PrefManager.getProjectSegments(projectName).distinctBy { it.segment_NAME })
     }
     private fun sendsectionList(projectName: String) {
-        firestoreRepository.getSegments(projectName) { serverResult ->
-            when (serverResult) {
-                is ServerResult.Success -> {
-                    binding.progressbar.gone()
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val segList = serverResult.data
-                        if (segList.isNotEmpty()) {
-                            for (i in 0 until segList.size) {
-                                if (segList[i].segment_NAME == segmentName) {
-                                    sectionList = segList[i].sections
-                                }
-                            }
-                            PrefManager.putsectionsList(sectionList)
-                            withContext(Dispatchers.Main) {
-                                PrefManager.list.value = sectionList
-                            }
-                        }
-                    }
-                }
-                is ServerResult.Failure -> {
-                    val exception = serverResult.exception
-                    // Handle the failure here
-                }
-                is ServerResult.Progress -> {
-                    binding.progressbar.visible()
-                }
+//        firestoreRepository.getSegments(projectName) { serverResult ->
+//            when (serverResult) {
+//                is ServerResult.Success -> {
+//                    binding.progressbar.gone()
+//                    CoroutineScope(Dispatchers.Main).launch {
+//                        val segList = serverResult.data
+//                        if (segList.isNotEmpty()) {
+//                            for (i in 0 until segList.size) {
+//                                if (segList[i].segment_NAME == segmentName) {
+//                                    sectionList = segList[i].sections
+//                                }
+//                            }
+//                            PrefManager.putsectionsList(sectionList)
+//                            withContext(Dispatchers.Main) {
+//                                PrefManager.list.value = sectionList
+//                            }
+//                        }
+//                    }
+//                }
+//                is ServerResult.Failure -> {
+//                    val exception = serverResult.exception
+//                    // Handle the failure here
+//                }
+//                is ServerResult.Progress -> {
+//                    binding.progressbar.visible()
+//                }
+//            }
+//        }
+        val segments=PrefManager.getProjectSegments(projectName)
+        val newList=segments.distinctBy { it.segment_NAME }
+        for(segment in newList){
+            if (segment.segment_NAME==segmentName){
+                sectionList=segment.sections
             }
         }
+        PrefManager.putsectionsList(sectionList)
+        PrefManager.list.value = sectionList
+
     }
 
 

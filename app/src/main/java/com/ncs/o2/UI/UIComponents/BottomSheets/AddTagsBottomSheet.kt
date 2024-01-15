@@ -192,7 +192,6 @@ class AddTagsBottomSheet (private var TagsList: MutableList<Tag>, private val ca
                     binding.progressbar.visible()
                     binding.chipGroup.gone()
                 }
-
             }
         }
     }

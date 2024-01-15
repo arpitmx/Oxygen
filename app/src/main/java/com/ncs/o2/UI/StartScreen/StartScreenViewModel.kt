@@ -181,6 +181,20 @@ constructor(
         return repository.getTasksinProject(projectName)
 
     }
+    suspend fun getTasksinProjectAccordingtoTimeStamp(
+        projectName: String,
+    ) : ServerResult<List<Task>>{
+
+        return repository.getTasksinProjectAccordingtoTimeStamp(projectName)
+
+    }
+    suspend fun getTagsinProjectAccordingtoTimeStamp(
+        projectName: String,
+    ) : ServerResult<List<Tag>>{
+
+        return repository.getTagsinProjectAccordingtoTimeStamp(projectName)
+
+    }
     suspend fun getTagsinProject(
         projectName: String,
     ) : ServerResult<List<Tag>>{
