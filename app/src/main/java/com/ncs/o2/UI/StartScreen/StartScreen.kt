@@ -514,81 +514,184 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
     private fun setUpTasks(projectName: String) {
         val dao = db.tasksDao()
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
+        if (PrefManager.getLastTaskTimeStamp(projectName).seconds.toInt()==0) {
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
 
-                val taskResult = withContext(Dispatchers.IO) {
-                    viewModel.getTasksinProject(projectName)
-                }
-
-                Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
-
-                when (taskResult) {
-
-                    is ServerResult.Failure -> {
+                    val taskResult = withContext(Dispatchers.IO) {
+                        viewModel.getTasksinProject(projectName)
                     }
 
-                    is ServerResult.Progress -> {
-                    }
+                    Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
 
-                    is ServerResult.Success -> {
+                    when (taskResult) {
 
-                        val tasks = taskResult.data
-                        for (task in tasks) {
-                            dao.insert(task)
+                        is ServerResult.Failure -> {
                         }
 
+                        is ServerResult.Progress -> {
+                        }
+
+                        is ServerResult.Success -> {
+
+                            val tasks = taskResult.data
+                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                            for (task in tasks) {
+                                dao.insert(task)
+                            }
+                        }
 
                     }
 
+                } catch (e: Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
                 }
 
-            } catch (e: Exception) {
+            }
+        }
+        else{
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
 
-                Timber.tag(TaskDetailsFragment.TAG).e(e)
+                    val taskResult = withContext(Dispatchers.IO) {
+                        viewModel.getTasksinProjectAccordingtoTimeStamp(projectName)
+                    }
 
+                    Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
+
+                    when (taskResult) {
+
+                        is ServerResult.Failure -> {
+                        }
+
+                        is ServerResult.Progress -> {
+                        }
+
+                        is ServerResult.Success -> {
+
+                            val tasks = taskResult.data
+                            if (tasks.isNotEmpty()){
+                                val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                                PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                                for (task in tasks) {
+                                    dao.insert(task)
+                                }
+                            }
+
+
+                        }
+
+                    }
+
+                } catch (e: Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+                }
 
             }
-
         }
     }
 
     private fun setUpTags(projectName: String) {
         val dao = db.tagsDao()
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
+        if (PrefManager.getLastTagTimeStamp(projectName).seconds.toInt()==0) {
 
-                val tagResult = withContext(Dispatchers.IO) {
-                    viewModel.getTagsinProject(projectName)
-                }
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
 
-                Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
-
-                when (tagResult) {
-
-                    is ServerResult.Failure -> {
+                    val tagResult = withContext(Dispatchers.IO) {
+                        viewModel.getTagsinProject(projectName)
                     }
 
-                    is ServerResult.Progress -> {
-                    }
+                    Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
 
-                    is ServerResult.Success -> {
+                    when (tagResult) {
 
-                        val tags = tagResult.data
-                        for (tag in tags) {
-                            dao.insert(tag)
+                        is ServerResult.Failure -> {
                         }
-                        setUpNotifications()
+
+                        is ServerResult.Progress -> {
+                        }
+
+                        is ServerResult.Success -> {
+
+                            val tags = tagResult.data
+                            val newList=tagResult.data.toMutableList().sortedByDescending { it.last_tag_updated }
+                            PrefManager.setLastTagTimeStamp(projectName,newList[0].last_tag_updated!!)
+                            for (tag in tags) {
+                                dao.insert(tag)
+                            }
+                            setUpNotifications()
+                        }
                     }
+
+                } catch (e: Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
                 }
-
-            } catch (e: Exception) {
-
-                Timber.tag(TaskDetailsFragment.TAG).e(e)
-
 
             }
+        }
+        else{
+            Timber.tag(TaskDetailsFragment.TAG).d("for $projectName ${PrefManager.getLastTagTimeStamp(projectName)}")
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
 
+                    val tagResult = withContext(Dispatchers.IO) {
+                        viewModel.getTagsinProjectAccordingtoTimeStamp(projectName)
+                    }
+
+                    Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
+
+                    when (tagResult) {
+
+                        is ServerResult.Failure -> {
+                            setUpNotifications()
+                        }
+
+                        is ServerResult.Progress -> {
+                        }
+
+                        is ServerResult.Success -> {
+
+                            val tags = tagResult.data
+                            CoroutineScope(Dispatchers.IO).launch {
+                                if (tags.isNotEmpty()) {
+                                    val newList = tagResult.data.toMutableList()
+                                        .sortedByDescending { it.last_tag_updated }
+                                    PrefManager.setLastTagTimeStamp(
+                                        projectName,
+                                        newList[0].last_tag_updated!!
+                                    )
+                                    for (tag in tags) {
+                                        dao.insert(tag)
+                                    }
+                                }
+                                withContext(Dispatchers.Main){
+                                    setUpNotifications()
+                                }
+                            }
+
+
+                        }
+                    }
+
+                } catch (e: Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+                }
+
+            }
         }
     }
 

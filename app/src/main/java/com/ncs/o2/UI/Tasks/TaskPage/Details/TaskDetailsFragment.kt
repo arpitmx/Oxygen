@@ -192,6 +192,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             }
             binding.taskDetailLinLay.setOnClickThrottleBounceListener {}
 
+
+
     }
 
     override fun onDestroyView() {
@@ -335,6 +337,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                 }
             }
 
+        }
+        binding.swiperefresh.setOnRefreshListener {
+            fetchTaskAgain(activityBinding.taskId)
         }
 
     }
@@ -554,7 +559,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         layoutManager.flexWrap = FlexWrap.WRAP
         contriRecyclerView.layoutManager = layoutManager
 
-        adapter = ContributorAdapter(list, this, false)
+        adapter = ContributorAdapter(list.distinctBy { it.firebaseID }.toMutableList(), this, false)
         contriRecyclerView.adapter = adapter
 
     }
@@ -1055,6 +1060,68 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     }
 
+    private fun fetchTaskAgain(id: String){
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    viewModel.getTasksById(id, PrefManager.getcurrentProject())
+                }
+
+                Timber.tag(TAG).d("Fetched task result : ${taskResult}")
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in task fetching : ${taskResult.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.swiperefresh.isRefreshing=false
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        val localUserObj = PrefManager.getcurrentUserdetails()
+
+                        currentUser?.let { userObj ->
+
+                            if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
+                                binding.becomeModerator.visible()
+                            }
+                        }
+
+                        binding.progressBar.gone()
+
+                        setDefaultViews(taskResult.data)
+                        setTaskDetails(taskResult.data)
+                        db.tasksDao().insert(taskResult.data)
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+
+            }
+
+        }
+    }
     private fun fetchFromDB(id: String){
         viewModel.getTaskbyIdFromDB(
             projectName = PrefManager.getcurrentProject(),

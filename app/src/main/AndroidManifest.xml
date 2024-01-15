@@ -28,7 +28,7 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
-            android:name=".UI.LogsActivity"
+            android:name=".UI.Logs.LogsActivity"
             android:exported="false" />
         <activity
             android:name=".UI.UpdateScreen.UpdaterActivity"

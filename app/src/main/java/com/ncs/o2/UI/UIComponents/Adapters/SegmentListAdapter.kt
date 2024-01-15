@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Models.Segment
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.databinding.SegmetSelectionItemBinding
 
@@ -25,7 +26,7 @@ Tasks FUTURE ADDITION :
 
 */
 class SegmentListAdapter constructor(
-    val segments: List<Segment>,
+    val segments: List<SegmentItem>,
     val onClickCallback: OnClickCallback
 ) : RecyclerView.Adapter<SegmentListAdapter.ViewHolder>() {
 
@@ -53,6 +54,6 @@ class SegmentListAdapter constructor(
         RecyclerView.ViewHolder(binding.root)
 
     interface OnClickCallback {
-        fun onClick(segment: Segment, position: Int)
+        fun onClick(segment: SegmentItem, position: Int)
     }
 }

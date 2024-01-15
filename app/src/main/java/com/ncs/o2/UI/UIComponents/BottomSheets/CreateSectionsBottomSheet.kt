@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.Errors
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -82,6 +84,13 @@ class CreateSectionsBottomSheet : BottomSheetDialogFragment(){
         viewModel.segmentcreationLiveData.observe(this){ state->
             when(state){
                 ServerExceptions.segement_created.exceptionDescription->{
+                    val segment=PrefManager.getSegmentDetails()
+                    val oldSegments=PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+                    val new = oldSegments.toMutableList()
+                    new.add(SegmentItem(segment_NAME = segment.segment_NAME, sections = sectionNameList))
+                    Log.d("segmentCreationCacheCheck",new.toString())
+                    PrefManager.saveProjectSegments(projectName = PrefManager.getcurrentProject(),new)
+                    Log.d("segmentCreationCacheCheck",PrefManager.getProjectSegments(PrefManager.getcurrentProject()).toString())
                     this.dismiss()
                     this.toast("Segment Created")
                 }

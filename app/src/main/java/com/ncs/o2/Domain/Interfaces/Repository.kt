@@ -220,7 +220,15 @@ interface Repository {
         projectName: String,
     ): ServerResult<List<Task>>
 
+    suspend fun getTasksinProjectAccordingtoTimeStamp(
+        projectName: String,
+    ): ServerResult<List<Task>>
+
     suspend fun getTagsinProject(
+        projectName: String,
+    ): ServerResult<List<Tag>>
+
+    suspend fun getTagsinProjectAccordingtoTimeStamp(
         projectName: String,
     ): ServerResult<List<Tag>>
     fun uploadProjectIcon(bitmap: Bitmap, projectId: String): LiveData<ServerResult<StorageReference>>

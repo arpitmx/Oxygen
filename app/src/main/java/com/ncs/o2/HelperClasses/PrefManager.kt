@@ -17,6 +17,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.versa.Constants.Endpoints
+import java.sql.Time
 import java.util.Date
 
 /*
@@ -44,7 +45,15 @@ object PrefManager {
     private lateinit var editor : SharedPreferences.Editor
     val list=MutableLiveData<List<String>>()
     private val projectTimestampMapKey = "project_timestamp_map"
+    private val lastTaskTimestampMapKey = "last_task_timestamp_map"
+    private val lastTagTimestampMapKey = "last_tag_timestamp_map"
+
+
     private lateinit var projectTimestampMap: MutableMap<String, Long>
+    private lateinit var LastTaskTimestampMap: MutableMap<String, Timestamp>
+    private lateinit var LastTagTimestampMap: MutableMap<String, Timestamp>
+
+
     private val projectIdTaskIdMapKey = "project_id_task_id_map"
     private lateinit var projectIdTaskIdMap: MutableMap<String, Timestamp>
     fun initialize(context: Context) {
@@ -60,6 +69,22 @@ object PrefManager {
         } ?: mutableMapOf()
         val savedProjectIdTaskIdMapString = sharedPreferences.getString(projectIdTaskIdMapKey, null)
         projectIdTaskIdMap = savedProjectIdTaskIdMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+        val savedLastTaskTimeStampMapString = sharedPreferences.getString(lastTaskTimestampMapKey, null)
+        LastTaskTimestampMap = savedLastTaskTimeStampMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+        val savedLastTagTimeStampMapString = sharedPreferences.getString(lastTagTimestampMapKey, null)
+        LastTagTimestampMap = savedLastTagTimeStampMapString?.let {
             try {
                 Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
             } catch (e: JsonSyntaxException) {
@@ -436,7 +461,41 @@ object PrefManager {
         editor.putInt("readCount", 0)
         editor.apply()
     }
+    fun getAllTimeReadCount(): Int {
+        return sharedPreferences.getInt("allTimeReadCount", 0)
+    }
 
+    fun setAllTimeReadCount(count: Int) {
+        val oldCount= getAllTimeReadCount()
+        editor.putInt("allTimeReadCount", oldCount+count)
+        editor.apply()
+    }
 
+    fun setLastTaskTimeStamp(projectName: String, timestamp: Timestamp) {
+        LastTaskTimestampMap[projectName] = timestamp
+        saveLastTaskTimeStampHashMapToPreferences()
+    }
 
+    fun getLastTaskTimeStamp(projectName: String): Timestamp {
+        return LastTaskTimestampMap[projectName] ?: Timestamp(0, 0)
+    }
+    private fun saveLastTaskTimeStampHashMapToPreferences() {
+        val hashMapString = Gson().toJson(LastTaskTimestampMap)
+        editor.putString(lastTaskTimestampMapKey, hashMapString)
+        editor.apply()
+    }
+
+    fun setLastTagTimeStamp(projectName: String, timestamp: Timestamp) {
+        LastTagTimestampMap[projectName] = timestamp
+        saveLastTagTimeStampHashMapToPreferences()
+    }
+
+    fun getLastTagTimeStamp(projectName: String): Timestamp {
+        return LastTagTimestampMap[projectName] ?: Timestamp(0, 0)
+    }
+    private fun saveLastTagTimeStampHashMapToPreferences() {
+        val hashMapString = Gson().toJson(LastTagTimestampMap)
+        editor.putString(lastTagTimestampMapKey, hashMapString)
+        editor.apply()
+    }
 }
