@@ -438,6 +438,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         PrefManager.selectedPosition.value = position
         val drawerLayout = binding.drawer
         drawerLayout.closeDrawer(GravityCompat.START)
+        val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+        segment.segmentSelectionListener = this
+        segment.show(supportFragmentManager, "Segment Selection")
+        binding.gioActionbar.switchSegmentButton.rotate180(this)
 
     }
 
