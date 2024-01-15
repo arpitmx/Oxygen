@@ -498,4 +498,26 @@ object PrefManager {
         editor.putString(lastTagTimestampMapKey, hashMapString)
         editor.apply()
     }
+    fun putProjectsTasksRetrieved(key: String, stringList: List<String>) {
+        val gson = Gson()
+        val json = gson.toJson(stringList)
+        editor.putString(key, json)
+        editor.apply()
+    }
+
+    fun getStringList(key: String): List<String> {
+        val jsonString = sharedPreferences.getString(key, null)
+        return if (jsonString != null) {
+            try {
+                val gson = Gson()
+                val type = object : TypeToken<List<String>>() {}.type
+                gson.fromJson(jsonString, type)
+            } catch (e: JsonSyntaxException) {
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+    }
+
 }
