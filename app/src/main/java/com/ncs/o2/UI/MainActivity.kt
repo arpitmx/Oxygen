@@ -1,5 +1,6 @@
 package com.ncs.o2.UI
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -60,6 +61,7 @@ import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
@@ -76,6 +78,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -436,12 +439,14 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
         PrefManager.selectedPosition.value = position
-        val drawerLayout = binding.drawer
-        drawerLayout.closeDrawer(GravityCompat.START)
-        val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-        segment.segmentSelectionListener = this
-        segment.show(supportFragmentManager, "Segment Selection")
-        binding.gioActionbar.switchSegmentButton.rotate180(this)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            setUpTasks(projectID)
+            setUpTags(projectName = projectID)
+
+        }
+
+
 
     }
 
@@ -461,6 +466,224 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             movetotaskspage()
         }
 
+    }
+
+    private fun setUpTasks(projectName: String) {
+        val dao = db.tasksDao()
+        val progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("Please wait, Syncing Tasks")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        if (PrefManager.getLastTaskTimeStamp(projectName).seconds.toInt()==0) {
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+
+                    val taskResult = withContext(Dispatchers.IO) {
+                        viewModel.getTasksinProject(projectName)
+                    }
+
+                    when (taskResult) {
+
+                        is ServerResult.Failure -> {
+                            progressDialog.dismiss()
+                            val drawerLayout = binding.drawer
+                            drawerLayout.closeDrawer(GravityCompat.START)
+                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+                            segment.segmentSelectionListener = this@MainActivity
+                            segment.show(supportFragmentManager, "Segment Selection")
+                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
+
+                        }
+
+                        is ServerResult.Progress -> {
+                            progressDialog.show()
+                            progressDialog.setMessage("Please wait, Syncing Tasks")
+
+                        }
+
+                        is ServerResult.Success -> {
+                            val tasks = taskResult.data
+                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                            for (task in tasks) {
+                                dao.insert(task)
+                            }
+                            progressDialog.dismiss()
+
+                            val drawerLayout = binding.drawer
+                            drawerLayout.closeDrawer(GravityCompat.START)
+                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+                            segment.segmentSelectionListener = this@MainActivity
+                            segment.show(supportFragmentManager, "Segment Selection")
+                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
+                        }
+
+                    }
+
+                } catch (e: java.lang.Exception) {
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+                    progressDialog.dismiss()
+
+                }
+
+            }
+        }
+        else{
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+
+                    val taskResult = withContext(Dispatchers.IO) {
+                        viewModel.getTasksinProjectAccordingtoTimeStamp(projectName)
+                    }
+
+                    Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
+
+                    when (taskResult) {
+
+                        is ServerResult.Failure -> {
+                            progressDialog.dismiss()
+                            val drawerLayout = binding.drawer
+                            drawerLayout.closeDrawer(GravityCompat.START)
+                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+                            segment.segmentSelectionListener = this@MainActivity
+                            segment.show(supportFragmentManager, "Segment Selection")
+                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
+
+                        }
+
+                        is ServerResult.Progress -> {
+                            progressDialog.show()
+                            progressDialog.setMessage("Please wait, Syncing Tasks")
+
+                        }
+
+                        is ServerResult.Success -> {
+
+                            val tasks = taskResult.data
+                            if (tasks.isNotEmpty()){
+                                val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                                PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                                for (task in tasks) {
+                                    dao.insert(task)
+                                }
+                            }
+                            progressDialog.dismiss()
+
+                            val drawerLayout = binding.drawer
+                            drawerLayout.closeDrawer(GravityCompat.START)
+                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+                            segment.segmentSelectionListener = this@MainActivity
+                            segment.show(supportFragmentManager, "Segment Selection")
+                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
+
+
+                        }
+
+                    }
+
+                } catch (e: java.lang.Exception) {
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+                    progressDialog.dismiss()
+
+
+                }
+
+            }
+        }
+    }
+    private fun setUpTags(projectName: String) {
+        val dao = db.tagsDao()
+        if (PrefManager.getLastTagTimeStamp(projectName).seconds.toInt()==0) {
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+
+                    val tagResult = withContext(Dispatchers.IO) {
+                        viewModel.getTagsinProject(projectName)
+                    }
+
+                    Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
+
+                    when (tagResult) {
+
+                        is ServerResult.Failure -> {
+                        }
+
+                        is ServerResult.Progress -> {
+                        }
+
+                        is ServerResult.Success -> {
+
+                            val tags = tagResult.data
+                            val newList=tagResult.data.toMutableList().sortedByDescending { it.last_tag_updated }
+                            PrefManager.setLastTagTimeStamp(projectName,newList[0].last_tag_updated!!)
+                            for (tag in tags) {
+                                dao.insert(tag)
+                            }
+                        }
+                    }
+
+                } catch (e: java.lang.Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+                }
+
+            }
+        }
+        else{
+            Timber.tag(TaskDetailsFragment.TAG).d("for $projectName ${PrefManager.getLastTagTimeStamp(projectName)}")
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+
+                    val tagResult = withContext(Dispatchers.IO) {
+                        viewModel.getTagsinProjectAccordingtoTimeStamp(projectName)
+                    }
+
+                    Timber.tag(TaskDetailsFragment.TAG).d("Fetched Tag result : ${tagResult}")
+
+                    when (tagResult) {
+
+                        is ServerResult.Failure -> {
+                        }
+
+                        is ServerResult.Progress -> {
+                        }
+
+                        is ServerResult.Success -> {
+
+                            val tags = tagResult.data
+                            CoroutineScope(Dispatchers.IO).launch {
+                                if (tags.isNotEmpty()) {
+                                    val newList = tagResult.data.toMutableList()
+                                        .sortedByDescending { it.last_tag_updated }
+                                    PrefManager.setLastTagTimeStamp(
+                                        projectName,
+                                        newList[0].last_tag_updated!!
+                                    )
+                                    for (tag in tags) {
+                                        dao.insert(tag)
+                                    }
+                                }
+
+                            }
+
+
+                        }
+                    }
+
+                } catch (e: java.lang.Exception) {
+
+                    Timber.tag(TaskDetailsFragment.TAG).e(e)
+
+
+                }
+
+            }
+        }
     }
 
 

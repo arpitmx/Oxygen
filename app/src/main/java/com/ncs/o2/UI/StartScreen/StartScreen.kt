@@ -440,10 +440,8 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
                         setUpFCMTokenIfRequired(document = document)
                         setUpProjectsList(document = document)
                         val projectsList = PrefManager.getProjectsList()
-                        for (projects in projectsList) {
-                            setUpTasks(projects)
-                            setUpTags(projects)
-                        }
+                        setUpTasks(PrefManager.getcurrentProject())
+                        setUpTags(PrefManager.getcurrentProject())
                     }
 
 
@@ -614,6 +612,7 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
                     when (tagResult) {
 
                         is ServerResult.Failure -> {
+                            setUpNotifications()
                         }
 
                         is ServerResult.Progress -> {
