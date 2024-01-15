@@ -1,16 +1,11 @@
 package com.ncs.o2.UI.Setting
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.ncs.o2.Constants.TestingConfig
-import com.ncs.o2.Domain.Interfaces.AuthRepository
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -18,14 +13,12 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
-import com.ncs.o2.UI.LogsActivity
-import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Logs.LogsActivity
 import com.ncs.o2.UI.NewChanges
 import com.ncs.o2.databinding.ActivitySettingsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {

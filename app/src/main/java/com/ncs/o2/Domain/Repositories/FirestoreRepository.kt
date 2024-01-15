@@ -947,6 +947,7 @@ class FirestoreRepository @Inject constructor(
 
             val snapShot = task
             ServerLogger().addRead(snapShot.size())
+            Log.d("ServerLoggerSize",snapShot.size().toString())
 
             if (!snapShot.isEmpty) {
 
@@ -970,6 +971,47 @@ class FirestoreRepository @Inject constructor(
         }
 
     }
+
+    override suspend fun getTasksinProjectAccordingtoTimeStamp(
+        projectName: String,
+    ): ServerResult<List<Task>> {
+
+        return try {
+
+            val task =
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .whereGreaterThan("last_updated",PrefManager.getLastTaskTimeStamp(projectName))
+                    .get().await()
+
+            val snapShot = task
+            Log.d("ServerLoggerSize","Running filter ${snapShot.size().toString()}")
+            ServerLogger().addRead(snapShot.size())
+
+            if (!snapShot.isEmpty) {
+
+                val list:MutableList<Task> = mutableListOf()
+                for (document in snapShot.documents){
+                    val taskData = document.toObject(Task::class.java)
+                    list.add(taskData!!)
+
+                }
+
+                list?.let {
+                    return ServerResult.Success(it)
+                } ?: ServerResult.Failure(Exception("Document not found for title:"))
+
+            } else {
+                return ServerResult.Failure(Exception("Document not found for title"))
+            }
+
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+
+    }
+
 
     override suspend fun getTagsinProject(
         projectName: String,
@@ -1028,6 +1070,70 @@ class FirestoreRepository @Inject constructor(
         }
 
     }
+
+    override suspend fun getTagsinProjectAccordingtoTimeStamp(
+        projectName: String,
+    ): ServerResult<List<Tag>> {
+
+        try {
+            val projectDocumentRef = firestore.collection(Endpoints.PROJECTS).document(projectName)
+
+            val tagsCollectionExists = projectDocumentRef.collection(Endpoints.Project.TAGS).get().await().documents.isNotEmpty()
+
+            if (tagsCollectionExists) {
+                val task = projectDocumentRef
+                    .collection(Endpoints.Project.TAGS)
+                    .whereGreaterThan("last_tag_updated", PrefManager.getLastTagTimeStamp(projectName))
+                    .get().await()
+
+                val snapShot = task
+                ServerLogger().addRead(snapShot.size())
+
+                if (!snapShot.isEmpty) {
+
+                    val list: MutableList<Tag> = mutableListOf()
+                    for (document in snapShot.documents) {
+
+                        val tagText = document.getString("tagText")
+                        val tagID = document.getString("tagID")
+                        val textColor = document.getString("textColor")!!
+                        val bgColor = document.getString("bgColor")
+                        val projectName = document.getString("projectName")
+
+                        val lastUpdate: Timestamp
+                        if (document.get(Endpoints.Project.LAST_TAG_UPDATED).isNull) {
+                            lastUpdate = Timestamp.now()
+                        } else {
+                            lastUpdate = document.get(Endpoints.Project.LAST_TAG_UPDATED) as Timestamp
+                        }
+                        val tagData = Tag(
+                            tagText = tagText!!,
+                            tagID = tagID!!,
+                            textColor = textColor,
+                            bgColor = bgColor!!,
+                            last_tag_updated = lastUpdate,
+                            projectName = projectName!!
+                        )
+                        list.add(tagData)
+                    }
+
+                    list.let {
+                        return ServerResult.Success(it)
+                    }
+
+                } else {
+                    return ServerResult.Failure(Exception("Document not found for title: $projectName"))
+                }
+            } else {
+                println("TAGS collection does not exist for project: $projectName")
+                return ServerResult.Failure(Exception("TAGS collection not found for title: $projectName"))
+            }
+
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
 
     override suspend fun getTasksItem(
         projectName: String,

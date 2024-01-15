@@ -262,6 +262,9 @@ dependencies {
     implementation 'pub.devrel:easypermissions:3.0.0'
     implementation 'pub.devrel:easypermissions:2.0.1'
 
+    //swipe to refresh
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
+
 
 
     implementation 'androidx.core:core-ktx:1.10.1'
