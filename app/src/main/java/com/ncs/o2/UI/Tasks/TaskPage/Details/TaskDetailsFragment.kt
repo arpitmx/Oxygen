@@ -1181,6 +1181,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     binding.progressBar.visible()
                 }
 
+                else -> {}
             }
 
         }
