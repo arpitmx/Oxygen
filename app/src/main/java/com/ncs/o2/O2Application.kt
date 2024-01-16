@@ -2,9 +2,13 @@ package com.ncs.o2
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
@@ -19,11 +23,15 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.Domain.Workers.FCMWorker
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Services.NotificationApiService
+import com.ncs.versa.Constants.Endpoints
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import io.github.kbiakov.codeview.classifier.CodeProcessor
 import kotlinx.coroutines.CoroutineScope
@@ -63,10 +71,10 @@ class O2Application : Application(), Configuration.Provider{
     lateinit var db: TasksDatabase
     @Inject
     lateinit var notificationDB:NotificationDatabase
-
     @Inject
     @FirebaseRepository
     lateinit var repository: com.ncs.o2.Domain.Interfaces.Repository
+
 
 
     //Todo : Check if initiations taking too long, before production

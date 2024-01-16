@@ -14,8 +14,10 @@ import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ChecklistItemBinding
+import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
 
 class CheckListAdapter constructor(
@@ -61,7 +63,13 @@ class CheckListAdapter constructor(
             }
             if (isAssignee) {
                 holder.binding.clear.gone()
-                holder.binding.checkbox.visible()
+                if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                    holder.binding.checkbox.visible()
+                }
+                else{
+                    holder.binding.checkbox.gone()
+
+                }
                 holder.binding.checkbox.isChecked = list[position].done
                 val isChecked = holder.binding.checkbox.isChecked
                 if (isChecked) {
@@ -84,7 +92,13 @@ class CheckListAdapter constructor(
             }
             if (isAssignee && isModerator) {
                 holder.binding.clear.gone()
-                holder.binding.checkbox.visible()
+                if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                    holder.binding.checkbox.visible()
+                }
+                else{
+                    holder.binding.checkbox.gone()
+
+                }
                 holder.binding.checkbox.isChecked = list[position].done
                 val isChecked = holder.binding.checkbox.isChecked
                 if (isChecked) {
@@ -105,12 +119,19 @@ class CheckListAdapter constructor(
                     checkListItemListener.onCheckBoxClick(list[position].id, isChecked, position)
                 }
                 holder.binding.parent.setOnClickThrottleBounceListener {
-                    checkListItemListener.onClick(position)
+                    if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+                        checkListItemListener.onClick(position)
+                    }
                 }
             }
             if (isModerator) {
                 holder.binding.clear.gone()
-                holder.binding.checkbox.visible()
+                if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                    holder.binding.checkbox.visible()
+                }
+                else{
+                    holder.binding.checkbox.gone()
+                }
                 holder.binding.checkbox.isChecked = list[position].done
                 val isChecked = holder.binding.checkbox.isChecked
                 if (isChecked) {
@@ -131,7 +152,9 @@ class CheckListAdapter constructor(
                     checkListItemListener.onCheckBoxClick(list[position].id, isChecked, position)
                 }
                 holder.binding.parent.setOnClickThrottleBounceListener {
-                    checkListItemListener.onClick(position)
+                    if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+                        checkListItemListener.onClick(position)
+                    }
                 }
             }
         }

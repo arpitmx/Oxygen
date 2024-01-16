@@ -2,6 +2,8 @@ package com.ncs.o2.UI.Setting
 
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -10,18 +12,21 @@ import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Logs.LogsActivity
 import com.ncs.o2.UI.NewChanges
 import com.ncs.o2.databinding.ActivitySettingsBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
 
 @AndroidEntryPoint
-class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
+class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,NetworkChangeReceiver.NetworkChangeCallback {
 
     private lateinit var binding:ActivitySettingsBinding
     private lateinit var auth: FirebaseAuth
@@ -29,13 +34,15 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
         GlobalUtils.EasyElements(this@SettingsActivity)
     }
     private val TAG = "SettingsActivity"
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         auth = FirebaseAuth.getInstance()
-
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
         setUpViews()
         setUpRecyclerView()
         setContentView(binding.root)
@@ -79,8 +86,13 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
 
     override fun onClick(position: Int) {
         if (Codes.STRINGS.clickedSetting == "Edit Profile"){
-            startActivity(Intent(this,EditProfileActivity::class.java))
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+                startActivity(Intent(this, EditProfileActivity::class.java))
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            else{
+                util.showSnackbar(binding.root,"Profile edit not available",2000)
+            }
         }
         else if (Codes.STRINGS.clickedSetting == "What's New"){
             startActivity(Intent(this, NewChanges::class.java))
@@ -144,6 +156,24 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick {
         } else {
             false
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        util.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        startActivity(intent)
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
     }
 
 }

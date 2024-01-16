@@ -1,6 +1,8 @@
 package com.ncs.o2.UI.Notifications
 
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -21,6 +23,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
@@ -30,9 +33,10 @@ import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick {
+class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick,NetworkChangeReceiver.NetworkChangeCallback {
 
     private val binding: ActivityNotificationsBinding by lazy {
         ActivityNotificationsBinding.inflate(layoutInflater)
@@ -40,6 +44,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     private val utils: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     private val viewModel: NotificationsViewModel by viewModels()
 
     private lateinit var adapter: NotificationAdapter
@@ -54,6 +59,9 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         val projectID=intent.getStringExtra("projectID")
         val taskID=intent.getStringExtra("taskID")
@@ -274,6 +282,23 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
             }
         }
     }
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
 
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        utils.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        startActivity(intent)
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
+    }
 
 }

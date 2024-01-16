@@ -1,5 +1,7 @@
 package com.ncs.o2.UI.CreateTask
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,11 +12,15 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.UIComponents.Adapters.CheckListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CheckListBottomSheet
 import com.ncs.o2.databinding.ActivityChecklistBinding
+import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.AbstractMarkwonPlugin
@@ -32,10 +38,12 @@ import io.noties.markwon.syntax.Prism4jThemeDarkula
 import io.noties.markwon.syntax.SyntaxHighlightPlugin
 import io.noties.prism4j.Prism4j
 import timber.log.Timber
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItemListener,CheckListAdapter.CheckListItemListener {
+class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItemListener,CheckListAdapter.CheckListItemListener,
+    NetworkChangeReceiver.NetworkChangeCallback {
 
     private val binding: ActivityChecklistBinding by lazy {
         ActivityChecklistBinding.inflate(layoutInflater)
@@ -47,10 +55,16 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
 
     private var list:MutableList<CheckList> = mutableListOf()
     private lateinit var checkListAdapter:CheckListAdapter
+    @Inject
+    lateinit var utils : GlobalUtils.EasyElements
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+
         listener = ListenerHolder.checkListListener!!
         val dataList = intent.getSerializableExtra("checkListArray") as ArrayList<CheckList>?
         list.addAll(dataList!!)
@@ -168,5 +182,23 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
 
     override fun onCheckBoxClick(id: String, isChecked: Boolean, position: Int) {
 
+    }
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        utils.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        startActivity(intent)
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
     }
 }

@@ -48,6 +48,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserListBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentSearchBinding
+import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -371,12 +372,27 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             filterBottomSheet.show(requireFragmentManager(), "PRIORITY")
         }
         binding.assignee.setOnClickThrottleBounceListener {
-            val assigneeListBottomSheet = UserListBottomSheet(OList, selectedAssignee,this,this,"ASSIGNEE")
-            assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+
+                val assigneeListBottomSheet =
+                    UserListBottomSheet(OList, selectedAssignee, this, this, "ASSIGNEE")
+                assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
+            }
+            else{
+                toast("Can't fetch Assignee")
+            }
         }
         binding.created.setOnClickThrottleBounceListener {
-            val assigneeListBottomSheet = UserListBottomSheet(OList2, selectedAssignee2,this,this,"CREATED BY")
-            assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+
+                val assigneeListBottomSheet =
+                    UserListBottomSheet(OList2, selectedAssignee2, this, this, "CREATED BY")
+                assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
+            }
+            else{
+                toast("Can't fetch Creators")
+            }
+
         }
         binding.segment.setOnClickThrottleBounceListener {
             val segment = SegmentSelectionBottomSheet("Search")

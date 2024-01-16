@@ -25,6 +25,7 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -40,6 +41,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.CheckListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CheckListBottomSheet
 import com.ncs.o2.databinding.FragmentTaskChecklistBinding
+import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.AbstractMarkwonPlugin
@@ -99,6 +101,13 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
         if (moderatorList.contains(currentUser)){
             isModerator=true
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE){
+                binding.btnAddMoreCheckList.visible()
+            }
+            else{
+                binding.btnAddMoreCheckList.invisible()
+
+            }
         }
 
         if (assignee == currentUser) {
@@ -106,11 +115,18 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         }
 
         if (isModerator || isAssignee) {
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE){
+                binding.btnAddMoreCheckList.visible()
+            }
+            else{
+                binding.btnAddMoreCheckList.invisible()
 
+            }
             //Current user is moderator or assignee (Make the checklist editable)
             Timber.tag(TAG)
                 .d("running initviews when true " + isModerator.toString() + " " + isAssignee.toString())
             initViews()
+
         }
         if (!isModerator && !isAssignee){
 
@@ -144,6 +160,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
         }
         if (isModerator && isAssignee){
+
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,true,true)
 
         }
@@ -193,7 +210,9 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                         setCheckListRecyclerView(result.data)
                         binding.progressbar.gone()
                         if (isModerator){
-                            binding.btnAddMoreCheckList.visible()
+                            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                                binding.btnAddMoreCheckList.visible()
+                            }
                         }
                     }
 

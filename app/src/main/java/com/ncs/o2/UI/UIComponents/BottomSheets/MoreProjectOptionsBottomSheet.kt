@@ -19,6 +19,7 @@ import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -26,6 +27,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.MoreOptionBottomSheetBinding
 import com.ncs.o2.databinding.MoreProjectOptionBottomsheetBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -66,7 +68,12 @@ class MoreProjectOptionsBottomSheet : BottomSheetDialogFragment(){
             dismiss()
         }
         binding.shareButton.setOnClickThrottleBounceListener {
-            getProjectLink()
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+                getProjectLink()
+            }
+            else{
+               toast("Error getting project link,you are offline")
+            }
         }
     }
 

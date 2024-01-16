@@ -519,5 +519,23 @@ object PrefManager {
             emptyList()
         }
     }
+    fun getAppMode(): String? {
+        return sharedPreferences.getString("appMode", Endpoints.ONLINE_MODE)
+    }
+
+    fun setAppMode(mode:String) {
+        editor.putString("appMode", mode)
+        editor.apply()
+    }
+
+     fun hasOfflineDialogBeenShown(): Boolean {
+        return sharedPreferences.getBoolean("offlineDialogShown", false)
+    }
+
+     fun setOfflineDialogShown(isshown:Boolean) {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("offlineDialogShown", isshown)
+        editor.apply()
+    }
 
 }

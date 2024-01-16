@@ -3,8 +3,10 @@ package com.ncs.o2.UI.createProject
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -33,6 +35,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
@@ -47,7 +50,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback,
-    UserlistBottomSheet.getContributorsCallback {
+    UserlistBottomSheet.getContributorsCallback , NetworkChangeReceiver.NetworkChangeCallback{
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
@@ -65,6 +68,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         ActivityCreateProjectBinding.inflate(layoutInflater)
     }
 
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
@@ -73,7 +77,8 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this).get(createProjectViewModel::class.java)
-
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
         val desc = binding.projectDesc.text
         val image = binding.image
         binding.cardView.setOnClickListener {
@@ -359,6 +364,25 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     override fun onTListUpdated(TList: MutableList<User>) {
         OList.clear()
         OList = TList
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        util.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        startActivity(intent)
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
     }
 
 }
