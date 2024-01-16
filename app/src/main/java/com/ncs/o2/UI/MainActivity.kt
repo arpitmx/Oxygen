@@ -131,7 +131,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 handleDynamicLink(intent)
                 dynamicLinkHandled = true
             }
-
         }
         else{
 
@@ -431,7 +430,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onClick(projectID: String, position: Int) {
 
         // Handle click on a project in the list
-        Toast.makeText(this, "Clicked $projectID", Toast.LENGTH_SHORT).show()
         PrefManager.setcurrentsegment("Select Segment")
         viewModel.updateCurrentSegment("Select Segment")
 

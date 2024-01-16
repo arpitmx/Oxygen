@@ -37,6 +37,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.deleteDownloadedFile
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -102,13 +103,13 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initialise()
-        PrefManager.resetReadCount()
     }
 
     private fun initialise() {
 
-        binding.fragContainer.popInfinity(this)
-        binding.fragContainer.rotateInfinity(this)
+        PrefManager.resetReadCount()
+
+        binding.fragContainer.gone()
 
         //Check for updates
         viewModel.getUpdateDocumentLiveData().observe(this) { update ->
@@ -247,7 +248,10 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
     private fun setBallAnimator() {
 
+
         ball = binding.fragContainer
+        ball.visible()
+        ball.animFadein(this,500)
 
         ball.rotateInfinity(this)
         val maxsize = 15f
