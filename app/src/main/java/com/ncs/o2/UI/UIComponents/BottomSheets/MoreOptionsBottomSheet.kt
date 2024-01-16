@@ -17,11 +17,13 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.MoreOptionBottomSheetBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -59,9 +61,15 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
             dismiss()
         }
         binding.shareButton.setOnClickThrottleBounceListener {
-            binding.progressBar.visible()
-            binding.buttons.gone()
-            createTaskLink(activityBinding.taskId)
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE){
+                binding.progressBar.visible()
+                binding.buttons.gone()
+                createTaskLink(activityBinding.taskId)
+            }
+            else{
+                toast("Error Creating task link, you are offline")
+            }
+
         }
     }
 

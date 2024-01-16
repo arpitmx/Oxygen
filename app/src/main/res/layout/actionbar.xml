@@ -100,6 +100,43 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="100dp"
+            android:id="@+id/offlineIndicator"
+            android:layout_height="35dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/secondarybg"
+            app:cardCornerRadius="45dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/notification_cont"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="@color/yello"
+                    app:cardCornerRadius="15dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:text="OFFLINE"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/better_white"
+                    android:textSize="13dp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
 
         <ImageButton
             android:id="@+id/create_task_button"
@@ -114,6 +151,8 @@
             app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@android:drawable/ic_input_add"
             app:tint="@color/primary" />
+
+
 
         <ImageButton
             android:id="@+id/new_changes_btn"
