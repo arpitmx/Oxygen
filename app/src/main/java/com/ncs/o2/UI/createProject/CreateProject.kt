@@ -384,5 +384,10 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     override fun onOfflineModeNegativeSelected() {
         networkChangeReceiver.retryNetworkCheck()
     }
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
 
 }

@@ -112,6 +112,11 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
     private fun setUpViews() {
 
     }
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
 
     override fun onPause() {
         super.onPause()

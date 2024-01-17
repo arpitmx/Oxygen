@@ -165,6 +165,11 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
     private fun editUserDetails(newUserInfo: UserInfo){
 
         if(userInfo!= newUserInfo){

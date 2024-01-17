@@ -95,6 +95,12 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         unregisterReceiver(networkChangeReceiver)
     }
 
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
+
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
         utils.restartApp()

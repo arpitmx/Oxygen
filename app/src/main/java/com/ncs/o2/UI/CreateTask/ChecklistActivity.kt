@@ -125,6 +125,11 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
         initViews()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
     interface checkListListener{
         fun sendcheckListarray(list: MutableList<CheckList>)
     }

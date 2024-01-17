@@ -332,6 +332,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
     }
 
 
+
     private fun showBallError(error: Errors, logs: Exception) {
 
         Handler(Looper.getMainLooper()).postDelayed({

@@ -78,6 +78,11 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             onBackPressed()
         }
     }
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)

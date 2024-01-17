@@ -74,6 +74,7 @@ class LogsActivity : AppCompatActivity() ,NetworkChangeReceiver.NetworkChangeCal
         unregisterReceiver(networkChangeReceiver)
     }
 
+
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
         utils.restartApp()
@@ -86,5 +87,10 @@ class LogsActivity : AppCompatActivity() ,NetworkChangeReceiver.NetworkChangeCal
 
     override fun onOfflineModeNegativeSelected() {
         networkChangeReceiver.retryNetworkCheck()
+    }
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
     }
 }
