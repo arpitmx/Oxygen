@@ -49,8 +49,8 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+
+        registerReceiver(true)
 
             taskId = intent.getStringExtra("task_id")!!
             val _index= intent.getStringExtra("index")
@@ -91,10 +91,52 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         if (show) binding.progressbarBottomTab.visible()
         else binding.progressbarBottomTab.gone()
     }
+
+    private var receiverRegistered = false
+
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
+
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
+
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(true)
+    }
+
 
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
