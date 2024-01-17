@@ -4,9 +4,11 @@ import android.Manifest
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -26,18 +28,20 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.StartScreen.StartScreen
 import com.ncs.o2.databinding.ActivityEditProfileBinding
 import com.ncs.o2.databinding.ChooseDesignationBottomSheetBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.InputStream
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class EditProfileActivity : AppCompatActivity() {
+class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkChangeCallback{
 
     private val TAG= "EditProfileActivity"
 
@@ -59,12 +63,14 @@ class EditProfileActivity : AppCompatActivity() {
     private var newImageUrl: String?= null
     private var newBio: String?= null
     var newUsername: String?= null
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
         setUpView()
 
         viewModel.getUserDetails()
@@ -437,5 +443,24 @@ class EditProfileActivity : AppCompatActivity() {
             e.printStackTrace()
         }
         return bitmap
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        util.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        startActivity(intent)
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
     }
 }

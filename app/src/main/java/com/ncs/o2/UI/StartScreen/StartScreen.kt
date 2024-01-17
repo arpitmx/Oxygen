@@ -3,7 +3,9 @@ package com.ncs.o2.UI.StartScreen
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -37,7 +39,6 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.deleteDownloadedFile
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -49,6 +50,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.Services.Updater.UpdateDownloaderService
@@ -73,7 +75,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class StartScreen @Inject constructor() : AppCompatActivity() {
+class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeReceiver.NetworkChangeCallback {
 
     @Inject
     @FirebaseRepository
@@ -91,6 +93,9 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
         ActivitySplashScreenBinding.inflate(layoutInflater)
     }
 
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
+
+
     companion object {
         val DELAY = 500L
         val DELAY_ACTIVITY_START = 0L
@@ -102,14 +107,22 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        initialise()
+        PrefManager.resetReadCount()
+        PrefManager.setOfflineDialogShown(false)
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+            initialise()
+        }
+        else{
+            startMainActivity()
+        }
+
     }
 
     private fun initialise() {
 
-        PrefManager.resetReadCount()
-
-        binding.fragContainer.gone()
+        binding.fragContainer.popInfinity(this)
+        binding.fragContainer.rotateInfinity(this)
 
         //Check for updates
         viewModel.getUpdateDocumentLiveData().observe(this) { update ->
@@ -248,10 +261,7 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
     private fun setBallAnimator() {
 
-
         ball = binding.fragContainer
-        ball.visible()
-        ball.animFadein(this,500)
 
         ball.rotateInfinity(this)
         val maxsize = 15f
@@ -287,24 +297,37 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
     private fun startMainActivity() {
 
-        viewModel.checkMaintenanceThroughRepository().observe(this) {
+        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
 
-            if (Codes.STRINGS.isMaintaining != null) {
-                if (Codes.STRINGS.isMaintaining == "true") {
-                    Log.d("maintainenceCheck", "maintaining")
-                    val intent = Intent(this, MaintainingScreen::class.java)
-                    startActivity(intent)
-                    finishAffinity()
-                } else {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    overridePendingTransition(
-                        R.anim.fadein,
-                        R.anim.fadeout
-                    )
-                    finishAffinity()
+            viewModel.checkMaintenanceThroughRepository().observe(this) {
+
+                if (Codes.STRINGS.isMaintaining != null) {
+                    if (Codes.STRINGS.isMaintaining == "true") {
+                        Log.d("maintainenceCheck", "maintaining")
+                        val intent = Intent(this, MaintainingScreen::class.java)
+                        startActivity(intent)
+                        finishAffinity()
+                    } else {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        overridePendingTransition(
+                            R.anim.fadein,
+                            R.anim.fadeout
+                        )
+                        finishAffinity()
+                    }
                 }
             }
+        }
+        else{
+
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(
+                R.anim.fadein,
+                R.anim.fadeout
+            )
+            finishAffinity()
         }
     }
 
@@ -807,5 +830,27 @@ class StartScreen @Inject constructor() : AppCompatActivity() {
 
     }
 
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        util.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+        startMainActivity()
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
+    }
+    override fun onResume() {
+        super.onResume()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
 
 }

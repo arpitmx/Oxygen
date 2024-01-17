@@ -261,12 +261,15 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <include
-            android:id="@+id/input_box"
-            layout="@layout/inputbox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="0dp" />
+
+            <include
+                android:id="@+id/input_box"
+                layout="@layout/inputbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp" />
+
+
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

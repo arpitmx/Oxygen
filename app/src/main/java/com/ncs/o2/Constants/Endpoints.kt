@@ -2,6 +2,8 @@ package com.ncs.versa.Constants
 
 object Endpoints {
 
+    const val ONLINE_MODE="Online"
+    const val OFFLINE_MODE="Offline"
     const val USERS = "Users"
     const val PROJECTS = "Projects"
     const val APP_CONFIG = "AppConfig"

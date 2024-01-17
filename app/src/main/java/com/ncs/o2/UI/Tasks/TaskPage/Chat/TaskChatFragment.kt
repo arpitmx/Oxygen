@@ -173,6 +173,14 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+            binding.inputBox.segmentParent.visible()
+
+        }
+        else{
+            binding.inputBox.segmentParent.gone()
+
+        }
         setDetails(activityBinding.taskId)
         setUpChatbox()
         setUpRecyclerview()
@@ -186,7 +194,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun initViews() {
 
-        val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+
+
+            val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.inputBox.editboxMessage, InputMethodManager.SHOW_IMPLICIT)
 
         binding.chatboxOptionBox.gone()

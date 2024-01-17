@@ -43,6 +43,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
@@ -164,8 +165,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
+            manageEdits()
             setUpViews()
             runDelayed(100) {
                 setDetails(activityBinding.taskId)
@@ -209,6 +209,43 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         super.onResume()
     }
 
+    private fun manageEdits(){
+        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+            binding.section.isEnabled=true
+            binding.section.isClickable=true
+
+            binding.priority.isEnabled=true
+            binding.priority.isClickable=true
+
+            binding.taskType.isEnabled=true
+            binding.taskType.isClickable=true
+
+            binding.assignee.isEnabled=true
+            binding.assignee.isClickable=true
+
+            binding.status.isEnabled=true
+            binding.status.isClickable=true
+
+        }
+        else if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
+            binding.section.isEnabled=false
+            binding.section.isClickable=false
+
+            binding.priority.isEnabled=false
+            binding.priority.isClickable=false
+
+            binding.taskType.isEnabled=false
+            binding.taskType.isClickable=false
+
+            binding.assignee.isEnabled=false
+            binding.assignee.isClickable=false
+
+            binding.status.isEnabled=false
+            binding.status.isClickable=false
+
+        }
+    }
+
 
     @Later("1. Check if the request has already made, if made then set text and clickability on the button accordingly")
     private fun setUpViews() {
@@ -225,7 +262,14 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
         activityBinding.binding.gioActionbar.btnModerator.setOnClickThrottleBounceListener {
             //toast("You are a moderator, can edit this task")
-            utils.showSnackbar(binding.root,"You are a moderator and can edit this task",5000)
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                utils.showSnackbar(binding.root,"You are a moderator and can edit this task",5000)
+
+            }
+            else{
+                utils.showSnackbar(binding.root,"You are a moderator and can edit this task when online",5000)
+
+            }
         }
 
         binding.btnEditSummary.setOnClickThrottleBounceListener {
@@ -241,9 +285,11 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             assigneeListBottomSheet.show(requireFragmentManager(), "assigneelist")
         }
         binding.section.setOnClickThrottleBounceListener {
-            val sections = sectionDisplayBottomSheet(taskDetails.segment!!)
-            sections.sectionSelectionListener = this@TaskDetailsFragment
-            sections.show(requireFragmentManager(), "Section Selection")
+                val sections = sectionDisplayBottomSheet(taskDetails.segment!!)
+                sections.sectionSelectionListener = this@TaskDetailsFragment
+                sections.show(requireFragmentManager(), "Section Selection")
+
+
         }
         binding.priority.setOnClickThrottleBounceListener {
             list.clear()
@@ -267,76 +313,79 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         }
 
         binding.becomeModerator.setOnClickThrottleBounceListener {
-            binding.becomeModerator.gone()
-            viewLifecycleOwner.lifecycleScope.launch {
-                try {
-                    val result = withContext(Dispatchers.IO) {
-                        viewModel.updateModerators(
-                            taskID = activityBinding.taskId,
-                            projectName = PrefManager.getcurrentProject(),
-                            moderator = currentUser.EMAIL
-                        )
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+                binding.becomeModerator.gone()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            viewModel.updateModerators(
+                                taskID = activityBinding.taskId,
+                                projectName = PrefManager.getcurrentProject(),
+                                moderator = currentUser.EMAIL
+                            )
 
-                    }
+                        }
 
-                    when (result) {
+                        when (result) {
 
-                        is ServerResult.Failure -> {
+                            is ServerResult.Failure -> {
 
-                            utils.singleBtnDialog(
-                                "Failure",
-                                "Failure in Updating: ${result.exception.message}",
-                                "Okay"
-                            ) {
-                                requireActivity().finish()
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in Updating: ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+                                binding.becomeModerator.visible()
+                                binding.progressBar.gone()
+
                             }
-                            binding.becomeModerator.visible()
-                            binding.progressBar.gone()
 
-                        }
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
 
-                        is ServerResult.Progress -> {
-                            binding.progressBar.visible()
-                        }
-
-                        is ServerResult.Success -> {
-                            activityBinding.binding.gioActionbar.btnModerator.visible()
-                            binding.progressBar.gone()
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
-                                task?.moderators=listOf(currentUser.EMAIL)
-                                db.tasksDao().update(task!!)
-                                for (user in task.moderators){
-                                    if (user==currentUser.EMAIL){
-                                        fetchUserbyId(user){
-                                            it?.isChecked=true
-                                            ModeratorsBottomSheet.DataHolder.users.add(it!!)
+                            is ServerResult.Success -> {
+                                activityBinding.binding.gioActionbar.btnModerator.visible()
+                                binding.progressBar.gone()
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val task = db.tasksDao().getTasksbyId(
+                                        activityBinding.taskId,
+                                        PrefManager.getcurrentProject()
+                                    )
+                                    task?.moderators = listOf(currentUser.EMAIL)
+                                    db.tasksDao().update(task!!)
+                                    for (user in task.moderators) {
+                                        if (user == currentUser.EMAIL) {
+                                            fetchUserbyId(user) {
+                                                it?.isChecked = true
+                                                ModeratorsBottomSheet.DataHolder.users.add(it!!)
+                                            }
+                                        } else {
+                                            fetchUserbyId(user) {
+                                                ModeratorsBottomSheet.DataHolder.users.add(it!!)
+                                            }
                                         }
                                     }
-                                    else{
-                                        fetchUserbyId(user){
-                                            ModeratorsBottomSheet.DataHolder.users.add(it!!)
-                                        }
+                                    withContext(Dispatchers.Main) {
+                                        requireActivity().recreate()
                                     }
                                 }
-                                withContext(Dispatchers.Main) {
-                                    requireActivity().recreate()
-                                }
+                                toast("You are now a moderator")
+
                             }
-                            toast("You are now a moderator")
 
                         }
 
+                    } catch (e: Exception) {
+
+                        Timber.tag(TAG).e(e)
+                        binding.progressBar.gone()
+
                     }
-
-                } catch (e: Exception) {
-
-                    Timber.tag(TAG).e(e)
-                    binding.progressBar.gone()
-
                 }
             }
-
         }
         binding.swiperefresh.setOnRefreshListener {
             fetchTaskAgain(activityBinding.taskId)
@@ -472,7 +521,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     private fun manageAddModeratorsView(isModerator: Boolean) {
         if (isModerator) {
-            binding.addContributorsBtn.visible()
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+                binding.addContributorsBtn.visible()
+            }
         }
     }
 
@@ -541,11 +592,21 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         for (moderator in list) {
             if (moderator.firebaseID == PrefManager.getcurrentUserdetails().EMAIL) {
                 isModerator = true
-                binding.btnEditSummary.visible()
-                binding.assignee.isEnabled = true
-                binding.section.isEnabled=true
-                binding.priority.isEnabled=true
-                activityBinding.binding.gioActionbar.btnModerator.visible()
+                if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                    binding.btnEditSummary.visible()
+                    binding.assignee.isEnabled = true
+                    binding.section.isEnabled=true
+                    binding.priority.isEnabled=true
+                    activityBinding.binding.gioActionbar.btnModerator.visible()
+                }
+                else{
+                    binding.btnEditSummary.gone()
+                    binding.assignee.isEnabled = false
+                    binding.section.isEnabled=false
+                    binding.priority.isEnabled=false
+                    activityBinding.binding.gioActionbar.btnModerator.visible()
+                }
+
             }
             manageState(taskDetails)
             manageAddModeratorsView(isModerator)
@@ -568,8 +629,16 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         Log.d("tagchecks",list.toString())
         val newList = ArrayList(list)
         if (isModerator){
-            val editTag = Tag("Edit Tags", bgColor = "#FFFFFF", textColor = "#000000", tagID = "edit", projectName = PrefManager.getcurrentProject())
-            newList.add(editTag)
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+                val editTag = Tag(
+                    "Edit Tags",
+                    bgColor = "#FFFFFF",
+                    textColor = "#000000",
+                    tagID = "edit",
+                    projectName = PrefManager.getcurrentProject()
+                )
+                newList.add(editTag)
+            }
         }
         val tagsRecyclerView = binding.tagRecyclerView
         val layoutManager = FlexboxLayoutManager(requireContext())
@@ -1022,7 +1091,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                                 currentUser?.let { userObj ->
 
                                     if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
-                                        binding.becomeModerator.visible()
+                                        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                                            binding.becomeModerator.visible()
+                                        }
                                     }
                                 }
 
@@ -1099,7 +1170,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         currentUser?.let { userObj ->
 
                             if (taskResult.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
-                                binding.becomeModerator.visible()
+                                if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+                                    binding.becomeModerator.visible()
+                                }
                             }
                         }
 
@@ -1135,7 +1208,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     currentUser?.let { userObj ->
 
                         if (result.data.moderators.size == 0 && localUserObj.ROLE >= 2) {
-                            binding.becomeModerator.visible()
+                            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+
+                                binding.becomeModerator.visible()
+                            }
                         }
                     }
 

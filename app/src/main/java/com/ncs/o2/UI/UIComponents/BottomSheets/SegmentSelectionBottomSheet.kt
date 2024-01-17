@@ -17,7 +17,9 @@ import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
@@ -26,6 +28,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottom
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentViewModel
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.SegmetSelectionBottomSheetBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +70,8 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
     lateinit var sectionList:MutableList<String>
     private val faker: Faker by lazy { Faker() }
     private lateinit var segmentName:String
-
+    @Inject
+    lateinit var utils: GlobalUtils.EasyElements
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -102,14 +106,18 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
         }
 
         binding.createSegmentBtn.setOnClickThrottleBounceListener {
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                dismiss()
+                val createSegmentBottomSheet = CreateSegmentBottomSheet()
+                createSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
 
-            dismiss()
-            val createSegmentBottomSheet = CreateSegmentBottomSheet()
-            createSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
-//            val createSectionsBottomSheet = CreateSectionsBottomSheet()
-//            createSectionsBottomSheet.show(requireActivity().supportFragmentManager,"this")
-
+            }
+            else{
+                toast("Segments creation is not allowed")
+            }
         }
+
+
     }
 
     private fun setBottomSheetConfig() {

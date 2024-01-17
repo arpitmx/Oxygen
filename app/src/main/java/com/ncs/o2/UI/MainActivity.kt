@@ -3,8 +3,10 @@ package com.ncs.o2.UI
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -52,6 +54,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.Navigator
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
@@ -79,16 +82,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener  {
+class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener,NetworkChangeReceiver.NetworkChangeCallback  {
     lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
     private var dynamicLinkHandled = false
     private var doubleBackPress = false
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
     // ViewModels
     private val viewModel: MainActivityViewModel by viewModels()
@@ -125,6 +130,22 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         super.onCreate(savedInstanceState)
 
         projects=ArrayList()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+
+        if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
+            binding.gioActionbar.offlineIndicator.visible()
+        }
+        else{
+            binding.gioActionbar.offlineIndicator.gone()
+
+        }
+
+        binding.gioActionbar.offlineIndicator.setOnClickThrottleBounceListener {
+            easyElements.twoBtnDialog("Offline Mode Active", msg = "As network is not available, offline mode is active, things may not be in sync with server","Check Network","Cancel",{
+                networkChangeReceiver.retryNetworkCheck()
+            },{})
+        }
 
         if (FirebaseAuth.getInstance().currentUser!=null) {
             if (savedInstanceState == null) {
@@ -135,6 +156,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         else{
 
             FirebaseAuth.getInstance().signOut()
+            deleteCache(this)
             val intent = Intent(this, AuthScreenActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -148,6 +170,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setContentView(binding.root)
 
         PrefManager.initialize(this)
+        setUpInitilisations()
+    }
+    private fun setUpInitilisations(){
         manageViews()
         setUpViews()
 
@@ -178,7 +203,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
-            binding.gioActionbar.notificationCont.invisible()
+            binding.gioActionbar.notificationCont.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -211,7 +236,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
-            binding.gioActionbar.notificationCont.invisible()
+            binding.gioActionbar.notificationCont.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
@@ -255,6 +280,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     override fun onResume() {
         super.onResume()
+
         setNotificationCountOnActionBar()
     }
 
@@ -320,11 +346,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Add project button click listener
         val add_button: AppCompatButton = drawerLayout.findViewById(R.id.add_project_btn)
         add_button.setOnClickListener {
-            drawerLayout.closeDrawer(GravityCompat.START)
-            val project = AddProjectBottomSheet()
-            project.projectAddedListener = this
-            project.show(supportFragmentManager, "Add Project")
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                drawerLayout.closeDrawer(GravityCompat.START)
+                val project = AddProjectBottomSheet()
+                project.projectAddedListener = this
+                project.show(supportFragmentManager, "Add Project")
+            }else{
+                easyElements.showSnackbar(binding.root,"Projects can't be added in offline mode",2000)
+            }
+
         }
+
+
 
         //Setting button click listener
         val setting_btn: AppCompatButton = drawerLayout.findViewById(R.id.setting_btn)
@@ -335,10 +368,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // setting up Edit Profile
         binding.drawerheaderfile.ibEditProfile.setOnClickListener {
 
-            val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
-            drawerLayout.closeDrawer(GravityCompat.START)
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+
+                val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                drawerLayout.closeDrawer(GravityCompat.START)
+            }
+            else{
+                easyElements.showSnackbar(binding.root,"Profile edit not available",2000)
+
+            }
 
         }
         binding.gioActionbar.searchBar.setOnClickThrottleBounceListener {
@@ -397,9 +437,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             .into(binding.drawerheaderfile.userDp)
 
 
-        viewModel.showDialogLD.observe(this) { data ->
-            easyElements.singleBtnDialog(data[0], data[1],"OK",{})
-        }
+//        viewModel.showDialogLD.observe(this) { data ->
+//            easyElements.singleBtnDialog(data[0], data[1],"OK",{})
+//        }
 
     }
 
@@ -695,32 +735,62 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     fun setBottomNavBar() {
 
         bottmNav = binding.bottomNav
-        bottmNav.setOnItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
+        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+            bottmNav.setOnItemSelectedListener { menuItem ->
 
-                R.id.assigned_item -> {
-                    replaceFragment(AssignedFragment())
-                    true
+                when (menuItem.itemId) {
+
+                    R.id.assigned_item -> {
+                        replaceFragment(AssignedFragment())
+                        true
+                    }
+
+                    R.id.bottom_search -> {
+                        replaceFragment(SearchFragment())
+                        true
+                    }
+
+                    R.id.task_item -> {
+                        replaceFragment(TasksHolderFragment())
+                        true
+                    }
+                    else ->{
+                        startActivity(Intent(this,CreateTaskActivity::class.java))
+                        false
+                    }
                 }
 
-                R.id.bottom_search -> {
-                    replaceFragment(SearchFragment())
-                    true
-                }
 
-                R.id.task_item -> {
-                    replaceFragment(TasksHolderFragment())
-                    true
-                }
-
-                else ->{
-                    startActivity(Intent(this,CreateTaskActivity::class.java))
-                    false
-                }
             }
+        }else{
+            bottmNav.setOnItemSelectedListener { menuItem ->
+
+                when (menuItem.itemId) {
+
+                    R.id.assigned_item -> {
+                        easyElements.showSnackbar(binding.root,"Workspace is not available in offline mode",3000)
+                        false
+                    }
+
+                    R.id.bottom_search -> {
+                        replaceFragment(SearchFragment())
+                        true
+                    }
+
+                    R.id.task_item -> {
+                        replaceFragment(TasksHolderFragment())
+                        true
+                    }
+                    else ->{
+                        easyElements.showSnackbar(binding.root,"Task Creation is not available in offline mode",3000)
+                        false
+                    }
+                }
 
 
+            }
         }
+
 
     }
     private fun replaceFragment(fragment: Fragment) {
@@ -972,6 +1042,39 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             }
         }
     }
+    private fun deleteCache(context: Context) {
+        try {
+            val dir: File = context.cacheDir
+            if (!deleteDir(dir)){
+                easyElements.singleBtnDialog("Failed to logout","Error in deleting the caches.., clear app data from settings manually","Okay"){}
+                Timber.d("TAG", "Problem in clearing cache..")
+            }else{
+                Timber.i("TAG", "Cache is cleared..")
+            }
+        } catch (e: java.lang.Exception) {
+            Timber.e("TAG", "Problem in clearing cache.., $e")
+            easyElements.singleBtnDialog("Failed to logout, clear data from app settings manually",e.cause.toString(),"Okay"){}
+        }
+    }
+
+    private fun deleteDir(dir: File?): Boolean {
+        return if (dir != null && dir.isDirectory) {
+            val children: Array<String>? = dir.list()
+            if (children != null) {
+                for (i in children.indices) {
+                    val success = deleteDir(File(dir, children[i]))
+                    if (!success) {
+                        return false
+                    }
+                }
+            }
+            dir.delete()
+        } else if (dir != null && dir.isFile) {
+            dir.delete()
+        } else {
+            false
+        }
+    }
     private fun movetosearch(tagText: String?) {
         val transaction = supportFragmentManager.beginTransaction()
         val fragment = SearchFragment()
@@ -1031,4 +1134,25 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         return list
     }
 
+
+
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        easyElements.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        startActivity(intent)
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
+    }
 }

@@ -2,9 +2,11 @@ package com.ncs.o2.UI.CreateTask
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -59,6 +61,7 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.CodeViewerActivity
@@ -94,7 +97,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     SegmentSelectionBottomSheet.sendSectionsListListner,
     setDurationBottomSheet.DurationAddedListener,
     sectionDisplayBottomSheet.SectionSelectionListener ,BottomSheet.SendText,
-    AssigneeListBottomSheet.getassigneesCallback, AssigneeListBottomSheet.updateAssigneeCallback,ChecklistActivity.checkListListener,ImageAdapter.ImagesListner{
+    AssigneeListBottomSheet.getassigneesCallback, AssigneeListBottomSheet.updateAssigneeCallback,ChecklistActivity.checkListListener,ImageAdapter.ImagesListner,
+    NetworkChangeReceiver.NetworkChangeCallback{
 
     private var contriList: MutableList<User> = mutableListOf()
     @Inject
@@ -123,6 +127,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         ActivityCreateTaskBinding.inflate(layoutInflater)
     }
     private var description:String?=null
+    private val networkChangeReceiver = NetworkChangeReceiver(this,this)
+
 
 
 //    private val viewmodel: CreateTaskViewModel by viewModels()
@@ -330,7 +336,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         setContentView(binding.root)
         draft=PrefManager.getDraftTask()!!
         Log.d("draftissue",draft.toString())
-
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
         if (PrefManager.getcurrentUserdetails().ROLE>=3){
             manageViewsforModerators()
             setDefaultViewsforModerators()
@@ -1663,5 +1670,23 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 isChecked = false
             ))
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
+    override fun onOnlineModePositiveSelected() {
+        PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        utils.restartApp()
+    }
+
+    override fun onOfflineModePositiveSelected() {
+        startActivity(intent)
+        PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
+    }
+
+    override fun onOfflineModeNegativeSelected() {
+        networkChangeReceiver.retryNetworkCheck()
     }
 }
