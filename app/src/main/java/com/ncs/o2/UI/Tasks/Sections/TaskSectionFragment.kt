@@ -37,10 +37,10 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
+class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
     companion object {
-        fun newInstance(sectionName: String): TaskSectionFragment {
+        fun newInstance(sectionName: String, ): TaskSectionFragment {
             val fragment = TaskSectionFragment()
             val args = Bundle()
             args.putString("sectionName", sectionName)
@@ -51,15 +51,15 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
-    @Inject
-    lateinit var db:TasksDatabase
 
+    @Inject
+    lateinit var db: TasksDatabase
     private lateinit var viewModel: TaskSectionViewModel
     private lateinit var binding: FragmentTaskSectionBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
     private lateinit var taskList: ArrayList<TaskItem>
-    private  lateinit var tasks: ArrayList<Task>
+    private lateinit var tasks: ArrayList<Task>
     private lateinit var taskList2: ArrayList<Task>
     private lateinit var projectName: String
     private lateinit var segmentName: String
@@ -81,8 +81,6 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
     private val activityBinding: ActivityMainBinding by lazy {
         (requireActivity() as MainActivity).binding
     }
-
-
 
 
     private val searchCont by lazy {
@@ -132,9 +130,9 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 //        }
     }
 
-    private fun showLoader(show : Int){
+    private fun showLoader(show: Int) {
 
-        if (show == 1){
+        if (show == 1) {
 
             // Tasks loading
 
@@ -144,7 +142,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
             binding.recyclerView.gone()
             binding.placeholder.gone()
 
-        }else if (show == 0){
+        } else if (show == 0) {
 
             //Tasks loaded
 
@@ -154,7 +152,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
             binding.progressbarBlock.gone()
             binding.placeholder.gone()
 
-        }else if (show == -1){
+        } else if (show == -1) {
 
             //Empty tasks
 
@@ -172,8 +170,12 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
 
         if (db.tasksDao().isNull) {
             taskList = ArrayList()
-            Log.d("fetch","fetching from firestore")
-            viewModel.getTasksItemsForSegment(projectName, segmentName, viewModel.sectionName!!) { result ->
+            Log.d("fetch", "fetching from firestore")
+            viewModel.getTasksItemsForSegment(
+                projectName,
+                segmentName,
+                viewModel.sectionName!!
+            ) { result ->
                 when (result) {
                     is ServerResult.Success -> {
 
@@ -193,7 +195,8 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
                         } else {
 
                             recyclerView = binding.recyclerView
-                            taskListAdapter = TaskListAdapter(firestoreRepository, requireContext(),taskList,db)
+                            taskListAdapter =
+                                TaskListAdapter(firestoreRepository, requireContext(), taskList, db)
                             taskListAdapter.setOnClickListener(this)
                             val layoutManager =
                                 LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -255,11 +258,10 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
                 }
 
             }
-        }
-        else{
+        } else {
 
             tasks = ArrayList()
-            Log.d("fetch","fetching from DB")
+            Log.d("fetch", "fetching from DB")
             fetchfromdb()
         }
 
@@ -273,9 +275,12 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
     }
 
 
-
-    fun fetchfromdb(){
-        viewModel.getTasksForSegmentFromDB(projectName, segmentName, viewModel.sectionName!!) { result ->
+    fun fetchfromdb() {
+        viewModel.getTasksForSegmentFromDB(
+            projectName,
+            segmentName,
+            viewModel.sectionName!!
+        ) { result ->
             when (result) {
                 is DBResult.Success -> {
 
@@ -302,7 +307,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
                                 assignee_id = task.assignee!!,
                                 difficulty = task.difficulty!!,
                                 timestamp = task.time_STAMP,
-                                completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!)=="Completed") true else false,
+                                completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
                                 tagList = task.tags
                             )
                         }
@@ -370,6 +375,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
             }
         }
     }
+
     private fun showSearch() {
         searchCont.visible()
     }
@@ -384,6 +390,7 @@ class TaskSectionFragment : Fragment(), TaskListAdapter.OnClickListener {
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
+
     private fun movetotaskspage() {
         val transaction = fragmentManager?.beginTransaction()!!
         val fragment = TasksHolderFragment()

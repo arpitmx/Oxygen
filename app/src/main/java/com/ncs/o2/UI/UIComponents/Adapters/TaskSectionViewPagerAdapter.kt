@@ -35,4 +35,6 @@ class TaskSectionViewPagerAdapter(fragmentActivity: Fragment, private var totalC
         }
         return TaskSectionFragment.newInstance("")
     }
+
+
 }

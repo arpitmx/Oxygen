@@ -388,7 +388,13 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             }
         }
         binding.swiperefresh.setOnRefreshListener {
-            fetchTaskAgain(activityBinding.taskId)
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                fetchTaskAgain(activityBinding.taskId)
+            }
+            else{
+                binding.swiperefresh.isRefreshing=false
+                utils.showSnackbar(binding.root,"Can't refresh the page",2000)
+            }
         }
 
     }
@@ -1163,6 +1169,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     }
 
                     is ServerResult.Success -> {
+                        utils.showSnackbar(binding.root,"Page refreshed",2000)
                         binding.swiperefresh.isRefreshing=false
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         val localUserObj = PrefManager.getcurrentUserdetails()
