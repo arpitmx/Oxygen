@@ -14,40 +14,50 @@
         android:textSize="15sp"
         android:fontFamily="@font/sf_pro_display_semibold"
         android:layout_marginEnd="5dp"
-        android:text="Tab Text"
+        android:text=""
         android:textColor="@color/account" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:id="@+id/count"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/tabIcon"
-            android:layout_width="28dp"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
             android:background="@drawable/tab_selected__icon_bg"
             android:contentDescription="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/account"
-            android:orientation="horizontal"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/iconCount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="1"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textColor="@color/darkbg_main_a80"
+                android:textSize="12sp"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                app:layout_constraintBottom_toBottomOf="@+id/tabIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </LinearLayout>
 
 
-        <TextView
-            android:id="@+id/iconCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2"
-            android:textColor="@color/darkbg_main_a80"
-            android:textSize="12sp"
-            android:fontFamily="@font/sf_pro_display_semibold"
-            app:layout_constraintBottom_toBottomOf="@+id/tabIcon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
