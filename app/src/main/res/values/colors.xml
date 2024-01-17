@@ -69,4 +69,7 @@
     <color name="negativeButtonTextColor">#000000</color>
     <color name="bottomSheetDividerColor">@color/primarybg</color>
     <color name="mod">#69EDFF</color>
+    <color name="selected_tab_color">@color/primary</color>
+    <color name="unselected_tab_color">@color/account</color>
+
 </resources>
