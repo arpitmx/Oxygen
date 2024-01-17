@@ -10,6 +10,8 @@
     <color name="darkTheme_bg">#242222</color>
     <color name="darkbg_main">#222222</color>
     <color name="darkbg_main_a80">#131313</color>
+    <color name="chat_bg">#1E1E1E</color>
+
 
     <color name="secondaryPink">#ff89b3</color>
     <color name="secondaryBlue">#0061ff</color>

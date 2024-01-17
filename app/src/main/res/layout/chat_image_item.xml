@@ -5,7 +5,6 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/darkbg_main_a80"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"

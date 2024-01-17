@@ -164,7 +164,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
-                overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
+                overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
                 finish()
             }
         }
@@ -176,7 +176,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
 
         backBtn.setOnClickThrottleBounceListener {
             startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
-            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.fade_in)
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
             finish()
         }
 
