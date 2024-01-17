@@ -36,6 +36,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
@@ -846,6 +847,18 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 is ServerResult.Success -> {
                     if (result.data.isNotEmpty()){
                         val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val messages=messageDatabase.messagesDao().getMessagesForTask(PrefManager.getcurrentProject(),activityBinding.taskId)
+                            withContext(Dispatchers.Main){
+                                if (messages.isEmpty()){
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity"
+                                }
+                                else{
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity (${messages.size})"
+                                }
+                            }
+                        }
+
                         chatAdapter.appendMessages(result.data)
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                         PrefManager.setTaskTimestamp(PrefManager.getcurrentProject(),activityBinding.taskId,messagedata[0].timestamp!!)
@@ -901,6 +914,15 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDatabase.messagesDao().insert(message)
+                            val messages=messageDatabase.messagesDao().getMessagesForTask(PrefManager.getcurrentProject(),activityBinding.taskId)
+                            withContext(Dispatchers.Main){
+                                if (messages.isEmpty()){
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity"
+                                }
+                                else{
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity (${messages.size})"
+                                }
+                            }
                         }
 
                         if (message.messageType == MessageType.NORMAL_MSG || message.messageType == MessageType.REPLY_MSG) {

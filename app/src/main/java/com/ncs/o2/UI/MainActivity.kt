@@ -299,6 +299,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onResume() {
         super.onResume()
         registerReceiver(true)
+
         setNotificationCountOnActionBar()
     }
 

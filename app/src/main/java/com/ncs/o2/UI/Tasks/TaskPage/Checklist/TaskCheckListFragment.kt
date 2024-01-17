@@ -115,13 +115,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         }
 
         if (isModerator || isAssignee) {
-            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE){
-                binding.btnAddMoreCheckList.visible()
-            }
-            else{
-                binding.btnAddMoreCheckList.invisible()
 
-            }
             //Current user is moderator or assignee (Make the checklist editable)
             Timber.tag(TAG)
                 .d("running initviews when true " + isModerator.toString() + " " + isAssignee.toString())
@@ -160,7 +154,13 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
         }
         if (isModerator && isAssignee){
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE){
+                binding.btnAddMoreCheckList.visible()
+            }
+            else{
+                binding.btnAddMoreCheckList.invisible()
 
+            }
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,true,true)
 
         }
@@ -668,4 +668,5 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         }
 
     }
+
 }

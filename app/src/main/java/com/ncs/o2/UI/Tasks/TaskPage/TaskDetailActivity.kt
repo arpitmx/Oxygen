@@ -117,6 +117,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         registerReceiver(false)
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
@@ -136,6 +137,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         super.onResume()
         registerReceiver(true)
     }
+
 
 
     override fun onOnlineModePositiveSelected() {

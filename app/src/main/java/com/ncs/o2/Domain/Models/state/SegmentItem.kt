@@ -4,5 +4,7 @@ import com.google.firebase.Timestamp
 
 data class SegmentItem (
     val segment_NAME : String="",
-    var sections: MutableList<String> = mutableListOf()
-)
+    var sections: MutableList<String> = mutableListOf(),
+    val segment_ID : String="",
+
+    )

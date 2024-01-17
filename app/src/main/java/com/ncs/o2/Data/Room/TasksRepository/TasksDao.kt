@@ -31,6 +31,9 @@ interface TasksDao {
     @Query("SELECT * FROM tasks WHERE project_ID = :projectId and segment = :segmentName and section = :sectionName")
     suspend fun getTasksforSegments(projectId: String,segmentName:String,sectionName:String):List<Task>
 
+    @Query("SELECT * FROM tasks WHERE project_ID = :projectId and segment = :segmentName and section = :sectionName")
+    fun getTasks(projectId: String,segmentName:String,sectionName:String):List<Task>
+
     @Query("SELECT * FROM tasks WHERE project_ID = :projectName " +
             "AND (:type = 0 OR type = :type) " +
             "AND (:state = 0 OR status = :state) " +

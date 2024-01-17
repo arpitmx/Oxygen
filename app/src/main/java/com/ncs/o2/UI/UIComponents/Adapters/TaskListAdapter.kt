@@ -40,6 +40,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
 
         fun bind(task: TaskItem,user: User) {
             if (user.profileDPUrl!=null) {
+
                 binding.asigneeDp.loadProfileImg(user.profileDPUrl.toString())
             }else{
                 binding.asigneeDp.setImageDrawable(context.getDrawable(R.drawable.profile_pic_placeholder))

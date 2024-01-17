@@ -430,14 +430,16 @@ class ProfilePictureSelectionFragment : Fragment() {
                 for (segmentDocument in segmentsSnapshot.documents) {
                     val segmentName = segmentDocument.id
                     val sections=segmentDocument.get("sections") as MutableList<String>
-                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections))
+                    val segment_ID= segmentDocument.getString("segment_ID")
+
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!))
                 }
             }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
 
-        return list
+        return list.distinctBy { it.segment_ID }
     }
 
 
