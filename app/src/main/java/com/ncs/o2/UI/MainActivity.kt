@@ -50,6 +50,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -142,7 +143,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         else{
             binding.gioActionbar.offlineIndicator.gone()
         }
-
         binding.gioActionbar.offlineIndicator.setOnClickThrottleBounceListener {
             easyElements.twoBtnDialog("Offline Mode Active", msg = "As network is not available, offline mode is active, things may not be in sync with server","Check Network","Cancel",{
                 networkChangeReceiver.retryNetworkCheck()
@@ -170,10 +170,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         // Hide keyboard at startup
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         setContentView(binding.root)
-
         PrefManager.initialize(this)
         setUpInitilisations()
+
+
     }
+
     private fun setUpInitilisations(){
         manageViews()
         setUpViews()
@@ -191,6 +193,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             Log.d("projectSegments",PrefManager.getProjectSegments(project).toString())
         }
     }
+
     private fun manageViews(){
         if (PrefManager.getcurrentsegment()== "Select Segment") {
             binding.placeholderText.visible()
@@ -301,6 +304,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         registerReceiver(true)
 
         setNotificationCountOnActionBar()
+        setUpInitilisations()
     }
 
 
@@ -512,9 +516,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onSegmentSelected(segmentName: String) {
 
         // Handle segment selection
+        binding.gioActionbar.tabLayout.gone()
         binding.gioActionbar.titleTv.text = segmentName
         segmentText.value = segmentName
         viewModel.updateCurrentSegment(segmentName)
+        runDelayed(1000){
+            binding.gioActionbar.tabLayout.visible()
+        }
         if (segmentName=="Select Segment"){
             binding.gioActionbar.tabLayout.gone()
             binding.gioActionbar.searchCont.gone()
@@ -918,7 +926,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                                     val intent =
                                         Intent(this@MainActivity, TaskDetailActivity::class.java)
                                     intent.putExtra("task_id", taskId)
+                                    intent.putExtra("type", "shareTask")
+
                                     startActivity(intent)
+                                    finish()
                                     overridePendingTransition(
                                         R.anim.slide_in_left,
                                         R.anim.slide_out_left
@@ -975,7 +986,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                                     val intent =
                                         Intent(this@MainActivity, TaskDetailActivity::class.java)
                                     intent.putExtra("task_id", taskId)
+                                    intent.putExtra("type", "shareTask")
+
                                     startActivity(intent)
+                                    finish()
                                     overridePendingTransition(
                                         R.anim.slide_in_left,
                                         R.anim.slide_out_left

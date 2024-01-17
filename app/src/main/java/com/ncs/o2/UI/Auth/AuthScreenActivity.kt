@@ -37,13 +37,15 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     @Inject
     lateinit var utils : GlobalUtils.EasyElements
-
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
     @Issue("Fragment duplicate on configuration change, implement that.")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
         if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
             utils.singleBtnDialog("No network","As network is not available and your were not logged in, you can't proceed further","EXIT") {
                 finish()
@@ -108,7 +110,21 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
                 }
             }
     }
+    private var receiverRegistered = false
 
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
     private fun setUpViews() {
 
     }
@@ -118,10 +134,27 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
         registerReceiver(networkChangeReceiver, intentFilter)
     }
 
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
+
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
+    }
+
 
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)

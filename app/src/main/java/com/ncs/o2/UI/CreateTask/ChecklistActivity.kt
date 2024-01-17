@@ -58,12 +58,14 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
     @Inject
     lateinit var utils : GlobalUtils.EasyElements
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
-
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
 
         listener = ListenerHolder.checkListListener!!
         val dataList = intent.getSerializableExtra("checkListArray") as ArrayList<CheckList>?
@@ -101,7 +103,21 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
             finish()
         }
     }
+    private var receiverRegistered = false
 
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
     private fun setCheckListRecyclerView(list: MutableList<CheckList>) {
 
         checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,true)
@@ -188,9 +204,25 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
     override fun onCheckBoxClick(id: String, isChecked: Boolean, position: Int) {
 
     }
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
     }
 
     override fun onOnlineModePositiveSelected() {

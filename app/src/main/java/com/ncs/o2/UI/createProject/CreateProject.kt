@@ -67,6 +67,10 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     val binding: ActivityCreateProjectBinding by lazy {
         ActivityCreateProjectBinding.inflate(layoutInflater)
     }
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
+
 
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
@@ -77,8 +81,8 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this).get(createProjectViewModel::class.java)
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
         val desc = binding.projectDesc.text
         val image = binding.image
         binding.cardView.setOnClickListener {
@@ -272,7 +276,21 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             }
         }
     }
+    private var receiverRegistered = false
 
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
     private fun addIconUrlToFirestore(imageUrl: String, title: String) {
 
         viewModel.storeIconUrlToFirestore(imageUrl , title).observe(this) { data ->
@@ -366,9 +384,25 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         OList = TList
     }
 
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
     }
 
     override fun onOnlineModePositiveSelected() {

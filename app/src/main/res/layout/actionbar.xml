@@ -373,12 +373,12 @@
         android:background="@color/darkbg_main"
         app:tabIndicatorColor="@color/divider_or"
         app:tabMode="scrollable"
-
         android:layoutAnimation="@anim/layout_animation_fadein"
         app:tabIndicatorAnimationMode="fade"
         app:tabRippleColor="@color/item_bg_glow"
         app:tabSelectedTextColor="@color/primary"
-        app:tabTextColor="@color/account" />
+        app:tabIconTint="@drawable/tab_icon_selector"
+        app:tabTextColor="@drawable/tab_icon_color" />
 
 
     <LinearLayout

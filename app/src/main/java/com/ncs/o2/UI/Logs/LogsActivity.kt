@@ -24,11 +24,14 @@ class LogsActivity : AppCompatActivity() ,NetworkChangeReceiver.NetworkChangeCal
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     @Inject
     lateinit var utils : GlobalUtils.EasyElements
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLogsBinding.inflate(layoutInflater)
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
 
         setContentView(binding.root)
         setUpViews()
@@ -52,6 +55,21 @@ class LogsActivity : AppCompatActivity() ,NetworkChangeReceiver.NetworkChangeCal
 
         setRecyclerView(list)
     }
+    private var receiverRegistered = false
+
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
     fun setRecyclerView(dataList: List<LogsItem>){
         val recyclerView=binding.rvLogs
         val adapter = LogsAdapter(dataList.toMutableList())
@@ -69,9 +87,25 @@ class LogsActivity : AppCompatActivity() ,NetworkChangeReceiver.NetworkChangeCal
         val title:String,
         val count:String,
     )
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
     }
 
 

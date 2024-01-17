@@ -130,7 +130,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
 
-
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
 //    private val viewmodel: CreateTaskViewModel by viewModels()
 
     private val easyElements: GlobalUtils.EasyElements by lazy {
@@ -336,8 +338,8 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         setContentView(binding.root)
         draft=PrefManager.getDraftTask()!!
         Log.d("draftissue",draft.toString())
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
         if (PrefManager.getcurrentUserdetails().ROLE>=3){
             manageViewsforModerators()
             setDefaultViewsforModerators()
@@ -1671,10 +1673,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
             ))
         }
     }
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(networkChangeReceiver)
-    }
+
 
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
@@ -1686,12 +1685,51 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         PrefManager.setAppMode(Endpoints.OFFLINE_MODE)
     }
 
+
     override fun onOfflineModeNegativeSelected() {
         networkChangeReceiver.retryNetworkCheck()
     }
+    private var receiverRegistered = false
+
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        registerReceiver(false)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
+    }
+
     override fun onResume() {
         super.onResume()
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
     }
+
+
 }

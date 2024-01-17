@@ -51,7 +51,9 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     private lateinit var backBtn: ImageView
     private lateinit var notificationRV: RecyclerView
     private lateinit var notifications: List<Notification>
-
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
     companion object {
         const val TAG = "NotificationsActivity"
     }
@@ -59,8 +61,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         val projectID=intent.getStringExtra("projectID")
@@ -282,11 +284,41 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
             }
         }
     }
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+    private var receiverRegistered = false
+
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
     }
 
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        registerReceiver(false)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
+    }
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
         utils.restartApp()

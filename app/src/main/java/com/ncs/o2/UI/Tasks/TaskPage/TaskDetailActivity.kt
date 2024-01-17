@@ -36,6 +36,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         ActivityTaskDetailBinding.inflate(layoutInflater)
     }
     lateinit var taskId:String
+     var type: String? =null
     var index:String?=null
     lateinit var isworkspace:String
     var users:MutableList<UserInMessage> = mutableListOf()
@@ -53,6 +54,12 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         registerReceiver(true)
 
             taskId = intent.getStringExtra("task_id")!!
+            val _type=intent.getStringExtra("type")
+
+            if (_type!=null){
+                type=_type
+            }
+
             val _index= intent.getStringExtra("index")
             if (_index!=null){
                 index=_index
@@ -77,9 +84,14 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        //startActivity(Intent(this@TaskDetailActivity, MainActivity::class.java))
         super.onBackPressed()
-        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+        if (type=="shareTask" ){
+            startActivity(Intent(this@TaskDetailActivity, MainActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+        }
+        else{
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+        }
 
     }
     private fun setActionbar() {
