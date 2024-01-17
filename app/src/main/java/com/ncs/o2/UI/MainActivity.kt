@@ -117,6 +117,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     // Navigation drawer toggle
     private lateinit var toggle: ActionBarDrawerToggle
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
+
 
     // Data binding
     val binding: ActivityMainBinding by lazy {
@@ -131,15 +135,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         super.onCreate(savedInstanceState)
 
         projects=ArrayList()
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
 
         if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
             binding.gioActionbar.offlineIndicator.visible()
         }
         else{
             binding.gioActionbar.offlineIndicator.gone()
-
         }
         binding.gioActionbar.offlineIndicator.setOnClickThrottleBounceListener {
             easyElements.twoBtnDialog("Offline Mode Active", msg = "As network is not available, offline mode is active, things may not be in sync with server","Check Network","Cancel",{
@@ -281,10 +283,26 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
 
+    private var receiverRegistered = false
+
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
+
         setNotificationCountOnActionBar()
         setUpInitilisations()
     }
@@ -1150,11 +1168,25 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
 
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
 
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
     }
 
     override fun onOnlineModePositiveSelected() {

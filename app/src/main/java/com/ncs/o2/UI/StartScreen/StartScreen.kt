@@ -39,6 +39,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.deleteDownloadedFile
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -121,8 +122,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
     private fun initialise() {
 
-        binding.fragContainer.popInfinity(this)
-        binding.fragContainer.rotateInfinity(this)
+        binding.fragContainer.gone()
 
         //Check for updates
         viewModel.getUpdateDocumentLiveData().observe(this) { update ->
@@ -261,7 +261,10 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
     private fun setBallAnimator() {
 
+
         ball = binding.fragContainer
+        ball.visible()
+        ball.animFadein(this,500)
 
         ball.rotateInfinity(this)
         val maxsize = 15f
@@ -844,14 +847,48 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
     override fun onOfflineModeNegativeSelected() {
         networkChangeReceiver.retryNetworkCheck()
     }
+
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
     override fun onResume() {
         super.onResume()
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
     }
+
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
+    }
+
+    private var receiverRegistered = false
+
+    private val intentFilter by lazy{
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
     }
 
 }

@@ -35,14 +35,17 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     }
     private val TAG = "SettingsActivity"
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
+    private val  intentFilter by lazy {
+        IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         auth = FirebaseAuth.getInstance()
-        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkChangeReceiver, intentFilter)
+        registerReceiver(true)
         setUpViews()
         setUpRecyclerView()
         setContentView(binding.root)
@@ -164,12 +167,44 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     }
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(networkChangeReceiver)
+        registerReceiver(false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registerReceiver(false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerReceiver(false)
     }
 
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
         util.restartApp()
+    }
+
+
+    private var receiverRegistered = false
+
+    fun registerReceiver(flag : Boolean){
+        if (flag){
+            if (!receiverRegistered) {
+                registerReceiver(networkChangeReceiver,intentFilter)
+                receiverRegistered = true
+            }
+        }else{
+            if (receiverRegistered){
+                unregisterReceiver(networkChangeReceiver)
+                receiverRegistered = false
+            }
+        }
     }
 
     override fun onOfflineModePositiveSelected() {
