@@ -76,6 +76,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     val intent = Intent(this, TaskDetailActivity::class.java)
                     intent.putExtra("task_id", taskID)
                     intent.putExtra("index", "1")
+                    intent.putExtra("type", "notifications")
+
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
@@ -85,6 +87,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     val intent = Intent(this, TaskDetailActivity::class.java)
                     intent.putExtra("task_id", taskID)
                     intent.putExtra("index", "1")
+                    intent.putExtra("type", "notifications")
+
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
@@ -110,6 +114,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     val intent = Intent(this, TaskDetailActivity::class.java)
                     intent.putExtra("task_id", taskID)
                     intent.putExtra("index", "0")
+                    intent.putExtra("type", "notifications")
+
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
@@ -119,6 +125,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     val intent = Intent(this, TaskDetailActivity::class.java)
                     intent.putExtra("task_id", taskID)
                     intent.putExtra("index", "0")
+                    intent.putExtra("type", "notifications")
+
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
@@ -128,6 +136,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     val intent = Intent(this, TaskDetailActivity::class.java)
                     intent.putExtra("task_id", taskID)
                     intent.putExtra("index", "2")
+                    intent.putExtra("type", "notifications")
+
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
@@ -291,6 +301,12 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
             NotificationType.TASK_CHECKLIST_UPDATE.name->{
                 val intent = Intent(this, TaskDetailActivity::class.java)
                 intent.putExtra("task_id", notification.taskID)
+                intent.putExtra("index", "2")
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name->{
+                val intent = Intent(this, MainActivity::class.java)
                 intent.putExtra("index", "2")
                 startActivity(intent)
                 this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)

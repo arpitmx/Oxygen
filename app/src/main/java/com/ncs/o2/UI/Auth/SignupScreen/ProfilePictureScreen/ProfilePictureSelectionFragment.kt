@@ -367,7 +367,11 @@ class ProfilePictureSelectionFragment : Fragment() {
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 for (project in getProjectsList()){
                                                     val list=getSegments(project)
+                                                    val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
                                                     saveProjectSegments(project,list)
+                                                    if (newList.isNotEmpty()){
+                                                        setLastSegmentsTimeStamp(project,newList[0].creation_DATETIME!!)
+                                                    }
                                                 }
                                                 withContext(Dispatchers.Main){
                                                     setLastSeenTimeStamp(0)
@@ -431,15 +435,16 @@ class ProfilePictureSelectionFragment : Fragment() {
                     val segmentName = segmentDocument.id
                     val sections=segmentDocument.get("sections") as MutableList<String>
                     val segment_ID= segmentDocument.getString("segment_ID")
+                    val creation_DATETIME= segmentDocument.get("creation_DATETIME") as Timestamp
 
-                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!))
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME))
                 }
             }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
 
-        return list.distinctBy { it.segment_ID }
+        return list
     }
 
 

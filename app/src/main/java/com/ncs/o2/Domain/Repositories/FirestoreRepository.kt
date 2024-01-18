@@ -902,6 +902,39 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    fun getNewSegments(
+        projectName: String, result: (ServerResult<List<Segment>>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.SEGMENT)
+            .whereGreaterThan("creation_DATETIME",PrefManager.getLastSegmentsTimeStamp(projectName))
+            .get(Source.SERVER)
+            .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
+
+                val segment_list = mutableListOf<Segment>()
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    for (document in querySnapshot.documents) {
+                        val segments = document.toObject(Segment::class.java)
+                        segment_list.add(segments!!)
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        Timber.d("segements", segment_list.toString())
+                        result(ServerResult.Success(segment_list))
+                    }
+
+                }
+
+
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
+
     fun getTasks(
         projectName: String,
         segmentName: String,

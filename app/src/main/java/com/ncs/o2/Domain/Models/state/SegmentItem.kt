@@ -6,5 +6,6 @@ data class SegmentItem (
     val segment_NAME : String="",
     var sections: MutableList<String> = mutableListOf(),
     val segment_ID : String="",
+    var creation_DATETIME : Timestamp?=null,
 
     )

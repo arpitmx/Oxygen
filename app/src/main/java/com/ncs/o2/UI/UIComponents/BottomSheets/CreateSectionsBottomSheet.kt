@@ -87,7 +87,7 @@ class CreateSectionsBottomSheet : BottomSheetDialogFragment(){
                     val segment=PrefManager.getSegmentDetails()
                     val oldSegments=PrefManager.getProjectSegments(PrefManager.getcurrentProject())
                     val new = oldSegments.toMutableList()
-                    new.add(SegmentItem(segment_NAME = segment.segment_NAME, sections = sectionNameList))
+                    new.add(SegmentItem(segment_NAME = segment.segment_NAME, sections = sectionNameList, segment_ID = segment.segment_ID, creation_DATETIME = Timestamp.now()))
                     Log.d("segmentCreationCacheCheck",new.toString())
                     PrefManager.saveProjectSegments(projectName = PrefManager.getcurrentProject(),new)
                     Log.d("segmentCreationCacheCheck",PrefManager.getProjectSegments(PrefManager.getcurrentProject()).toString())

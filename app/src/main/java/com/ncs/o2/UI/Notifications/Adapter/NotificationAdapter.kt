@@ -65,6 +65,9 @@ class NotificationAdapter(
             NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.toString() -> {
                 return T.TASK_COMMENT_MENTION_NOTIFICATION
             }
+            NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.toString() -> {
+                return T.TEAMS_COMMENT_MENTION_NOTIFICATION
+            }
             NotificationType.TASK_ASSIGNED_NOTIFICATION.toString() -> {
                 return T.TASK_ASSIGNED_NOTIFICATION
             }
@@ -89,6 +92,10 @@ class NotificationAdapter(
 
         return when (viewType) {
             T.TASK_COMMENT_MENTION_NOTIFICATION -> {
+                val binding = NotificationMentionItemBinding.inflate(inflater, parent, false)
+                ActivityMentionNotificationVH(binding)
+            }
+            T.TEAMS_COMMENT_MENTION_NOTIFICATION -> {
                 val binding = NotificationMentionItemBinding.inflate(inflater, parent, false)
                 ActivityMentionNotificationVH(binding)
             }
@@ -117,6 +124,9 @@ class NotificationAdapter(
             NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.toString() -> {
                 (holder as ActivityMentionNotificationVH).bind(notification)
             }
+            NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.toString() -> {
+                (holder as ActivityMentionNotificationVH).bind(notification)
+            }
             NotificationType.TASK_ASSIGNED_NOTIFICATION.toString() -> {
                 (holder as ActivityAssignedNotificationVH).bind(notification)
             }
@@ -136,7 +146,12 @@ class NotificationAdapter(
 
         fun bind(notification: Notification) {
 
-            binding.taskId.text = notification.taskID
+            if (notification.notificationType==NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name){
+                binding.taskId.text = notification.taskID
+            }
+            else{
+                binding.taskId.text = "@Teams"
+            }
             binding.durationTv.text = DateTimeUtils.getTimeAgo(notification.timeStamp)
             binding.msgTv.text = notification.message
 

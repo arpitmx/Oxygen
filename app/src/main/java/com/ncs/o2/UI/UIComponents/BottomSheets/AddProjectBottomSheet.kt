@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -108,6 +109,10 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                                                     CoroutineScope(Dispatchers.IO).launch {
                                                         for (project in PrefManager.getProjectsList()) {
                                                             val list = getProjectSegments(project)
+                                                            val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
+                                                            if (newList.isNotEmpty()){
+                                                                PrefManager.setLastSegmentsTimeStamp(project,newList[0].creation_DATETIME!!)
+                                                            }
                                                             PrefManager.saveProjectSegments(project, list)
                                                         }
                                                         withContext(Dispatchers.Main){
@@ -146,6 +151,7 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
         }
 
     }
+
     suspend fun getProjectSegments(project: String): List<SegmentItem> {
         val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)
         val list = mutableListOf<SegmentItem>()
@@ -159,7 +165,10 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                 for (segmentDocument in segmentsSnapshot.documents) {
                     val segmentName = segmentDocument.id
                     val sections=segmentDocument.get("sections") as MutableList<String>
-                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections))
+                    val segment_ID= segmentDocument.getString("segment_ID")
+                    val creation_DATETIME= segmentDocument.get("creation_DATETIME") as Timestamp
+
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME!!))
                 }
             }
         } catch (e: java.lang.Exception) {

@@ -1187,7 +1187,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
                         setDefaultViews(taskResult.data)
                         setTaskDetails(taskResult.data)
-                        db.tasksDao().insert(taskResult.data)
+                        db.tasksDao().update(taskResult.data)
 
                     }
 

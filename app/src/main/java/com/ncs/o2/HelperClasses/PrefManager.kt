@@ -48,12 +48,14 @@ object PrefManager {
     private val lastTaskTimestampMapKey = "last_task_timestamp_map"
     private val lastTagTimestampMapKey = "last_tag_timestamp_map"
     private val lastTeamsTimestampMapKey = "last_teams_timestamp_map"
+    private val lastSegmentsTimestampMapKey = "last_segments_timestamp_map"
 
 
     private lateinit var projectTimestampMap: MutableMap<String, Long>
     private lateinit var LastTaskTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastTagTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastTeamsTimestampMap: MutableMap<String, Timestamp>
+    private lateinit var LastSegmentsTimestampMap: MutableMap<String, Timestamp>
 
 
     private val projectIdTaskIdMapKey = "project_id_task_id_map"
@@ -96,6 +98,16 @@ object PrefManager {
 
         val savedLastTeamsTimeStampMapString = sharedPreferences.getString(lastTeamsTimestampMapKey, null)
         LastTeamsTimestampMap = savedLastTeamsTimeStampMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+
+        val savedLastSegmentsTimeStampMapString = sharedPreferences.getString(
+            lastSegmentsTimestampMapKey, null)
+        LastSegmentsTimestampMap = savedLastSegmentsTimeStampMapString?.let {
             try {
                 Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
             } catch (e: JsonSyntaxException) {
@@ -559,6 +571,18 @@ object PrefManager {
     private fun saveLastTeamsTimeStampHashMapToPreferences() {
         val hashMapString = Gson().toJson(LastTeamsTimestampMap)
         editor.putString(lastTeamsTimestampMapKey, hashMapString)
+        editor.apply()
+    }
+    fun setLastSegmentsTimeStamp(projectName: String, timestamp: Timestamp) {
+        LastSegmentsTimestampMap[projectName] = timestamp
+        saveLastSegmentsTimeStampHashMapToPreferences()
+    }
+    fun getLastSegmentsTimeStamp(projectName: String): Timestamp {
+        return LastSegmentsTimestampMap[projectName] ?: Timestamp(0, 0)
+    }
+    private fun saveLastSegmentsTimeStampHashMapToPreferences() {
+        val hashMapString = Gson().toJson(LastSegmentsTimestampMap)
+        editor.putString(lastSegmentsTimestampMapKey, hashMapString)
         editor.apply()
     }
 
