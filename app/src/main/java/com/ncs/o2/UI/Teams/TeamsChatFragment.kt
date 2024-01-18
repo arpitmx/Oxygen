@@ -183,6 +183,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
         activityBinding.binding.gioActionbar.constraintLayoutsearch.gone()
         activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.binding.gioActionbar.constraintLayoutTeams.visible()
+        activityBinding.binding.gioActionbar.projectName.text=PrefManager.getcurrentProject()
 
     }
 

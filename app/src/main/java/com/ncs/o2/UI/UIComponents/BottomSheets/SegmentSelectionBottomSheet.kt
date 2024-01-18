@@ -10,9 +10,12 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.Timestamp
 import com.mifmif.common.regex.Main
+import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -159,29 +162,127 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
     }
 
     private fun fetchSegments(projectName: String) {
-//        firestoreRepository.getSegments(projectName) { serverResult ->
-//            when (serverResult) {
-//                is ServerResult.Success -> {
-//                    binding.progressbar.gone()
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        val segList = serverResult.data
-//                        if (segList.isNotEmpty()) {
-//                            withContext(Dispatchers.Main) {
-//                                setRecyclerView(segList)
-//                            }
-//                        }
-//
-//                    }
-//                }
-//                is ServerResult.Failure -> {
-//                    val exception = serverResult.exception
-//                }
-//                is ServerResult.Progress -> {
-//                    binding.progressbar.visible()
-//                }
-//            }
-//        }
-        setRecyclerView(PrefManager.getProjectSegments(projectName).distinctBy { it.segment_NAME })
+        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
+            if (PrefManager.getLastSegmentsTimeStamp(projectName).seconds.toInt() == 0) {
+                Log.d("segmentsFetchCheck","Fetching segments from firebase")
+                firestoreRepository.getSegments(projectName) { serverResult ->
+                    when (serverResult) {
+                        is ServerResult.Success -> {
+                            binding.progressbar.gone()
+                            if (serverResult.data.isNotEmpty()) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val segList = serverResult.data
+                                    var segments: List<SegmentItem> =
+                                        serverResult.data.map { segment ->
+                                            SegmentItem(
+                                                segment_NAME = segment.segment_NAME,
+                                                sections = segment.sections,
+                                                segment_ID = segment.segment_ID,
+                                                creation_DATETIME = segment.creation_DATETIME
+                                            )
+                                        }
+                                    val list = PrefManager.getProjectSegments(projectName).toMutableList()
+                                    Log.d("segmentsFetchCheck", "old segments : \n ${list.toString()}")
+                                    segments = segments.distinctBy { it.segment_ID }.sortedByDescending { it.creation_DATETIME }
+                                    Log.d("segmentsFetchCheck", "new segments : \n ${segments.toString()}")
+                                    list.addAll(segments)
+                                    Log.d("segmentsFetchCheck", "after addition : \n ${list.toString()}")
+                                    PrefManager.saveProjectSegments(projectName, list)
+
+
+                                    if (segments.isNotEmpty()) {
+                                        PrefManager.setLastSegmentsTimeStamp(
+                                            projectName,
+                                            segments[0].creation_DATETIME!!
+                                        )
+
+                                        withContext(Dispatchers.Main) {
+                                            setRecyclerView(PrefManager.getProjectSegments(projectName).distinctBy { it.segment_ID })
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+                        is ServerResult.Failure -> {
+                            val exception = serverResult.exception
+                        }
+
+                        is ServerResult.Progress -> {
+                            binding.progressbar.visible()
+                        }
+                    }
+                }
+            } else {
+                Log.d("segmentsFetchCheck","Fetching segments from cache")
+
+                setRecyclerView(
+                    PrefManager.getProjectSegments(projectName).distinctBy { it.segment_NAME })
+            }
+            getNewSegments(projectName)
+        }else{
+            Log.d("segmentsFetchCheck","Fetching segments from cache")
+
+            setRecyclerView(
+                PrefManager.getProjectSegments(projectName).distinctBy { it.segment_NAME })
+        }
+
+    }
+
+    private fun getNewSegments(projectName: String){
+        firestoreRepository.getNewSegments(projectName) { serverResult ->
+            when (serverResult) {
+                is ServerResult.Success -> {
+                    binding.progressbar.gone()
+                    if (serverResult.data.isNotEmpty()) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            Log.d(
+                                "segmentsFetchCheck",
+                                "Looking for new segments found: \n ${serverResult.data}"
+                            )
+
+                            val segList = serverResult.data
+                            var segments: List<SegmentItem> = serverResult.data.map { segment ->
+                                SegmentItem(
+                                    segment_NAME = segment.segment_NAME,
+                                    sections = segment.sections,
+                                    segment_ID = segment.segment_ID,
+                                    creation_DATETIME = segment.creation_DATETIME
+                                )
+                            }
+
+                            val list = PrefManager.getProjectSegments(projectName).toMutableList()
+                            Log.d("segmentsFetchCheck", "old segments : \n ${list.toString()}")
+                            segments = segments.distinctBy { it.segment_ID }.sortedByDescending { it.creation_DATETIME }
+                            Log.d("segmentsFetchCheck", "new segments : \n ${segments.toString()}")
+                            list.addAll(segments)
+                            Log.d("segmentsFetchCheck", "after addition : \n ${list.toString()}")
+                            PrefManager.saveProjectSegments(projectName, list)
+
+
+                            if (segments.isNotEmpty()) {
+                                PrefManager.setLastSegmentsTimeStamp(
+                                    projectName,
+                                    segments[0].creation_DATETIME!!
+                                )
+
+                                withContext(Dispatchers.Main) {
+                                    setRecyclerView(PrefManager.getProjectSegments(projectName).distinctBy { it.segment_ID })
+                                }
+                            }
+
+                        }
+                    }
+                }
+                is ServerResult.Failure -> {
+                    val exception = serverResult.exception
+                }
+                is ServerResult.Progress -> {
+                    binding.progressbar.visible()
+                }
+            }
+        }
     }
     private fun sendsectionList(projectName: String) {
 //        firestoreRepository.getSegments(projectName) { serverResult ->

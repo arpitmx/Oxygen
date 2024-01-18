@@ -34,6 +34,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FirebaseFirestore
@@ -218,20 +219,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.constraintLayoutTeams.gone()
             binding.gioActionbar.notificationCont.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
-            binding.gioActionbar.tabLayout.visible()
-            binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
             binding.bottomNavParent.visible()
-            binding.gioActionbar.tabLayout.visible()
-            binding.gioActionbar.searchCont.visible()
-            binding.gioActionbar.actionbar.visible()
-            binding.gioActionbar.constraintLayout2.visible()
-            binding.gioActionbar.constraintLayoutsearch.gone()
-            binding.gioActionbar.constraintLayoutworkspace.gone()
             binding.gioActionbar.notificationCont.visible()
             setNotificationCountOnActionBar()
         }
@@ -251,20 +245,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             binding.gioActionbar.constraintLayout2.visible()
             binding.gioActionbar.constraintLayoutsearch.gone()
             binding.gioActionbar.constraintLayoutworkspace.gone()
+            binding.gioActionbar.constraintLayoutTeams.gone()
             binding.gioActionbar.notificationCont.gone()
         } else {
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
-            binding.gioActionbar.tabLayout.visible()
-            binding.gioActionbar.searchCont.visible()
             binding.gioActionbar.line.visible()
             binding.bottomNavParent.visible()
-            binding.gioActionbar.tabLayout.visible()
-            binding.gioActionbar.searchCont.visible()
-            binding.gioActionbar.actionbar.visible()
-            binding.gioActionbar.constraintLayout2.visible()
-            binding.gioActionbar.constraintLayoutsearch.gone()
-            binding.gioActionbar.constraintLayoutworkspace.gone()
             binding.gioActionbar.notificationCont.visible()
             setNotificationCountOnActionBar()
         }
@@ -1081,10 +1068,16 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     setupProjectsList()
                     CoroutineScope(Dispatchers.IO).launch {
                         val list = getProjectSegments(PrefManager.getlastaddedproject())
+                        val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
+
                         PrefManager.saveProjectSegments(PrefManager.getlastaddedproject(), list)
                         withContext(Dispatchers.Main){
                             easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)
                         }
+                        if (newList.isNotEmpty()){
+                            PrefManager.setLastSegmentsTimeStamp(PrefManager.getlastaddedproject(),newList[0].creation_DATETIME!!)
+                        }
+
                     }
                 }
                 is ServerResult.Failure -> {
@@ -1186,7 +1179,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 for (segmentDocument in segmentsSnapshot.documents) {
                     val segmentName = segmentDocument.id
                     val sections=segmentDocument.get("sections") as MutableList<String>
-                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections))
+                    val segment_ID= segmentDocument.getString("segment_ID")
+                    val creation_DATETIME= segmentDocument.get("creation_DATETIME") as Timestamp
+
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME!!))
                 }
             }
         } catch (e: java.lang.Exception) {

@@ -70,6 +70,10 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         viewModel.sectionName
     }
 
+    private val activityBinding: MainActivity by lazy {
+        (requireActivity() as MainActivity)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,16 +82,14 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         return binding.root
     }
 
-    private val activityBinding: ActivityMainBinding by lazy {
-        (requireActivity() as MainActivity).binding
-    }
+
 
 
     private val searchCont by lazy {
-        activityBinding.gioActionbar.searchCont
+        activityBinding.binding.gioActionbar.searchCont
     }
     private val segmentText by lazy {
-        activityBinding.gioActionbar.titleTv
+        activityBinding.binding.gioActionbar.titleTv
     }
 
 
@@ -107,7 +109,17 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         viewModel.sectionName = sectionName
 
         setupViews()
+        manageViews()
+    }
 
+    private fun manageViews(){
+        activityBinding.binding.gioActionbar.tabLayout.visible()
+        activityBinding.binding.gioActionbar.searchCont.visible()
+        activityBinding.binding.gioActionbar.actionbar.visible()
+        activityBinding.binding.gioActionbar.constraintLayout2.visible()
+        activityBinding.binding.gioActionbar.constraintLayoutsearch.gone()
+        activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
+        activityBinding.binding.gioActionbar.constraintLayoutTeams.gone()
     }
 
     private fun setupViews() {
@@ -267,7 +279,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
 
 
-        activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener {
+        activityBinding.binding.gioActionbar.refresh.setOnClickThrottleBounceListener {
             requireActivity().recreate()
         }
 
@@ -397,7 +409,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
-        activityBinding.bottomNav.menu.getItem(0).isChecked = true
-        activityBinding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
+        activityBinding.binding.bottomNav.menu.getItem(0).isChecked = true
+        activityBinding.binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
     }
 }

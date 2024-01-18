@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -164,8 +165,15 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                             var fcmToken = document.getString(Endpoints.User.FCM_TOKEN)
                                             val projects = document.get("PROJECTS") as List<String>
                                             for (project in projects){
-                                                val list=getProjectSegments(project)
-                                                PrefManager.saveProjectSegments(project,list)
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    val list=getProjectSegments(project)
+                                                    val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
+                                                    PrefManager.saveProjectSegments(project,list)
+                                                    if (newList.isNotEmpty()){
+                                                        PrefManager.setLastSegmentsTimeStamp(project,newList[0].creation_DATETIME!!)
+                                                    }
+                                                }
+
                                             }
                                             val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
                                             if (fcmToken == null) {
@@ -322,15 +330,16 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                     val segmentName = segmentDocument.id
                     val sections=segmentDocument.get("sections") as MutableList<String>
                     val segment_ID= segmentDocument.getString("segment_ID")
+                    val creation_DATETIME= segmentDocument.get("creation_DATETIME") as Timestamp
 
-                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!))
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME!!))
                 }
             }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
 
-        return list.distinctBy { it.segment_ID }
+        return list
     }
 
 

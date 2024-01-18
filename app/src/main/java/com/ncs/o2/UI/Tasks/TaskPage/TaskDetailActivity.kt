@@ -85,7 +85,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         super.onBackPressed()
-        if (type=="shareTask" ){
+        if (type=="shareTask" ||  type=="notifications" ){
             startActivity(Intent(this@TaskDetailActivity, MainActivity::class.java))
             overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
         }

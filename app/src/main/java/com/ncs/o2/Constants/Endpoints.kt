@@ -150,6 +150,8 @@ object Endpoints {
             const val TASK_ASSIGNED_NOTIFICATION = 5
             const val WORKSPACE_TASK_UPDATED=6
             const val TASK_CHECKLIST_UPDATED=7
+            const val TEAMS_COMMENT_MENTION_NOTIFICATION = 8
+
         }
 
     }
