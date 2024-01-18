@@ -100,6 +100,7 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         activityBinding.gioActionbar.actionbar.visible()
         activityBinding.gioActionbar.constraintLayout2.gone()
         activityBinding.gioActionbar.constraintLayoutsearch.gone()
+        activityBinding.gioActionbar.constraintLayoutTeams.gone()
         activityBinding.gioActionbar.constraintLayoutworkspace.visible()
     }
     private fun setUpViewPager() {

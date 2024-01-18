@@ -23,6 +23,7 @@ import com.ncs.o2.Constants.Errors
 import com.ncs.o2.Constants.IDType
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
+import com.ncs.o2.Data.Room.MessageRepository.MessageProjectAssociation
 import com.ncs.o2.Data.Room.MessageRepository.MessageProjectTaskAssociation
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
@@ -1485,6 +1486,30 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+    override suspend fun postTeamsMessage(
+        projectName: String,
+        message: Message,
+        serverResult: (ServerResult<Int>) -> Unit
+    ) {
+
+
+        return try {
+
+            serverResult(ServerResult.Progress)
+            firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .collection(Endpoints.Project.GENERAL)
+                .document(message.messageId)
+                .set(message)
+                .await()
+
+            serverResult(ServerResult.Success(200))
+
+        } catch (exception: Exception) {
+            serverResult(ServerResult.Failure(exception))
+        }
+    }
+
     override fun getMessages(
         projectName: String,
         taskId: String,
@@ -1605,6 +1630,121 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    override fun getNewTeamsMessages(
+        projectName: String,
+        result: (ServerResult<List<Message>>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.GENERAL)
+            .whereGreaterThan("timestamp",PrefManager.getLastTeamsTimeStamp(projectName))
+            .addSnapshotListener { querySnapshot, exception ->
+                ServerLogger().addRead(querySnapshot!!.size())
+
+
+                if (exception != null) {
+                    result(ServerResult.Failure(exception))
+                    return@addSnapshotListener
+                }
+
+                val messageList = mutableListOf<Message>()
+
+                querySnapshot?.let { snapshot ->
+                    for (newDocs in snapshot.documentChanges) {
+
+                        val document = newDocs.document
+
+                        val messageId = document.getString("messageId")
+                        val senderId = document.getString("senderId")
+                        val content = document.getString("content")
+                        val timestamp = document.getTimestamp("timestamp")
+                        val messageType = document.getString("messageType")
+                        val additionalData = document.get("additionalData") as HashMap<String, Any>
+
+                        val messageData = Message(
+                            messageId!!,
+                            senderId!!,
+                            content!!,
+                            timestamp!!,
+                            com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!,
+                            additionalData,
+                        )
+                        Timber.tag(TAG).d("NM123 : $messageData")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            msgDB.teamsMessagesDao().insertAssociation(
+                                MessageProjectAssociation(
+                                    messageId = messageId,
+                                    projectId = projectName,)
+                            )
+                            msgDB.teamsMessagesDao().insert(messageData)
+                        }
+                        messageData.let { messageList.add(it) }
+
+
+                    }
+                }
+
+                result(ServerResult.Success(messageList))
+            }
+    }
+
+    override fun getTeamsMessages(
+        projectName: String,
+        result: (ServerResult<List<Message>>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.GENERAL)
+            .addSnapshotListener { querySnapshot, exception ->
+                ServerLogger().addRead(querySnapshot!!.size())
+
+                if (exception != null) {
+                    result(ServerResult.Failure(exception))
+                    return@addSnapshotListener
+                }
+
+                val messageList = mutableListOf<Message>()
+
+                querySnapshot?.let { snapshot ->
+                    for (newDocs in snapshot.documentChanges) {
+
+                        val document = newDocs.document
+
+                        val messageId = document.getString("messageId")
+                        val senderId = document.getString("senderId")
+                        val content = document.getString("content")
+                        val timestamp = document.getTimestamp("timestamp")
+                        val messageType = document.getString("messageType")
+                        val additionalData = document.get("additionalData") as HashMap<String, Any>
+
+                        val messageData = Message(
+                            messageId!!,
+                            senderId!!,
+                            content!!,
+                            timestamp!!,
+                            com.ncs.o2.Domain.Models.Enums.MessageType.fromString(messageType!!)!!,
+                            additionalData,
+                        )
+                        Timber.tag(TAG).d("NM123 : $messageData")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            msgDB.teamsMessagesDao().insertAssociation(
+                                MessageProjectAssociation(
+                                    messageId = messageId,
+                                    projectId = projectName)
+                            )
+                            msgDB.teamsMessagesDao().insert(messageData)
+                        }
+                        messageData.let { messageList.add(it) }
+
+                    }
+                }
+
+                result(ServerResult.Success(messageList))
+            }
+    }
+
+
+
     override fun getProjectLink(
         projectName: String,
         result: (ServerResult<String>) -> Unit
@@ -1662,6 +1802,29 @@ class FirestoreRepository @Inject constructor(
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
         val imageFileName =
             "${Endpoints.Storage.PROJECTS}/${projectId}/${Endpoints.Storage.TASKS}/$taskId/${Endpoints.Storage.CHATS}/images/${RandomIDGenerator.generateRandomId()}"
+
+        val imageRef = storageReference.child(imageFileName)
+
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+        val data = baos.toByteArray()
+        val uploadTask = imageRef.putBytes(data)
+
+        uploadTask.addOnSuccessListener {
+            liveData.postValue(ServerResult.Success(imageRef))
+
+        }.addOnFailureListener { exception ->
+            liveData.postValue(ServerResult.Failure(exception))
+
+        }
+
+        return liveData
+    }
+    override fun postTeamsImage(bitmap: Bitmap,projectId:String): LiveData<ServerResult<StorageReference>> {
+
+        val liveData = MutableLiveData<ServerResult<StorageReference>>()
+        val imageFileName =
+            "${Endpoints.Storage.PROJECTS}/${projectId}/${Endpoints.Project.GENERAL}/images/${RandomIDGenerator.generateRandomId()}"
 
         val imageRef = storageReference.child(imageFileName)
 

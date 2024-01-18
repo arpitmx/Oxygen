@@ -47,11 +47,13 @@ object PrefManager {
     private val projectTimestampMapKey = "project_timestamp_map"
     private val lastTaskTimestampMapKey = "last_task_timestamp_map"
     private val lastTagTimestampMapKey = "last_tag_timestamp_map"
+    private val lastTeamsTimestampMapKey = "last_teams_timestamp_map"
 
 
     private lateinit var projectTimestampMap: MutableMap<String, Long>
     private lateinit var LastTaskTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastTagTimestampMap: MutableMap<String, Timestamp>
+    private lateinit var LastTeamsTimestampMap: MutableMap<String, Timestamp>
 
 
     private val projectIdTaskIdMapKey = "project_id_task_id_map"
@@ -85,6 +87,15 @@ object PrefManager {
         } ?: mutableMapOf()
         val savedLastTagTimeStampMapString = sharedPreferences.getString(lastTagTimestampMapKey, null)
         LastTagTimestampMap = savedLastTagTimeStampMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+
+        val savedLastTeamsTimeStampMapString = sharedPreferences.getString(lastTeamsTimestampMapKey, null)
+        LastTeamsTimestampMap = savedLastTeamsTimeStampMapString?.let {
             try {
                 Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
             } catch (e: JsonSyntaxException) {
@@ -535,6 +546,19 @@ object PrefManager {
      fun setOfflineDialogShown(isshown:Boolean) {
         val editor = sharedPreferences.edit()
         editor.putBoolean("offlineDialogShown", isshown)
+        editor.apply()
+    }
+    fun setLastTeamsTimeStamp(projectName: String, timestamp: Timestamp) {
+        LastTeamsTimestampMap[projectName] = timestamp
+        saveLastTeamsTimeStampHashMapToPreferences()
+    }
+
+    fun getLastTeamsTimeStamp(projectName: String): Timestamp {
+        return LastTeamsTimestampMap[projectName] ?: Timestamp(0, 0)
+    }
+    private fun saveLastTeamsTimeStampHashMapToPreferences() {
+        val hashMapString = Gson().toJson(LastTeamsTimestampMap)
+        editor.putString(lastTeamsTimestampMapKey, hashMapString)
         editor.apply()
     }
 

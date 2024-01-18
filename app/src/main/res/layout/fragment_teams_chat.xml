@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/chat_bg"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+
+
+    <include
+        android:id="@+id/actionBar"
+        layout="@layout/actionbar_teampage"
+        />
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btn_scrolldown"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/input_box_container"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/scroll_down_bg"
+        android:elevation="5dp"
+        android:src="@drawable/baseline_keyboard_arrow_down_24"
+        android:tint="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="171dp"
+        android:layout_marginTop="292dp"
+        android:visibility="gone"
+        android:layout_marginEnd="170dp"
+        android:layout_marginBottom="297dp"
+        android:indeterminateTint="@color/colorAccent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="70dp"
+        android:gravity="center"
+        android:id="@+id/placeholder"
+        android:visibility="gone"
+        android:text="No Messages here..."
+        android:fontFamily="@font/sf_pro_display_medium"
+        android:textColor="@color/better_white"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chat_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:nestedScrollingEnabled="false"
+        android:clipToPadding="false"
+        android:layout_above="@+id/input_box_container"
+        android:layoutAnimation="@anim/layout_animation_fadein"
+        android:paddingBottom="20dp"
+        android:scrollbarSize="3dp"
+        android:scrollbarThumbVertical="@color/primary"
+        android:scrollbars="vertical"
+        android:visibility="visible" />
+
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/input_box_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="-1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="0dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/mention_users_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/curvedbggreymentionlist"
+            android:orientation="vertical"
+            android:elevation="5dp"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/item_bg_curve"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/mention_user_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layoutAnimation="@anim/layout_animation_fadein"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/mentionProgressbar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_top_30dp"
+                android:indeterminateTint="@color/primary"
+                android:visibility="visible" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#1DE3E1E1"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+        <HorizontalScrollView
+            android:id="@+id/chatbox_option_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/darkbg_main"
+            android:paddingTop="5dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="5dp"
+                android:paddingEnd="10dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnPaste"
+                    android:layout_width="70dp"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/outline_content_paste_24"
+                    />
+
+                <ImageButton
+                    android:id="@+id/btnAttachImage"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_image_24"
+                    />
+
+                <ImageButton
+                    android:id="@+id/btnCodeBlock"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_code_24"
+                    />
+
+                <ImageButton
+                    android:id="@+id/btnLink"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_add_link_24" />
+
+                <ImageButton
+                    android:id="@+id/btnChecklist"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_check_box_outline_blank_24" />
+
+                <ImageButton
+                    android:id="@+id/btnAttachBold"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_format_bold_24"
+                    />
+
+                <ImageButton
+                    android:id="@+id/btnAttachItalics"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_format_italic_24"
+                    />
+                <ImageButton
+                    android:id="@+id/btnAttachBlockQuote"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_format_quote_24"
+                    />
+
+                <ImageButton
+                    android:id="@+id/btnBackTick"
+                    style="@style/chatbox_options"
+                    android:src="@drawable/baseline_highlight_alt_24" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/suggestion_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/btn_select_image_from_storage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxWidth="250dp"
+                android:maxHeight="250dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="10">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:padding="2dp"
+
+                    >
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/imagePreview"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/tasknull_placeholder" />
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <ImageButton
+                    android:id="@+id/cross_btn_select_pdf"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:paddingTop="5dp"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:src="@drawable/baseline_clear_24"
+                    app:tint="@color/account"
+
+                    />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <include
+            android:id="@+id/input_box"
+            layout="@layout/inputbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginBottom="55dp"
+            />
+
+
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</RelativeLayout>

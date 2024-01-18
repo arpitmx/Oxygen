@@ -88,6 +88,22 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
+                NotificationType.TEAMS_COMMENT_NOTIFICATION.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra("index", "2")
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
+                NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra("index", "2")
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
                 NotificationType.TASK_ASSIGNED_NOTIFICATION.name->{
                     finish()
                     updateProjectCache(projectID)

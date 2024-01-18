@@ -42,4 +42,9 @@ interface TasksRepository {
         taskID: String,
         resultCallback: (DBResult<List<Message>>) -> Unit
     )
+
+    suspend fun getTeamsMessagesforProject(
+        projectName: String,
+        resultCallback: (DBResult<List<Message>>) -> Unit
+    )
 }

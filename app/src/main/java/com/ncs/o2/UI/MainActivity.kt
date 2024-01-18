@@ -66,8 +66,10 @@ import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
+import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
+import com.ncs.o2.UI.Teams.TeamsChatFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
@@ -95,6 +97,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private var dynamicLinkHandled = false
     private var doubleBackPress = false
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
+    val sharedViewModel: SharedViewModel by viewModels()
+    var index:String?=null
 
     // ViewModels
     private val viewModel: MainActivityViewModel by viewModels()
@@ -136,6 +140,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         projects=ArrayList()
         registerReceiver(true)
+
+        val _index= intent.getStringExtra("index")
+        if (_index!=null){
+            movetoteamspage()
+        }
+
 
         if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
             binding.gioActionbar.offlineIndicator.visible()
@@ -777,6 +787,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                         true
                     }
 
+                    R.id.teams_page -> {
+                        replaceFragment(TeamsChatFragment())
+                        true
+                    }
+
                     R.id.task_item -> {
                         replaceFragment(TasksHolderFragment())
                         true
@@ -801,6 +816,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
                     R.id.bottom_search -> {
                         replaceFragment(SearchFragment())
+                        true
+                    }
+
+                    R.id.teams_page -> {
+                        replaceFragment(TeamsChatFragment())
                         true
                     }
 
@@ -1119,8 +1139,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         transaction.addToBackStack(null)
         transaction.commit()
 
-        binding.bottomNav.menu.getItem(2).isChecked = true
-        binding.bottomNav.menu.getItem(2).setIcon(R.drawable.ic_searchico)
+        binding.bottomNav.menu.getItem(3).isChecked = true
+        binding.bottomNav.menu.getItem(3).setIcon(R.drawable.ic_searchico)
     }
     private fun movetotaskspage() {
         val transaction = supportFragmentManager.beginTransaction()
@@ -1130,6 +1150,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         transaction.commit()
         binding.bottomNav.menu.getItem(0).isChecked = true
         binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
+    }
+    private fun movetoteamspage() {
+        val transaction = supportFragmentManager.beginTransaction()
+        val fragment = TeamsChatFragment()
+        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+        binding.bottomNav.menu.getItem(2).isChecked = true
+        binding.bottomNav.menu.getItem(2).setIcon(R.drawable.baseline_groups_24)
     }
     override fun onBackPressed() {
         if (doubleBackPress) {

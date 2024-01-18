@@ -50,14 +50,26 @@ interface Repository {
 
     suspend fun postMessage(projectName: String, taskId:String, message: Message, serverResult: (ServerResult<Int>) -> Unit)
 
+    suspend fun postTeamsMessage(projectName: String, message: Message, serverResult: (ServerResult<Int>) -> Unit)
+
+
     fun getMessages(
         projectName: String,
         taskId:String,
         result: (ServerResult<List<Message>>) -> Unit
     )
+
+    fun getTeamsMessages(
+        projectName: String,
+        result: (ServerResult<List<Message>>) -> Unit
+    )
     fun getNewMessages(
         projectName: String,
         taskId:String,
+        result: (ServerResult<List<Message>>) -> Unit
+    )
+    fun getNewTeamsMessages(
+        projectName: String,
         result: (ServerResult<List<Message>>) -> Unit
     )
     fun insertNotification(
@@ -66,6 +78,8 @@ interface Repository {
         result: (ServerResult<Int>) -> Unit
     )
     fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>>
+
+    fun postTeamsImage(bitmap: Bitmap,projectId:String): LiveData<ServerResult<StorageReference>>
 
     fun getProjectLink(
         projectName: String,

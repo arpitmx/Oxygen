@@ -77,6 +77,28 @@ class FCMessagingService : FirebaseMessagingService() {
 
                     showNotification(notification = notif, context = applicationContext)
                 }
+                if (type == NotificationType.TEAMS_COMMENT_NOTIFICATION.name){
+                    val notif = FCMNotification(
+                        notificationType = NotificationType.TEAMS_COMMENT_NOTIFICATION,
+                        title =  title.orEmpty(),
+                        message = body.orEmpty(),
+                        taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
+                    )
+                    showNotification(notification = notif, context = applicationContext)
+                }
+                if (type == NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name){
+                    val notif = FCMNotification(
+                        notificationType = NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION,
+                        title =  title.orEmpty(),
+                        message = body.orEmpty(),
+                        taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
+
+                    )
+
+                    showNotification(notification = notif, context = applicationContext)
+                }
                 if (type == NotificationType.TASK_ASSIGNED_NOTIFICATION.name){
                     val notif = FCMNotification(
                         notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION,
@@ -97,6 +119,7 @@ class FCMessagingService : FirebaseMessagingService() {
                     )
                     showNotification(notification = notif, context = applicationContext)
                 }
+
                 if (type == NotificationType.TASK_CHECKLIST_UPDATE.name){
                     val notif = FCMNotification(
                         notificationType = NotificationType.TASK_CHECKLIST_UPDATE,

@@ -211,6 +211,8 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                     is ServerResult.Progress -> {
 
                     }
+
+                    else -> {}
                 }
             }
         }else{

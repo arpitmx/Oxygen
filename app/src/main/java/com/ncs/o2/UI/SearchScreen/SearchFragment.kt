@@ -145,6 +145,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         activityBinding.gioActionbar.constraintLayout2.gone()
         activityBinding.gioActionbar.constraintLayoutsearch.visible()
         activityBinding.gioActionbar.constraintLayoutworkspace.gone()
+        activityBinding.gioActionbar.constraintLayoutTeams.gone()
+
     }
     private fun initViews(){
         binding.searchBar.addTextChangedListener(object : TextWatcher {
