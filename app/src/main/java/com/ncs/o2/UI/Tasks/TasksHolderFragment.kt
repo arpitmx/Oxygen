@@ -114,6 +114,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         activityBinding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.gioActionbar.actionbar.visible()
         activityBinding.gioActionbar.constraintLayoutsearch.gone()
+        activityBinding.gioActionbar.constraintLayoutTeams.gone()
 
         setUpBackPress()
     }

@@ -126,6 +126,23 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase,private v
         }
     }
 
+    override suspend fun getTeamsMessagesforProject(
+        projectName: String,
+        resultCallback: (DBResult<List<Message>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val messages = msgDB.teamsMessagesDao().getMessagesForProject(projectName)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(messages))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
 
 
 }

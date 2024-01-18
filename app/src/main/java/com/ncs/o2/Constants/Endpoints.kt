@@ -98,7 +98,7 @@ object Endpoints {
         const val CONTRIBUTERS = "CONTRIBUTERS"
         const val PROJECTID = "PROJECT_ID"
         const val TASKID = "TASKID"
-
+        const val GENERAL="GENERAL"
         const val PROJECTNAME = "PROJECT_NAME"
         const val TAGS = "TAGS"
         const val CHECKLIST="CHECKLIST"
