@@ -295,6 +295,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 
         viewModel.storeIconUrlToFirestore(imageUrl , title).observe(this) { data ->
             if (data) {
+                PrefManager.setProjectIconUrl(title,imageUrl)
                 Toast.makeText(this, "Project Created", Toast.LENGTH_SHORT)
                     .show()
                 binding.projectTitle.setText("")

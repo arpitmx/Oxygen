@@ -1,3 +1,4 @@
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Paint
@@ -39,7 +40,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: TaskItem,user: User) {
-            if (user.profileDPUrl!=null) {
+            if (user.profileDPUrl!=null &&(context as? Activity)?.isDestroyed != true) {
 
                 binding.asigneeDp.loadProfileImg(user.profileDPUrl.toString())
             }else{

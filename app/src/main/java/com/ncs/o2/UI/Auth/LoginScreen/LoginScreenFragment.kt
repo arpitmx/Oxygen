@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -167,6 +168,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                             for (project in projects){
                                                 CoroutineScope(Dispatchers.IO).launch {
                                                     val list=getProjectSegments(project)
+                                                    saveProjectIconUrls(projectName = project)
                                                     val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
                                                     PrefManager.saveProjectSegments(project,list)
                                                     if (newList.isNotEmpty()){
@@ -257,6 +259,21 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
             }
         }
+    }
+
+    private fun saveProjectIconUrls(projectName:String){
+
+        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                    PrefManager.setProjectIconUrl(projectName,imageUrl!!)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("failCheck", exception.toString())
+            }
+
     }
 
     private fun sendVerificationEmail(user: FirebaseUser?) {

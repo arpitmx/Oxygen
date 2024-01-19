@@ -1,4 +1,4 @@
-package com.ncs.o2.UI.Teams
+package com.ncs.o2.UI.Teams.Chat
 
 import android.content.Context
 import android.content.Intent

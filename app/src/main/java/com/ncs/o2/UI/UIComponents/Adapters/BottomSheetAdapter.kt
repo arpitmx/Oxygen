@@ -1,15 +1,12 @@
 package com.ncs.o2.UI.UIComponents.Adapters
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.R
-import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.databinding.BottomSheetEachItemBinding
-import java.util.Random
 
 class BottomSheetAdapter(
     private val dataList: MutableList<String>,

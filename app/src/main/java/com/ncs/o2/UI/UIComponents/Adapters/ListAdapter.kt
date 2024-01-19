@@ -83,21 +83,32 @@ interface ProjectCallback{
 
          vh.label.text = sList[position]
 
-         FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(sList[position]).get()
-             .addOnSuccessListener { documentSnapshot ->
-                 if (documentSnapshot.exists()) {
-                     val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
-                     if (imageUrl != null && (context as? Activity)?.isDestroyed != true) {
-                         Glide.with(context)
-                             .load(imageUrl)
-                             .error(R.drawable.placeholder_image)
-                             .into(vh.icon)
+         if (PrefManager.getProjectIconUrl(sList[position])==""){
+             FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(sList[position]).get()
+                 .addOnSuccessListener { documentSnapshot ->
+                     if (documentSnapshot.exists()) {
+                         val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                         if (imageUrl != null && (context as? Activity)?.isDestroyed != true) {
+                             PrefManager.setProjectIconUrl(sList[position], imageUrl)
+                             Glide.with(context)
+                                 .load(imageUrl)
+                                 .error(R.drawable.placeholder_image)
+                                 .into(vh.icon)
+                         }
                      }
                  }
-             }
-             .addOnFailureListener { exception ->
-                 Log.d("failCheck", exception.toString())
-             }
+                 .addOnFailureListener { exception ->
+                     Log.d("failCheck", exception.toString())
+                 }
+         }
+         else{
+             Glide.with(context)
+                 .load(PrefManager.getProjectIconUrl(sList[position]))
+                 .error(R.drawable.placeholder_image)
+                 .into(vh.icon)
+         }
+
+
 
          vh.radioButton.isChecked = position == selectedPosition
          vh.layout.setOnClickListener {

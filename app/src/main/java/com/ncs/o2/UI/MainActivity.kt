@@ -40,14 +40,11 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
-import com.ncs.o2.Domain.Models.Notification
-import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
@@ -70,7 +67,8 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
-import com.ncs.o2.UI.Teams.TeamsChatFragment
+import com.ncs.o2.UI.Teams.Chat.TeamsChatFragment
+import com.ncs.o2.UI.Teams.TeamsFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
@@ -183,6 +181,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         setContentView(binding.root)
         PrefManager.initialize(this)
         setUpInitilisations()
+
+        for (project in PrefManager.getProjectsList()){
+            Log.d("projectCheck",PrefManager.getProjectIconUrl(project).toString())
+        }
 
 
     }
@@ -368,8 +370,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         add_button.setOnClickListener {
             if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
                 drawerLayout.closeDrawer(GravityCompat.START)
-                val project = AddProjectBottomSheet()
-                project.projectAddedListener = this
+                val project = AddProjectBottomSheet(this)
                 project.show(supportFragmentManager, "Add Project")
             }else{
                 easyElements.showSnackbar(binding.root,"Projects can't be added in offline mode",2000)
@@ -751,8 +752,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
 
     override fun onProjectAdded(userProjects: ArrayList<String>) {
-        projects.clear()
-        projects.addAll(userProjects)
+        Log.d("projectCheck",PrefManager.getProjectsList().toString())
+        PrefManager.putProjectsList(userProjects)
+        Log.d("projectCheck",PrefManager.getProjectsList().toString())
+        setupProjectsList()
         projectListAdapter.notifyDataSetChanged()
     }
 
@@ -775,7 +778,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     }
 
                     R.id.teams_page -> {
-                        replaceFragment(TeamsChatFragment())
+                        replaceFragment(TeamsFragment())
                         true
                     }
 
@@ -807,7 +810,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     }
 
                     R.id.teams_page -> {
-                        replaceFragment(TeamsChatFragment())
+                        replaceFragment(TeamsFragment())
                         true
                     }
 
@@ -1146,7 +1149,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
     private fun movetoteamspage() {
         val transaction = supportFragmentManager.beginTransaction()
-        val fragment = TeamsChatFragment()
+        val fragment = TeamsFragment()
         transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
         transaction.addToBackStack(null)
         transaction.commit()

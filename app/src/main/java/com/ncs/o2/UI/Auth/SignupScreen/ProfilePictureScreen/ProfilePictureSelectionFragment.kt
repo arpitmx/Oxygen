@@ -366,6 +366,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                             putProjectsList(listOf("NCSOxygen"))
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 for (project in getProjectsList()){
+                                                    saveProjectIconUrls(projectName = project)
                                                     val list=getSegments(project)
                                                     val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
                                                     saveProjectSegments(project,list)
@@ -420,6 +421,21 @@ class ProfilePictureSelectionFragment : Fragment() {
             }
 
         }
+    }
+
+    private fun saveProjectIconUrls(projectName:String){
+
+        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                    PrefManager.setProjectIconUrl(projectName,imageUrl!!)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("failCheck", exception.toString())
+            }
+
     }
     suspend fun getSegments(project: String): List<SegmentItem> {
         val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)

@@ -6,12 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
-import com.ncs.o2.UI.UIComponents.Adapters.BottomSheetAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.LogsAdapter
 import com.ncs.o2.databinding.ActivityLogsBinding
 import com.ncs.versa.Constants.Endpoints
