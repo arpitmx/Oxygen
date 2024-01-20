@@ -74,6 +74,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
+import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
 import com.ncs.o2.databinding.FragmentTeamsChatBinding
 import com.ncs.versa.Constants.Endpoints
@@ -111,8 +112,8 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
     TeamsChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick {
 
     lateinit var binding: FragmentTeamsChatBinding
-    private val activityBinding: MainActivity by lazy {
-        (requireActivity() as MainActivity)
+    private val activityBinding: TeamsActivity by lazy {
+        (requireActivity() as TeamsActivity)
     }
     @Inject
     @FirebaseRepository
@@ -161,25 +162,10 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentTeamsChatBinding.inflate(inflater, container, false)
-        manageviews()
         return binding.root
 
     }
-    private fun manageviews(){
-        val drawerLayout = activityBinding.binding.drawer
-        activityBinding.binding.gioActionbar.btnHamTeams.setOnClickThrottleBounceListener {
-            val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
-            drawerLayout.openDrawer(gravity)
-        }
-        activityBinding.binding.gioActionbar.tabLayout.gone()
-        activityBinding.binding.gioActionbar.searchCont.visible()
-        activityBinding.binding.gioActionbar.actionbar.visible()
-        activityBinding.binding.gioActionbar.constraintLayout2.gone()
-        activityBinding.binding.gioActionbar.constraintLayoutsearch.gone()
-        activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
-        activityBinding.binding.gioActionbar.constraintLayoutTeams.visible()
-        activityBinding.binding.gioActionbar.projectIcon.load(PrefManager.getProjectIconUrl(PrefManager.getcurrentProject()),resources.getDrawable(R.drawable.placeholder_image))
-    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
@@ -458,7 +444,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
 
     private fun uploadImageToFirebaseStorage(bitmap: Bitmap, projectId: String) {
 
-        chatViewModel.uploadImageFromTeams(bitmap, projectId).observe(viewLifecycleOwner) { result ->
+        chatViewModel.uploadImageFromTeams(bitmap, projectId,activityBinding.channelID).observe(viewLifecycleOwner) { result ->
 
             when (result) {
                 is ServerResult.Failure -> {
@@ -739,9 +725,9 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
         CoroutineScope(Dispatchers.IO).launch {
-            if (PrefManager.getLastTeamsTimeStamp(PrefManager.getcurrentProject()).seconds.toInt()==0){
+            if (PrefManager.getChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID).seconds.toInt()==0){
                 Log.d("messageFetch","messageFetch from firebase")
-                chatViewModel.getTeamsMessages(PrefManager.getcurrentProject()) { result ->
+                chatViewModel.getTeamsMessages(PrefManager.getcurrentProject(),activityBinding.channelID) { result ->
                     when (result) {
                         is ServerResult.Success -> {
                             if (result.data.isEmpty()) {
@@ -755,7 +741,8 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                         messageDatabase.teamsMessagesDao().insertAssociation(
                                             MessageProjectAssociation(
                                                 messageId = message.messageId,
-                                                projectId = PrefManager.getcurrentProject())
+                                                projectId = PrefManager.getcurrentProject(),
+                                                channelId = activityBinding.channelID)
                                         )
                                     }
                                     withContext(Dispatchers.Main){
@@ -765,7 +752,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                         recyclerView.visible()
                                         binding.placeholder.gone()
                                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                                        PrefManager.setLastTeamsTimeStamp(PrefManager.getcurrentProject(),messagedata[0].timestamp!!)
+                                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID,messagedata[0].timestamp!!)
                                     }
                                 }
                             }
@@ -792,7 +779,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             }else {
                 Log.d("messageFetch", "messageFetch from db ")
                 chatViewModel.getTeamsMessagesforProject(
-                    PrefManager.getcurrentProject(),
+                    PrefManager.getcurrentProject(),activityBinding.channelID
                 ) { result ->
                     when (result) {
                         is DBResult.Success -> {
@@ -807,7 +794,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                 recyclerView.visible()
                                 binding.placeholder.gone()
                                 recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                                PrefManager.setLastTeamsTimeStamp(PrefManager.getcurrentProject(),messagedata[0].timestamp!!)
+                                PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID,messagedata[0].timestamp!!)
 
                             }
 
@@ -845,14 +832,14 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
     }
 
     fun getNewMessages(){
-        chatViewModel.getNewTeamsMessages(PrefManager.getcurrentProject()) { result ->
+        chatViewModel.getNewTeamsMessages(PrefManager.getcurrentProject(),activityBinding.channelID) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     if (result.data.isNotEmpty()){
                         val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
                         chatAdapter.appendMessages(result.data)
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                        PrefManager.setLastTeamsTimeStamp(PrefManager.getcurrentProject(),messagedata[0].timestamp!!)
+                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID,messagedata[0].timestamp!!)
                     }
 
                 }
@@ -883,7 +870,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postTeamsMessage(
-                projectName = PrefManager.getcurrentProject(), message = message
+                projectName = PrefManager.getcurrentProject(), message = message, channelID = activityBinding.channelID
 
             ) { result ->
 
@@ -902,6 +889,10 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
                         clearReplying()
+                        recyclerView.visible()
+                        binding.placeholder.gone()
+                        chatAdapter.appendMessages(listOf(message))
+                        recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
 
 
                         if (message.messageType == MessageType.NORMAL_MSG || message.messageType == MessageType.REPLY_MSG) {
@@ -1042,7 +1033,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                 )
                             }
                         }
-                        recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+
 
                     }
                 }
@@ -1064,6 +1055,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
                 projectID = PrefManager.getcurrentProject(),
+                channelID = activityBinding.channelID
             )
         }
         if (type == NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION) {
@@ -1083,6 +1075,8 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
                 projectID = PrefManager.getcurrentProject(),
+                channelID = activityBinding.channelID
+
             )
         }
 

@@ -9,6 +9,7 @@ import com.google.firebase.Timestamp
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
+import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
@@ -49,6 +50,8 @@ object PrefManager {
     private val lastTagTimestampMapKey = "last_tag_timestamp_map"
     private val lastTeamsTimestampMapKey = "last_teams_timestamp_map"
     private val lastSegmentsTimestampMapKey = "last_segments_timestamp_map"
+    private val lastChannelsTimestampMapKey = "last_channels_timestamp_map"
+
     private val projectIconUrlMapKey = "project_icon_url_map"
 
 
@@ -57,11 +60,17 @@ object PrefManager {
     private lateinit var LastTagTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastTeamsTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastSegmentsTimestampMap: MutableMap<String, Timestamp>
+    private lateinit var LastChannelTimestampMap: MutableMap<String, Timestamp>
+
     private lateinit var ProjectIconUrlMap: MutableMap<String, String>
 
 
     private val projectIdTaskIdMapKey = "project_id_task_id_map"
+    private val projectIdChannelIdMapKey = "project_id_channel_id_map"
+
     private lateinit var projectIdTaskIdMap: MutableMap<String, Timestamp>
+    private lateinit var projectIdChannelIdMap: MutableMap<String, Timestamp>
+
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(Endpoints.SharedPref.SHAREDPREFERENCES, Context.MODE_PRIVATE)
         editor= sharedPreferences.edit()
@@ -126,6 +135,27 @@ object PrefManager {
                 mutableMapOf()
             }
         } ?: mutableMapOf()
+
+        val savedProjectIdChannelIdMapString = sharedPreferences.getString(projectIdChannelIdMapKey, null)
+        projectIdChannelIdMap = savedProjectIdChannelIdMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+
+        val savedLastChannelsTimeStampMapString = sharedPreferences.getString(
+            lastChannelsTimestampMapKey, null)
+        LastChannelTimestampMap = savedLastChannelsTimeStampMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+
+
     }
 
 
@@ -608,6 +638,53 @@ object PrefManager {
         val hashMapString = Gson().toJson(ProjectIconUrlMap)
         editor.putString(projectIconUrlMapKey, hashMapString)
         editor.apply()
+    }
+    fun setChannelTimestamp(projectId: String, channelID: String, timestamp: Timestamp) {
+        val id = "$projectId$channelID"
+        projectIdChannelIdMap[id] = timestamp
+        saveProjectIdChannelIdMapToPreferences()
+    }
+
+
+    fun getChannelTimestamp(projectId: String, channelID: String): Timestamp {
+        val id = "$projectId$channelID"
+        return projectIdChannelIdMap[id] ?: Timestamp(0, 0)
+    }
+
+    private fun saveProjectIdChannelIdMapToPreferences() {
+        val projectIdChannelIdMapString = Gson().toJson(projectIdChannelIdMap)
+        editor.putString(projectIdChannelIdMapKey, projectIdChannelIdMapString)
+        editor.apply()
+    }
+
+    fun setLastChannelTimeStamp(projectName: String, timestamp: Timestamp) {
+        LastChannelTimestampMap[projectName] = timestamp
+        saveLastChannelTimeStampHashMapToPreferences()
+    }
+    fun getLastChannelTimeStamp(projectName: String): Timestamp {
+        return LastChannelTimestampMap[projectName] ?: Timestamp(0, 0)
+    }
+    private fun saveLastChannelTimeStampHashMapToPreferences() {
+        val hashMapString = Gson().toJson(LastChannelTimestampMap)
+        editor.putString(lastChannelsTimestampMapKey, hashMapString)
+        editor.apply()
+    }
+    fun saveProjectChannels(projectName: String, channels: List<Channel>) {
+        val gson = Gson()
+        val channelsJson = gson.toJson(channels)
+        editor.putString("project_channels_$projectName", channelsJson)
+        editor.apply()
+    }
+
+    fun getProjectChannels(projectName: String): List<Channel> {
+        val channelsJson = sharedPreferences.getString("project_channels_$projectName", null)
+        val gson = Gson()
+        val type = object : TypeToken<List<Channel>>() {}.type
+        return if (channelsJson != null) {
+            gson.fromJson(channelsJson, type)
+        } else {
+            emptyList()
+        }
     }
 
 }

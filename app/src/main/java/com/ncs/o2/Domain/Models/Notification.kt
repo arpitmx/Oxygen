@@ -57,4 +57,6 @@ data class Notification(
 
     @ColumnInfo(name = "projectID")
     val projectID:String?=null,
+
+    val channelID:String=""
 )

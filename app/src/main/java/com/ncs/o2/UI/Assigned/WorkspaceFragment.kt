@@ -21,9 +21,11 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.WorkspaceTaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
@@ -98,7 +100,14 @@ class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
         getTaskIdsList()
 
         activityBinding.gioActionbar.refresh.setOnClickThrottleBounceListener(1000) {
-            requireActivity().recreate()
+        }
+
+        binding.swiperefresh.setOnRefreshListener {
+            ExtensionsUtil.runDelayed(1000) {
+                toast("Page refreshed")
+                requireActivity().recreate()
+                binding.swiperefresh.isRefreshing = false
+            }
         }
 
     }

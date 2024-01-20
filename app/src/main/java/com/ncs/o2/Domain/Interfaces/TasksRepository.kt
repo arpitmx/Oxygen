@@ -45,6 +45,7 @@ interface TasksRepository {
 
     suspend fun getTeamsMessagesforProject(
         projectName: String,
+        channelId:String,
         resultCallback: (DBResult<List<Message>>) -> Unit
     )
 }

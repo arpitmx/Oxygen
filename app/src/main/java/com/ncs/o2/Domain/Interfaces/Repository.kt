@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.IDType
+import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Message
@@ -50,8 +51,12 @@ interface Repository {
 
     suspend fun postMessage(projectName: String, taskId:String, message: Message, serverResult: (ServerResult<Int>) -> Unit)
 
-    suspend fun postTeamsMessage(projectName: String, message: Message, serverResult: (ServerResult<Int>) -> Unit)
-
+    suspend fun postTeamsMessage(
+        projectName: String,
+        channelID:String,
+        message: Message,
+        serverResult: (ServerResult<Int>) -> Unit
+    )
 
     fun getMessages(
         projectName: String,
@@ -61,6 +66,7 @@ interface Repository {
 
     fun getTeamsMessages(
         projectName: String,
+        channelID: String,
         result: (ServerResult<List<Message>>) -> Unit
     )
     fun getNewMessages(
@@ -70,6 +76,8 @@ interface Repository {
     )
     fun getNewTeamsMessages(
         projectName: String,
+        channelID: String,
+
         result: (ServerResult<List<Message>>) -> Unit
     )
     fun insertNotification(
@@ -79,7 +87,7 @@ interface Repository {
     )
     fun postImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>>
 
-    fun postTeamsImage(bitmap: Bitmap,projectId:String): LiveData<ServerResult<StorageReference>>
+    fun postTeamsImage(bitmap: Bitmap,projectId:String,channelID: String): LiveData<ServerResult<StorageReference>>
 
     fun getProjectLink(
         projectName: String,
@@ -99,6 +107,14 @@ interface Repository {
         id: String,
         projectName: String,
         result: (ServerResult<Tag>) -> Unit
+    )
+    fun getChannels(
+        projectName: String,
+        result: (ServerResult<List<Channel>>) -> Unit
+    )
+    fun getNewChannels(
+        projectName: String,
+        result: (ServerResult<List<Channel>>) -> Unit
     )
     fun getMessageUserInfobyId(id: String, serverResult: (ServerResult<UserInMessage>) -> Unit)
 
@@ -207,6 +223,11 @@ interface Repository {
         message: Message,
     ): ServerResult<Boolean>
 
+    suspend fun postChannel(
+        channel: Channel,
+        projectName: String,
+        serverResult: (ServerResult<Int>) -> Unit
+    )
     suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit)
     suspend fun initilizeTagslistner(projectName: String,result: (ServerResult<Int>) -> Unit)
     suspend fun initilizeNotificationslistner(userID: String,result: (ServerResult<Int>) -> Unit)

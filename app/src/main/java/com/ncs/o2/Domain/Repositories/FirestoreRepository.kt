@@ -29,6 +29,7 @@ import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Interfaces.ServerErrorCallback
+import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Message
@@ -612,6 +613,74 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    override fun getChannels(
+        projectName: String,
+        result: (ServerResult<List<Channel>>) -> Unit
+    ){
+
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.CHANNELS)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val channelsList:MutableList<Channel> = mutableListOf()
+                for (document in querySnapshot){
+                    val channel_desc=document.getString("channel_desc")
+                    val channel_id=document.getString("channel_id")
+                    val channel_name=document.getString("channel_name")
+                    val creator=document.getString("creator")
+                    val timestamp=document.get("timestamp") as Timestamp
+
+                    val channel=Channel(
+                        channel_id = channel_id!!,
+                        channel_desc = channel_desc!!,
+                        channel_name = channel_name!!,
+                        creator = creator!!,
+                        timestamp = timestamp,
+                    )
+                    channelsList.add(channel)
+                }
+                result(ServerResult.Success(channelsList))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
+    override fun getNewChannels(
+        projectName: String,
+        result: (ServerResult<List<Channel>>) -> Unit
+    ){
+
+        firestore.collection(Endpoints.PROJECTS)
+            .document(projectName)
+            .collection(Endpoints.Project.CHANNELS)
+            .whereGreaterThan("timestamp",PrefManager.getLastChannelTimeStamp(projectName))
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val channelsList:MutableList<Channel> = mutableListOf()
+                for (document in querySnapshot){
+                    val channel_desc=document.getString("channel_desc")
+                    val channel_id=document.getString("channel_id")
+                    val channel_name=document.getString("channel_name")
+                    val creator=document.getString("creator")
+                    val timestamp=document.get("timestamp") as Timestamp
+
+                    val channel=Channel(
+                        channel_id = channel_id!!,
+                        channel_desc = channel_desc!!,
+                        channel_name = channel_name!!,
+                        creator = creator!!,
+                        timestamp = timestamp,
+                    )
+                    channelsList.add(channel)
+                }
+                result(ServerResult.Success(channelsList))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
 
     override fun createUniqueID(idType: IDType, projectID: String, generatedID: (String) -> Unit) {
 
@@ -1521,6 +1590,7 @@ class FirestoreRepository @Inject constructor(
 
     override suspend fun postTeamsMessage(
         projectName: String,
+        channelID:String,
         message: Message,
         serverResult: (ServerResult<Int>) -> Unit
     ) {
@@ -1531,10 +1601,23 @@ class FirestoreRepository @Inject constructor(
             serverResult(ServerResult.Progress)
             firestore.collection(Endpoints.PROJECTS)
                 .document(projectName)
-                .collection(Endpoints.Project.GENERAL)
+                .collection(Endpoints.Project.CHANNELS)
+                .document(channelID)
+                .collection(Endpoints.Project.CHANNEL_CHATS)
                 .document(message.messageId)
                 .set(message)
                 .await()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                msgDB.teamsMessagesDao().insertAssociation(
+                    MessageProjectAssociation(
+                        messageId = message.messageId,
+                        projectId = projectName,
+                        channelId = channelID
+                    )
+                )
+                msgDB.teamsMessagesDao().insert(message)
+            }
 
             serverResult(ServerResult.Success(200))
 
@@ -1665,12 +1748,15 @@ class FirestoreRepository @Inject constructor(
 
     override fun getNewTeamsMessages(
         projectName: String,
+        channelID: String,
         result: (ServerResult<List<Message>>) -> Unit
     ) {
         firestore.collection(Endpoints.PROJECTS)
             .document(projectName)
-            .collection(Endpoints.Project.GENERAL)
-            .whereGreaterThan("timestamp",PrefManager.getLastTeamsTimeStamp(projectName))
+            .collection(Endpoints.Project.CHANNELS)
+            .document(channelID)
+            .collection(Endpoints.Project.CHANNEL_CHATS)
+            .whereGreaterThan("timestamp",PrefManager.getChannelTimestamp(projectName,channelID))
             .addSnapshotListener { querySnapshot, exception ->
                 ServerLogger().addRead(querySnapshot!!.size())
 
@@ -1707,7 +1793,8 @@ class FirestoreRepository @Inject constructor(
                             msgDB.teamsMessagesDao().insertAssociation(
                                 MessageProjectAssociation(
                                     messageId = messageId,
-                                    projectId = projectName,)
+                                    projectId = projectName,
+                                    channelId = channelID)
                             )
                             msgDB.teamsMessagesDao().insert(messageData)
                         }
@@ -1723,11 +1810,14 @@ class FirestoreRepository @Inject constructor(
 
     override fun getTeamsMessages(
         projectName: String,
+        channelID: String,
         result: (ServerResult<List<Message>>) -> Unit
     ) {
         firestore.collection(Endpoints.PROJECTS)
             .document(projectName)
-            .collection(Endpoints.Project.GENERAL)
+            .collection(Endpoints.Project.CHANNELS)
+            .document(channelID)
+            .collection(Endpoints.Project.CHANNEL_CHATS)
             .addSnapshotListener { querySnapshot, exception ->
                 ServerLogger().addRead(querySnapshot!!.size())
 
@@ -1763,7 +1853,8 @@ class FirestoreRepository @Inject constructor(
                             msgDB.teamsMessagesDao().insertAssociation(
                                 MessageProjectAssociation(
                                     messageId = messageId,
-                                    projectId = projectName)
+                                    projectId = projectName,
+                                    channelId = channelID)
                             )
                             msgDB.teamsMessagesDao().insert(messageData)
                         }
@@ -1853,11 +1944,11 @@ class FirestoreRepository @Inject constructor(
 
         return liveData
     }
-    override fun postTeamsImage(bitmap: Bitmap,projectId:String): LiveData<ServerResult<StorageReference>> {
+    override fun postTeamsImage(bitmap: Bitmap,projectId:String,channelID: String): LiveData<ServerResult<StorageReference>> {
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
         val imageFileName =
-            "${Endpoints.Storage.PROJECTS}/${projectId}/${Endpoints.Project.GENERAL}/images/${RandomIDGenerator.generateRandomId()}"
+            "${Endpoints.Storage.PROJECTS}/${projectId}/${Endpoints.Project.CHANNELS}/${channelID}/images/${RandomIDGenerator.generateRandomId()}"
 
         val imageRef = storageReference.child(imageFileName)
 
@@ -2285,6 +2376,27 @@ class FirestoreRepository @Inject constructor(
         } catch (e: Exception) {
             return ServerResult.Failure(e)
         }
+    }
+    override suspend fun postChannel(
+        channel: Channel,
+        projectName: String,
+        serverResult: (ServerResult<Int>) -> Unit
+    ) {
+
+
+        return try {
+
+            serverResult(ServerResult.Progress)
+            firestore.collection(Endpoints.PROJECTS)
+                .document(projectName).collection(Endpoints.Project.CHANNELS).document(channel.channel_id)
+                .set(channel)
+                .await()
+            serverResult(ServerResult.Success(200))
+
+        } catch (exception: Exception) {
+            serverResult(ServerResult.Failure(exception))
+        }
+
     }
     override suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit) {
         val projectDocument = FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName)

@@ -190,6 +190,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
     private fun setUpInitilisations(){
+        binding.gioActionbar.searchCont.gone()
         manageViews()
         setUpViews()
 

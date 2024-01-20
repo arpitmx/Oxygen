@@ -25,6 +25,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
+import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.databinding.ChatImageItemBinding
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.ChatMessageReplyItemBinding
@@ -36,7 +37,7 @@ import java.util.Date
 
 
 class TeamsChatAdapter(
-    val activitybinding:MainActivity,
+    val activitybinding:TeamsActivity,
     val repository: FirestoreRepository,
     var msgList: MutableList<Message>,
     val context: Context,

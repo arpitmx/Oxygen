@@ -105,6 +105,8 @@ object Endpoints {
         const val LAST_UPDATED="last_updated"
         const val LAST_TAG_UPDATED="last_tag_updated"
         const val LAST_MESSAGE_AT="last_message_at"
+        const val CHANNELS="CHANNELS"
+        const val CHANNEL_CHATS="CHATS"
     }
 
 
@@ -124,7 +126,7 @@ object Endpoints {
         const val taskID: String = "taskID"
         const val title: String = "title"
         const val message: String = "message"
-
+        const val channelId:String="channelID"
         const val fromUser: String = "fromUser"
         const val toUser: String = "toUser"
         const val timeStamp: String = "timeStamp"

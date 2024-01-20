@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".UI.Teams.TeamsActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <include
+        android:id="@+id/actionBar"
+        layout="@layout/actionbar_teampage"/>
+
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/teams_chat_fragment_container"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="true"
+        />
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

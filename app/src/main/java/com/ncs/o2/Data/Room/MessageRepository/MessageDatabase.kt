@@ -9,7 +9,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.HelperClasses.Convertors
 
-@Database(entities = [Message::class, UserInMessage::class, Task::class, MessageProjectTaskAssociation::class, MessageProjectAssociation::class], version = 3)
+@Database(entities = [Message::class, UserInMessage::class, Task::class, MessageProjectTaskAssociation::class, MessageProjectAssociation::class], version = 4)
 @TypeConverters(Convertors::class)
 abstract class MessageDatabase : RoomDatabase() {
     abstract fun usersDao(): UsersDao

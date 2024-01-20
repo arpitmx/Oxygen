@@ -17,35 +17,53 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:weightSum="10">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_weight="8"
-                android:fontFamily="@font/sfbold"
-                android:text="Channels"
-                android:textColor="@color/better_white"
-                android:textSize="20dp" />
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:weightSum="10"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:fontFamily="@font/sfbold"
+                    android:text="Channels "
+                    android:textColor="@color/better_white"
+                    android:textSize="18dp" />
+
+                <ImageView
+                    android:id="@+id/channel_ic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="3dp"
+                    android:src="@drawable/star_filled"
+                    app:tint="@color/better_white" />
+
+
+            </LinearLayout>
             <ImageView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:layout_weight="2"
                 android:id="@+id/arrow"
+                android:layout_width="0dp"
+                android:layout_marginEnd="22dp"
+                android:layout_height="wrap_content"
                 android:src="@drawable/baseline_keyboard_arrow_down_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/better_white" />
-
-        </LinearLayout>
-
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,8 +71,32 @@
             android:visibility="gone"
             android:id="@+id/extendedChannels">
 
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:visibility="gone"
+                android:layout_margin="20dp"
+                android:id="@+id/progress_bar"
+                android:indeterminateTint="@color/primary"/>
+
+            <TextView
+                android:id="@+id/placeholder"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_display_regular"
+                android:gravity="center"
+                android:layout_margin="30dp"
+                android:layout_gravity="center"
+                android:text="No channels yet..."
+                android:textColor="@color/account"
+                android:textSize="16dp"
+                />
+
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channels_rv"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/channels_each_item"/>
@@ -63,12 +105,13 @@
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
                 android:weightSum="10"
+                android:visibility="gone"
                 android:id="@+id/addChannels"
                 android:layout_marginBottom="15dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
                 android:background="@color/darkbg_main"
                 android:layout_height="wrap_content">
 
@@ -79,7 +122,7 @@
                     android:fontFamily="@font/sf_pro_display_light"
                     android:text="+"
                     android:textColor="@color/better_white"
-                    android:textSize="22dp" />
+                    android:textSize="20dp" />
 
                 <TextView
                     android:id="@+id/channel_name"
@@ -90,37 +133,19 @@
                     android:fontFamily="@font/sf_pro_display_light"
                     android:text="Add channel"
                     android:textColor="@color/better_white"
-                    android:textSize="22dp" />
+                    android:textSize="18dp" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <View
+            android:id="@+id/line"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="@dimen/_5dp"
-            android:layout_marginEnd="@dimen/_5dp"
-            android:background="@color/divider_or"/>
+            android:layout_height="2dp"
+            android:background="@color/border_grey" />
     </LinearLayout>
 
 
 
-    <LinearLayout
-        android:layout_width="55dp"
-        android:id="@+id/addBtn"
-        android:layout_height="55dp"
-        android:layout_marginBottom="25dp"
-        android:layout_marginEnd="25dp"
-        android:background="@drawable/item_bg_curve"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:src="@drawable/round_edit_24"
-            app:tint="@color/better_white" />
-    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

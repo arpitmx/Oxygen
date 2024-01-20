@@ -68,6 +68,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         val projectID=intent.getStringExtra("projectID")
         val taskID=intent.getStringExtra("taskID")
         val type=intent.getStringExtra("type")
+        val channelID=intent.getStringExtra("channelID")
         if (projectID!=null && taskID!=null && type!=null){
             when(type){
                 NotificationType.TASK_COMMENT_NOTIFICATION.name->{

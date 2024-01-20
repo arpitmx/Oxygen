@@ -79,13 +79,14 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         super.onViewCreated(view, savedInstanceState)
         segmentName=PrefManager.getcurrentsegment()
 
+
+        activityBinding.gioActionbar.searchCont.gone()
+
         if (segmentName=="Select Segment"){
             activityBinding.gioActionbar.tabLayout.gone()
-            activityBinding.gioActionbar.searchCont.gone()
         }
         else{
             activityBinding.gioActionbar.tabLayout.visible()
-            activityBinding.gioActionbar.searchCont.visible()
         }
         val sectionsList = PrefManager.getsectionsList().toMutableList()
 
@@ -105,7 +106,6 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
             }
             else{
                 activityBinding.gioActionbar.tabLayout.visible()
-                activityBinding.gioActionbar.searchCont.visible()
             }
         }
 

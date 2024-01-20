@@ -128,11 +128,12 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase,private v
 
     override suspend fun getTeamsMessagesforProject(
         projectName: String,
+        channelId:String,
         resultCallback: (DBResult<List<Message>>) -> Unit
     ) {
         withContext(Dispatchers.IO) {
             try {
-                val messages = msgDB.teamsMessagesDao().getMessagesForProject(projectName)
+                val messages = msgDB.teamsMessagesDao().getMessagesForProject(projectName,channelId)
                 withContext(Dispatchers.Main) {
                     resultCallback(DBResult.Success(messages))
                 }
