@@ -45,15 +45,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomSheet.OnChannelAdded {
 
+    @Inject
+    @FirebaseRepository
+    lateinit var repository: Repository
     lateinit var binding:FragmentTeamsBinding
     private val activityBinding: MainActivity by lazy {
         (requireActivity() as MainActivity)
     }
 
     private var isVisible=false
-    @Inject
-    @FirebaseRepository
-    lateinit var repository: Repository
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
