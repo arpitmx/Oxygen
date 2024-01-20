@@ -544,8 +544,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         transaction?.addToBackStack(null)
         transaction?.commit()
 
-        activityBinding.bottomNav.menu.getItem(2).isChecked = true
-        activityBinding.bottomNav.menu.getItem(2).setIcon(R.drawable.ic_searchico)
+        activityBinding.bottomNav.menu.getItem(3).isChecked = true
+        activityBinding.bottomNav.menu.getItem(3).setIcon(R.drawable.ic_searchico)
     }
 }
 

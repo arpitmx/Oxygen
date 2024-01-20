@@ -2602,19 +2602,21 @@ class FirestoreRepository @Inject constructor(
                 val userDocument = getUserDocument()
 
                 val projectData = getProjectData(projectLink)
-
+                Log.d("projectCheck",projectData.toString())
                 if (projectData != null) {
-                    val isProjectAlreadyAdded = checkIfProjectAlreadyAdded(userDocument, projectData)
+                    val isProjectAlreadyAdded = checkIfProjectAlreadyAdded(userDocument, projectData[0]!!)
                     if (isProjectAlreadyAdded) {
                         return ServerResult.Success(ArrayList())
                     }
 
-                    userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData))
+                    userDocument.update("PROJECTS", FieldValue.arrayUnion(projectData[0]!!))
                         .await()
                     ServerLogger().addRead(1)
 
-                    updateProjectContributors(projectData)
-                    PrefManager.lastaddedproject(projectData)
+                    updateProjectContributors(projectData[0]!!)
+                    PrefManager.lastaddedproject(projectData[0]!!)
+                    PrefManager.setProjectIconUrl(projectData[0]!!,projectData[1]!!)
+                    Log.d("projectCheck",PrefManager.getProjectIconUrl(projectData[0]!!).toString())
 
                     val updatedUserProjects = getUserProjects(userDocument)
 
@@ -2636,7 +2638,7 @@ class FirestoreRepository @Inject constructor(
 
     }
 
-    private suspend fun getProjectData(projectLink: String): String? {
+    private suspend fun getProjectData(projectLink: String): List<String?>? {
         Log.d("projectcheck",projectLink.toString())
         val documents = firebaseFirestore.collection("Projects")
             .whereEqualTo("PROJECT_DEEPLINK", projectLink.toLowerCase())
@@ -2647,7 +2649,7 @@ class FirestoreRepository @Inject constructor(
 
         return if (!documents.isEmpty) {
             ServerLogger().addRead(1)
-            documents.documents.firstOrNull()?.getString("PROJECT_NAME")
+            listOf(documents.documents.firstOrNull()?.getString("PROJECT_NAME"),documents.documents.firstOrNull()?.getString("ICON_URL"))
 
         } else {
             null

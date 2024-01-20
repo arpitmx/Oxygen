@@ -16,7 +16,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:name=".O2Application"
         android:allowBackup="true"
@@ -30,11 +29,14 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.Teams.TeamsActivity"
+            android:exported="false" />
+        <activity
             android:name=".UI.Logs.LogsActivity"
             android:exported="false" />
         <activity
             android:name=".UI.UpdateScreen.UpdaterActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".UI.CreateTask.ChecklistActivity"
             android:exported="false" />
@@ -67,13 +69,15 @@
             android:exported="false" />
         <activity
             android:name=".UI.Auth.AuthScreenActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
+
         <receiver
             android:name=".HelperClasses.NetworkChangeReceiver"
-            android:label="NetworkChangeReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="NetworkChangeReceiver">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                <action
+                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
                     tools:ignore="BatteryLife" />
             </intent-filter>
         </receiver>
@@ -145,7 +149,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>

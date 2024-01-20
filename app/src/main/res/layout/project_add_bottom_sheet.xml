@@ -93,6 +93,8 @@
         android:id="@+id/progress_bar"
         android:visibility="gone"
         android:indeterminateTint="@color/purple"/>
+
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/submit_link"
         android:layout_width="match_parent"

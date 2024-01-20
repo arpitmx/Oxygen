@@ -49,6 +49,7 @@ object PrefManager {
     private val lastTagTimestampMapKey = "last_tag_timestamp_map"
     private val lastTeamsTimestampMapKey = "last_teams_timestamp_map"
     private val lastSegmentsTimestampMapKey = "last_segments_timestamp_map"
+    private val projectIconUrlMapKey = "project_icon_url_map"
 
 
     private lateinit var projectTimestampMap: MutableMap<String, Long>
@@ -56,6 +57,7 @@ object PrefManager {
     private lateinit var LastTagTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastTeamsTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastSegmentsTimestampMap: MutableMap<String, Timestamp>
+    private lateinit var ProjectIconUrlMap: MutableMap<String, String>
 
 
     private val projectIdTaskIdMapKey = "project_id_task_id_map"
@@ -110,6 +112,16 @@ object PrefManager {
         LastSegmentsTimestampMap = savedLastSegmentsTimeStampMapString?.let {
             try {
                 Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+
+        val savedProjectIconUrlMapString = sharedPreferences.getString(
+            projectIconUrlMapKey, null)
+        ProjectIconUrlMap = savedProjectIconUrlMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, String>>() {}.type)
             } catch (e: JsonSyntaxException) {
                 mutableMapOf()
             }
@@ -583,6 +595,18 @@ object PrefManager {
     private fun saveLastSegmentsTimeStampHashMapToPreferences() {
         val hashMapString = Gson().toJson(LastSegmentsTimestampMap)
         editor.putString(lastSegmentsTimestampMapKey, hashMapString)
+        editor.apply()
+    }
+    fun setProjectIconUrl(projectName: String, url:String) {
+        ProjectIconUrlMap[projectName] = url
+        saveProjectIconUrlHashMapToPreferences()
+    }
+    fun getProjectIconUrl(projectName: String): String {
+        return ProjectIconUrlMap[projectName] ?: ""
+    }
+    private fun saveProjectIconUrlHashMapToPreferences() {
+        val hashMapString = Gson().toJson(ProjectIconUrlMap)
+        editor.putString(projectIconUrlMapKey, hashMapString)
         editor.apply()
     }
 

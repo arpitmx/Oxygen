@@ -1,4 +1,4 @@
-package com.ncs.o2.UI.Teams
+package com.ncs.o2.UI.Teams.Chat
 
 import android.Manifest
 import android.animation.Animator
@@ -40,7 +40,6 @@ import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.MessageRepository.MessageProjectAssociation
-import com.ncs.o2.Data.Room.MessageRepository.MessageProjectTaskAssociation
 import com.ncs.o2.Data.Room.MessageRepository.UsersDao
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -49,7 +48,6 @@ import com.ncs.o2.Domain.Models.Enums.MessageType
 import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
@@ -57,6 +55,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursorMiddleCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
@@ -70,16 +69,12 @@ import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
-import com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters.ChatAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.ChatViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
-import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
-import com.ncs.o2.databinding.ActivityMainBinding
-import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.o2.databinding.FragmentTeamsChatBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -177,14 +172,13 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             drawerLayout.openDrawer(gravity)
         }
         activityBinding.binding.gioActionbar.tabLayout.gone()
-        activityBinding.binding.gioActionbar.searchCont.gone()
+        activityBinding.binding.gioActionbar.searchCont.visible()
         activityBinding.binding.gioActionbar.actionbar.visible()
         activityBinding.binding.gioActionbar.constraintLayout2.gone()
         activityBinding.binding.gioActionbar.constraintLayoutsearch.gone()
         activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.binding.gioActionbar.constraintLayoutTeams.visible()
-        activityBinding.binding.gioActionbar.projectName.text=PrefManager.getcurrentProject()
-
+        activityBinding.binding.gioActionbar.projectIcon.load(PrefManager.getProjectIconUrl(PrefManager.getcurrentProject()),resources.getDrawable(R.drawable.placeholder_image))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

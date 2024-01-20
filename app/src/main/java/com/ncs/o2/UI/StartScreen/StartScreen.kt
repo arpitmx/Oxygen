@@ -471,8 +471,22 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                         setUpFCMTokenIfRequired(document = document)
                         setUpProjectsList(document = document)
                         val projectsList = PrefManager.getProjectsList()
-                        setUpTasks(PrefManager.getcurrentProject())
-                        setUpTags(PrefManager.getcurrentProject())
+                        CoroutineScope(Dispatchers.IO).launch {
+                            for (project in projectsList){
+                                if (PrefManager.getProjectIconUrl(project)==""){
+                                    saveProjectIconUrls(projectName = project)
+                                }
+                                Log.d("projectCheck",PrefManager.getProjectIconUrl(project).toString())
+
+                            }
+                            withContext(Dispatchers.Main){
+                                setUpTasks(PrefManager.getcurrentProject())
+                                setUpTags(PrefManager.getcurrentProject())
+                            }
+                        }
+
+
+
                     }
 
 
@@ -530,6 +544,20 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
     }
 
+    private fun saveProjectIconUrls(projectName:String){
+
+        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                    PrefManager.setProjectIconUrl(projectName,imageUrl!!)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("failCheck", exception.toString())
+            }
+
+    }
     private fun stopAnimAndStartActivity() {
         Handler(Looper.getMainLooper()).postDelayed(
             {

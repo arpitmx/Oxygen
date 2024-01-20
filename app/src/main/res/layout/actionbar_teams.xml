@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/darkbg_main"
+    android:id="@+id/actionbar"
+    android:layout_height="wrap_content">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutTeams"
+        android:layout_width="match_parent"
+        android:visibility="visible"
+        android:layout_height="@dimen/action_bar"
+        android:elevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/teamsSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/padding_bottom_offset"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
+
+
+            <!--            <de.hdodenhof.circleimageview.CircleImageView-->
+            <!--                android:id="@+id/asignee_dp"-->
+            <!--                android:layout_width="40dp"-->
+            <!--                android:scaleY="0.8"-->
+            <!--                android:layout_marginStart="2dp"-->
+            <!--                android:scaleX="0.8"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:layout_alignParentTop="true"-->
+            <!--                android:layout_alignParentEnd="true"-->
+            <!--                android:layout_alignParentBottom="false"-->
+            <!--                android:src="@drawable/apphd"-->
+            <!--                app:layout_constraintEnd_toStartOf="@+id/create_task_button"-->
+            <!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/label_cardview_green"
+                app:cardCornerRadius="10dp">
+
+                <ImageView
+                    android:id="@+id/projectIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ncs" />
+            </androidx.cardview.widget.CardView>
+
+
+            <TextView
+                android:id="@+id/teams"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:paddingBottom="@dimen/padding_bottom_offset"
+                android:text="Teams"
+                android:textColor="@color/primary"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnHam"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/search_cont"
+        android:visibility="visible"
+        android:orientation="horizontal"
+        android:layout_height="55dp">
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/search_bar"
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="7dp"
+            android:layout_marginStart="15dp"
+            android:focusable="false"
+            android:editable="false"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="7dp"
+            android:background="@drawable/item_bg_curve"
+            android:drawableStart="@drawable/ic_searchico"
+            android:paddingStart="15dp"
+            android:paddingBottom="1dp"
+            android:gravity="start|center_vertical"
+            android:hint="Search tasks, tags, etc."
+            android:textAllCaps="false"
+            android:textColorHint="@color/account"
+            android:drawablePadding="15dp"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:transitionName="searchActivityTransition"
+            android:textSize="18dp"
+            android:textColor="#DEE3E3E3"
+            android:drawableTint="#DEE3E3E3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:inputType="textAutoCorrect" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="1.2"
+            android:layout_gravity="center"
+            android:padding="6dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="7dp"
+            android:background="@drawable/item_bg_curve"
+            android:layout_marginBottom="7dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/filter"
+            android:id="@+id/refresh"
+            app:tint="@color/primary" />
+
+
+    </LinearLayout>
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/line"
+        android:background="@color/border_grey"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

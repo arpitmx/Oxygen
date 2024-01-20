@@ -11,7 +11,8 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.UI.UIComponents.Adapters.BottomSheetAdapter
 import com.ncs.o2.databinding.LayoutPriorityBottomSheetBinding
 
-class BottomSheet(private val dataList: List<String>,private val type:String,private val sendText: SendText):BottomSheetDialogFragment (),BottomSheetAdapter.onClickString{
+class BottomSheet(private val dataList: List<String>,private val type:String,private val sendText: SendText):BottomSheetDialogFragment (),
+    BottomSheetAdapter.onClickString{
     lateinit var binding: LayoutPriorityBottomSheetBinding
     override fun onCreateView(
         inflater: LayoutInflater,

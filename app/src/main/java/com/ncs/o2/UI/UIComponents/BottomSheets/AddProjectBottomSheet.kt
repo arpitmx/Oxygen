@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,10 +26,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class AddProjectBottomSheet : BottomSheetDialogFragment(){
+class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListener) : BottomSheetDialogFragment(){
 
     lateinit var binding:ProjectAddBottomSheetBinding
-    var projectAddedListener: ProjectAddedListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,37 +43,19 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setViews()
-    }
-
-    private fun setViews() {
-
-
-        setBottomSheetConfig()
-        setActionbar()
-
-    }
-
-    private fun setActionbar() {
-        binding.closeBtn.setOnClickThrottleBounceListener{
-            dismiss()
-        }
-
-        binding.addProject.setOnClickThrottleBounceListener {
-            startActivity(Intent(requireContext(), CreateProject::class.java))
-            dismiss()
-        }
         binding.submitLink.setOnClickThrottleBounceListener {
+            binding.progressBar.visible()
             val link = binding.projectLink.text.toString()
 
             if (link.isNotEmpty()) {
-                binding.submitLink.gone()
-                binding.progressBar.visible()
+
 
                 val userDocument = FirebaseFirestore.getInstance().collection("Users")
                     .document(FirebaseAuth.getInstance().currentUser?.email!!)
 
                 var _projectData: String? = null
                 var projectData: String? = null
+                var imageUrl:String?=null
 
                 FirebaseFirestore.getInstance().collection("Projects")
                     .whereEqualTo("PROJECT_LINK", link)
@@ -83,6 +65,8 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                             for (document in documents) {
                                 val project = document.data
                                 projectData = project.get("PROJECT_NAME").toString()
+                                imageUrl = project.get("ICON_URL").toString()
+
                             }
 
                             if (projectData != null) {
@@ -106,6 +90,11 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                                                     )
                                                     FirebaseFirestore.getInstance().collection(
                                                         Endpoints.PROJECTS).document(projectData!!).update(addCont)
+                                                    Log.d("projectCheck",projectData.toString())
+                                                    Log.d("projectCheck",imageUrl.toString())
+
+
+
                                                     CoroutineScope(Dispatchers.IO).launch {
                                                         for (project in PrefManager.getProjectsList()) {
                                                             val list = getProjectSegments(project)
@@ -115,8 +104,10 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                                                             }
                                                             PrefManager.saveProjectSegments(project, list)
                                                         }
+
                                                         withContext(Dispatchers.Main){
                                                             PrefManager.lastaddedproject(projectData!!)
+                                                            PrefManager.setProjectIconUrl(projectData!!,imageUrl!!)
                                                             userProjects?.add(projectData!!.trim())
                                                             sendcallBack(userProjects!!)
                                                             Toast.makeText(
@@ -124,7 +115,9 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                                                                 "Project Added Successfully",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
-                                                            projectAddedListener?.onProjectAdded(userProjects!!)
+                                                            projectAddedListener.onProjectAdded(
+                                                                userProjects
+                                                            )
                                                             dismiss()
                                                         }
                                                     }
@@ -146,9 +139,30 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
                     .addOnFailureListener { e ->
                     }
             } else {
+                binding.progressBar.gone()
                 Toast.makeText(requireContext(), "Project Link can't be empty", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun setViews() {
+
+
+        setBottomSheetConfig()
+        setActionbar()
+
+    }
+
+    private fun setActionbar() {
+        binding.closeBtn.setOnClickThrottleBounceListener{
+            dismiss()
+        }
+
+        binding.addProject.setOnClickThrottleBounceListener {
+            startActivity(Intent(requireContext(), CreateProject::class.java))
+            dismiss()
+        }
+
 
     }
 
@@ -184,7 +198,7 @@ class AddProjectBottomSheet : BottomSheetDialogFragment(){
         fun onProjectAdded(userProjects:ArrayList<String>)
     }
     fun sendcallBack(userProjects: ArrayList<String>){
-        projectAddedListener?.onProjectAdded(userProjects)
+        projectAddedListener.onProjectAdded(userProjects)
     }
 
 }
