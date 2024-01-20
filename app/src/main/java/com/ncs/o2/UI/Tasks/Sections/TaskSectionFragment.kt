@@ -21,7 +21,9 @@ import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
@@ -114,9 +116,9 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
     private fun manageViews(){
         activityBinding.binding.gioActionbar.tabLayout.visible()
-        activityBinding.binding.gioActionbar.searchCont.visible()
         activityBinding.binding.gioActionbar.actionbar.visible()
         activityBinding.binding.gioActionbar.constraintLayout2.visible()
+        activityBinding.binding.gioActionbar.searchCont.gone()
         activityBinding.binding.gioActionbar.constraintLayoutsearch.gone()
         activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.binding.gioActionbar.constraintLayoutTeams.gone()
@@ -277,10 +279,14 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
             fetchfromdb()
         }
 
-
-
+        binding.swiperefresh.setOnRefreshListener {
+            runDelayed(1000){
+                toast("Page refreshed")
+                requireActivity().recreate()
+                binding.swiperefresh.isRefreshing=false
+            }
+        }
         activityBinding.binding.gioActionbar.refresh.setOnClickThrottleBounceListener {
-            requireActivity().recreate()
         }
 
 
@@ -389,7 +395,6 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     }
 
     private fun showSearch() {
-        searchCont.visible()
     }
 
     private fun hideSearch() {

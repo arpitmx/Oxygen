@@ -56,16 +56,18 @@ class ChatViewModel @Inject constructor(
 
     fun getTeamsMessages(
         projectName: String,
+        channelId:String,
         resultCallback: (ServerResult<List<Message>>) -> Unit
     ) {
-        repository.getTeamsMessages(projectName,resultCallback)
+        repository.getTeamsMessages(projectName,channelId,resultCallback)
     }
 
     fun getNewTeamsMessages(
         projectName: String,
+        channelId:String,
         resultCallback: (ServerResult<List<Message>>) -> Unit
     ) {
-        repository.getNewTeamsMessages(projectName,resultCallback)
+        repository.getNewTeamsMessages(projectName,channelId,resultCallback)
     }
     fun getUserbyId(
         user_id:String,
@@ -76,8 +78,8 @@ class ChatViewModel @Inject constructor(
     fun uploadImage(bitmap: Bitmap,projectId:String,taskId:String): LiveData<ServerResult<StorageReference>> {
         return repository.postImage(bitmap,projectId,taskId)
     }
-    fun uploadImageFromTeams(bitmap: Bitmap,projectId:String): LiveData<ServerResult<StorageReference>> {
-        return repository.postTeamsImage(bitmap,projectId)
+    fun uploadImageFromTeams(bitmap: Bitmap,projectId:String,channelId: String): LiveData<ServerResult<StorageReference>> {
+        return repository.postTeamsImage(bitmap,projectId,channelId)
     }
     fun getDPUrlThroughRepository(reference: StorageReference): LiveData<ServerResult<String>> {
         return repository.getUserDPUrl(reference)
@@ -99,10 +101,11 @@ class ChatViewModel @Inject constructor(
 
     fun getTeamsMessagesforProject(
         projectName: String,
+        channelId: String,
         resultCallback: (DBResult<List<Message>>) -> Unit
     ) {
         CoroutineScope(Dispatchers.Main).launch {
-            taskRepository.getTeamsMessagesforProject(projectName,resultCallback)
+            taskRepository.getTeamsMessagesforProject(projectName,channelId,resultCallback)
         }
 
     }

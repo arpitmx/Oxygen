@@ -52,6 +52,7 @@ class FCMessagingService : FirebaseMessagingService() {
             val body = receivedNotification.data[N.BODY]
             val taskID = receivedNotification.data[N.TASKID]
             val projectID = receivedNotification.data[N.project_id]
+            val channelID = receivedNotification.data[N.channelId]
 
 
             type?.let {
@@ -83,7 +84,9 @@ class FCMessagingService : FirebaseMessagingService() {
                         title =  title.orEmpty(),
                         message = body.orEmpty(),
                         taskID =  taskID.orEmpty(),
-                        projectID = projectID.orEmpty()
+                        projectID = projectID.orEmpty(),
+                        channelId = channelID.orEmpty()
+
                     )
                     showNotification(notification = notif, context = applicationContext)
                 }
@@ -93,7 +96,8 @@ class FCMessagingService : FirebaseMessagingService() {
                         title =  title.orEmpty(),
                         message = body.orEmpty(),
                         taskID =  taskID.orEmpty(),
-                        projectID = projectID.orEmpty()
+                        projectID = projectID.orEmpty(),
+                        channelId = channelID.orEmpty()
 
                     )
 

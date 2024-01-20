@@ -550,7 +550,10 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
                     val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
-                    PrefManager.setProjectIconUrl(projectName,imageUrl!!)
+                    if (imageUrl != null) {
+                        PrefManager.setProjectIconUrl(projectName, imageUrl)
+
+                    }
                 }
             }
             .addOnFailureListener { exception ->

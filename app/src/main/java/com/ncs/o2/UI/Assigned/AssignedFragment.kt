@@ -96,11 +96,11 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
             drawerLayout.openDrawer(gravity)
         }
         activityBinding.gioActionbar.tabLayout.visible()
-        activityBinding.gioActionbar.searchCont.visible()
         activityBinding.gioActionbar.actionbar.visible()
         activityBinding.gioActionbar.constraintLayout2.gone()
         activityBinding.gioActionbar.constraintLayoutsearch.gone()
         activityBinding.gioActionbar.constraintLayoutTeams.gone()
+        activityBinding.gioActionbar.searchCont.gone()
         activityBinding.gioActionbar.constraintLayoutworkspace.visible()
     }
     private fun setUpViewPager() {

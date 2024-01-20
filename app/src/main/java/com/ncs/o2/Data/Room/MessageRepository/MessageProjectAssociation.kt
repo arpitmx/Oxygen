@@ -6,4 +6,5 @@ import androidx.room.Entity
 data class MessageProjectAssociation(
     val messageId: String,
     val projectId: String,
+    val channelId: String,
 )

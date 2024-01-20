@@ -117,6 +117,7 @@ object NotificationsUtils {
             data.addProperty(N.TYPE, notification.notificationType)
             data.addProperty(N.TASKID, notification.taskID)
             data.addProperty(N.project_id,notification.projectID)
+            data.addProperty(N.channelId,notification.channelID)
 
             payload.add(N.DATA, data)
 
@@ -134,6 +135,7 @@ object NotificationsUtils {
             data.addProperty(N.TYPE, notification.notificationType)
             data.addProperty(N.TASKID, notification.taskID)
             data.addProperty(N.project_id,notification.projectID)
+            data.addProperty(N.channelId,notification.channelID)
 
             payload.add(N.DATA, data)
 

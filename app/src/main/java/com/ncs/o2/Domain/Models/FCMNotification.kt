@@ -27,4 +27,5 @@ data class FCMNotification constructor(
     val message: String = "",
     val taskID : String = "",
     val projectID:String="",
+    val channelId:String=""
 )
