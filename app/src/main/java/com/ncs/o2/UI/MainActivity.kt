@@ -190,7 +190,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             Log.d("projectCheck",PrefManager.getProjectIconUrl(project).toString())
         }
 
-
     }
 
     private fun setUpInitilisations(){
@@ -202,6 +201,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         viewModel.currentSegment.observe(this, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
+
+
         val searchFragment = intent.getStringExtra("search")
         if (searchFragment != null) {
             when (searchFragment) {
@@ -215,53 +216,67 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     private fun manageViews(){
         if (PrefManager.getcurrentsegment()== "Select Segment") {
+
             binding.placeholderText.visible()
             binding.navHostFragmentActivityMain.gone()
-            binding.gioActionbar.tabLayout.gone()
-            binding.gioActionbar.searchCont.gone()
-            binding.gioActionbar.line.gone()
             binding.bottomNavParent.gone()
-            binding.gioActionbar.tabLayout.gone()
-            binding.gioActionbar.searchCont.gone()
-            binding.gioActionbar.actionbar.visible()
-            binding.gioActionbar.constraintLayout2.visible()
-            binding.gioActionbar.constraintLayoutsearch.gone()
-            binding.gioActionbar.constraintLayoutworkspace.gone()
-            binding.gioActionbar.constraintLayoutTeams.gone()
-            binding.gioActionbar.notificationCont.gone()
+
+            with(binding.gioActionbar) {
+                line.gone()
+                tabLayout.gone()
+                searchCont.gone()
+                tabLayout.gone()
+                searchCont.gone()
+                actionbar.visible()
+                constraintLayout2.visible()
+                constraintLayoutsearch.gone()
+                constraintLayoutworkspace.gone()
+                constraintLayoutTeams.gone()
+                notificationCont.gone()
+            }
+
         } else {
+
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
-            binding.gioActionbar.line.visible()
             binding.bottomNavParent.visible()
+
+            binding.gioActionbar.line.visible()
             binding.gioActionbar.notificationCont.visible()
             setNotificationCountOnActionBar()
         }
     }
 
     private fun updateUIBasedOnSegment(newSegment: String) {
+
         if (newSegment == "Select Segment") {
+
             binding.placeholderText.visible()
             binding.navHostFragmentActivityMain.gone()
-            binding.gioActionbar.tabLayout.gone()
-            binding.gioActionbar.searchCont.gone()
-            binding.gioActionbar.line.gone()
             binding.bottomNavParent.gone()
-            binding.gioActionbar.tabLayout.gone()
-            binding.gioActionbar.searchCont.gone()
-            binding.gioActionbar.actionbar.visible()
-            binding.gioActionbar.constraintLayout2.visible()
-            binding.gioActionbar.constraintLayoutsearch.gone()
-            binding.gioActionbar.constraintLayoutworkspace.gone()
-            binding.gioActionbar.constraintLayoutTeams.gone()
-            binding.gioActionbar.notificationCont.gone()
+
+            with(binding.gioActionbar) {
+                tabLayout.gone()
+                searchCont.gone()
+                line.gone()
+                actionbar.visible()
+                constraintLayout2.visible()
+                constraintLayoutsearch.gone()
+                constraintLayoutworkspace.gone()
+                constraintLayoutTeams.gone()
+                notificationCont.gone()
+            }
+
+
         } else {
+
             binding.placeholderText.gone()
             binding.navHostFragmentActivityMain.visible()
             binding.gioActionbar.line.visible()
             binding.bottomNavParent.visible()
             binding.gioActionbar.notificationCont.visible()
             setNotificationCountOnActionBar()
+
         }
     }
 
@@ -287,7 +302,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     }
 
-
     private var receiverRegistered = false
 
     fun registerReceiver(flag : Boolean){
@@ -307,7 +321,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onResume() {
         super.onResume()
         registerReceiver(true)
-
         setNotificationCountOnActionBar()
         setUpInitilisations()
     }
@@ -445,10 +458,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     private fun setUpProjects() {
 
-        // Set up the list of projects and related UI components
-//        binding.lottieProgressInclude.progressbarStrip.visible()
-//        binding.lottieProgressInclude.progressbarBlock.gone()
-
         viewModel.fetchUserProjectsFromRepository()
         val user=PrefManager.getcurrentUserdetails()
         binding.drawerheaderfile.username.text=user.USERNAME
@@ -543,7 +552,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         else{
             movetotaskspage()
         }
-
     }
 
     private fun setUpTasks(projectName: String) {
@@ -856,6 +864,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         fragmentTransaction.commit()
 
     }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if (!dynamicLinkHandled) {
@@ -1065,7 +1074,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
         view.findViewById<TextView>(R.id.projectName).text=id
-
         view.findViewById<Button>(R.id.btnNo).setOnClickThrottleBounceListener {
             bottomSheetDialog.dismiss()
         }
@@ -1078,13 +1086,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
     private fun addProjectToUser(projectLink: String) {
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = firestoreRepository.addProjectToUser(projectLink)
-            when (result) {
+        CoroutineScope(Dispatchers.Main).launch {
+            when (val result = firestoreRepository.addProjectToUser(projectLink)) {
                 is ServerResult.Success -> {
                     projects.clear()
                     projects.addAll(result.data)
-                    Log.d("result",result.data.toString())
+                    Timber.tag("result").d(result.data.toString())
                     PrefManager.putProjectsList(result.data)
                     projectListAdapter.notifyDataSetChanged()
                     setupProjectsList()
@@ -1114,11 +1121,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                 is ServerResult.Failure -> {
                     Toast.makeText(this@MainActivity, "Failed to add project: ${result.exception.message}", Toast.LENGTH_SHORT).show()
                 }
-
                 else -> {}
             }
         }
     }
+
     private fun deleteCache(context: Context) {
         try {
             val dir: File = context.cacheDir
@@ -1152,6 +1159,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             false
         }
     }
+
     private fun movetosearch(tagText: String?) {
         val transaction = supportFragmentManager.beginTransaction()
         val fragment = SearchFragment()
@@ -1166,6 +1174,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.bottomNav.menu.getItem(3).isChecked = true
         binding.bottomNav.menu.getItem(3).setIcon(R.drawable.ic_searchico)
     }
+
     private fun movetotaskspage() {
         val transaction = supportFragmentManager.beginTransaction()
         val fragment = TasksHolderFragment()
@@ -1175,6 +1184,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.bottomNav.menu.getItem(0).isChecked = true
         binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
     }
+
     private fun movetoteamspage() {
         val transaction = supportFragmentManager.beginTransaction()
         val fragment = TeamsFragment()
@@ -1184,6 +1194,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.bottomNav.menu.getItem(2).isChecked = true
         binding.bottomNav.menu.getItem(2).setIcon(R.drawable.baseline_groups_24)
     }
+
     override fun onBackPressed() {
         if (doubleBackPress) {
             super.onBackPressed()
@@ -1192,11 +1203,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         this.doubleBackPress = true
         easyElements.showSnackbar(binding.root,"Press back again to exit",2000)
-
         Handler(Looper.getMainLooper()).postDelayed({
             doubleBackPress = false
         }, 2000)
     }
+
     suspend fun getProjectSegments(project: String): List<SegmentItem> {
         val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)
         val list = mutableListOf<SegmentItem>()

@@ -12,7 +12,7 @@ import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.HelperClasses.NotificationBuilderUtil
 import com.ncs.o2.Domain.Models.FCMNotification
 import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Services.NotificationApiService
+import com.ncs.o2.Api.NotificationApiService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -41,9 +41,9 @@ Tasks FUTURE ADDITION :
 
 @HiltWorker
 class FCMWorker @AssistedInject constructor(
-            @Assisted context: Context,
-            @Assisted workerParameters: WorkerParameters,
-            @Assisted val notificationApiService: NotificationApiService,
+    @Assisted context: Context,
+    @Assisted workerParameters: WorkerParameters,
+    @Assisted val notificationApiService: NotificationApiService,
         ) : CoroutineWorker(context, workerParameters)  {
 
     private val _resultLiveData =  MutableLiveData<ServerResult<String>>()
@@ -57,9 +57,9 @@ class FCMWorker @AssistedInject constructor(
 
         return try {
 
-
             val payloadJson: JsonObject = getJsonPayload(inputData.getString(PAYLOAD_DATA)!!)
             val response = notificationApiService.sendNotification(payloadJson)
+
             if (response.isSuccessful) {
                 Timber.tag(TAG).d("Successful : ${response.body()}")
                 _resultLiveData.postValue(ServerResult.Success("Success"))

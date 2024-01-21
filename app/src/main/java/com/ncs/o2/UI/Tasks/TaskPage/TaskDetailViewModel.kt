@@ -21,7 +21,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Repositories.TaskRepository
 import com.ncs.o2.Domain.Utility.FirebaseRepository
-import com.ncs.o2.Services.NotificationApiService
+import com.ncs.o2.Api.NotificationApiService
 import com.ncs.o2.Domain.Workers.FCMWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -53,8 +53,8 @@ Tasks FUTURE ADDITION :
 @HiltViewModel
 class TaskDetailViewModel @Inject
 constructor(val notificationApiService: NotificationApiService,
-            @FirebaseRepository val repository: Repository, val app: Application,private val firestoreRepository: FirestoreRepository,
-    val taskRepository: TaskRepository
+            @FirebaseRepository val repository: Repository, val app: Application, private val firestoreRepository: FirestoreRepository,
+            val taskRepository: TaskRepository
 ) : AndroidViewModel(app) {
 
     companion object{

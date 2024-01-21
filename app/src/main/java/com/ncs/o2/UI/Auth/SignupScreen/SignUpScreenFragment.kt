@@ -52,7 +52,6 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
 
     private val viewModel: SignUpViewModel by viewModels()
     lateinit var binding: FragmentSignUpBinding
-
     lateinit var authResource: LiveData<ServerResult<FirebaseUser>?>
 
     override fun onCreateView(
@@ -236,7 +235,6 @@ class SignUpScreenFragment @Inject constructor() : Fragment() {
             Timber.tag("FCM TOKEN").d("FCM registration %s", token)
             token(tokenFCM)
         }
-
     }
 
     private fun handleValidation() {

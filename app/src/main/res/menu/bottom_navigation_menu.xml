@@ -4,13 +4,13 @@
     <item
         android:id="@+id/task_item"
         android:enabled="true"
-        android:icon="@drawable/baseline_article_24"
+        android:icon="@drawable/round_task_alt_24"
         android:title="@string/bottom_nav_item_tasks" />
 
     <item
         android:id="@+id/assigned_item"
         android:enabled="true"
-        android:icon="@drawable/round_task_alt_24"
+        android:icon="@drawable/baseline_business_center_24"
         android:title="@string/bottom_nav_item_assigned" />
 
     <item

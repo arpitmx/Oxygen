@@ -26,7 +26,7 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Workers.FCMWorker
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.Services.NotificationApiService
+import com.ncs.o2.Api.NotificationApiService
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package com.ncs.o2.Services
+package com.ncs.o2.Api
 
 import com.google.gson.JsonObject
 import com.ncs.o2.BuildConfig
