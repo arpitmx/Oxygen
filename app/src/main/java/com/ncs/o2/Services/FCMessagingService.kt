@@ -53,6 +53,7 @@ class FCMessagingService : FirebaseMessagingService() {
             val taskID = receivedNotification.data[N.TASKID]
             val projectID = receivedNotification.data[N.project_id]
             val channelID = receivedNotification.data[N.channelId]
+            val from = receivedNotification.data[N.fromUser]
 
 
             type?.let {
@@ -79,17 +80,21 @@ class FCMessagingService : FirebaseMessagingService() {
                     showNotification(notification = notif, context = applicationContext)
                 }
                 if (type == NotificationType.TEAMS_COMMENT_NOTIFICATION.name){
-                    val notif = FCMNotification(
-                        notificationType = NotificationType.TEAMS_COMMENT_NOTIFICATION,
-                        title =  title.orEmpty(),
-                        message = body.orEmpty(),
-                        taskID =  taskID.orEmpty(),
-                        projectID = projectID.orEmpty(),
-                        channelId = channelID.orEmpty()
 
-                    )
-                    showNotification(notification = notif, context = applicationContext)
+                    if (PrefManager.getCurrentUserEmail()!=from){
+                        val notif = FCMNotification(
+                            notificationType = NotificationType.TEAMS_COMMENT_NOTIFICATION,
+                            title =  title.orEmpty(),
+                            message = body.orEmpty(),
+                            taskID =  taskID.orEmpty(),
+                            projectID = projectID.orEmpty(),
+                            channelId = channelID.orEmpty()
+
+                        )
+                        showNotification(notification = notif, context = applicationContext)
+                    }
                 }
+
                 if (type == NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name){
                     val notif = FCMNotification(
                         notificationType = NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION,

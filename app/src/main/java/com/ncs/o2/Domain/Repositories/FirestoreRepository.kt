@@ -647,6 +647,8 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+
+
     override fun getNewChannels(
         projectName: String,
         result: (ServerResult<List<Channel>>) -> Unit
@@ -2382,22 +2384,34 @@ class FirestoreRepository @Inject constructor(
         projectName: String,
         serverResult: (ServerResult<Int>) -> Unit
     ) {
-
-
-        return try {
-
+        try {
             serverResult(ServerResult.Progress)
-            firestore.collection(Endpoints.PROJECTS)
-                .document(projectName).collection(Endpoints.Project.CHANNELS).document(channel.channel_id)
-                .set(channel)
+
+            val channelDocument = firestore.collection(Endpoints.PROJECTS)
+                .document(projectName)
+                .collection(Endpoints.Project.CHANNELS)
+                .document(channel.channel_name)
+                .get()
                 .await()
-            serverResult(ServerResult.Success(200))
+
+            if (channelDocument.exists()) {
+                serverResult(ServerResult.Failure(Exception("Duplicate Channel")))
+            } else {
+                firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.CHANNELS)
+                    .document(channel.channel_name)
+                    .set(channel)
+                    .await()
+
+                serverResult(ServerResult.Success(200))
+            }
 
         } catch (exception: Exception) {
             serverResult(ServerResult.Failure(exception))
         }
-
     }
+
     override suspend fun initilizelistner(projectName: String,result: (ServerResult<Int>) -> Unit) {
         val projectDocument = FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(projectName)
         val listenerRegistration = projectDocument.addSnapshotListener { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->

@@ -12,6 +12,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -108,6 +109,7 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                                                         withContext(Dispatchers.Main){
                                                             PrefManager.lastaddedproject(projectData!!)
                                                             PrefManager.setProjectIconUrl(projectData!!,imageUrl!!)
+
                                                             userProjects?.add(projectData!!.trim())
                                                             sendcallBack(userProjects!!)
                                                             Toast.makeText(
@@ -115,6 +117,16 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                                                                 "Project Added Successfully",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
+                                                            val projectTopic = projectData!!.replace("\\s+".toRegex(), "_") + "_TOPIC_GENERAL"
+
+                                                            FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
+                                                                .addOnCompleteListener { task ->
+                                                                    if (task.isSuccessful) {
+                                                                        Log.d("FCM", "Subscribed to topic successfully")
+                                                                    } else {
+                                                                        Log.d("FCM", "Failed to subscribe to topic",)
+                                                                    }
+                                                                }
                                                             projectAddedListener.onProjectAdded(
                                                                 userProjects
                                                             )

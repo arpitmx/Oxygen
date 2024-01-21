@@ -466,7 +466,7 @@ object ExtensionsUtil {
         this.startAnimation(animation)
     }
 
-    fun View.set180(context: Context, animDuration: Long = 500L) {
+    fun View.set180(context: Context, animDuration: Long = 200L) {
         clearAnimation()
         val currentRotation = tag as? Float ?: 0f
         val targetRotation = if (currentRotation == 0f) 180f else 0f

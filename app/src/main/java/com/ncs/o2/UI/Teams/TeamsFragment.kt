@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
@@ -24,6 +25,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
@@ -31,6 +33,8 @@ import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.Adapters.BottomSheetAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateNewChannelBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.TeamsPagemoreOptions
 import com.ncs.o2.databinding.FragmentTeamsBinding
 import com.ncs.o2.databinding.FragmentTeamsChatBinding
 import com.ncs.versa.Constants.Endpoints
@@ -53,7 +57,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
         (requireActivity() as MainActivity)
     }
 
-    private var isVisible=false
+    private var isVisible=true
 
 
     override fun onCreateView(
@@ -69,6 +73,35 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        binding.extendedChannels.visible()
+
+
+        activityBinding.binding.gioActionbar.btnMoreTeams.setOnClickThrottleBounceListener {
+            val moreTeamsOptionBottomSheet =
+                TeamsPagemoreOptions()
+            moreTeamsOptionBottomSheet.show(requireFragmentManager(), "more")
+        }
+
+
+
+        if (PrefManager.getLastChannelTimeStamp(PrefManager.getcurrentProject()).seconds.toInt()==0){
+            fetchChannels()
+        }
+        else{
+            Log.d("channelFetch","fetch from cache")
+            val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+            val newList = oldList.toMutableList().sortedByDescending { it.timestamp }
+            Log.d("channelFetch","fetch from cache new list: \n ${newList.toString()}")
+            if (newList.isNotEmpty()){
+                binding.placeholder.gone()
+                binding.channelsRv.visible()
+                setRecyclerView(newList.distinctBy { it.channel_id })
+            }
+        }
+        fetchNewChannels()
+
+
         binding.channels.setOnClickListener {
             binding.arrow.set180(requireContext())
             if (!isVisible){
@@ -145,8 +178,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
                 is ServerResult.Success -> {
                     binding.progressBar.gone()
                     if (result.data.isEmpty()){
-                        binding.channelsRv.gone()
-                        binding.placeholder.visible()
+                        postDefaultChannel()
                     }
                     else{
                         Log.d("channelFetch","fetch from firebase")
@@ -178,6 +210,42 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
         }
     }
 
+    private fun postDefaultChannel(){
+        val channel= Channel(
+            channel_name = "General",
+            channel_desc = "General Description",
+            channel_id = "General${RandomIDGenerator.generateRandomTaskId(4)}",
+            timestamp = Timestamp.now(),
+            creator = PrefManager.getCurrentUserEmail()
+        )
+
+        CoroutineScope(Dispatchers.Main).launch {
+            repository.postChannel(channel,PrefManager.getcurrentProject()) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+                        binding.progressBar.gone()
+                    }
+
+                    ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+                        val newList = (oldList.toMutableList() + channel).sortedByDescending { it.timestamp }
+                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(),newList)
+                        PrefManager.setLastChannelTimeStamp(PrefManager.getcurrentProject(),channel.timestamp!!)
+                        setRecyclerView(newList.distinctBy { it.channel_id })
+                    }
+                }
+            }
+        }
+    }
+
+
     fun setRecyclerView(dataList: List<Channel>){
         val recyclerView=binding.channelsRv
         val adapter = ChannelsAdapter(dataList.toMutableList(),this)
@@ -201,6 +269,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
         activityBinding.binding.gioActionbar.constraintLayoutsearch.gone()
         activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.binding.gioActionbar.constraintLayoutTeams.visible()
+        activityBinding.binding.gioActionbar.btnMoreTeams.visible()
         activityBinding.binding.gioActionbar.projectIcon.load(
             PrefManager.getProjectIconUrl(
                 PrefManager.getcurrentProject()),resources.getDrawable(R.drawable.placeholder_image))
@@ -208,7 +277,6 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
 
     override fun onChannelClick(channel: Channel) {
         val intent = Intent(requireContext(), TeamsActivity::class.java)
-        intent.putExtra("channel_id", channel.channel_id)
         intent.putExtra("channel_name", channel.channel_name)
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)

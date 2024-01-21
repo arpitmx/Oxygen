@@ -1,11 +1,13 @@
 package com.ncs.o2.UI.Teams
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.Teams.Chat.TeamsChatFragment
 import com.ncs.o2.databinding.ActivityMainBinding
@@ -20,19 +22,16 @@ class TeamsActivity : AppCompatActivity() {
     }
     val sharedViewModel: SharedViewModel by viewModels()
 
-    lateinit var channelID:String
     lateinit var channelName:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        channelID = intent.getStringExtra("channel_id")!!
         channelName = intent.getStringExtra("channel_name")!!
 
-        Log.d("channelID","$channelID --- $channelName")
 
 
-        binding.actionBar.channelName.text=channelName
+        binding.actionBar.channelName.text="# $channelName"
 
 
         attachFragment()
@@ -45,8 +44,14 @@ class TeamsActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("index", "2")
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+        finish()
         super.onBackPressed()
     }
+
     private fun attachFragment(){
         val transaction = supportFragmentManager.beginTransaction()
         val fragment = TeamsChatFragment()

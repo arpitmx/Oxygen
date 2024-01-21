@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
@@ -361,6 +362,16 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
+                                        val projectTopic = "NCSOxygen_TOPIC_GENERAL"
+
+                                        FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Log.d("FCM", "Subscribed to topic successfully")
+                                                } else {
+                                                    Log.d("FCM", "Failed to subscribe to topic",)
+                                                }
+                                            }
                                         with(PrefManager){
 
                                             putProjectsList(listOf("NCSOxygen"))

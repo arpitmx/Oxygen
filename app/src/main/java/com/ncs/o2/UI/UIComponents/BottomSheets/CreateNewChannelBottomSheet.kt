@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.ui.text.toLowerCase
 import androidx.core.graphics.drawable.toDrawable
 import com.github.dhaval2404.colorpicker.ColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
@@ -39,6 +40,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.datafaker.Faker
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,6 +51,7 @@ class CreateNewChannelBottomSheet (private val callback:OnChannelAdded): BottomS
     @FirebaseRepository
     lateinit var repository: Repository
     lateinit var binding: CreateNewChannelBottomsheetBinding
+    var flag:Int=0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,11 +78,12 @@ class CreateNewChannelBottomSheet (private val callback:OnChannelAdded): BottomS
         }
 
         binding.doneButton.setOnClickThrottleBounceListener {
-            if (binding.channelName.text.isNullOrEmpty()){
+            flag=0
+            val title=binding.channelName.text.toString().trim()
+            if (title.isEmpty()){
                 toast("Channel name is required")
             }
             else{
-                val title=binding.channelName.text.toString()
                 val id="$title${RandomIDGenerator.generateRandomTaskId(5)}"
                 val channel=Channel(
                     channel_name = title,
@@ -89,31 +93,47 @@ class CreateNewChannelBottomSheet (private val callback:OnChannelAdded): BottomS
                     creator = PrefManager.getCurrentUserEmail()
                 )
 
-                CoroutineScope(Dispatchers.Main).launch {
-                    repository.postChannel(channel,PrefManager.getcurrentProject()) { result ->
+                val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
 
-                        when (result) {
+                for(c in oldList){
+                    if (c.channel_name.trim().equals(channel.channel_name.trim(), ignoreCase = true)){
+                        flag=1
+                        toast("Channel with the same name already exists")
+                    }
+                }
+                if (flag==0){
+                    CoroutineScope(Dispatchers.Main).launch {
+                        repository.postChannel(channel,PrefManager.getcurrentProject()) { result ->
 
-                            is ServerResult.Failure -> {
-                                toast("Something went wrong")
-                                binding.progressBar.gone()
+                            when (result) {
+
+                                is ServerResult.Failure -> {
+                                    val exception = result.exception
+                                    if (exception is Exception && exception.message?.contains("Duplicate Channel") == true) {
+                                        toast("Channel with the same name already exists")
+                                    } else {
+                                        toast("Something went wrong")
+                                    }
+                                    binding.progressBar.gone()
+                                }
+
+                                ServerResult.Progress -> {
+                                    binding.progressBar.visible()
+                                }
+
+                                is ServerResult.Success -> {
+                                    toast("Channel Created Successfully")
+                                    binding.progressBar.gone()
+                                    dismiss()
+                                    callback.onChannelAdd(channel)
+
+                                }
+
                             }
-
-                            ServerResult.Progress -> {
-                                binding.progressBar.visible()
-                            }
-
-                            is ServerResult.Success -> {
-                                toast("Channel Created Successfully")
-                                binding.progressBar.gone()
-                                dismiss()
-                                callback.onChannelAdd(channel)
-
-                            }
-
                         }
                     }
                 }
+
             }
         }
     }
