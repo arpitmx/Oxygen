@@ -38,8 +38,10 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
@@ -50,8 +52,10 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
@@ -189,7 +193,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
     private fun setUpInitilisations(){
-        binding.gioActionbar.searchCont.gone()
+
+
         manageViews()
         setUpViews()
 
@@ -510,6 +515,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         PrefManager.selectedPosition.value = position
 
         CoroutineScope(Dispatchers.Main).launch {
+            val projectTopic = projectID.replace("\\s+".toRegex(), "_") + "_TOPIC_GENERAL"
+            FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("FCM", "Subscribed to topic successfully")
+                    } else {
+                        Log.d("FCM", "Failed to subscribe to topic",)
+                    }
+                }
             setUpTasks(projectID)
             setUpTags(projectName = projectID)
 
@@ -757,6 +771,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             }
         }
     }
+
+
+
+
 
 
 
@@ -1079,8 +1097,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     setupProjectsList()
                     CoroutineScope(Dispatchers.IO).launch {
                         val list = getProjectSegments(PrefManager.getlastaddedproject())
-                        val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
+                        val projectTopic = PrefManager.getlastaddedproject().replace("\\s+".toRegex(), "_") + "_TOPIC_GENERAL"
 
+                        FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d("FCM", "Subscribed to topic successfully")
+                                } else {
+                                    Log.d("FCM", "Failed to subscribe to topic",)
+                                }
+                            }
+                        val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
                         PrefManager.saveProjectSegments(PrefManager.getlastaddedproject(), list)
                         withContext(Dispatchers.Main){
                             easyElements.showSnackbar(binding.root,"Successfully joined this project",2000)

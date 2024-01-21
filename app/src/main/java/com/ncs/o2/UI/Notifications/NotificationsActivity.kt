@@ -29,6 +29,7 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,7 +69,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         val projectID=intent.getStringExtra("projectID")
         val taskID=intent.getStringExtra("taskID")
         val type=intent.getStringExtra("type")
-        val channelID=intent.getStringExtra("channelID")
+        val channelID=intent.getStringExtra("channel_name")
         if (projectID!=null && taskID!=null && type!=null){
             when(type){
                 NotificationType.TASK_COMMENT_NOTIFICATION.name->{
@@ -96,16 +97,18 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                 NotificationType.TEAMS_COMMENT_NOTIFICATION.name->{
                     finish()
                     updateProjectCache(projectID)
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra("index", "2")
+                    val intent = Intent(this, TeamsActivity::class.java)
+                    Log.d("teamsChannelID",channelID.toString())
+                    intent.putExtra("channel_name", channelID)
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
                 NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name->{
                     finish()
                     updateProjectCache(projectID)
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra("index", "2")
+                    val intent = Intent(this, TeamsActivity::class.java)
+                    Log.d("teamsChannelID",channelID.toString())
+                    intent.putExtra("channel_name", channelID)
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }

@@ -9,10 +9,13 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.JsonObject
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Workers.FCMWorker
+import org.json.JSONObject
 import com.ncs.versa.Constants.Endpoints.Notifications as N
 import java.util.concurrent.TimeUnit
 
@@ -67,6 +70,44 @@ object NotificationsUtils {
         }
     }
 
+    fun sendFCMNotificationToTopic(topic: String, notification: Notification) {
+        val payloadJsonObject = buildNotificationPayloadForTopic(topic, notification)
+        payloadJsonObject?.let {
+            val payloadInputData = Data.Builder()
+                .putString(FCMWorker.PAYLOAD_DATA, payloadJsonObject.toString())
+                .build()
+
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
+                .setConstraints(constraints)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 500L, TimeUnit.MICROSECONDS)
+                .setInputData(payloadInputData)
+                .build()
+
+            workManager.enqueue(workRequest)
+        }
+    }
+
+    private fun buildNotificationPayloadForTopic(topic: String, notification: Notification): JsonObject? {
+
+        val payload = JsonObject()
+        val data = JsonObject()
+
+        payload.addProperty(N.TO, "/topics/$topic")
+        data.addProperty(N.TITLE, notification.title)
+        data.addProperty(N.BODY, notification.message)
+        data.addProperty(N.TYPE, notification.notificationType)
+        data.addProperty(N.project_id,notification.projectID)
+        data.addProperty(N.fromUser,notification.fromUser)
+        data.addProperty(N.channelId,notification.channelID)
+
+        payload.add(N.DATA, data)
+
+        return payload
+    }
 
 
 

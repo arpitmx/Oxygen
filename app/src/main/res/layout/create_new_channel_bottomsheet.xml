@@ -196,7 +196,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Set Channel Description"
-                android:lines="5"
+                android:lines="2"
                 android:singleLine="false"
                 android:textColorHint="@color/darkbg_main_a80"
 

@@ -137,6 +137,7 @@ sealed class Errors {
         }
 
 
+
     }
 
     sealed class NetworkErrors : Errors() {

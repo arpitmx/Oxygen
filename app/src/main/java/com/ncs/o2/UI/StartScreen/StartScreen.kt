@@ -60,6 +60,7 @@ import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.O2Bot.O2Bot
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
+import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.UpdateScreen.UpdaterActivity
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
@@ -95,6 +96,8 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
     }
 
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
+
+    val sharedViewModel: SharedViewModel by viewModels()
 
 
     companion object {

@@ -26,10 +26,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.Api.MailApiService
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.Domain.Models.Mail
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -55,6 +58,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfilePictureSelectionFragment : Fragment() {
+
+    @Inject
+    lateinit var mailApiService: MailApiService
 
     @Inject
     lateinit var util : GlobalUtils.EasyElements
@@ -361,6 +367,16 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
+                                        val projectTopic = "NCSOxygen_TOPIC_GENERAL"
+
+                                        FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Log.d("FCM", "Subscribed to topic successfully")
+                                                } else {
+                                                    Log.d("FCM", "Failed to subscribe to topic",)
+                                                }
+                                            }
                                         with(PrefManager){
 
                                             putProjectsList(listOf("NCSOxygen"))
@@ -387,6 +403,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                                         ROLE = role!!,
                                                         FCM_TOKEN = fcm,
                                                     ))
+                                                    setMail(quantity = 1, userName = username,email=email)
                                                     requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
                                                 }
                                             }
@@ -476,5 +493,17 @@ class ProfilePictureSelectionFragment : Fragment() {
             e.printStackTrace()
         }
         return bitmap
+    }
+
+    private suspend fun setMail(quantity: Int = 1,userName:String,email:String){
+
+        val mail = Mail("ONBOARD-MAIL", username = userName, email = email)
+        val response = mailApiService.sendOnboardingMail(mail)
+
+        if (response.isSuccessful) {
+            Timber.tag("MailService").d("Mail sending Successful : ${response.body()}")
+        } else {
+            Timber.tag("MailService").d("Mail sending failed: ${response.body()}")
+        }
     }
 }

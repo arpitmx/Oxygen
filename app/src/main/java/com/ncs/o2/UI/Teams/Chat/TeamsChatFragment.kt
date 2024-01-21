@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Teams.Chat
 
 import android.Manifest
+import android.adservices.topics.Topic
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
@@ -444,7 +445,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
 
     private fun uploadImageToFirebaseStorage(bitmap: Bitmap, projectId: String) {
 
-        chatViewModel.uploadImageFromTeams(bitmap, projectId,activityBinding.channelID).observe(viewLifecycleOwner) { result ->
+        chatViewModel.uploadImageFromTeams(bitmap, projectId,activityBinding.channelName).observe(viewLifecycleOwner) { result ->
 
             when (result) {
                 is ServerResult.Failure -> {
@@ -725,9 +726,9 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
         CoroutineScope(Dispatchers.IO).launch {
-            if (PrefManager.getChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID).seconds.toInt()==0){
+            if (PrefManager.getChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName).seconds.toInt()==0){
                 Log.d("messageFetch","messageFetch from firebase")
-                chatViewModel.getTeamsMessages(PrefManager.getcurrentProject(),activityBinding.channelID) { result ->
+                chatViewModel.getTeamsMessages(PrefManager.getcurrentProject(),activityBinding.channelName) { result ->
                     when (result) {
                         is ServerResult.Success -> {
                             if (result.data.isEmpty()) {
@@ -742,7 +743,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                             MessageProjectAssociation(
                                                 messageId = message.messageId,
                                                 projectId = PrefManager.getcurrentProject(),
-                                                channelId = activityBinding.channelID)
+                                                channelId = activityBinding.channelName)
                                         )
                                     }
                                     withContext(Dispatchers.Main){
@@ -752,7 +753,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                         recyclerView.visible()
                                         binding.placeholder.gone()
                                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID,messagedata[0].timestamp!!)
+                                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
                                     }
                                 }
                             }
@@ -779,7 +780,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             }else {
                 Log.d("messageFetch", "messageFetch from db ")
                 chatViewModel.getTeamsMessagesforProject(
-                    PrefManager.getcurrentProject(),activityBinding.channelID
+                    PrefManager.getcurrentProject(),activityBinding.channelName
                 ) { result ->
                     when (result) {
                         is DBResult.Success -> {
@@ -794,7 +795,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                 recyclerView.visible()
                                 binding.placeholder.gone()
                                 recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                                PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID,messagedata[0].timestamp!!)
+                                PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
 
                             }
 
@@ -832,14 +833,14 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
     }
 
     fun getNewMessages(){
-        chatViewModel.getNewTeamsMessages(PrefManager.getcurrentProject(),activityBinding.channelID) { result ->
+        chatViewModel.getNewTeamsMessages(PrefManager.getcurrentProject(),activityBinding.channelName) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     if (result.data.isNotEmpty()){
                         val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
                         chatAdapter.appendMessages(result.data)
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelID,messagedata[0].timestamp!!)
+                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
                     }
 
                 }
@@ -870,7 +871,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
         CoroutineScope(Dispatchers.Main).launch {
 
             repository.postTeamsMessage(
-                projectName = PrefManager.getcurrentProject(), message = message, channelID = activityBinding.channelID
+                projectName = PrefManager.getcurrentProject(), message = message, channelID = activityBinding.channelName
 
             ) { result ->
 
@@ -988,19 +989,46 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                     NotificationType.TEAMS_COMMENT_NOTIFICATION, message = trimmedMsg
                                 )
 
-                                val filteredList = {
-                                    val list = activityBinding.sharedViewModel.getList()
-                                    if (list.contains(PrefManager.getUserFCMToken())) {
-                                        list.remove(PrefManager.getUserFCMToken())
-                                    }
-                                    list
+                                if (activityBinding.channelName=="General"){
+                                    val projectTopic = PrefManager.getcurrentProject().replace("\\s+".toRegex(), "_") + "_TOPIC_GENERAL"
+
+                                    val _notification =  Notification(
+                                        notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                                        notificationType = NotificationType.TEAMS_COMMENT_NOTIFICATION.name,
+                                        taskID = "",
+                                        message = trimmedMsg,
+                                        title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} commented in #${activityBinding.channelName}",
+                                        fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                                        toUser = "None",
+                                        timeStamp = Timestamp.now().seconds,
+                                        projectID = PrefManager.getcurrentProject(),
+                                        channelID = activityBinding.channelName
+                                    )
+
+                                    sendNotificationtoTopic(
+                                        projectTopic, _notification
+                                    )
 
                                 }
-                                notification?.let {
-                                    sendNotification(
-                                        filteredList.invoke(), notification
-                                    )
+                                else{
+                                    val filteredList = {
+                                        val list = activityBinding.sharedViewModel.getList()
+                                        if (list.contains(PrefManager.getUserFCMToken())) {
+                                            list.remove(PrefManager.getUserFCMToken())
+                                        }
+                                        list
+
+                                    }
+                                    Log.d("fcmToken",filteredList.invoke().toString())
+
+                                    notification?.let {
+                                        sendNotification(
+                                            filteredList.invoke(), notification
+                                        )
+                                    }
                                 }
+
+
                             }
 
 
@@ -1050,12 +1078,12 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                 notificationType = NotificationType.TEAMS_COMMENT_NOTIFICATION.name,
                 taskID = "",
                 message = message,
-                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} commented in teams chat",
+                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} commented in #${activityBinding.channelName}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
                 projectID = PrefManager.getcurrentProject(),
-                channelID = activityBinding.channelID
+                channelID = activityBinding.channelName
             )
         }
         if (type == NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION) {
@@ -1070,12 +1098,12 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                 notificationType = NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name,
                 taskID = "",
                 message = message,
-                title = "${PrefManager.getcurrentProject()} | @${PrefManager.getcurrentUserdetails().USERNAME} mentioned $usernames",
+                title = "${PrefManager.getcurrentProject()} | @${PrefManager.getcurrentUserdetails().USERNAME} mentioned $usernames in #${activityBinding.channelName}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
                 projectID = PrefManager.getcurrentProject(),
-                channelID = activityBinding.channelID
+                channelID = activityBinding.channelName
 
             )
         }
@@ -1092,6 +1120,23 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                         receiverToken, notification = notification
                     )
                 }
+
+            }
+
+        } catch (exception: Exception) {
+            Timber.tag("")
+            utils.showSnackbar(binding.root, "Failure in sending notifications", 5000)
+        }
+
+    }
+
+    private fun sendNotificationtoTopic(topic: String, notification: Notification) {
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                NotificationsUtils.sendFCMNotificationToTopic(
+                    topic = topic, notification = notification
+                )
 
             }
 

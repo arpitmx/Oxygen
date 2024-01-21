@@ -27,9 +27,15 @@ class SharedViewModel : ViewModel(){
     private val _notificationReceiverLiveData = MutableLiveData<MutableList<String>>()
     val notificationReceiverLiveData: LiveData<MutableList<String>> get() = _notificationReceiverLiveData
 
+    private val _allNotificationReceiverLiveData = MutableLiveData<MutableList<String>>()
+
 
     fun getList(): MutableList<String> {
         return _notificationReceiverLiveData.value.orEmpty().distinct().toMutableList()
+    }
+
+    fun getAllListofTokens(): MutableList<String> {
+        return _allNotificationReceiverLiveData.value.orEmpty().distinct().toMutableList()
     }
 
     fun pushReceiver(token : String){
@@ -37,6 +43,13 @@ class SharedViewModel : ViewModel(){
         currentList.add(token)
         _notificationReceiverLiveData.value = currentList
 
+        Timber.tag("SharedViewModel").d("Pushed : $token")
+    }
+
+    fun pushAllReceiver(token : String){
+        val currentList = _allNotificationReceiverLiveData.value.orEmpty().toMutableList()
+        currentList.add(token)
+        _allNotificationReceiverLiveData.value = currentList
         Timber.tag("SharedViewModel").d("Pushed : $token")
     }
 
