@@ -47,8 +47,12 @@ android {
 
 // This code sets two build configuration fields, FCM_BASE_URL and FCM_SERVER_KEY, with specific string values for Firebase Cloud Messaging.
         debug{
+
+            //Mail Server
+            buildConfigField("String", "MAIL_SERVER_URL", "\"https://o2gitman.vercel.app/\"")
+
+            //Gemini, FCM
             buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")
-// This code enables minification and resource shrinking, and applies ProGuard rules to optimize the Android app.
             buildConfigField("String", "FCM_SERVER_KEY", "\"AAAAmReJ314:APA91bGdEcp1FOt43szF1N7xbG-Pdjuct_0gZzhuDP5GvpSt_ECeXV3mQhKq3Gqq1Rgqa6FGcUwTlCyJYqbo0f89Flb5Y6X44nNMVkqW5Q1XsXZZXwE-77N3bORGbEdQ1TbM24Cb90Dw\"")
             buildConfigField("String","GEMINI_API_KEY","\"AIzaSyDVca4I2Jk5heUGS_0Jry1721VC8M32ATg\"")
         }

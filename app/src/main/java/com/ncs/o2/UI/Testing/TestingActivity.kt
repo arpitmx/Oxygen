@@ -6,7 +6,10 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.ListenableWorker
 import com.google.firebase.Timestamp
+import com.ncs.o2.Api.MailApiService
+import com.ncs.o2.Api.NotificationApiService
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.TestingConfig
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -22,12 +25,16 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
+import com.ncs.o2.Domain.Models.Mail
+import com.ncs.o2.Domain.Workers.FCMWorker
 import com.ncs.o2.databinding.ActivityTestingBinding
+import dagger.assisted.Assisted
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.datafaker.Faker
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -41,6 +48,10 @@ class TestingActivity : AppCompatActivity() {
 
     @Inject
     lateinit var db: NotificationDatabase
+
+    @Inject
+    lateinit var mailApiService: MailApiService
+
 
     private val binding: ActivityTestingBinding by lazy {
         ActivityTestingBinding.inflate(layoutInflater)
@@ -105,6 +116,18 @@ class TestingActivity : AppCompatActivity() {
 
                 CoroutineScope(Dispatchers.Main).launch {
                     fetchLatestNotifications(quantity)
+                }
+
+                binding.modeEt.text.clear()
+                binding.quantityEt.text.clear()
+            }
+
+            5->{
+                binding.testTitleTv.text = TestingConfig.TestModes.SEND_MAIL_ONBOARDING.toString()
+                val quantity = Integer.parseInt(binding.quantityEt.text.toString())
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    setMail(1)
                 }
 
                 binding.modeEt.text.clear()
@@ -605,8 +628,6 @@ class TestingActivity : AppCompatActivity() {
     }
     ```
     """.trimIndent()
-
-
     val description4 = """
     ### Codeforces problem A 455 : 
         
@@ -642,8 +663,6 @@ class TestingActivity : AppCompatActivity() {
        
     
     """.trimIndent()
-
-
     val description5= """
         # Sigmo-Music 📱 
 
@@ -719,8 +738,6 @@ class TestingActivity : AppCompatActivity() {
         <img src="https://user-images.githubusercontent.com/59350776/141678560-87a180ef-5bbc-4c9b-a89f-0108877f49cf.png" width="350">
 
     """.trimIndent()
-
-
     val desc6 = """
         # ElasticViews 
 
@@ -1009,8 +1026,6 @@ class TestingActivity : AppCompatActivity() {
         THE SOFTWARE.
         ```
     """.trimIndent()
-
-
     val desc7 = """
         # HTextView
 Animation effects with custom font support to TextView
@@ -1160,6 +1175,18 @@ See [`LICENSE`](LICENSE) for full of the license text.
     See the License for the specific language governing permissions and
     limitations under the License.
     """.trimIndent()
+
+    private suspend fun setMail(quantity: Int = 1){
+
+        val mail = Mail("ONBOARD-MAIL", username = "Alok", email = "sudoarmax@gmail.com")
+        val response = mailApiService.sendOnboardingMail(mail)
+
+        if (response.isSuccessful) {
+            Timber.tag("TestingActivity").d("Mail sending Successful : ${response.body()}")
+        } else {
+            Timber.tag("TestingActivity").d("Mail sending failed: ${response.body()}")
+        }
+    }
 
     private fun postTasks(quantity: Int) {
         for (i in 1..quantity) {

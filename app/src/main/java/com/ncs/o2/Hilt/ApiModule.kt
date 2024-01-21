@@ -1,7 +1,8 @@
 package com.ncs.o2.Hilt
 
+import com.ncs.o2.Api.MailApiService
 import com.ncs.o2.BuildConfig
-import com.ncs.o2.Services.NotificationApiService
+import com.ncs.o2.Api.NotificationApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,6 +37,7 @@ Tasks FUTURE ADDITION :
 object ApiModule {
 
 
+
     @Provides
     @Singleton
     fun provideOkHTTPClient(): OkHttpClient {
@@ -58,6 +60,18 @@ object ApiModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(NotificationApiService::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    fun getMailApiService(okkHttpClient: OkHttpClient): MailApiService {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.MAIL_SERVER_URL)
+            .client(okkHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(MailApiService::class.java)
     }
 
 

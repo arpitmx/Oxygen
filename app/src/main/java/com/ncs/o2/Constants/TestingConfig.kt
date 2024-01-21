@@ -35,6 +35,7 @@ object TestingConfig {
         ADD_TASKS,
         ADD_NOTIFICATION_ROOM,
         FETCH_LATEST_NOTIFICATION_FIRESTORE,
+        SEND_MAIL_ONBOARDING
     }
 
 }
