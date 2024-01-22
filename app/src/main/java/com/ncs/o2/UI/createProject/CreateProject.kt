@@ -194,6 +194,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                                                                 mutableUserProjects.add(title.trim())
                                                                 Log.d("userProjects(NEW)", mutableUserProjects.toString())
                                                                 PrefManager.putProjectsList(mutableUserProjects)
+                                                                PrefManager.setProjectDeepLink(title.trim(),shortLink.toString())
 
                                                             }
                                                             .addOnFailureListener { e ->

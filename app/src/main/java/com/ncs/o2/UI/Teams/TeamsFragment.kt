@@ -63,6 +63,9 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
     }
 
     private var isVisible=true
+    private var isStatsVisible=true
+    private var isTeamsVisible=false
+
 
 
     override fun onCreateView(
@@ -105,6 +108,29 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         }
         fetchNewChannels()
 
+        binding.stats.setOnClickListener {
+            binding.arrowStats.set180(requireContext())
+            if(!isStatsVisible){
+                isStatsVisible=true
+                binding.extendedStats.visible()
+            }
+            else{
+                isStatsVisible=false
+                binding.extendedStats.gone()
+            }
+        }
+
+        binding.teams.setOnClickListener {
+            binding.arrowTeam.set180(requireContext())
+            if(!isTeamsVisible){
+                isTeamsVisible=true
+                binding.extendedTeam.visible()
+            }
+            else{
+                isTeamsVisible=false
+                binding.extendedTeam.gone()
+            }
+        }
 
         binding.channels.setOnClickListener {
             binding.arrow.set180(requireContext())
@@ -134,15 +160,10 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
             }
         }
 
-        binding.favs.statParent.setOnClickThrottleBounceListener {
+
+        binding.pending.statParent.setOnClickThrottleBounceListener {
             val intent = Intent(requireContext(), TasksHolderActivity::class.java)
-            intent.putExtra("type", "Favs")
-            startActivity(intent)
-            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
-        }
-        binding.active.statParent.setOnClickThrottleBounceListener {
-            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
-            intent.putExtra("type", "Active")
+            intent.putExtra("type", "Pending")
             startActivity(intent)
             requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
@@ -168,13 +189,24 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
 
         }
 
-        binding.teamMembers.setOnClickThrottleBounceListener {
+        binding.viewTeamMember.setOnClickThrottleBounceListener {
             val intent = Intent(requireContext(), TeamsViewerActivity::class.java)
             startActivity(intent)
             requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
 
+        binding.addTeamMembers.setOnClickThrottleBounceListener {
+            val link=PrefManager.getProjectDeepLink(PrefManager.getcurrentProject())
+            Log.d("deeplink",link)
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra(Intent.EXTRA_TEXT, link)
+            startActivity(Intent.createChooser(intent, "Share Project link using"))
+        }
+
     }
+
+
 
     fun fetchNewChannels(){
         repository.getNewChannels(
@@ -294,13 +326,9 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
 
             withContext(Dispatchers.Main){
 
-                binding.favs.statIcon.setImageDrawable(resources.getDrawable(R.drawable.star_filled))
-                binding.favs.statTitle.text="Favourites"
-                binding.favs.statCount.text="${favs.size} tasks"
-
-                binding.active.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_active_24))
-                binding.active.statTitle.text="Active"
-                binding.active.statCount.text="${submittedTasks!!.size+openTasks!!.size} tasks"
+                binding.pending.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_access_time_filled_24))
+                binding.pending.statTitle.text="Pending"
+                binding.pending.statCount.text="${submittedTasks!!.size+openTasks!!.size} tasks"
 
                 binding.ongoing.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_ongoing_24))
                 binding.ongoing.statTitle.text="Ongoing"

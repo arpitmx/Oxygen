@@ -53,6 +53,7 @@ object PrefManager {
     private val lastChannelsTimestampMapKey = "last_channels_timestamp_map"
 
     private val projectIconUrlMapKey = "project_icon_url_map"
+    private val projectDeeplinkMapKey = "project_deeplink_map"
 
 
     private lateinit var projectTimestampMap: MutableMap<String, Long>
@@ -63,6 +64,7 @@ object PrefManager {
     private lateinit var LastChannelTimestampMap: MutableMap<String, Timestamp>
 
     private lateinit var ProjectIconUrlMap: MutableMap<String, String>
+    private lateinit var ProjectDeepLinkMap: MutableMap<String, String>
 
 
     private val projectIdTaskIdMapKey = "project_id_task_id_map"
@@ -155,6 +157,15 @@ object PrefManager {
             }
         } ?: mutableMapOf()
 
+        val savedProjectDeeplinkMapString = sharedPreferences.getString(
+            projectDeeplinkMapKey, null)
+        ProjectDeepLinkMap = savedProjectDeeplinkMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, String>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
 
     }
 
@@ -703,4 +714,17 @@ object PrefManager {
             emptyList()
         }
     }
+    fun setProjectDeepLink(projectName: String, link:String) {
+        ProjectDeepLinkMap[projectName] = link
+        saveProjectDeepLinkHashMapToPreferences()
+    }
+    fun getProjectDeepLink(projectName: String): String {
+        return ProjectDeepLinkMap[projectName] ?: ""
+    }
+    private fun saveProjectDeepLinkHashMapToPreferences() {
+        val hashMapString = Gson().toJson(ProjectDeepLinkMap)
+        editor.putString(projectDeeplinkMapKey, hashMapString)
+        editor.apply()
+    }
+
 }

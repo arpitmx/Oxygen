@@ -339,7 +339,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         val filteredList = contributorsData.filter { contributor ->
             contributor.username!!.contains(query, ignoreCase = true)
         }
-        mentionAdapter.updateList(filteredList)
+        val uniqueList=filteredList.toSet().toMutableList()
+        mentionAdapter.updateList(uniqueList)
     }
 
     private fun sendMessageProcess() {
@@ -688,6 +689,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     private fun setMentionUsersRv(list: MutableList<User>) {
+        val uniqueList = list.toSet().toMutableList()
         Log.d("rvList", list.toString())
         mentionAdapter = MentionUsersAdapter(list, this)
         val linearLayoutManager = LinearLayoutManager(requireContext())

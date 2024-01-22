@@ -52,54 +52,61 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
     lateinit var db: TasksDatabase
     @Inject
     lateinit var util: GlobalUtils.EasyElements
+    var type: String? =null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val type=intent.getStringExtra("type")
+        type=intent.getStringExtra("type")
 
-        when(type){
-            "Favs" ->{
-                binding.title.text="Favourite"
+        if (type!=null){
+            when(type) {
+                "Favs" -> {
+                    binding.title.text = "Favourite"
 
-                if (PrefManager.getProjectFavourites(PrefManager.getcurrentProject()).isEmpty()){
-                    binding.layout.gone()
-                    binding.recyclerView.gone()
-                    binding.progressbarBlock.gone()
-                    binding.placeholder.visible()
-                }
-                else{
-                    for (id in PrefManager.getProjectFavourites(PrefManager.getcurrentProject())){
-                        fetchTasksforID(id)
+                    if (PrefManager.getProjectFavourites(PrefManager.getcurrentProject()).isEmpty()) {
+                        binding.layout.gone()
+                        binding.recyclerView.gone()
+                        binding.progressbarBlock.gone()
+                        binding.placeholder.visible()
+                    } else {
+                        for (id in PrefManager.getProjectFavourites(PrefManager.getcurrentProject())) {
+                            fetchTasksforID(id)
+                        }
                     }
                 }
-            }
-            "Active"->{
-                binding.title.text="Active"
 
-                FetchTasksforState(1)
-                FetchTasksforState(2)
-            }
-            "Ongoing"->{
-                binding.title.text="Ongoing"
+                "Pending" -> {
+                    binding.title.text = "Pending"
 
-                FetchTasksforState(3)
+                    FetchTasksforState(1)
+                    FetchTasksforState(2)
+                }
 
-            }
-            "Review"->{
-                binding.title.text="Review"
+                "Ongoing" -> {
+                    binding.title.text = "Ongoing"
 
-                FetchTasksforState(4)
+                    FetchTasksforState(3)
 
-            }
-            "Completed"->{
-                binding.title.text="Completed"
+                }
 
-                FetchTasksforState(5)
+                "Review" -> {
+                    binding.title.text = "Review"
 
-            }
-            else->{
-                finish()
+                    FetchTasksforState(4)
+
+                }
+
+                "Completed" -> {
+                    binding.title.text = "Completed"
+
+                    FetchTasksforState(5)
+
+                }
+
+                else -> {
+                    finish()
+                }
             }
         }
 
@@ -341,11 +348,20 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
     override fun onBackPressed() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("index", "2")
-        startActivity(intent)
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-        finish()
         super.onBackPressed()
+        if (type=="Favs"){
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("index", "1")
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+            finish()
+        }
+        else{
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("index", "2")
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
+            finish()
+        }
     }
 }
