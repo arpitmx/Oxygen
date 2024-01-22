@@ -310,8 +310,9 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                 this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
             }
             NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name->{
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("index", "2")
+                finish()
+                val intent = Intent(this, TeamsActivity::class.java)
+                intent.putExtra("channel_name", notification.channelID)
                 startActivity(intent)
                 this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
             }

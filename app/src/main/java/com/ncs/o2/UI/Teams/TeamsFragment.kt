@@ -13,6 +13,8 @@ import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
+import com.ncs.o2.Constants.SwitchFunctions
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
@@ -43,15 +45,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.shouheng.utils.app.ActivityUtils.overridePendingTransition
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomSheet.OnChannelAdded {
+class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.OnChannelAdded{
 
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
+    @Inject
+    lateinit var db:TasksDatabase
     lateinit var binding:FragmentTeamsBinding
     private val activityBinding: MainActivity by lazy {
         (requireActivity() as MainActivity)
@@ -66,9 +71,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
     ): View? {
         binding = FragmentTeamsBinding.inflate(inflater, container, false)
         manageviews()
-        if (PrefManager.getcurrentUserdetails().ROLE>=3){
-            binding.addChannels.visible()
-        }
+        setUpProjectStats()
         return binding.root
     }
 
@@ -79,9 +82,10 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
 
         activityBinding.binding.gioActionbar.btnMoreTeams.setOnClickThrottleBounceListener {
             val moreTeamsOptionBottomSheet =
-                TeamsPagemoreOptions()
+                TeamsPagemoreOptions(this)
             moreTeamsOptionBottomSheet.show(requireFragmentManager(), "more")
         }
+
 
 
 
@@ -130,10 +134,44 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
             }
         }
 
-        binding.addChannels.setOnClickThrottleBounceListener {
-            val newChannelsBottomShet =
-                CreateNewChannelBottomSheet(this)
-            newChannelsBottomShet.show(requireFragmentManager(), "Channels")
+        binding.favs.statParent.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
+            intent.putExtra("type", "Favs")
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+        }
+        binding.active.statParent.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
+            intent.putExtra("type", "Active")
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+        }
+        binding.ongoing.statParent.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
+            intent.putExtra("type", "Ongoing")
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+
+        }
+        binding.review.statParent.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
+            intent.putExtra("type", "Review")
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+
+        }
+        binding.completed.statParent.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
+            intent.putExtra("type", "Completed")
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+
+        }
+
+        binding.teamMembers.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TeamsViewerActivity::class.java)
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
 
     }
@@ -245,6 +283,43 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
         }
     }
 
+    fun setUpProjectStats(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val favs=PrefManager.getProjectFavourites(PrefManager.getcurrentProject())
+            val submittedTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),1)
+            val openTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),2)
+            val ongoingTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),3)
+            val reviewTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),4)
+            val completedTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),5)
+
+            withContext(Dispatchers.Main){
+
+                binding.favs.statIcon.setImageDrawable(resources.getDrawable(R.drawable.star_filled))
+                binding.favs.statTitle.text="Favourites"
+                binding.favs.statCount.text="${favs.size} tasks"
+
+                binding.active.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_active_24))
+                binding.active.statTitle.text="Active"
+                binding.active.statCount.text="${submittedTasks!!.size+openTasks!!.size} tasks"
+
+                binding.ongoing.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_ongoing_24))
+                binding.ongoing.statTitle.text="Ongoing"
+                binding.ongoing.statCount.text="${ongoingTasks!!.size} tasks"
+
+                binding.review.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_review_24))
+                binding.review.statTitle.text="Review"
+                binding.review.statCount.text="${reviewTasks!!.size} tasks"
+
+                binding.completed.statIcon.setImageDrawable(resources.getDrawable(R.drawable.round_task_alt_24))
+                binding.completed.statTitle.text="Completed"
+                binding.completed.statCount.text="${completedTasks!!.size} tasks"
+            }
+
+        }
+
+
+    }
+
 
     fun setRecyclerView(dataList: List<Channel>){
         val recyclerView=binding.channelsRv
@@ -270,6 +345,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
         activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.binding.gioActionbar.constraintLayoutTeams.visible()
         activityBinding.binding.gioActionbar.btnMoreTeams.visible()
+        activityBinding.binding.gioActionbar.projectName.text=PrefManager.getcurrentProject()
         activityBinding.binding.gioActionbar.projectIcon.load(
             PrefManager.getProjectIconUrl(
                 PrefManager.getcurrentProject()),resources.getDrawable(R.drawable.placeholder_image))
@@ -282,13 +358,14 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick,CreateNewChannelBottomS
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
-    override fun onChannelAdd(channel: Channel) {
+    override fun onChannel(channel: Channel) {
         val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
         val newList = (oldList.toMutableList() + channel).sortedByDescending { it.timestamp }
         PrefManager.saveProjectChannels(PrefManager.getcurrentProject(),newList)
         PrefManager.setLastChannelTimeStamp(PrefManager.getcurrentProject(),channel.timestamp!!)
         setRecyclerView(newList.distinctBy { it.channel_id })
     }
+
 
 }
 

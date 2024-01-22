@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="105dp"
+    android:id="@+id/stat_parent"
+    android:background="@drawable/stats_border"
+    android:orientation="vertical"
+    android:layout_marginStart="5dp"
+    android:paddingStart="8dp"
+    android:layout_height="125dp">
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:id="@+id/stat_icon"
+        android:layout_marginTop="35dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/baseline_active_24"
+        app:tint="@color/better_white" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/better_white"
+        android:text="Active"
+        android:id="@+id/stat_title"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:layout_marginStart="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/edit_text_txt"
+        android:text="4 tasks"
+        android:id="@+id/stat_count"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/sf_pro_display_semibold"
+        android:layout_marginStart="8dp"/>
+
+
+</LinearLayout>

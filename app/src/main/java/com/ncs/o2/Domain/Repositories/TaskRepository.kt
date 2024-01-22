@@ -38,7 +38,24 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase,private v
             }
         }
     }
-
+    override suspend fun getTasksItemsForState(
+        projectName: String,
+        state: Int,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val tasks = taskDao.getTasksInProjectforState(projectName, state)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(tasks))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
     override suspend fun getTaskbyID(
         projectName: String,
         taskId:String,

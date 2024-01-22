@@ -354,12 +354,9 @@ class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
     }
 
     private fun showSearch() {
-        searchCont.visible()
     }
 
     private fun hideSearch() {
-
-        searchCont.gone()
     }
 
     override fun onCLick(position: Int, task: TaskItem) {

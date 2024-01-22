@@ -16,6 +16,7 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Interfaces.Repository
+import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -33,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TeamsPagemoreOptions : BottomSheetDialogFragment(){
+class TeamsPagemoreOptions(private val callback:OnChannelAdded) : BottomSheetDialogFragment(),CreateNewChannelBottomSheet.OnChannelAdded{
 
     lateinit var binding:TeamsPageOptionsBottomsheetBinding
 
@@ -45,12 +46,26 @@ class TeamsPagemoreOptions : BottomSheetDialogFragment(){
     ): View {
         binding = TeamsPageOptionsBottomsheetBinding.inflate(inflater, container, false)
         return binding.root
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setActionbar()
+        if (PrefManager.getcurrentUserdetails().ROLE>=3 && PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+            binding.addChannels.visible()
+        }
+        else{
+            binding.addChannels.gone()
 
+        }
+        binding.addChannels.setOnClickThrottleBounceListener {
+            dismiss()
+            val newChannelsBottomShet =
+                CreateNewChannelBottomSheet(this)
+            newChannelsBottomShet.show(requireFragmentManager(), "Channels")
+        }
     }
 
     private fun setActionbar() {
@@ -58,6 +73,12 @@ class TeamsPagemoreOptions : BottomSheetDialogFragment(){
             dismiss()
         }
 
+    }
+    override fun onChannelAdd(channel: Channel) {
+        callback.onChannel(channel)
+    }
+    interface OnChannelAdded{
+        fun onChannel(channel: Channel)
     }
 
 }

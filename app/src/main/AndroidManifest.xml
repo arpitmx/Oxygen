@@ -29,6 +29,12 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.Teams.TeamsViewerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Teams.TasksHolderActivity"
+            android:exported="false" />
+        <activity
             android:name=".UI.Teams.TeamsActivity"
             android:exported="false" />
         <activity
