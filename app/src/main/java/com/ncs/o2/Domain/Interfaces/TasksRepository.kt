@@ -15,6 +15,12 @@ interface TasksRepository {
         resultCallback: (DBResult<List<Task>>) -> Unit
     )
 
+    suspend fun getTasksItemsForState(
+        projectName: String,
+        state: Int,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    )
+
     suspend fun getTaskbyID(
         projectName: String,
         taskId: String,

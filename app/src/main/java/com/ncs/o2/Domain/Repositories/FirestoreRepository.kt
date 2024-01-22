@@ -2292,6 +2292,20 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+    fun getProjectContributors(projectName: String,result: (ServerResult<List<String>>) -> Unit
+    ){
+
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .get()
+            .addOnSuccessListener {
+                val contributors=it.get("contributors") as List<String>
+                result(ServerResult.Success(contributors))
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+
+    }
 
     override suspend fun updateCheckList(
         taskId: String,
@@ -2596,6 +2610,7 @@ class FirestoreRepository @Inject constructor(
             }
         }
     }
+
 
 
 

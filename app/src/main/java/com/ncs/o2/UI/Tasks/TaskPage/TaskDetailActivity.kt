@@ -6,12 +6,14 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
@@ -79,6 +81,36 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
                 moreOptionBottomSheet.show(supportFragmentManager, "more")
             }
 
+        var favs=PrefManager.getProjectFavourites(PrefManager.getcurrentProject())
+        Log.d("favsss",favs.toString())
+        if (favs.contains(taskId)){
+            binding.gioActionbar.btnFav.setImageDrawable(resources.getDrawable(R.drawable.star_filled))
+        }
+        else{
+            binding.gioActionbar.btnFav.setImageDrawable(resources.getDrawable(R.drawable.star_unfilled))
+        }
+
+        binding.gioActionbar.btnFav.setOnClickThrottleBounceListener {
+            if (favs.contains(taskId)){
+                val newList=favs.toMutableList()
+                newList.remove(taskId)
+                favs=newList
+                Log.d("favsss",newList.toString())
+                PrefManager.saveProjectFavourites(PrefManager.getcurrentProject(),newList)
+                binding.gioActionbar.btnFav.setImageDrawable(resources.getDrawable(R.drawable.star_unfilled))
+                toast("Task removed from favourites")
+            }
+            else{
+                val newList=favs.toMutableList()
+                newList.add(taskId)
+                Log.d("favsss",newList.toString())
+                favs=newList
+                PrefManager.saveProjectFavourites(PrefManager.getcurrentProject(),newList)
+                binding.gioActionbar.btnFav.setImageDrawable(resources.getDrawable(R.drawable.star_filled))
+                toast("Task added to favourites")
+            }
+        }
+
     }
 
 
@@ -97,6 +129,8 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     private fun setActionbar() {
         binding.gioActionbar.titleTv.text = taskId
         binding.gioActionbar.doneItem.gone()
+
+
     }
 
     override fun showProgressbar(show: Boolean) {

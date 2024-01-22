@@ -64,6 +64,25 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
             taskRepository.getTasksItemsForSegment(projectName, segmentName, sectionName, resultCallback)
         }
     }
+
+    fun getTasksForID(
+        projectName: String,
+        taskID:String,
+        resultCallback: (DBResult<Task>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTaskbyID(projectName, taskID, resultCallback)
+        }
+    }
+    fun getTasksForStateFromDB(
+        projectName: String,
+        state:Int,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTasksItemsForState(projectName, state, resultCallback)
+        }
+    }
     fun getTagsInProject(
         projectName:String,
         resultCallback: (DBResult<List<Tag>>) -> Unit

@@ -7,15 +7,89 @@
     android:background="@color/darkbg_main"
     android:layout_height="match_parent"
     tools:context=".UI.Teams.TeamsFragment">
+    <!-- round task alt -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:weightSum="10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:fontFamily="@font/sfbold"
+                android:text="Project "
+                android:textColor="@color/better_white"
+                android:textSize="18dp" />
+
+            <ImageView
+                android:id="@+id/stats_ic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="3dp"
+                android:src="@drawable/baseline_trending_up_24"
+                app:tint="@color/better_white" />
+
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/details_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/horizontal_scrollview_bg"
+            android:clipToPadding="false"
+            android:paddingStart="15dp"
+            android:scrollbars="none"
+            android:layout_marginBottom="5dp"
+            android:nestedScrollingEnabled="true">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <include
+                    android:id="@+id/favs"
+                    layout="@layout/each_stat_item"/>
+                <include
+                    android:id="@+id/active"
+                    layout="@layout/each_stat_item"/>
+                <include
+                    android:id="@+id/ongoing"
+                    layout="@layout/each_stat_item"/>
+                <include
+                    android:id="@+id/review"
+                    layout="@layout/each_stat_item"/>
+                <include
+                    android:id="@+id/completed"
+                    layout="@layout/each_stat_item"/>
+            </LinearLayout>
+
+
+        </HorizontalScrollView>
+
 
     <LinearLayout
         android:id="@+id/channels"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -97,45 +171,12 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channels_rv"
                 android:visibility="gone"
+                android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/channels_each_item"/>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:orientation="horizontal"
-                android:weightSum="10"
-                android:visibility="gone"
-                android:id="@+id/addChannels"
-                android:layout_marginBottom="15dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="7dp"
-                android:paddingBottom="7dp"
-                android:background="@color/darkbg_main"
-                android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:fontFamily="@font/sf_pro_display_light"
-                    android:text="+"
-                    android:textColor="@color/better_white"
-                    android:textSize="20dp" />
-
-                <TextView
-                    android:id="@+id/channel_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="8"
-                    android:layout_marginStart="20dp"
-                    android:fontFamily="@font/sf_pro_display_light"
-                    android:text="Add channel"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <View
             android:id="@+id/line"
@@ -144,8 +185,59 @@
             android:background="@color/border_grey" />
     </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/teamMembers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="10dp"
+                    android:gravity="start"
+                    android:paddingBottom="10dp"
+                    android:weightSum="10"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:fontFamily="@font/sfbold"
+                        android:text="View Team "
+                        android:textColor="@color/better_white"
+                        android:textSize="18dp" />
+
+                    <ImageView
+                        android:id="@+id/teamsIc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="3dp"
+                        android:src="@drawable/baseline_groups_24"
+                        app:tint="@color/better_white" />
 
 
+                </LinearLayout>
 
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:id="@+id/line2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/border_grey" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -686,5 +686,21 @@ object PrefManager {
             emptyList()
         }
     }
+    fun saveProjectFavourites(projectName: String, favs: List<String>) {
+        val gson = Gson()
+        val channelsJson = gson.toJson(favs)
+        editor.putString("project_favs_$projectName", channelsJson)
+        editor.apply()
+    }
 
+    fun getProjectFavourites(projectName: String): List<String> {
+        val favsJson = sharedPreferences.getString("project_favs_$projectName", null)
+        val gson = Gson()
+        val type = object : TypeToken<List<String>>() {}.type
+        return if (favsJson != null) {
+            gson.fromJson(favsJson, type)
+        } else {
+            emptyList()
+        }
+    }
 }
