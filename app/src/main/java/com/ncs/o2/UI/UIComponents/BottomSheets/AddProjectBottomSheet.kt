@@ -58,6 +58,7 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                 var projectData: String? = null
                 var imageUrl:String?=null
 
+
                 FirebaseFirestore.getInstance().collection("Projects")
                     .whereEqualTo("PROJECT_LINK", link)
                     .get()
@@ -109,7 +110,7 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                                                         withContext(Dispatchers.Main){
                                                             PrefManager.lastaddedproject(projectData!!)
                                                             PrefManager.setProjectIconUrl(projectData!!,imageUrl!!)
-
+                                                            PrefManager.setProjectDeepLink(projectData!!,link.trim())
                                                             userProjects?.add(projectData!!.trim())
                                                             sendcallBack(userProjects!!)
                                                             Toast.makeText(

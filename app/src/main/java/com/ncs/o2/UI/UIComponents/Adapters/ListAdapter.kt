@@ -88,6 +88,7 @@ interface ProjectCallback{
                  .addOnSuccessListener { documentSnapshot ->
                      if (documentSnapshot.exists()) {
                          val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+
                          if (imageUrl != null && (context as? Activity)?.isDestroyed != true) {
                              PrefManager.setProjectIconUrl(sList[position], imageUrl)
                              Glide.with(context)

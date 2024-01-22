@@ -446,7 +446,9 @@ class ProfilePictureSelectionFragment : Fragment() {
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
                     val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                    val projectLink = documentSnapshot.data?.get("PROJECT_LINK")?.toString()
                     PrefManager.setProjectIconUrl(projectName,imageUrl!!)
+                    PrefManager.setProjectDeepLink(projectName,projectLink!!)
                 }
             }
             .addOnFailureListener { exception ->

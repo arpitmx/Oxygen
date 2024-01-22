@@ -16,6 +16,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:id="@+id/stats"
+            android:layout_height="wrap_content"
+            >
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,26 +54,34 @@
 
 
         </LinearLayout>
-
+            <ImageView
+                android:id="@+id/arrow_stats"
+                android:layout_width="0dp"
+                android:layout_marginEnd="22dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_keyboard_arrow_up_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/better_white" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <HorizontalScrollView
-            android:id="@+id/details_scrollview"
+            android:id="@+id/extended_stats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="visible"
             android:background="@drawable/horizontal_scrollview_bg"
             android:clipToPadding="false"
             android:paddingStart="15dp"
             android:scrollbars="none"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="20dp"
             android:nestedScrollingEnabled="true">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <include
-                    android:id="@+id/favs"
-                    layout="@layout/each_stat_item"/>
-                <include
-                    android:id="@+id/active"
+                    android:id="@+id/pending"
                     layout="@layout/each_stat_item"/>
                 <include
                     android:id="@+id/ongoing"
@@ -83,6 +97,11 @@
 
         </HorizontalScrollView>
 
+        <View
+            android:id="@+id/line3"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/border_grey" />
 
     <LinearLayout
         android:id="@+id/channels"
@@ -194,6 +213,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
+                android:id="@+id/teams"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
@@ -214,7 +234,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
                         android:fontFamily="@font/sfbold"
-                        android:text="View Team "
+                        android:text="Team "
                         android:textColor="@color/better_white"
                         android:textSize="18dp" />
 
@@ -230,7 +250,84 @@
 
                 </LinearLayout>
 
+                <ImageView
+                    android:id="@+id/arrow_team"
+                    android:layout_width="0dp"
+                    android:layout_marginEnd="22dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_keyboard_arrow_down_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/better_white" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:weightSum="10"
+                android:paddingStart="10dp"
+                android:id="@+id/extended_team"
+                android:paddingEnd="10dp"
+                android:visibility="gone"
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
+                android:background="@color/darkbg_main"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/viewTeamMember"
+                    android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:src="@drawable/baseline_subdirectory_arrow_right_24"/>
+
+                <TextView
+                    android:id="@+id/channel_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="15dp"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:text="View Team Members"
+                    android:textColor="@color/edit_text_txt"
+                    android:textSize="18dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/addTeamMembers"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:src="@drawable/outline_add_24"
+                        app:tint="@color/edit_text_txt" />
+
+                    <TextView
+                        android:id="@+id/AddTeamMemebers"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="8"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginStart="15dp"
+                        android:fontFamily="@font/sf_pro_display_medium"
+                        android:text="Add Members"
+                        android:textColor="@color/edit_text_txt"
+                        android:textSize="18dp" />
+                </LinearLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
             <View
                 android:id="@+id/line2"
                 android:layout_width="match_parent"

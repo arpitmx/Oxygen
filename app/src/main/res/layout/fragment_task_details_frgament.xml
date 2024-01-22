@@ -107,7 +107,7 @@
 
                             <TextView
                                 style="@style/LabelStyleTaskTab"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="0dp"
                                 android:layout_weight="4"
                                 android:maxLines="1"
@@ -142,7 +142,7 @@
 
                             <TextView
                                 style="@style/LabelStyleTaskTab"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="0dp"
                                 android:layout_weight="4"
                                 android:gravity="start|bottom"
@@ -154,7 +154,7 @@
                             <include
                                 android:id="@+id/priorityInclude"
                                 layout="@layout/task_creation_detail_item"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="0dp"
                                 android:layout_weight="6" />
 
@@ -171,7 +171,7 @@
 
                             <TextView
                                 style="@style/LabelStyleTaskTab"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="0dp"
                                 android:layout_weight="4"
                                 android:paddingStart="@dimen/padding_start_task_create"
@@ -199,7 +199,7 @@
 
                             <TextView
                                 style="@style/LabelStyleTaskTab"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="0dp"
                                 android:layout_weight="4"
                                 android:gravity="start|bottom"
@@ -229,7 +229,7 @@
 
                             <TextView
                                 style="@style/LabelStyleTaskTab"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="0dp"
                                 android:layout_weight="4"
                                 android:gravity="start|bottom"
@@ -259,7 +259,7 @@
 
                             <TextView
                                 style="@style/LabelStyleTaskTab"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="0dp"
                                 android:layout_weight="4"
                                 android:gravity="start|bottom"

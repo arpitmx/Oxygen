@@ -30,6 +30,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.Teams.TasksHolderActivity
 import com.ncs.o2.UI.UIComponents.Adapters.TaskSectionViewPagerAdapter
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentAssignedBinding
@@ -94,6 +95,12 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         activityBinding.gioActionbar.btnHamWorkspace.setOnClickThrottleBounceListener {
             val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
+        }
+        activityBinding.gioActionbar.btnFav.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
+            intent.putExtra("type", "Favs")
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
         activityBinding.gioActionbar.tabLayout.visible()
         activityBinding.gioActionbar.actionbar.visible()

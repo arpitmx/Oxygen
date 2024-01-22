@@ -61,6 +61,7 @@ import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
+import com.ncs.o2.UI.Assigned.WorkspaceFragment
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
@@ -145,8 +146,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         registerReceiver(true)
 
         val _index= intent.getStringExtra("index")
-        if (_index!=null){
+        if (_index!=null && _index=="2"){
             movetoteamspage()
+        }
+        if (_index!=null && _index=="1"){
+            movetoworkspacepage()
         }
 
 
@@ -1193,6 +1197,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         transaction.commit()
         binding.bottomNav.menu.getItem(2).isChecked = true
         binding.bottomNav.menu.getItem(2).setIcon(R.drawable.baseline_groups_24)
+    }
+    private fun movetoworkspacepage() {
+        val transaction = supportFragmentManager.beginTransaction()
+        val fragment = AssignedFragment()
+        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+        binding.bottomNav.menu.getItem(1).isChecked = true
+        binding.bottomNav.menu.getItem(1).setIcon(R.drawable.baseline_business_center_24)
     }
 
     override fun onBackPressed() {
