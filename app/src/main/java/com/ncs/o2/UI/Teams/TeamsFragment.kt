@@ -164,12 +164,14 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         binding.pending.statParent.setOnClickThrottleBounceListener {
             val intent = Intent(requireContext(), TasksHolderActivity::class.java)
             intent.putExtra("type", "Pending")
+            intent.putExtra("index", "2")
             startActivity(intent)
             requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
         binding.ongoing.statParent.setOnClickThrottleBounceListener {
             val intent = Intent(requireContext(), TasksHolderActivity::class.java)
             intent.putExtra("type", "Ongoing")
+            intent.putExtra("index", "2")
             startActivity(intent)
             requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
 
@@ -177,6 +179,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         binding.review.statParent.setOnClickThrottleBounceListener {
             val intent = Intent(requireContext(), TasksHolderActivity::class.java)
             intent.putExtra("type", "Review")
+            intent.putExtra("index", "2")
             startActivity(intent)
             requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
 
@@ -184,6 +187,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         binding.completed.statParent.setOnClickThrottleBounceListener {
             val intent = Intent(requireContext(), TasksHolderActivity::class.java)
             intent.putExtra("type", "Completed")
+            intent.putExtra("index", "2")
             startActivity(intent)
             requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
 

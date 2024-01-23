@@ -293,7 +293,7 @@
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:background="@null"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="55dp"
             android:src="@drawable/star_filled"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -302,6 +302,18 @@
             app:layout_constraintVertical_bias="0.0"
             app:tint="@color/primary" />
 
+        <ImageButton
+            android:id="@+id/btnMoreAssigned"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="15dp"
+            android:background="@null"
+            android:src="@drawable/baseline_more_vert_24"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

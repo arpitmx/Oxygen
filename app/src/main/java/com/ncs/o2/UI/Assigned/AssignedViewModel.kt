@@ -49,4 +49,6 @@ class AssignedViewModel @Inject constructor(private val firestoreRepository: Fir
     }
 
 
+
+
 }

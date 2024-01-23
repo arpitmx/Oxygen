@@ -56,6 +56,25 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase,private v
             }
         }
     }
+    override suspend fun getTasksItemsForStatewithAssignee(
+        projectName: String,
+        assignee:String,
+        state: Int,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val tasks = taskDao.getTasksInProjectforStateForAssignee(projectName, state,assignee)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(tasks))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
     override suspend fun getTaskbyID(
         projectName: String,
         taskId:String,
@@ -124,6 +143,24 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase,private v
             }
         }
     }
+
+    override suspend fun getTasksInProject(
+        projectName: String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val tag = taskDao.getTasksInProject(projectName)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(tag!!))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
     override suspend fun getMessagesforTask(
         projectName: String,
         taskID: String,
@@ -162,5 +199,42 @@ class TaskRepository @Inject constructor(private val db: TasksDatabase,private v
         }
     }
 
+    override suspend fun getTasksItemsForModerators(
+        projectName: String,
+        moderator:String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val tasks = taskDao.getTasksInProjectforModerators(projectName, moderator)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(tasks))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
+
+    override suspend fun getTasksItemsOpenedBy(
+        projectName: String,
+        assigneer:String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val tasks = taskDao.getTasksInProjectforAssigneer(projectName, assigneer)
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Success(tasks))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    resultCallback(DBResult.Failure(e))
+                }
+            }
+        }
+    }
 
 }
