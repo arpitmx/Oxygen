@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/task_item">
+    app:startDestination="@id/project">
 
     <fragment
         android:id="@+id/task_item"
@@ -34,5 +34,14 @@
             app:destination="@id/task_item" />
     </fragment>
 
+    <fragment
+        android:id="@+id/project"
+        android:name="com.ncs.o2.UI.Teams.TeamsFragment"
+        android:label="teams_page"
+        tools:layout="@layout/fragment_teams" >
+        <action
+            android:id="@+id/action_doneFragment_to_task_item"
+            app:destination="@id/task_item" />
+    </fragment>
 
 </navigation>

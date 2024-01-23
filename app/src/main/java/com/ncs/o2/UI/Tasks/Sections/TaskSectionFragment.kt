@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Tasks.Sections
 
 import TaskListAdapter
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -29,12 +30,18 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -280,11 +287,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         }
 
         binding.swiperefresh.setOnRefreshListener {
-            runDelayed(1000){
-                toast("Page refreshed")
-                requireActivity().recreate()
-                binding.swiperefresh.isRefreshing=false
-            }
+            syncCache(PrefManager.getcurrentProject())
         }
         activityBinding.binding.gioActionbar.refresh.setOnClickThrottleBounceListener {
         }
@@ -292,6 +295,59 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
     }
 
+    private fun syncCache(projectName:String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Please wait, Syncing Tasks")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    firestoreRepository.getTasksinProjectAccordingtoTimeStamp(projectName)
+                }
+
+                Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+                        progressDialog.dismiss()
+                        binding.swiperefresh.isRefreshing=false
+                    }
+
+                    is ServerResult.Progress -> {
+                        progressDialog.show()
+                        progressDialog.setMessage("Please wait, Syncing Tasks")
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tasks = taskResult.data
+                        if (tasks.isNotEmpty()){
+                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                            for (task in tasks) {
+                                db.tasksDao().insert(task)
+                            }
+                        }
+                        progressDialog.dismiss()
+                        toast("Page refreshed")
+                        requireActivity().recreate()
+                        binding.swiperefresh.isRefreshing=false
+                    }
+
+                }
+
+            } catch (e: java.lang.Exception) {
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+                progressDialog.dismiss()
+
+
+            }
+
+        }
+    }
 
     fun fetchfromdb() {
         viewModel.getTasksForSegmentFromDB(

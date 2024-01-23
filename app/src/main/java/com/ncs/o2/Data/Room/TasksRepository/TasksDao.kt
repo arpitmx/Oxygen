@@ -31,6 +31,15 @@ interface TasksDao {
     @Query("SELECT * FROM tasks WHERE project_ID = :projectId and status =:state")
     suspend fun getTasksInProjectforState(projectId:String,state: Int): List<Task>
 
+    @Query("SELECT * FROM tasks WHERE project_ID = :projectId and status =:state and assignee=:assignee")
+    suspend fun getTasksInProjectforStateForAssignee(projectId:String,state: Int,assignee: String): List<Task>
+
+    @Query("SELECT * FROM tasks WHERE project_ID = :projectId and assigner =:assigner")
+    suspend fun getTasksInProjectforAssigneer(projectId:String,assigner:String): List<Task>
+
+    @Query("SELECT * FROM tasks WHERE project_ID = :projectId AND :moderator LIKE '%' || moderators || '%'")
+    suspend fun getTasksInProjectforModerators(projectId: String, moderator: String): List<Task>
+
     @Query("SELECT * FROM tasks WHERE project_ID = :projectId and segment = :segmentName and section = :sectionName")
     suspend fun getTasksforSegments(projectId: String,segmentName:String,sectionName:String):List<Task>
 

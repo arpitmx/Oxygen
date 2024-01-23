@@ -147,12 +147,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         val _index= intent.getStringExtra("index")
         if (_index!=null && _index=="2"){
+            binding.bottomNav.getMenu().getItem(2).setChecked(true)
             movetoteamspage()
         }
         if (_index!=null && _index=="1"){
+            binding.bottomNav.getMenu().getItem(1).setChecked(true)
             movetoworkspacepage()
         }
 
+        if (_index==null){
+            binding.bottomNav.getMenu().getItem(2).setChecked(true)
+        }
 
         if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
             binding.gioActionbar.offlineIndicator.visible()
@@ -193,6 +198,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         for (project in PrefManager.getProjectsList()){
             Log.d("projectCheck",PrefManager.getProjectIconUrl(project).toString())
         }
+
 
     }
 
@@ -793,6 +799,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     fun setBottomNavBar() {
 
         bottmNav = binding.bottomNav
+
         if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
             bottmNav.setOnItemSelectedListener { menuItem ->
 
@@ -854,8 +861,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                         false
                     }
                 }
-
-
             }
         }
 

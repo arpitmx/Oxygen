@@ -21,6 +21,13 @@ interface TasksRepository {
         resultCallback: (DBResult<List<Task>>) -> Unit
     )
 
+    suspend fun getTasksItemsForStatewithAssignee(
+        projectName: String,
+        assignee:String,
+        state: Int,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    )
+
     suspend fun getTaskbyID(
         projectName: String,
         taskId: String,
@@ -43,6 +50,11 @@ interface TasksRepository {
         resultCallback: (DBResult<List<Tag>>) -> Unit
     )
 
+    suspend fun getTasksInProject(
+        projectName: String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    )
+
     suspend fun getMessagesforTask(
         projectName: String,
         taskID: String,
@@ -53,5 +65,17 @@ interface TasksRepository {
         projectName: String,
         channelId:String,
         resultCallback: (DBResult<List<Message>>) -> Unit
+    )
+
+    suspend fun getTasksItemsForModerators(
+        projectName: String,
+        moderator:String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    )
+
+    suspend fun getTasksItemsOpenedBy(
+        projectName: String,
+        assigneer:String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
     )
 }
