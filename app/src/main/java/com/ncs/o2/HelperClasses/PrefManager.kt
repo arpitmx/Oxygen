@@ -273,7 +273,7 @@ object PrefManager {
         editor.apply()
     }
     fun getcurrentsegment():String {
-        return sharedPreferences.getString("segment","Development")!!
+        return sharedPreferences.getString("segment",Endpoints.defaultSegment)!!
     }
     fun setcurrentUserdetails(user:CurrentUser){
         editor.putString(Endpoints.User.USERNAME,user.USERNAME)

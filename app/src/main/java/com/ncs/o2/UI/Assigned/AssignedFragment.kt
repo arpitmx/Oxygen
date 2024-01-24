@@ -3,6 +3,7 @@ package com.ncs.o2.UI.Assigned
 import TaskListAdapter
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
@@ -30,6 +32,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Teams.TasksHolderActivity
 import com.ncs.o2.UI.UIComponents.Adapters.TaskSectionViewPagerAdapter
@@ -43,6 +46,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -61,6 +66,7 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
     }
     @Inject
     lateinit var db:TasksDatabase
+    var isGridVisible=true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -91,25 +97,100 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
 
     private fun setUpViews(){
 
-        binding.assigned.setOnClickThrottleBounceListener {
+        binding.assigned.statParent.setOnClickThrottleBounceListener {
             startActivity("WorkspaceAssigned")
         }
-        binding.working.setOnClickThrottleBounceListener {
+        binding.ongoing.statParent.setOnClickThrottleBounceListener {
             startActivity("WorkspaceWorking")
         }
-        binding.review.setOnClickThrottleBounceListener {
+        binding.review.statParent.setOnClickThrottleBounceListener {
             startActivity("WorkspaceReview")
         }
-        binding.completed.setOnClickThrottleBounceListener {
+        binding.completed.statParent.setOnClickThrottleBounceListener {
             startActivity("WorkspaceCompleted")
         }
-        activityBinding.gioActionbar.btnMoreAssigned.setOnClickThrottleBounceListener {
-            val moreOptionBottomSheet =
-                MoreOptionsWorkspaceBottomSheet()
-            moreOptionBottomSheet.show(requireFragmentManager(), "more")
+        binding.moderating.setOnClickThrottleBounceListener {
+            startActivity("moderating")
+        }
+        binding.openedBy.setOnClickThrottleBounceListener {
+            startActivity("opened")
+        }
+        binding.favs.setOnClickThrottleBounceListener {
+            startActivity("Favs")
+        }
+        binding.assignedGrid.setOnClickListener {
+            binding.arrowStats.set180(requireContext())
+            if(!isGridVisible){
+                isGridVisible=true
+                binding.extendedAssigned.visible()
+            }
+            else{
+                isGridVisible=false
+                binding.extendedAssigned.gone()
+            }
         }
 
+        binding.swiperefresh.setOnRefreshListener {
+            syncCache(PrefManager.getcurrentProject())
+        }
     }
+
+    private fun syncCache(projectName:String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Please wait, Syncing Tasks")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    firestoreRepository.getTasksinProjectAccordingtoTimeStamp(projectName)
+                }
+
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+                        progressDialog.dismiss()
+                        binding.swiperefresh.isRefreshing=false
+                        requireActivity().recreate()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        progressDialog.show()
+                        progressDialog.setMessage("Please wait, Syncing Tasks")
+
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tasks = taskResult.data
+                        if (tasks.isNotEmpty()){
+                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                            for (task in tasks) {
+                                db.tasksDao().insert(task)
+                            }
+                        }
+                        progressDialog.dismiss()
+                        requireActivity().recreate()
+                        binding.swiperefresh.isRefreshing=false
+
+                    }
+
+                }
+
+            } catch (e: java.lang.Exception) {
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+                progressDialog.dismiss()
+
+
+            }
+
+        }
+    }
+
 
     private fun startActivity(type:String){
         val intent = Intent(requireContext(), TasksHolderActivity::class.java)
@@ -124,13 +205,6 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         activityBinding.gioActionbar.btnHamWorkspace.setOnClickThrottleBounceListener {
             val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
-        }
-        activityBinding.gioActionbar.btnFav.setOnClickThrottleBounceListener {
-            val intent = Intent(requireContext(), TasksHolderActivity::class.java)
-            intent.putExtra("type", "Favs")
-            intent.putExtra("index", "1")
-            startActivity(intent)
-            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
         activityBinding.gioActionbar.tabLayout.gone()
         activityBinding.gioActionbar.actionbar.visible()
@@ -147,10 +221,22 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
             val reviewTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 4, assignee = PrefManager.getCurrentUserEmail())
             val completedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 5, assignee = PrefManager.getCurrentUserEmail())
 
-            binding.assignedCount.text="${assignedTasks.size} tasks"
-            binding.workingCount.text="${workingTasks.size} tasks"
-            binding.reviewCount.text="${reviewTasks.size} tasks"
-            binding.completedCount.text="${completedTasks.size} tasks"
+            binding.assigned.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_active_24))
+            binding.assigned.statTitle.text="Assigned"
+            binding.assigned.statCount.text="${assignedTasks.size} tasks"
+
+            binding.ongoing.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_ongoing_24))
+            binding.ongoing.statTitle.text="Working"
+            binding.ongoing.statCount.text="${workingTasks.size} tasks"
+
+            binding.review.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_review_24))
+            binding.review.statTitle.text="Reviewing"
+            binding.review.statCount.text="${reviewTasks.size} tasks"
+
+            binding.completed.statIcon.setImageDrawable(resources.getDrawable(R.drawable.round_task_alt_24))
+            binding.completed.statTitle.text="Completed"
+            binding.completed.statCount.text="${completedTasks.size} tasks"
+
 
         }
     }

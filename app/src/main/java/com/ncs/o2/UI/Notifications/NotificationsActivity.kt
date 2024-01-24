@@ -58,7 +58,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     companion object {
         const val TAG = "NotificationsActivity"
     }
-
+    var type:String?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -68,7 +68,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         val projectID=intent.getStringExtra("projectID")
         val taskID=intent.getStringExtra("taskID")
-        val type=intent.getStringExtra("type")
+        type=intent.getStringExtra("type")
         val channelID=intent.getStringExtra("channel_name")
         if (projectID!=null && taskID!=null && type!=null){
             when(type){
@@ -272,9 +272,15 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
-        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
         super.onBackPressed()
+        if (type!=null){
+            startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+        }
+        else{
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+        }
+
     }
 
     override fun onClick(notification: Notification) {
@@ -312,6 +318,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
             NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name->{
                 finish()
                 val intent = Intent(this, TeamsActivity::class.java)
+                Log.d("channele name",notification.channelID)
                 intent.putExtra("channel_name", notification.channelID)
                 startActivity(intent)
                 this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)

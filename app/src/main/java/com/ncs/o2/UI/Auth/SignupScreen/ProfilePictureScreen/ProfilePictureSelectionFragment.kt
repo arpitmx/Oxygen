@@ -280,7 +280,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                 val userData = mapOf(
                     "PHOTO_ADDED" to true,
-                    "PROJECTS" to listOf("NCSOxygen"),
+                    "PROJECTS" to listOf(Endpoints.defaultProject),
                     "TIMESTAMP" to Timestamp.now()
                 )
 
@@ -290,7 +290,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                         val addCont=mapOf<String, Any>(
                             "contributors" to FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.email)
                         )
-                        setUpTasks("NCSOxygen",imageUrl,addCont)
+                        setUpTasks(Endpoints.defaultProject,imageUrl,addCont)
 
                     }
                     .addOnFailureListener { e ->
@@ -345,7 +345,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                         for (task in tasks){
                             dao.insert(task)
                         }
-                        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document("NCSOxygen").update(addCont)
+                        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(Endpoints.defaultProject).update(addCont)
                         FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                             .get(Source.SERVER)
                             .addOnCompleteListener { task ->
@@ -367,7 +367,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
-                                        val projectTopic = "NCSOxygen_TOPIC_GENERAL"
+                                        val projectTopic = "${Endpoints.defaultProject}_TOPIC_GENERAL"
 
                                         FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
                                             .addOnCompleteListener { task ->
@@ -379,7 +379,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                             }
                                         with(PrefManager){
 
-                                            putProjectsList(listOf("NCSOxygen"))
+                                            putProjectsList(listOf(Endpoints.defaultProject))
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 for (project in getProjectsList()){
                                                     saveProjectIconUrls(projectName = project)
@@ -392,7 +392,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                                 }
                                                 withContext(Dispatchers.Main){
                                                     setLastSeenTimeStamp(0)
-                                                    setProjectTimeStamp("NCSOxygen",0)
+                                                    setProjectTimeStamp(Endpoints.defaultProject,0)
                                                     setLatestNotificationTimeStamp(0)
 
                                                     setcurrentUserdetails(CurrentUser(

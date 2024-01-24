@@ -37,7 +37,11 @@ import javax.inject.Inject
 class TeamsPagemoreOptions(private val callback:OnChannelAdded) : BottomSheetDialogFragment(),CreateNewChannelBottomSheet.OnChannelAdded{
 
     lateinit var binding:TeamsPageOptionsBottomsheetBinding
-
+    @Inject
+    @FirebaseRepository
+    lateinit var repository: Repository
+    @Inject
+    lateinit var utils : GlobalUtils.EasyElements
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,6 +70,49 @@ class TeamsPagemoreOptions(private val callback:OnChannelAdded) : BottomSheetDia
                 CreateNewChannelBottomSheet(this)
             newChannelsBottomShet.show(requireFragmentManager(), "Channels")
         }
+        binding.shareButton.setOnClickThrottleBounceListener {
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+                getProjectLink()
+            }
+            else{
+                toast("Error getting project link,you are offline")
+            }
+        }
+    }
+
+    private fun getProjectLink(){
+        repository.getProjectLink(PrefManager.getcurrentProject()) { result ->
+
+            when (result) {
+
+                is ServerResult.Failure -> {
+                    binding.progressBar.gone()
+                    binding.buttons.visible()
+                    utils.showSnackbar(requireView(),"Error getting project link",2000)
+                }
+
+                ServerResult.Progress -> {
+                    binding.progressBar.visible()
+                    binding.buttons.gone()
+                }
+
+                is ServerResult.Success -> {
+                    binding.progressBar.gone()
+                    binding.buttons.visible()
+                    Log.d("projectLink",result.data)
+                    shareProjectLink(result.data)
+                    dismiss()
+                }
+
+            }
+        }
+    }
+
+    private fun shareProjectLink(link:String) {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, link)
+        startActivity(Intent.createChooser(intent, "Share Project link using"))
     }
 
     private fun setActionbar() {

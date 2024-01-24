@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Teams
 
 import TaskListAdapter
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -208,7 +209,65 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
             startActivity(Intent.createChooser(intent, "Share Project link using"))
         }
 
+        binding.swiperefresh.setOnRefreshListener {
+            syncCache(PrefManager.getcurrentProject())
+        }
+
     }
+
+    private fun syncCache(projectName:String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Please wait, Syncing Tasks")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    repository.getTasksinProjectAccordingtoTimeStamp(projectName)
+                }
+
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+                        progressDialog.dismiss()
+                        binding.swiperefresh.isRefreshing=false
+                        requireActivity().recreate()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        progressDialog.show()
+                        progressDialog.setMessage("Please wait, Syncing Tasks")
+
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tasks = taskResult.data
+                        if (tasks.isNotEmpty()){
+                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                            for (task in tasks) {
+                                db.tasksDao().insert(task)
+                            }
+                        }
+                        progressDialog.dismiss()
+                        requireActivity().recreate()
+                        binding.swiperefresh.isRefreshing=false
+
+                    }
+
+                }
+
+            } catch (e: java.lang.Exception) {
+                progressDialog.dismiss()
+            }
+
+        }
+    }
+
 
 
 

@@ -21,6 +21,7 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -203,6 +204,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         binding.chatboxOptionBox.gone()
         mentionedUsers.clear()
         mentionAdapter = MentionUsersAdapter(emptyList<User>().toMutableList(), this)
+
+
+
+
+
+
+
         binding.inputBox.progressBarSendMsg.gone()
 
         binding.inputBox.editboxMessage.addTextChangedListener(object : TextWatcher {
@@ -325,6 +333,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     private fun pasteFromClipboard() {
+
         val clipData: ClipData? = clipboardManager.primaryClip
 
         if (clipData != null && clipData.itemCount > 0) {
@@ -336,6 +345,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     private fun filterList(query: String, mentionedUsers: List<User>) {
+
         val filteredList = contributorsData.filter { contributor ->
             contributor.username!!.contains(query, ignoreCase = true)
         }

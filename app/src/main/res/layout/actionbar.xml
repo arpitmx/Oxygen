@@ -100,110 +100,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
-
-        <LinearLayout
-            android:layout_width="100dp"
-            android:id="@+id/offlineIndicator"
-            android:layout_height="35dp"
-            android:visibility="gone"
-            android:orientation="horizontal"
-            android:background="@drawable/button_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/notification_cont"
-            app:layout_constraintTop_toTopOf="parent">
-
-
-                <ImageView
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="12dp"
-                    android:src="@drawable/baseline_circle_orange_24"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_display_semibold"
-                    android:text="OFFLINE"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/better_white"
-                    android:textSize="13dp" />
-
-        </LinearLayout>
-
-
-        <ImageButton
-            android:id="@+id/create_task_button"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="80dp"
-            android:background="@null"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@android:drawable/ic_input_add"
-            app:tint="@color/primary" />
-
-
-
-        <ImageButton
-            android:id="@+id/new_changes_btn"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:background="@null"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/create_task_button"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/baseline_new_releases_24"
-            app:tint="@color/primary" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="40dp"
-            android:id="@+id/notification_cont"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/create_task_button"
-            app:layout_constraintEnd_toStartOf="@+id/btnMore"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/notificationCountET"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/red_circle_bubble"
-                android:fontFamily="@font/sf_pro_display_semibold"
-                android:gravity="center"
-                android:padding="2dp"
-                android:minWidth="18dp"
-                android:layout_marginTop="6dp"
-                android:text="150"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <ImageButton
-                android:id="@+id/notifications"
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:background="@null"
-                android:src="@drawable/notifications"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/primary" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
         <ImageButton
             android:id="@+id/btnMore"
             android:layout_width="30dp"
@@ -295,7 +191,7 @@
             android:background="@null"
             android:layout_marginEnd="55dp"
             android:src="@drawable/star_filled"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -309,7 +205,7 @@
             android:layout_marginEnd="15dp"
             android:background="@null"
             android:src="@drawable/baseline_more_vert_24"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -474,6 +370,110 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
+        <LinearLayout
+            android:layout_width="100dp"
+            android:id="@+id/offlineIndicator"
+            android:layout_height="35dp"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:background="@drawable/button_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/notification_cont"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/baseline_circle_orange_24"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:text="OFFLINE"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/better_white"
+                android:textSize="13dp" />
+
+        </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/create_task_button"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="80dp"
+            android:background="@null"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@android:drawable/ic_input_add"
+            app:tint="@color/primary" />
+
+
+
+        <ImageButton
+            android:id="@+id/new_changes_btn"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/create_task_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/baseline_new_releases_24"
+            app:tint="@color/primary" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="40dp"
+            android:id="@+id/notification_cont"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/create_task_button"
+            app:layout_constraintEnd_toStartOf="@+id/btnMore"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/notificationCountET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/red_circle_bubble"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:padding="2dp"
+                android:minWidth="18dp"
+                android:layout_marginTop="6dp"
+                android:text="150"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <ImageButton
+                android:id="@+id/notifications"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:src="@drawable/notifications"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/primary" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <ImageButton
             android:id="@+id/btnMoreTeams"
             android:layout_width="30dp"
@@ -481,7 +481,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_more_vert_24"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
