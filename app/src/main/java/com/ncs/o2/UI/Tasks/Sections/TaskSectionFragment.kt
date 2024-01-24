@@ -382,13 +382,14 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                                 difficulty = task.difficulty!!,
                                 timestamp = task.time_STAMP,
                                 completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
-                                tagList = task.tags
+                                tagList = task.tags,
+                                last_updated = task.last_updated
                             )
                         }
                         val taskadapter = TaskListAdapter(
                             firestoreRepository,
                             requireContext(),
-                            taskItems.toMutableList(),
+                            taskItems.sortedByDescending { it.last_updated }.toMutableList(),
                             db
                         )
                         taskadapter.setOnClickListener(this)

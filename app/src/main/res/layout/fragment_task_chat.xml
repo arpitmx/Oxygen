@@ -100,13 +100,24 @@
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/item_bg_curve"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/mention_user_rv"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layoutAnimation="@anim/layout_animation_fadein"
-                android:visibility="gone" />
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mention_user_rv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_max="200dp"
+                    android:layoutAnimation="@anim/layout_animation_fadein"
+                    android:visibility="gone" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <ProgressBar
                 android:id="@+id/mentionProgressbar"

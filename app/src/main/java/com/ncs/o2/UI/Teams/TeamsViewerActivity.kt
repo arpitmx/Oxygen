@@ -110,11 +110,7 @@ class TeamsViewerActivity : AppCompatActivity() {
         recyclerView.visible()
     }
     override fun onBackPressed() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("index", "2")
-        startActivity(intent)
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-        finish()
         super.onBackPressed()
+        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
     }
 }

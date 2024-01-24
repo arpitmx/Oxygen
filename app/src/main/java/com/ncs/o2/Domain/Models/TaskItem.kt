@@ -13,8 +13,10 @@ data class TaskItem(
     val difficulty: Int = 0,
     val timestamp: Timestamp?=null,
     val completed:Boolean=false,
-    val tagList: List<String>
-) {
+    val tagList: List<String>,
+    val last_updated:Timestamp? = null
+
+    ) {
     @Exclude
     fun getDifficultyColor(): Int {
         when (difficulty) {

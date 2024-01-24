@@ -280,7 +280,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                 val userData = mapOf(
                     "PHOTO_ADDED" to true,
-                    "PROJECTS" to listOf("NCSOxygen"),
+                    "PROJECTS" to listOf(Endpoints.defaultProject),
                     "TIMESTAMP" to Timestamp.now()
                 )
 
@@ -290,7 +290,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                         val addCont=mapOf<String, Any>(
                             "contributors" to FieldValue.arrayUnion(FirebaseAuth.getInstance().currentUser?.email)
                         )
-                        setUpTasks("NCSOxygen",imageUrl,addCont)
+                        setUpTasks(Endpoints.defaultProject,imageUrl,addCont)
 
                     }
                     .addOnFailureListener { e ->
@@ -333,19 +333,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                 when (taskResult) {
 
                     is ServerResult.Failure -> {
-
-                    }
-
-                    is ServerResult.Progress -> {
-                    }
-
-                    is ServerResult.Success -> {
-
-                        val tasks=taskResult.data
-                        for (task in tasks){
-                            dao.insert(task)
-                        }
-                        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document("NCSOxygen").update(addCont)
+                        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(Endpoints.defaultProject).update(addCont)
                         FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
                             .get(Source.SERVER)
                             .addOnCompleteListener { task ->
@@ -367,7 +355,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                                         Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
 
-                                        val projectTopic = "NCSOxygen_TOPIC_GENERAL"
+                                        val projectTopic = "${Endpoints.defaultProject}_TOPIC_GENERAL"
 
                                         FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
                                             .addOnCompleteListener { task ->
@@ -379,7 +367,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                             }
                                         with(PrefManager){
 
-                                            putProjectsList(listOf("NCSOxygen"))
+                                            putProjectsList(listOf(Endpoints.defaultProject))
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 for (project in getProjectsList()){
                                                     saveProjectIconUrls(projectName = project)
@@ -392,7 +380,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                                 }
                                                 withContext(Dispatchers.Main){
                                                     setLastSeenTimeStamp(0)
-                                                    setProjectTimeStamp("NCSOxygen",0)
+                                                    setProjectTimeStamp(Endpoints.defaultProject,0)
                                                     setLatestNotificationTimeStamp(0)
 
                                                     setcurrentUserdetails(CurrentUser(
@@ -401,7 +389,98 @@ class ProfilePictureSelectionFragment : Fragment() {
                                                         BIO = bio!!,
                                                         DESIGNATION = designation!!,
                                                         ROLE = role!!,
-                                                        FCM_TOKEN = fcm,
+                                                        FCM_TOKEN = fcm!!,
+                                                    ))
+                                                    setMail(quantity = 1, userName = username,email=email)
+                                                    requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                } else {
+
+                                    val exception = task.exception
+                                    exception?.printStackTrace()
+
+                                    util.singleBtnDialog_InputError("Errors",
+                                        "There was an error : ${exception?.message} \nPlease retry",
+                                        "Retry"
+                                    ) {
+                                        Toast.makeText(requireActivity(), "Retrying", Toast.LENGTH_SHORT).show()
+                                        addImageUrlToFirestore(imageUrl)
+                                    }
+                                }
+                            }
+                    }
+
+                    is ServerResult.Progress -> {
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tasks=taskResult.data
+                        for (task in tasks){
+                            dao.insert(task)
+                        }
+                        FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(Endpoints.defaultProject).update(addCont)
+                        FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().currentUser?.email!!)
+                            .get(Source.SERVER)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+
+                                    val document = task.result
+                                    if (document != null && document.exists()) {
+
+                                        val bio=document.getString(Endpoints.User.BIO)
+                                        val designation=document.getString(Endpoints.User.DESIGNATION)
+                                        val email=document.getString(Endpoints.User.EMAIL)
+                                        val username=document.getString(Endpoints.User.USERNAME)
+                                        val role= document.getLong(Endpoints.User.ROLE)
+                                        var fcm : String? = document.getString(Endpoints.User.FCM_TOKEN)
+
+                                        if (fcm==null){
+                                            fcm = ""
+                                        }
+
+                                        Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
+
+                                        val projectTopic = "${Endpoints.defaultProject}_TOPIC_GENERAL"
+
+                                        FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Log.d("FCM", "Subscribed to topic successfully")
+                                                } else {
+                                                    Log.d("FCM", "Failed to subscribe to topic",)
+                                                }
+                                            }
+                                        with(PrefManager){
+
+                                            putProjectsList(listOf(Endpoints.defaultProject))
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                for (project in getProjectsList()){
+                                                    saveProjectIconUrls(projectName = project)
+                                                    val list=getSegments(project)
+                                                    val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
+                                                    saveProjectSegments(project,list)
+                                                    if (newList.isNotEmpty()){
+                                                        setLastSegmentsTimeStamp(project,newList[0].creation_DATETIME!!)
+                                                    }
+                                                }
+                                                withContext(Dispatchers.Main){
+                                                    setLastSeenTimeStamp(0)
+                                                    setProjectTimeStamp(Endpoints.defaultProject,0)
+                                                    setLatestNotificationTimeStamp(0)
+
+                                                    setcurrentUserdetails(CurrentUser(
+                                                        EMAIL = email!!,
+                                                        USERNAME = username!!,
+                                                        BIO = bio!!,
+                                                        DESIGNATION = designation!!,
+                                                        ROLE = role!!,
+                                                        FCM_TOKEN = fcm!!,
                                                     ))
                                                     setMail(quantity = 1, userName = username,email=email)
                                                     requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))

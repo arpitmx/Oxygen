@@ -27,7 +27,45 @@ class NewChanges : AppCompatActivity() {
 
         binding = ActivityNewChangesBinding.inflate(layoutInflater)
         setViews()
-        setUpTaskDescription(Endpoints.new_changes_des)
+        val desc="## Release Notes [24.1.24] - [24/01/2024]\n" +
+                "\n" +
+                "### New Features\n" +
+                " - Created project stats: Now you can easily track and analyze project statistics within the app.\n" +
+                " \n" +
+                " - Added Offline Mode: Now keep yourself on the go even when experiencing limited connectivity\n" +
+                "- Workspace Improvements: Be focused on your tasks with a more personalized workspace for both assignees and moderators.\n" +
+                "- Addition of Channels: Introducing channels for more organized and targeted conversations.\n" +
+                "\n" +
+                "### Enhancements\n" +
+                "\n" +
+                "- Task Drafting Enhancements: Improvements in saving the tasks as drafts in case of unexpected failures so that the progress is not lost.\n" +
+                "\n" +
+                "- Improvements for moderators: Now easily keep track for the tasks you are moderating in.\n" +
+                "\n" +
+                "- CheckLists creation: Moderators can add more checklists after the tasks has been created\n" +
+                "\n" +
+                "- Edit task summary: Task summary can be now edited after task has been created.\n" +
+                "\n" +
+                "### Bug Fixes\n" +
+                "- Possible bug fixes to crashes resolved\n" +
+                "\n" +
+                "### Performance Improvements\n" +
+                "- Improved opening of the screens and reduced load times.\n" +
+                "\n" +
+                "### User Interface Changes\n" +
+                "- Revamped UI of user's workspace\n" +
+                "\n" +
+                "- Made general improvements in UX\n" +
+                "\n" +
+                "### How to Update\n" +
+                "- Latest Version of O2 is 24.1.24, it can be downloaded from the release page, find version 24.1.16 at [Release Page](https://github.com/arpitmx/Oxygen/releases)\n" +
+                "\n" +
+                "### Feedback\n" +
+                "- Feedback is the key to enhancing user experience, it is our appeal to the users for providing any constructive feedback about any issues faced by them.\n" +
+                "\n" +
+                "### Thank You!\n" +
+                "\n"
+        setUpTaskDescription(desc)
 
         binding.gioActionbar.btnClose.setOnClickThrottleBounceListener{
             onBackPressed()
@@ -147,29 +185,12 @@ class NewChanges : AppCompatActivity() {
             }
         }
 
-//        @JavascriptInterface
-//        fun sendImages(imageUrls: Array<String>) {
-//            requireActivity().runOnUiThread {
-//                val recyclerView = binding.imageRecyclerView
-//                recyclerView.layoutManager =
-//                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-//                Log.d("list", imageUrls.toMutableList().toString())
-//                val adapter = ImageAdapter(imageUrls.toMutableList(), this@TaskDetailsFragment)
-//                recyclerView.adapter = adapter
-//            }
-//        }
-//
-//        @JavascriptInterface
-//        fun sendsingleImage(imageUrl: String) {
-//            requireActivity().runOnUiThread {
-//                onImageClicked(0, mutableListOf(imageUrl))
-//            }
-//        }
+
 
     }
     override fun onBackPressed() {
         super.onBackPressed()
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
         finish()
     }
 }

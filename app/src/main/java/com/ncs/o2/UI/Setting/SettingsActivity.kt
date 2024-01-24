@@ -57,7 +57,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             settingTitle("profile"),
             settingOption("Edit Profile", R.drawable.round_edit_24, ""),
             settingTitle("what's new"),
-            settingOption("What's New", R.drawable.baseline_info_24, "Version 1.1.0"),
+            settingOption("What's New", R.drawable.baseline_info_24, "Version 24.1.24"),
             settingTitle("Account"),
             settingOption("Log Out", R.drawable.logout, "") ,
             settingTitle("Logs"),
@@ -104,7 +104,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
         }
         else if (Codes.STRINGS.clickedSetting == "What's New"){
             startActivity(Intent(this, NewChanges::class.java))
-            overridePendingTransition(R.anim.faster_slide_bottom_to_up, R.anim.faster_slide_bottom_to_up)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
         else if (Codes.STRINGS.clickedSetting == "Logs"){
             startActivity(Intent(this, LogsActivity::class.java))

@@ -9,4 +9,5 @@ data class Update(
     val UPDATE_URL :   String = "",
     val VERSION_CODE : String = "",
     val VERSION_NAME : String = "",
+    val CLEAR_MEMORY : Boolean = false,
 ) : Serializable

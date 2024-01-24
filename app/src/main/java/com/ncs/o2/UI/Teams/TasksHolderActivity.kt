@@ -146,7 +146,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
                 }
 
                 "opened" ->{
-                    binding.title.text = "Opened"
+                    binding.title.text = "Opened by me"
                     FetchTasksforAssigner()
                 }
 
@@ -201,6 +201,76 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         }
     }
 
+    private fun setUpOnSuccessRV(list: MutableList<Task>){
+        if (list.isEmpty()){
+            binding.layout.gone()
+            binding.recyclerView.gone()
+            binding.progressbarBlock.gone()
+            binding.placeholder.visible()
+        }
+        else{
+            binding.layout.visible()
+            binding.recyclerView.visible()
+            binding.progressbarBlock.gone()
+            binding.placeholder.gone()
+            recyclerView = binding.recyclerView
+            taskItems.addAll(list.map { task ->
+                TaskItem(
+                    title = task.title!!,
+                    id = task.id,
+                    assignee_id = task.assignee!!,
+                    difficulty = task.difficulty!!,
+                    timestamp = task.time_STAMP,
+                    completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
+                    tagList = task.tags,
+                    last_updated = task.last_updated
+
+                )
+            }.toMutableList())
+            Log.d("tasksFetch",taskItems.toString())
+            val taskadapter = TaskListAdapter(
+                firestoreRepository,
+                this,
+                taskItems.sortedByDescending { it.last_updated }.toMutableList(),
+                db
+            )
+            taskadapter.setOnClickListener(this)
+
+
+            val layoutManager =
+                LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+            layoutManager.reverseLayout = false
+            with(recyclerView) {
+                this.layoutManager = layoutManager
+                adapter = taskadapter
+                edgeEffectFactory = BounceEdgeEffectFactory()
+            }
+            taskadapter.notifyDataSetChanged()
+
+            recyclerView.addOnScrollListener(object :
+                RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(
+                    recyclerView: RecyclerView,
+                    newState: Int
+                ) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    state[0] = newState
+                }
+
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
+                    } else if (dy < -10) {
+                    }
+                }
+            })
+
+        }
+    }
     private fun FetchTasksforStateandAssignee(status:Int){
         viewModel.getTasksforSegmentsforAssignee(
             PrefManager.getcurrentProject(),PrefManager.getCurrentUserEmail(),status
@@ -208,73 +278,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             when (result) {
                 is DBResult.Success -> {
 
-                    if (result.data.isEmpty()){
-                        binding.layout.gone()
-                        binding.recyclerView.gone()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.visible()
-                    }
-                    else{
-                        binding.layout.visible()
-                        binding.recyclerView.visible()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.gone()
-                        recyclerView = binding.recyclerView
-                        taskItems.addAll(result.data.map { task ->
-                            TaskItem(
-                                title = task.title!!,
-                                id = task.id,
-                                assignee_id = task.assignee!!,
-                                difficulty = task.difficulty!!,
-                                timestamp = task.time_STAMP,
-                                completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
-                                tagList = task.tags
-                            )
-                        }.toMutableList())
-                        Log.d("tasksFetch",taskItems.toString())
-                        val taskadapter = TaskListAdapter(
-                            firestoreRepository,
-                            this,
-                            taskItems.toMutableList(),
-                            db
-                        )
-                        taskadapter.setOnClickListener(this)
-
-
-                        val layoutManager =
-                            LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-                        layoutManager.reverseLayout = false
-                        with(recyclerView) {
-                            this.layoutManager = layoutManager
-                            adapter = taskadapter
-                            edgeEffectFactory = BounceEdgeEffectFactory()
-                        }
-                        taskadapter.notifyDataSetChanged()
-
-                        recyclerView.addOnScrollListener(object :
-                            RecyclerView.OnScrollListener() {
-                            override fun onScrollStateChanged(
-                                recyclerView: RecyclerView,
-                                newState: Int
-                            ) {
-                                super.onScrollStateChanged(recyclerView, newState)
-                                state[0] = newState
-                            }
-
-                            override fun onScrolled(
-                                recyclerView: RecyclerView,
-                                dx: Int,
-                                dy: Int
-                            ) {
-                                super.onScrolled(recyclerView, dx, dy)
-                                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                } else if (dy < -10) {
-                                }
-                            }
-                        })
-
-                    }
-
+                    setUpOnSuccessRV(result.data.toMutableList())
 
                 }
 
@@ -304,72 +308,8 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             when (result) {
                 is DBResult.Success -> {
 
-                    if (result.data.isEmpty()){
-                        binding.layout.gone()
-                        binding.recyclerView.gone()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.visible()
-                    }
-                    else{
-                        binding.layout.visible()
-                        binding.recyclerView.visible()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.gone()
-                        recyclerView = binding.recyclerView
-                         taskItems.addAll(result.data.map { task ->
-                            TaskItem(
-                                title = task.title!!,
-                                id = task.id,
-                                assignee_id = task.assignee!!,
-                                difficulty = task.difficulty!!,
-                                timestamp = task.time_STAMP,
-                                completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
-                                tagList = task.tags
-                            )
-                        }.toMutableList())
-                        Log.d("tasksFetch",taskItems.toString())
-                        val taskadapter = TaskListAdapter(
-                            firestoreRepository,
-                            this,
-                            taskItems.toMutableList(),
-                            db
-                        )
-                        taskadapter.setOnClickListener(this)
+                    setUpOnSuccessRV(result.data.toMutableList())
 
-
-                        val layoutManager =
-                            LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-                        layoutManager.reverseLayout = false
-                        with(recyclerView) {
-                            this.layoutManager = layoutManager
-                            adapter = taskadapter
-                            edgeEffectFactory = BounceEdgeEffectFactory()
-                        }
-                        taskadapter.notifyDataSetChanged()
-
-                        recyclerView.addOnScrollListener(object :
-                            RecyclerView.OnScrollListener() {
-                            override fun onScrollStateChanged(
-                                recyclerView: RecyclerView,
-                                newState: Int
-                            ) {
-                                super.onScrollStateChanged(recyclerView, newState)
-                                state[0] = newState
-                            }
-
-                            override fun onScrolled(
-                                recyclerView: RecyclerView,
-                                dx: Int,
-                                dy: Int
-                            ) {
-                                super.onScrolled(recyclerView, dx, dy)
-                                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                } else if (dy < -10) {
-                                }
-                            }
-                        })
-
-                    }
 
 
                 }
@@ -409,74 +349,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
                             }
                         }
                         withContext(Dispatchers.Main) {
-                            if (list.isEmpty()) {
-                                binding.layout.gone()
-                                binding.recyclerView.gone()
-                                binding.progressbarBlock.gone()
-                                binding.placeholder.visible()
-                            } else {
-                                binding.layout.visible()
-                                binding.recyclerView.visible()
-                                binding.progressbarBlock.gone()
-                                binding.placeholder.gone()
-                                recyclerView = binding.recyclerView
-                                taskItems.addAll(list.map { task ->
-                                    TaskItem(
-                                        title = task.title!!,
-                                        id = task.id,
-                                        assignee_id = task.assignee!!,
-                                        difficulty = task.difficulty!!,
-                                        timestamp = task.time_STAMP,
-                                        completed = if (SwitchFunctions.getStringStateFromNumState(
-                                                task.status!!
-                                            ) == "Completed"
-                                        ) true else false,
-                                        tagList = task.tags
-                                    )
-                                }.toMutableList())
-                                Log.d("tasksFetch", taskItems.toString())
-                                val taskadapter = TaskListAdapter(
-                                    firestoreRepository,
-                                    this@TasksHolderActivity,
-                                    taskItems.toMutableList(),
-                                    db
-                                )
-                                taskadapter.setOnClickListener(this@TasksHolderActivity)
-
-
-                                val layoutManager =
-                                    LinearLayoutManager(this@TasksHolderActivity, RecyclerView.VERTICAL, false)
-                                layoutManager.reverseLayout = false
-                                with(recyclerView) {
-                                    this.layoutManager = layoutManager
-                                    adapter = taskadapter
-                                    edgeEffectFactory = BounceEdgeEffectFactory()
-                                }
-                                taskadapter.notifyDataSetChanged()
-
-                                recyclerView.addOnScrollListener(object :
-                                    RecyclerView.OnScrollListener() {
-                                    override fun onScrollStateChanged(
-                                        recyclerView: RecyclerView,
-                                        newState: Int
-                                    ) {
-                                        super.onScrollStateChanged(recyclerView, newState)
-                                        state[0] = newState
-                                    }
-
-                                    override fun onScrolled(
-                                        recyclerView: RecyclerView,
-                                        dx: Int,
-                                        dy: Int
-                                    ) {
-                                        super.onScrolled(recyclerView, dx, dy)
-                                        if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                        } else if (dy < -10) {
-                                        }
-                                    }
-                                })
-
-                            }
+                            setUpOnSuccessRV(list.toMutableList())
                         }
                     }
 
@@ -509,72 +382,8 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             when (result) {
                 is DBResult.Success -> {
 
-                    if (result.data.isEmpty()){
-                        binding.layout.gone()
-                        binding.recyclerView.gone()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.visible()
-                    }
-                    else{
-                        binding.layout.visible()
-                        binding.recyclerView.visible()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.gone()
-                        recyclerView = binding.recyclerView
-                        taskItems.addAll(result.data.map { task ->
-                            TaskItem(
-                                title = task.title!!,
-                                id = task.id,
-                                assignee_id = task.assignee!!,
-                                difficulty = task.difficulty!!,
-                                timestamp = task.time_STAMP,
-                                completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
-                                tagList = task.tags
-                            )
-                        }.toMutableList())
-                        Log.d("tasksFetch",taskItems.toString())
-                        val taskadapter = TaskListAdapter(
-                            firestoreRepository,
-                            this,
-                            taskItems.toMutableList(),
-                            db
-                        )
-                        taskadapter.setOnClickListener(this)
+                    setUpOnSuccessRV(result.data.toMutableList())
 
-
-                        val layoutManager =
-                            LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-                        layoutManager.reverseLayout = false
-                        with(recyclerView) {
-                            this.layoutManager = layoutManager
-                            adapter = taskadapter
-                            edgeEffectFactory = BounceEdgeEffectFactory()
-                        }
-                        taskadapter.notifyDataSetChanged()
-
-                        recyclerView.addOnScrollListener(object :
-                            RecyclerView.OnScrollListener() {
-                            override fun onScrollStateChanged(
-                                recyclerView: RecyclerView,
-                                newState: Int
-                            ) {
-                                super.onScrollStateChanged(recyclerView, newState)
-                                state[0] = newState
-                            }
-
-                            override fun onScrolled(
-                                recyclerView: RecyclerView,
-                                dx: Int,
-                                dy: Int
-                            ) {
-                                super.onScrolled(recyclerView, dx, dy)
-                                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                } else if (dy < -10) {
-                                }
-                            }
-                        })
-
-                    }
 
 
                 }
@@ -604,65 +413,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             when (result) {
                 is DBResult.Success -> {
 
-                        binding.layout.visible()
-                        binding.recyclerView.visible()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.gone()
-                        recyclerView = binding.recyclerView
-                        val data= listOf(result.data)
-                        taskItems.addAll(data.map { task ->
-                            TaskItem(
-                                title = task.title!!,
-                                id = task.id,
-                                assignee_id = task.assignee!!,
-                                difficulty = task.difficulty!!,
-                                timestamp = task.time_STAMP,
-                                completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
-                                tagList = task.tags
-                            )
-                        }.toMutableList())
-                        Log.d("tasksFetch",taskItems.toString())
-                        val taskadapter = TaskListAdapter(
-                            firestoreRepository,
-                            this,
-                            taskItems.toMutableList(),
-                            db
-                        )
-                        taskadapter.setOnClickListener(this)
-
-
-                        val layoutManager =
-                            LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-                        layoutManager.reverseLayout = false
-                        with(recyclerView) {
-                            this.layoutManager = layoutManager
-                            adapter = taskadapter
-                            edgeEffectFactory = BounceEdgeEffectFactory()
-                        }
-                        taskadapter.notifyDataSetChanged()
-
-                        recyclerView.addOnScrollListener(object :
-                            RecyclerView.OnScrollListener() {
-                            override fun onScrollStateChanged(
-                                recyclerView: RecyclerView,
-                                newState: Int
-                            ) {
-                                super.onScrollStateChanged(recyclerView, newState)
-                                state[0] = newState
-                            }
-
-                            override fun onScrolled(
-                                recyclerView: RecyclerView,
-                                dx: Int,
-                                dy: Int
-                            ) {
-                                super.onScrolled(recyclerView, dx, dy)
-                                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                } else if (dy < -10) {
-                                }
-                            }
-                        })
-
+                    setUpOnSuccessRV(listOf(result.data).toMutableList())
 
                 }
 
@@ -746,19 +497,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
     }
     override fun onBackPressed() {
         super.onBackPressed()
-        if (index=="1"){
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("index", "1")
-            startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-            finish()
-        }
-        else if (index=="2"){
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("index", "2")
-            startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right)
-            finish()
-        }
+        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+
     }
 }

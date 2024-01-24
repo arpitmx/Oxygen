@@ -228,6 +228,11 @@ class FirestoreRepository @Inject constructor(
                     } else{
                         documentSnapshot.getString(Endpoints.Notifications.project_id)!!
                     }
+                    val channelID: String = if (documentSnapshot.getString(Endpoints.Notifications.channelId).isNull){
+                        ""
+                    } else{
+                        documentSnapshot.getString(Endpoints.Notifications.channelId)!!
+                    }
                     Notification(
                         notificationID = notificationID,
                         notificationType = notificationType,
@@ -237,7 +242,8 @@ class FirestoreRepository @Inject constructor(
                         fromUser = fromUser,
                         toUser = toUser,
                         timeStamp = timeStamp,
-                        projectID = projectID
+                        projectID = projectID,
+                        channelID = channelID
                     )
                 }
             }.await()
@@ -2570,6 +2576,11 @@ class FirestoreRepository @Inject constructor(
                                 } else{
                                     document.getString(Endpoints.Notifications.project_id)!!
                                 }
+                                val channelID: String = if (document.getString(Endpoints.Notifications.channelId).isNull){
+                                    ""
+                                } else{
+                                    document.getString(Endpoints.Notifications.channelId)!!
+                                }
                                 var LastUpdatedtimeStamp: Long? =null
                                 if (!document.getLong(Endpoints.Notifications.lastUpdated)!!.isNull){
                                     LastUpdatedtimeStamp=document.getLong(Endpoints.Notifications.lastUpdated)!!
@@ -2586,7 +2597,7 @@ class FirestoreRepository @Inject constructor(
                                     timeStamp = timeStamp,
                                     lastUpdated = LastUpdatedtimeStamp,
                                     projectID=projectID,
-
+                                    channelID = channelID
                                 )
                                 PrefManager.putLastNotificationCacheUpdateTimestamp(Timestamp.now().seconds)
 

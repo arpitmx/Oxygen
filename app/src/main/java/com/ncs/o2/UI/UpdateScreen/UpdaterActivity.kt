@@ -170,9 +170,44 @@ class UpdaterActivity @Inject constructor() : AppCompatActivity() {
         binding.buttonDownload.setOnClickListener {
             if (packageManager.canRequestPackageInstalls()) {
                 startDownloadProcess(APK_URL)
+                if (updateGlo!!.CLEAR_MEMORY){
+                    deleteCache(this)
+                }
             } else {
                 requestRuntimePermissionsAndProceed()
             }
+        }
+    }
+
+    private fun deleteCache(context: Context) {
+        try {
+            val dir: File = context.cacheDir
+            if (!deleteDir(dir)){
+                Timber.d("TAG", "Problem in clearing cache..")
+            }else{
+                Timber.i("TAG", "Cache is cleared..")
+            }
+        } catch (e: java.lang.Exception) {
+            Timber.e("TAG", "Problem in clearing cache.., $e")
+        }
+    }
+
+    private fun deleteDir(dir: File?): Boolean {
+        return if (dir != null && dir.isDirectory) {
+            val children: Array<String>? = dir.list()
+            if (children != null) {
+                for (i in children.indices) {
+                    val success = deleteDir(File(dir, children[i]))
+                    if (!success) {
+                        return false
+                    }
+                }
+            }
+            dir.delete()
+        } else if (dir != null && dir.isFile) {
+            dir.delete()
+        } else {
+            false
         }
     }
 
