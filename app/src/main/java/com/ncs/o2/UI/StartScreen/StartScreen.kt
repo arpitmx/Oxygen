@@ -822,7 +822,8 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
     private fun setUpProjectsList(document: DocumentSnapshot) {
         val projectsList = document.get("PROJECTS") as List<String>
         PrefManager.putProjectsList(projectsList)
-
+        val index=projectsList.indexOf("Oxidizer")
+        PrefManager.setRadioButton(index)
     }
 
 

@@ -261,7 +261,7 @@ object PrefManager {
         return sharedPreferences.getInt("position",0)
     }
     fun getcurrentProject():String {
-        return sharedPreferences.getString("project","NCSOxygen")!!
+        return sharedPreferences.getString("project",Endpoints.defaultProject)!!
     }
     fun setcurrentsegment(segment: String?) {
         val existingSegment = sharedPreferences.getString("segment", null)
@@ -369,7 +369,7 @@ object PrefManager {
         editor.apply()
     }
     fun getlastaddedproject():String {
-        return sharedPreferences.getString("last_project","NCSOxygen")!!
+        return sharedPreferences.getString("last_project",Endpoints.defaultProject)!!
     }
 
     fun setSegmentdetails(segment: Segment){
@@ -413,7 +413,7 @@ object PrefManager {
             val type = object : TypeToken<List<String>>() {}.type
             return gson.fromJson(sectionsJson, type)
         }else{
-            return listOf("Ongoing Progress", "Ready for Test", "Testing", "Completed")
+            return listOf("Must Read", "Features", "Working", "Instructions")
         }
     }
     fun putProjectsList(projects:List<String>){
@@ -454,7 +454,7 @@ object PrefManager {
             val type = object : TypeToken<List<String>>() {}.type
             return gson.fromJson(projectsJson, type)
         } else {
-            return listOf("NCSOxygen")
+            return listOf(Endpoints.defaultProject)
         }
     }
     fun putDraftTask(task: Task){

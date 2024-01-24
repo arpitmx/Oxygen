@@ -228,8 +228,8 @@ class FirestoreRepository @Inject constructor(
                     } else{
                         documentSnapshot.getString(Endpoints.Notifications.project_id)!!
                     }
-                    val channelID: String? = if (documentSnapshot.getString(Endpoints.Notifications.channelId).isNull){
-                        null
+                    val channelID: String = if (documentSnapshot.getString(Endpoints.Notifications.channelId).isNull){
+                        ""
                     } else{
                         documentSnapshot.getString(Endpoints.Notifications.channelId)!!
                     }
@@ -243,7 +243,7 @@ class FirestoreRepository @Inject constructor(
                         toUser = toUser,
                         timeStamp = timeStamp,
                         projectID = projectID,
-                        channelID = channelID!!
+                        channelID = channelID
                     )
                 }
             }.await()
@@ -2576,8 +2576,8 @@ class FirestoreRepository @Inject constructor(
                                 } else{
                                     document.getString(Endpoints.Notifications.project_id)!!
                                 }
-                                val channelID: String? = if (document.getString(Endpoints.Notifications.channelId).isNull){
-                                    null
+                                val channelID: String = if (document.getString(Endpoints.Notifications.channelId).isNull){
+                                    ""
                                 } else{
                                     document.getString(Endpoints.Notifications.channelId)!!
                                 }
@@ -2597,7 +2597,7 @@ class FirestoreRepository @Inject constructor(
                                     timeStamp = timeStamp,
                                     lastUpdated = LastUpdatedtimeStamp,
                                     projectID=projectID,
-                                    channelID = channelID!!
+                                    channelID = channelID
                                 )
                                 PrefManager.putLastNotificationCacheUpdateTimestamp(Timestamp.now().seconds)
 

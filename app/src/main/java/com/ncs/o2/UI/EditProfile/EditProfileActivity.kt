@@ -197,7 +197,7 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
                             val new_dp_url : String? = response.DP_URL
 
                             Timber.tag("Profile").d("Bio : ${bio}\n Designation : ${designation}\n Email : ${email} \n Username : ${username}\n Role : ${role}")
-                            PrefManager.putProjectsList(listOf("NCSOxygen"))
+                            PrefManager.putProjectsList(listOf(Endpoints.defaultProject))
                             PrefManager.setcurrentUserdetails(CurrentUser(EMAIL = email, USERNAME = username!!, BIO = bio!!, DESIGNATION = designation!!, ROLE = role))
                             PrefManager.setDpUrl(new_dp_url)
 
