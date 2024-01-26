@@ -4,10 +4,12 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.ListenableWorker
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Api.MailApiService
 import com.ncs.o2.Api.NotificationApiService
 import com.ncs.o2.Constants.NotificationType
@@ -28,6 +30,7 @@ import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Domain.Models.Mail
 import com.ncs.o2.Domain.Workers.FCMWorker
 import com.ncs.o2.databinding.ActivityTestingBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.assisted.Assisted
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -133,6 +136,14 @@ class TestingActivity : AppCompatActivity() {
                 binding.modeEt.text.clear()
                 binding.quantityEt.text.clear()
             }
+
+            6->{
+                updateUsernameAndFullname()
+
+                binding.modeEt.text.clear()
+                binding.quantityEt.text.clear()
+            }
+
 
             else -> {
                 binding.modeEt.text.clear()
@@ -1324,5 +1335,33 @@ See [`LICENSE`](LICENSE) for full of the license text.
 
         }
 
+    }
+
+    fun updateUsernameAndFullname() {
+        FirebaseFirestore.getInstance().collection(Endpoints.USERS)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                for (document in querySnapshot.documents) {
+                    val username = document.getString(Endpoints.User.USERNAME) ?: ""
+
+                    val usernameFirstWord = extractFirstWord(username)
+                    val fullnameFirstWord = "O2_USER ${extractFirstWord(username)}"
+
+                    Log.d("new names: ",usernameFirstWord)
+                    Log.d("new names: ",fullnameFirstWord)
+
+                    document.reference.update(
+                        Endpoints.User.USERNAME, usernameFirstWord,
+                        Endpoints.User.FULLNAME, fullnameFirstWord
+                    )
+                }
+
+            }
+            .addOnFailureListener { exception ->
+
+            }
+    }
+    private fun extractFirstWord(input: String): String {
+        return input.trim().split("\\s+".toRegex()).firstOrNull() ?: ""
     }
 }

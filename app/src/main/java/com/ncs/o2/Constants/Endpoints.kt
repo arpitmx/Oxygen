@@ -72,6 +72,7 @@ object Endpoints {
         const val PROJECTS = "PROJECTS"
         const val EMAIL = "EMAIL"
         const val USERNAME = "USERNAME"
+        const val FULLNAME="FULLNAME"
         const val BIO = "BIO"
         const val DESIGNATION = "DESIGNATION"
         const val ROLE = "ROLE"

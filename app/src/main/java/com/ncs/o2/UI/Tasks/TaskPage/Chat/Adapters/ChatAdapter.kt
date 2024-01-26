@@ -5,11 +5,13 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.ui.graphics.Color
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
@@ -35,6 +37,7 @@ import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.ChatMessageReplyItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonVisitor
 import timber.log.Timber
 import java.util.Date
 import java.util.regex.Pattern
@@ -261,7 +264,7 @@ class ChatAdapter(
 
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
 //        setMessageView(msgList[position], binding)
-        setMessageView(processMentionedmessage(msgList[position]),binding)
+        setMessageView(msgList[position].content,binding)
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.tvName.text = user.USERNAME
@@ -490,37 +493,45 @@ class ChatAdapter(
         }
     }
 
-
-
-    private fun setMessageView(message: String, binding: ChatMessageItemBinding) {
-        markwon.setMarkdown(binding.descriptionTv, message)
-        binding.descriptionTv.visible()
-    }
-
-    private fun processMentionedmessage(message: Message) : String{
-        val spannableStringBuilder = SpannableStringBuilder(message.content)
+    private fun processSpan(message: String) : SpannableStringBuilder{
+        val spannable = SpannableStringBuilder(message)
         val mentionedUsers: MutableList<String> = mutableListOf()
 
         val mentionPattern = Pattern.compile("@(\\w+)")
-        val mentionMatcher = mentionPattern.matcher(message.content)
+        val mentionMatcher = mentionPattern.matcher(message)
 
-        if (mentionMatcher.find()) {
+        while (mentionMatcher.find()) {
             val user = mentionMatcher.group(1)
             mentionedUsers.add(user)
-
             val startIndex = mentionMatcher.start()
-            val endIndex = mentionMatcher.end()
+            val endIndex = message.indexOf(" ", startIndex).takeIf { it != -1 } ?: mentionMatcher.end()
 
-            spannableStringBuilder.setSpan(
+
+            spannable.setSpan(
                 StyleSpan(Typeface.BOLD),
                 startIndex,
                 endIndex,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-        }
+            spannable.setSpan(
+                ForegroundColorSpan(context.resources.getColor(R.color.primary)),
+                startIndex,
+                endIndex,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
 
-        return spannableStringBuilder.toString()
+        }
+        return spannable
     }
+
+    private fun setMessageView(message: String, binding: ChatMessageItemBinding) {
+
+
+        markwon.setParsedMarkdown(binding.descriptionTv, processSpan(message))
+        binding.descriptionTv.visible()
+    }
+
+
 
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
