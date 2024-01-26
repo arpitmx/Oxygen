@@ -10,7 +10,7 @@ import com.ncs.o2.Domain.Models.Task
 
 @Dao
 interface TasksDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(task: Task)
 
     @Update
