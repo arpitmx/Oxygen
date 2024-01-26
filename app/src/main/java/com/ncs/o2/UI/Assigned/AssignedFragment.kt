@@ -48,6 +48,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -97,7 +98,10 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
     }
 
     private fun setUpViews(){
-        
+
+        OverScrollDecoratorHelper.setUpOverScroll(binding.parentScrollview)
+        OverScrollDecoratorHelper.setUpOverScroll(binding.extendedAssigned)
+
         binding.parent.gone()
         binding.parent.animFadein(requireContext(),300)
         binding.parent.visible()

@@ -1,306 +1,316 @@
-
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    android:id="@+id/swiperefresh"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:scrollbars="none"
-    android:layout_marginBottom="55dp"
-    android:background="@color/primary_bg"
-    android:layout_height="match_parent"
-    tools:context=".UI.Teams.TeamsFragment"
-    android:layout_width="match_parent"
-    android:id="@+id/parent"
-    >
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/parent_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
+        >
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/parent"
             android:layout_width="match_parent"
-            android:id="@+id/assignedGrid"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="match_parent"
+            android:layout_marginBottom="55dp"
+            android:background="@color/primary_bg"
+            android:scrollbars="none"
+            tools:context=".UI.Teams.TeamsFragment">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:weightSum="10"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/assignedGrid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:weightSum="10"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:text="Assigned"
+                            android:textColor="@color/better_white"
+                            android:textSize="@dimen/workspace_heading" />
+
+                        <ImageView
+                            android:id="@+id/stats_ic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:src="@drawable/baseline_business_center_24"
+                            app:tint="@color/better_white" />
+
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/arrow_stats"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="22dp"
+                        android:src="@drawable/baseline_keyboard_arrow_up_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/better_white" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <HorizontalScrollView
+                    android:id="@+id/extended_assigned"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="true"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="15dp"
+                    android:scrollbars="none"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <include
+                            android:id="@+id/assigned"
+                            layout="@layout/each_assigned_workspace" />
+
+                        <include
+                            android:id="@+id/ongoing"
+                            layout="@layout/each_assigned_workspace" />
+
+                        <include
+                            android:id="@+id/review"
+                            layout="@layout/each_assigned_workspace" />
+
+                        <include
+                            android:id="@+id/completed"
+                            layout="@layout/each_assigned_workspace" />
+                    </LinearLayout>
+
+
+                </HorizontalScrollView>
+
+                <View
+                    android:id="@+id/line3"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/border_grey" />
+
+                <LinearLayout
+                    android:id="@+id/moderating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:fontFamily="@font/sf_pro_display_semibold"
-                    android:text="Assigned"
-                    android:textColor="@color/better_white"
-                    android:textSize="@dimen/workspace_heading" />
+                    android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/stats_ic"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingTop="@dimen/button_size_workspace"
+                            android:paddingBottom="@dimen/button_size_workspace"
+                            android:weightSum="10"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:fontFamily="@font/sf_pro_display_semibold"
+                                android:text="Moderating "
+                                android:textColor="@color/better_white"
+                                android:textSize="@dimen/workspace_heading" />
+
+                            <ImageView
+                                android:id="@+id/channel_ic"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:src="@drawable/baseline_assignment_ind_24"
+                                app:tint="@color/better_white" />
+
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/arrow"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="22dp"
+                            android:src="@drawable/baseline_keyboard_arrow_right_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/better_white" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:id="@+id/line"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/border_grey" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/openedBy"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:src="@drawable/baseline_business_center_24"
-                    app:tint="@color/better_white" />
+                    android:orientation="vertical">
 
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:orientation="horizontal"
+                            android:paddingTop="@dimen/button_size_workspace"
+                            android:paddingBottom="@dimen/button_size_workspace"
+                            android:weightSum="10"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:fontFamily="@font/sf_pro_display_semibold"
+                                android:text="Opened by me "
+                                android:textColor="@color/better_white"
+                                android:textSize="@dimen/workspace_heading" />
+
+                            <ImageView
+                                android:id="@+id/teamsIc"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:src="@drawable/round_edit_24"
+                                app:tint="@color/better_white" />
+
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/arrow_team"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="22dp"
+                            android:src="@drawable/baseline_keyboard_arrow_right_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/better_white" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:id="@+id/line2"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/border_grey" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/favs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/teams"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:orientation="horizontal"
+                            android:paddingTop="@dimen/button_size_workspace"
+                            android:paddingBottom="@dimen/button_size_workspace"
+                            android:weightSum="10"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:fontFamily="@font/sf_pro_display_semibold"
+                                android:text="Favourites"
+                                android:textColor="@color/better_white"
+                                android:textSize="@dimen/workspace_heading" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:src="@drawable/star_filled"
+                                app:tint="@color/better_white" />
+
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="22dp"
+                            android:src="@drawable/baseline_keyboard_arrow_right_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/better_white" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/border_grey" />
+                </LinearLayout>
 
             </LinearLayout>
-            <ImageView
-                android:id="@+id/arrow_stats"
-                android:layout_width="0dp"
-                android:layout_marginEnd="22dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_keyboard_arrow_up_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/better_white" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <HorizontalScrollView
-            android:id="@+id/extended_assigned"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:clipToPadding="false"
-            android:paddingStart="10dp"
-            android:paddingEnd="15dp"
-            android:paddingTop="10dp"
-            android:scrollbars="none"
-            android:layout_marginBottom="20dp"
-            android:nestedScrollingEnabled="true">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <include
-                    android:id="@+id/assigned"
-                    layout="@layout/each_assigned_workspace"/>
-                <include
-                    android:id="@+id/ongoing"
-                    layout="@layout/each_assigned_workspace"/>
-                <include
-                    android:id="@+id/review"
-                    layout="@layout/each_assigned_workspace"/>
-                <include
-                    android:id="@+id/completed"
-                    layout="@layout/each_assigned_workspace"/>
-            </LinearLayout>
+    </ScrollView>
 
-
-        </HorizontalScrollView>
-
-        <View
-            android:id="@+id/line3"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/border_grey" />
-
-        <LinearLayout
-            android:id="@+id/moderating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="@dimen/button_size_workspace"
-                    android:paddingBottom="@dimen/button_size_workspace"
-                    android:weightSum="10"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        android:fontFamily="@font/sf_pro_display_semibold"
-                        android:text="Moderating "
-                        android:textColor="@color/better_white"
-                        android:textSize="@dimen/workspace_heading" />
-
-                    <ImageView
-                        android:id="@+id/channel_ic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:src="@drawable/baseline_assignment_ind_24"
-                        app:tint="@color/better_white" />
-
-
-                </LinearLayout>
-                <ImageView
-                    android:id="@+id/arrow"
-                    android:layout_width="0dp"
-                    android:layout_marginEnd="22dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_keyboard_arrow_right_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/better_white" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-            <View
-                android:id="@+id/line"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/border_grey" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/openedBy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="@dimen/button_size_workspace"
-                    android:paddingBottom="@dimen/button_size_workspace"
-                    android:gravity="start"
-                    android:weightSum="10"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        android:fontFamily="@font/sf_pro_display_semibold"
-                        android:text="Opened by me "
-                        android:textColor="@color/better_white"
-                        android:textSize="@dimen/workspace_heading" />
-
-                    <ImageView
-                        android:id="@+id/teamsIc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:src="@drawable/round_edit_24"
-                        app:tint="@color/better_white" />
-
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/arrow_team"
-                    android:layout_width="0dp"
-                    android:layout_marginEnd="22dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_keyboard_arrow_right_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/better_white" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:id="@+id/line2"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/border_grey" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/favs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:id="@+id/teams"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="@dimen/button_size_workspace"
-                    android:gravity="start"
-                    android:paddingBottom="@dimen/button_size_workspace"
-                    android:weightSum="10"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        android:fontFamily="@font/sf_pro_display_semibold"
-                        android:text="Favourites"
-                        android:textColor="@color/better_white"
-                        android:textSize="@dimen/workspace_heading" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:src="@drawable/star_filled"
-                        app:tint="@color/better_white" />
-
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_marginEnd="22dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_keyboard_arrow_right_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/better_white" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/border_grey" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -47,6 +47,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import me.shouheng.utils.app.ActivityUtils.overridePendingTransition
 import javax.inject.Inject
 
@@ -81,6 +82,10 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+
+        OverScrollDecoratorHelper.setUpOverScroll(binding.parent)
+        OverScrollDecoratorHelper.setUpOverScroll(binding.extendedStats)
 
         binding.parent.gone()
         binding.parent.animFadein(requireContext(), 300)

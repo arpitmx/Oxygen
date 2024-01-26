@@ -40,6 +40,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -91,6 +92,7 @@ class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         viewModel = ViewModelProvider(this).get(AssignedViewModel::class.java)
         val sectionName = arguments?.getString("sectionName", "") ?: ""
         viewModel.sectionName = sectionName
