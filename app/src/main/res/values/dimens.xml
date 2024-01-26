@@ -31,5 +31,7 @@
     <dimen name="designation_textsize">16sp</dimen>
     <dimen name="margin_top_task_detail">15dp</dimen>
     <dimen name="chat_margin">15dp</dimen>
+    <dimen name="workspace_heading">19dp</dimen>
+    <dimen name="button_size_workspace">15dp</dimen>
 
 </resources>

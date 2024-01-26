@@ -7,7 +7,6 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -41,7 +40,6 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
-import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.FilterBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.FilterTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
@@ -435,11 +433,11 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         button.setBackgroundResource(R.drawable.item_bg_curve_selected)
         val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
         drawable?.colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.darkbg_main),
+            ContextCompat.getColor(requireContext(), R.color.secondary_bg),
             PorterDuff.Mode.SRC_IN
         )
         button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
-        button.setTextColor(ContextCompat.getColor(requireContext(), R.color.darkbg_main))
+        button.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondary_bg))
     }
 
 

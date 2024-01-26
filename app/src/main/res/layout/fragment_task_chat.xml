@@ -139,7 +139,7 @@
             android:id="@+id/chatbox_option_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/darkbg_main"
+            android:background="@color/secondary_bg"
             android:paddingTop="5dp"
             android:scrollbars="none">
 

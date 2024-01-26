@@ -3,32 +3,50 @@
     android:layout_width="match_parent"
     android:orientation="horizontal"
     android:weightSum="10"
-    android:paddingStart="10dp"
+    android:paddingStart="5dp"
     android:id="@+id/parent"
     android:paddingEnd="10dp"
     android:paddingTop="7dp"
     android:paddingBottom="7dp"
-    android:background="@color/darkbg_main"
+    android:focusable="true"
+    android:clickable="true"
+    android:foreground="@drawable/ripplecustom"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:fontFamily="@font/sf_pro_display_medium"
-        android:text="#"
-        android:textColor="@color/edit_text_txt"
-        android:textSize="17dp" />
+        android:orientation="horizontal"
+        >
 
-    <TextView
-        android:id="@+id/channel_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="8"
-        android:layout_marginStart="15dp"
-        android:fontFamily="@font/sf_pro_display_medium"
-        android:text="Channels"
-        android:textColor="@color/edit_text_txt"
-        android:textSize="17dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:text="#"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:background="@drawable/channel_button_border"
+            android:textColor="@color/primary"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/channel_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:layout_marginStart="10dp"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:text="Channels"
+            android:textColor="@color/better_white"
+            android:textSize="18dp" />
+
+
+    </LinearLayout>
+
+
 
 </androidx.appcompat.widget.LinearLayoutCompat>

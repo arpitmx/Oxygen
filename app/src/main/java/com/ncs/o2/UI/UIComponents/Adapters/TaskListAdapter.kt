@@ -93,7 +93,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
 
         while(itr.hasNext()){
             val tag = itr.next()
-            if(tagIdSet.contains(tag.tagID)){
+            if(tagIdSet.contains(tag?.tagID)){
                 newList.add(tag)
             }
         }

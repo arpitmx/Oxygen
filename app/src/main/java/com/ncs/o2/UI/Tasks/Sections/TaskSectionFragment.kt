@@ -20,6 +20,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
@@ -133,22 +134,13 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
     private fun setupViews() {
 
+        binding.parent.gone()
+        binding.parent.animFadein(requireContext(),300)
+        binding.parent.visible()
+
         showLoader(1)
         setupRecyclerView()
-//        if (segmentName == "Select Segment") {
-//            activityBinding.placeholderText.visible()
-//            activityBinding.navHostFragmentActivityMain.gone()
-//            activityBinding.gioActionbar.tabLayout.gone()
-//            activityBinding.gioActionbar.searchCont.gone()
-//            activityBinding.gioActionbar.line.gone()
-//        } else {
-//            activityBinding.placeholderText.gone()
-//            activityBinding.navHostFragmentActivityMain.visible()
-//            activityBinding.gioActionbar.tabLayout.visible()
-//            activityBinding.gioActionbar.searchCont.visible()
-//            activityBinding.gioActionbar.line.visible()
-//            setupRecyclerView()
-//        }
+
     }
 
     private fun showLoader(show: Int) {

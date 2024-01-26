@@ -4,17 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkbg_main"
+    android:background="@color/primary_bg"
     tools:context=".UI.CreateTask.CreateTaskActivity">
-
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".UI.CreateTask.CreateTaskActivity">
-
 
         <include
             android:id="@+id/gio_actionbar"
@@ -36,7 +33,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <ScrollView
             android:id="@+id/parent_scrollview"
@@ -371,7 +367,7 @@
                         android:maxLines="2"
                         android:maxLength="100"
                         android:textAlignment="textStart"
-                        android:textColor="@color/darkbg_main"
+                        android:textColor="@color/secondary_bg"
                         android:textSize="17dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>

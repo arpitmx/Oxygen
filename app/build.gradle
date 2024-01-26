@@ -89,7 +89,6 @@ dependencies {
     //Easy Permission
     implementation 'pub.devrel:easypermissions:3.0.0'
 
-
     //Gemini
     implementation "com.google.ai.client.generativeai:generativeai:0.1.2"
 
@@ -100,6 +99,10 @@ dependencies {
     implementation 'com.github.kbiakov:CodeView-Android:1.3.2'
     implementation 'com.google.firebase:firebase-dynamic-links-ktx:21.2.0'
     implementation 'androidx.core:core-animation:1.0.0-rc01'
+
+
+    //Overscroll
+    implementation 'io.github.everythingme:overscroll-decor-android:1.1.1'
 
 
     final def markwon_version = '4.6.2'
@@ -116,8 +119,8 @@ dependencies {
     implementation"io.noties.markwon:ext-strikethrough:$markwon_version"
 
     //Prism 4j
-    implementation "io.noties:prism4j:2.0.0"
-    kapt 'io.noties:prism4j-bundler:2.0.0'
+//    implementation "io.noties:prism4j:2.0.0"
+//    kapt 'io.noties:prism4j-bundler:2.0.0'
 
 
     //Cloudnary
@@ -223,8 +226,6 @@ dependencies {
     //Utils library
     implementation "com.github.Shouheng88:utils-core:2.6.0"
 
-    //EasyPermission
-    implementation 'pub.devrel:easypermissions:3.0.0'
     //Timber
     implementation 'com.jakewharton.timber:timber:5.0.1'
 
@@ -258,13 +259,8 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
 
-    implementation 'pub.devrel:easypermissions:3.0.0'
-    implementation 'pub.devrel:easypermissions:2.0.1'
-
     //swipe to refresh
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
-
-
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'

@@ -4,7 +4,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="55dp"
-    android:background="@color/darkbg_main"
+    android:background="@color/secondary_bg"
     android:orientation="horizontal"
     android:elevation="5dp"
     android:weightSum="10"

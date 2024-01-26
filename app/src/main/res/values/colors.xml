@@ -8,15 +8,18 @@
 
     <color name="primary">#9FFF76</color>
     <color name="darkTheme_bg">#242222</color>
-    <color name="darkbg_main">#222222</color>
+
+    <color name="secondary_bg">#1C1C1C</color>
+    <color name="primary_bg">#161616</color>
+
     <color name="darkbg_main_a80">#131313</color>
     <color name="chat_bg">#1E1E1E</color>
 
 
     <color name="secondaryPink">#ff89b3</color>
     <color name="secondaryBlue">#0061ff</color>
-    <color name="primarybg">#0d0c0b</color>
-    <color name="secondarybg">#2B2B2B</color>
+    <color name="primarybg">#303030</color>
+    <color name="secondarybg">#0d0c0b</color>
 
 
 
@@ -71,5 +74,6 @@
     <color name="mod">#69EDFF</color>
     <color name="selected_tab_color">@color/primary</color>
     <color name="unselected_tab_color">@color/account</color>
+    <color name="darkbgmain_darker">#232323</color>
 
 </resources>

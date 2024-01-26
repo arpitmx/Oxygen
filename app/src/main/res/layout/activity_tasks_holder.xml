@@ -12,7 +12,7 @@
         android:visibility="visible"
         android:layout_height="wrap_content"
         android:elevation="5dp"
-        android:background="@color/darkbg_main"
+        android:background="@color/secondary_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -166,7 +166,7 @@
                 android:orientation="vertical"
                 android:layout_gravity="center"
                 android:visibility="gone"
-                android:background="@color/darkbg_main"
+                android:background="@color/secondary_bg"
                 android:gravity="center"
                 >
 

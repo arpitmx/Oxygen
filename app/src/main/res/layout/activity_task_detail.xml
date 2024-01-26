@@ -22,7 +22,7 @@
         style="@style/CustomTabLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/darkbg_main"
+        android:background="@color/secondary_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
@@ -73,15 +73,11 @@
         app:layout_constraintRight_toRightOf="parent" />
 
 
-
-
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="10"
         >
-
-
         <androidx.fragment.app.FragmentContainerView
             android:layout_height="match_parent"
             android:name="androidx.navigation.fragment.NavHostFragment"
@@ -93,11 +89,6 @@
             />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-
-
-
 
     <ProgressBar
         android:id="@+id/progressbar_bottom_tab"

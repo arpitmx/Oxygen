@@ -1,348 +1,421 @@
-
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    android:id="@+id/swiperefresh"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:scrollbars="none"
-    android:layout_marginBottom="55dp"
-    android:background="@color/darkbg_main"
     android:layout_height="match_parent"
-    tools:context=".UI.Teams.TeamsFragment">
-    <LinearLayout
+    android:background="@color/primary_bg">
+
+    <ScrollView
+        android:id="@+id/parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:id="@+id/stats"
-            android:layout_height="wrap_content"
-            >
+        android:paddingBottom="100dp"
+        android:clipToPadding="false"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:weightSum="10"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="30dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:fontFamily="@font/sfbold"
-                android:text="Project "
-                android:textColor="@color/better_white"
-                android:textSize="18dp" />
-
-            <ImageView
-                android:id="@+id/stats_ic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="3dp"
-                android:src="@drawable/baseline_trending_up_24"
-                app:tint="@color/better_white" />
-
-
-        </LinearLayout>
-            <ImageView
-                android:id="@+id/arrow_stats"
-                android:layout_width="0dp"
-                android:layout_marginEnd="22dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_keyboard_arrow_up_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/better_white" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <HorizontalScrollView
-            android:id="@+id/extended_stats"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:background="@drawable/horizontal_scrollview_bg"
-            android:clipToPadding="false"
-            android:paddingStart="15dp"
-            android:scrollbars="none"
-            android:layout_marginBottom="20dp"
-            android:nestedScrollingEnabled="true">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <include
-                    android:id="@+id/pending"
-                    layout="@layout/each_stat_item"/>
-                <include
-                    android:id="@+id/ongoing"
-                    layout="@layout/each_stat_item"/>
-                <include
-                    android:id="@+id/review"
-                    layout="@layout/each_stat_item"/>
-                <include
-                    android:id="@+id/completed"
-                    layout="@layout/each_stat_item"/>
-            </LinearLayout>
-
-
-        </HorizontalScrollView>
-
-        <View
-            android:id="@+id/line3"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/border_grey" />
-
-    <LinearLayout
-        android:id="@+id/channels"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:weightSum="10"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:fontFamily="@font/sfbold"
-                    android:text="Channels "
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp" />
-
-                <ImageView
-                    android:id="@+id/channel_ic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="3dp"
-                    android:src="@drawable/star_filled"
-                    app:tint="@color/better_white" />
-
-
-            </LinearLayout>
-            <ImageView
-                android:id="@+id/arrow"
-                android:layout_width="0dp"
-                android:layout_marginEnd="22dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_keyboard_arrow_up_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/better_white" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="visible"
-            android:id="@+id/extendedChannels">
-
-            <ProgressBar
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:visibility="gone"
-                android:layout_margin="20dp"
-                android:id="@+id/progress_bar"
-                android:indeterminateTint="@color/primary"/>
-
-            <TextView
-                android:id="@+id/placeholder"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_display_regular"
-                android:gravity="center"
-                android:layout_margin="30dp"
-                android:layout_gravity="center"
-                android:text="No channels yet..."
-                android:textColor="@color/account"
-                android:textSize="16dp"
-                />
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/channels_rv"
-                android:visibility="gone"
-                android:layout_marginBottom="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/channels_each_item"/>
-
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-        <View
-            android:id="@+id/line"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/border_grey" />
-    </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/teamMembers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:id="@+id/teams"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="10dp"
-                    android:gravity="start"
-                    android:paddingBottom="10dp"
-                    android:weightSum="10"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        android:fontFamily="@font/sfbold"
-                        android:text="Team "
-                        android:textColor="@color/better_white"
-                        android:textSize="18dp" />
-
-                    <ImageView
-                        android:id="@+id/teamsIc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="3dp"
-                        android:src="@drawable/baseline_groups_24"
-                        app:tint="@color/better_white" />
-
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/arrow_team"
-                    android:layout_width="0dp"
-                    android:layout_marginEnd="22dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_keyboard_arrow_down_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/better_white" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:weightSum="10"
-                android:paddingStart="10dp"
-                android:id="@+id/extended_team"
-                android:paddingEnd="10dp"
-                android:visibility="gone"
-                android:paddingTop="7dp"
-                android:paddingBottom="7dp"
-                android:background="@color/darkbg_main"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/card_view_project_element_bg"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/stats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/viewTeamMember"
-                    android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:src="@drawable/baseline_subdirectory_arrow_right_24"/>
+                   >
 
-                <TextView
-                    android:id="@+id/channel_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="8"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginStart="15dp"
-                    android:fontFamily="@font/sf_pro_display_medium"
-                    android:text="View Team Members"
-                    android:textColor="@color/edit_text_txt"
-                    android:textSize="18dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/addTeamMembers"
-                    android:orientation="horizontal">
-                    <ImageView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:src="@drawable/outline_add_24"
-                        app:tint="@color/edit_text_txt" />
+                        android:orientation="horizontal"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:weightSum="10"
 
-                    <TextView
-                        android:id="@+id/AddTeamMemebers"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/sf_pro_display_semibold"
+                                android:text="@string/project"
+                                android:textColor="@color/better_white"
+                                android:textSize="18dp" />
+
+                            <ImageView
+                                android:id="@+id/stats_ic"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="5dp"
+                                android:src="@drawable/baseline_trending_up_24"
+                                app:tint="@color/better_white" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/arrow_stats"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="8"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginStart="15dp"
-                        android:fontFamily="@font/sf_pro_display_medium"
-                        android:text="Add Members"
-                        android:textColor="@color/edit_text_txt"
-                        android:textSize="18dp" />
-                </LinearLayout>
+                        android:layout_marginEnd="22dp"
+                        android:background="@drawable/card_view_chatbox_options"
+                        android:src="@drawable/baseline_keyboard_arrow_up_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/better_white" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/border_grey"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+                <HorizontalScrollView
+                    android:id="@+id/extended_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="20dp"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="true"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="15dp"
+                    android:scrollbars="none"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <include
+                            android:id="@+id/pending"
+                            layout="@layout/each_stat_item" />
+
+                        <include
+                            android:id="@+id/ongoing"
+                            layout="@layout/each_stat_item" />
+
+                        <include
+                            android:id="@+id/review"
+                            layout="@layout/each_stat_item" />
+
+                        <include
+                            android:id="@+id/completed"
+                            layout="@layout/each_stat_item" />
+                    </LinearLayout>
+
+
+                </HorizontalScrollView>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-            <View
-                android:id="@+id/line2"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/border_grey" />
+            <!--            <View-->
+            <!--                android:id="@+id/line3"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="2dp"-->
+            <!--                android:background="@color/border_grey" />-->
+
+            <LinearLayout
+                android:id="@+id/channels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/card_view_project_element_bg"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:weightSum="10"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="Channels"
+                            android:textColor="@color/better_white"
+                            android:textSize="18dp" />
+
+                        <ImageView
+                            android:id="@+id/channel_ic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="5dp"
+                            android:src="@drawable/star_filled"
+                            app:tint="@color/better_white" />
+
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/arrow"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="22dp"
+                        android:background="@drawable/card_view_chatbox_options"
+                        android:src="@drawable/baseline_keyboard_arrow_up_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/better_white" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/extendedChannels"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_margin="20dp"
+                        android:indeterminateTint="@color/primary"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/placeholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="30dp"
+                        android:fontFamily="@font/sf_pro_display_regular"
+                        android:gravity="center"
+                        android:text="No channels yet..."
+                        android:textColor="@color/account"
+                        android:textSize="16dp"
+                        android:visibility="gone" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/border_grey"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/channels_rv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layoutAnimation="@anim/layout_animation_fadein"
+                        android:visibility="gone"
+                        tools:listitem="@layout/channels_each_item" />
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:id="@+id/line"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/border_grey" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/teamMembers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+
+                android:background="@drawable/card_view_project_element_bg"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/teams"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:orientation="horizontal"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="10dp"
+                        android:weightSum="10"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:fontFamily="@font/sfbold"
+                            android:text="Team "
+                            android:textColor="@color/better_white"
+                            android:textSize="18dp" />
+
+                        <ImageView
+                            android:id="@+id/teamsIc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/baseline_groups_24"
+                            app:tint="@color/better_white" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/arrow_team"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="22dp"
+                        android:background="@drawable/card_view_chatbox_options"
+                        android:src="@drawable/baseline_keyboard_arrow_down_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/better_white" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/border_grey"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/extended_team"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="7dp"
+                    android:visibility="gone"
+                    android:weightSum="10">
+
+                    <LinearLayout
+                        android:id="@+id/viewTeamMember"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="@drawable/ripplecustom"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:background="@drawable/channel_button_border"
+                            android:src="@drawable/baseline_subdirectory_arrow_right_24"
+                            app:tint="@color/dim_purple" />
+
+                        <TextView
+                            android:id="@+id/channel_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="8"
+                            android:fontFamily="@font/sf_pro_display_medium"
+                            android:text="View Team Members"
+                            android:textColor="@color/edit_text_txt"
+                            android:textSize="18dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/addTeamMembers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="@drawable/ripplecustom"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:background="@drawable/dark_bg_rounded_corner"
+                            android:src="@drawable/outline_add_24"
+                            app:tint="@color/primary" />
+
+                        <TextView
+                            android:id="@+id/AddTeamMemebers"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="8"
+                            android:fontFamily="@font/sf_pro_display_medium"
+                            android:text="Add Members"
+                            android:textColor="@color/edit_text_txt"
+                            android:textSize="18dp" />
+                    </LinearLayout>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </LinearLayout>
+
         </LinearLayout>
 
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -71,7 +71,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.ChatViewModel
-import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
+//import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
@@ -1260,12 +1260,12 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
 
     }
 
-
+// TODO : Use prism js in production
     private val markwon: Markwon by lazy {
 
         // *NOTE @O2 team : If ExampleGrammarLocator class is not found after pull, // just hit run, this class is built at compile time*
 
-        val prism4j = Prism4j(ExampleGrammarLocator())
+//        val prism4j = Prism4j(ExampleGrammarLocator())
 
         // *NOTE*
 
@@ -1275,7 +1275,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             .usePlugin(GlideImagesPlugin.create(activity)).usePlugin(TablePlugin.create(activity))
             .usePlugin(TaskListPlugin.create(activity)).usePlugin(HtmlPlugin.create())
             .usePlugin(StrikethroughPlugin.create())
-            .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
+//            .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
 
             .usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configure(registry: MarkwonPlugin.Registry) {

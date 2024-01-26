@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="5dp"
-    android:background="@color/darkbg_main_a80"
+    android:background="@color/primary_bg"
     android:foreground="@drawable/ripplecustom"
     android:orientation="vertical"
     android:clickable="true"

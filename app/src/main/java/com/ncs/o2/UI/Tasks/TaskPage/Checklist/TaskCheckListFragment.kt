@@ -34,7 +34,7 @@ import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
-import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
+//import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
@@ -426,7 +426,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
 
     private val markwon: Markwon by lazy {
-        val prism4j = Prism4j(ExampleGrammarLocator())
+//        val prism4j = Prism4j(ExampleGrammarLocator())
         val activity = requireActivity()
         Markwon.builder(activity)
             .usePlugin(ImagesPlugin.create())
@@ -435,7 +435,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             .usePlugin(TaskListPlugin.create(activity))
             .usePlugin(HtmlPlugin.create())
             .usePlugin(StrikethroughPlugin.create())
-            .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
+//            .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
 
             .usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configure(registry: MarkwonPlugin.Registry) {

@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/primary_bg"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/profile"
         android:layout_width="match_parent"
         android:layout_height="110dp"
-        android:background="@color/black_overlay"
         android:elevation="5dp"
+        android:background="@color/secondary_bg"
         android:orientation="horizontal"
         android:weightSum="10">
 

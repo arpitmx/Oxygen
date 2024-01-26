@@ -5,7 +5,11 @@
     android:orientation="horizontal"
     android:padding="7dp"
     android:id="@+id/parent"
-    android:background="@color/darkbg_main">
+    android:background="@color/primary_bg"
+    android:foreground="@drawable/ripplecustom"
+    android:clickable="true"
+    android:focusable="true"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="50dp"
@@ -51,7 +55,7 @@
             android:id="@+id/userName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textColor="@color/better_white"
             android:text="UserName"
             android:fontFamily="@font/sf_pro_display_medium"
@@ -61,20 +65,20 @@
             android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="@color/edit_text_hint"
             android:text="Email"
-            android:fontFamily="@font/sf_pro_display_medium"
+            android:fontFamily="@font/sf_pro_display_regular"
             />
 
         <TextView
             android:id="@+id/role"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="13sp"
             android:textColor="@color/edit_text_hint"
             android:text="Role"
-            android:fontFamily="@font/sf_pro_display_medium"
+            android:fontFamily="@font/sf_pro_display_regular"
             />
 
 
