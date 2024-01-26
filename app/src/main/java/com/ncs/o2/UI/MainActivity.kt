@@ -830,7 +830,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     }
                 }
 
-
             }
         }else{
             bottmNav.setOnItemSelectedListener { menuItem ->

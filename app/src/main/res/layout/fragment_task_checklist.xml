@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:background="@color/darkbg_main"
+        android:background="@color/secondary_bg"
         android:elevation="2dp"
         android:orientation="horizontal"
         android:visibility="invisible"

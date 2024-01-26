@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:padding="5dp"
     android:id="@+id/parent"
-    android:background="@color/darkbg_main">
+    android:background="@color/secondary_bg">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="40dp"

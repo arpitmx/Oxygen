@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:background="@color/darkbg_main"
+    android:background="@color/secondary_bg"
     android:id="@+id/actionbar_workspace"
     android:visibility="gone"
     android:layout_height="wrap_content">

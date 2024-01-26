@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:background="@color/darkbg_main"
+    android:background="@color/secondary_bg"
     android:id="@+id/actionbar"
     android:layout_height="wrap_content">
 
@@ -32,7 +32,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
-
             <!--            <de.hdodenhof.circleimageview.CircleImageView-->
             <!--                android:id="@+id/asignee_dp"-->
             <!--                android:layout_width="40dp"-->
@@ -52,7 +51,6 @@
                 android:layout_height="35dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/label_cardview_green"
                 app:cardCornerRadius="10dp">
 
                 <ImageView
@@ -61,6 +59,7 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ncs" />
+
             </androidx.cardview.widget.CardView>
 
 
@@ -72,7 +71,7 @@
                 android:fontFamily="@font/sf_pro_display_semibold"
                 android:gravity="center"
                 android:paddingBottom="@dimen/padding_bottom_offset"
-                android:text="Teams"
+                android:text="Project"
                 android:textColor="@color/primary"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -82,13 +81,7 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -143,8 +136,6 @@
 
 
     </LinearLayout>
-
-
 
     <View
         android:layout_width="match_parent"

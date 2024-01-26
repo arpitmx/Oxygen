@@ -6,11 +6,13 @@
     android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<androidx.appcompat.widget.LinearLayoutCompat
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/pureblack"
+    android:background="@color/primary_bg"
     tools:context=".UI.Tasks.TasksHolderFragment"
     >
 
@@ -50,7 +52,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:background="#020202"
             android:id="@+id/progress_layout"
             android:elevation="10dp"
             android:visibility="visible"
@@ -111,7 +112,7 @@
         android:layout_gravity="center"
         android:visibility="gone"
         android:translationY="-25dp"
-        android:background="@color/darkbg_main"
+        android:background="@color/secondary_bg"
         android:gravity="center"
         android:paddingBottom="@dimen/progress_offset"
         >

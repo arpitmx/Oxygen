@@ -11,10 +11,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     android:scrollbars="none"
     android:layout_marginBottom="55dp"
-    android:background="@color/darkbg_main"
+    android:background="@color/primary_bg"
     android:layout_height="match_parent"
     tools:context=".UI.Teams.TeamsFragment"
     android:layout_width="match_parent"
+    android:id="@+id/parent"
     >
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,17 +47,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-                    android:fontFamily="@font/sfbold"
-                    android:text="Your Workspace "
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:text="Assigned"
                     android:textColor="@color/better_white"
-                    android:textSize="18dp" />
+                    android:textSize="@dimen/workspace_heading" />
 
                 <ImageView
                     android:id="@+id/stats_ic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:layout_marginTop="3dp"
                     android:src="@drawable/baseline_business_center_24"
                     app:tint="@color/better_white" />
 
@@ -73,14 +73,16 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/better_white" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
         <HorizontalScrollView
             android:id="@+id/extended_assigned"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            android:background="@drawable/horizontal_scrollview_bg"
             android:clipToPadding="false"
-            android:paddingStart="15dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="15dp"
+            android:paddingTop="10dp"
             android:scrollbars="none"
             android:layout_marginBottom="20dp"
             android:nestedScrollingEnabled="true">
@@ -126,8 +128,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
+                    android:paddingTop="@dimen/button_size_workspace"
+                    android:paddingBottom="@dimen/button_size_workspace"
                     android:weightSum="10"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -138,17 +140,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
-                        android:fontFamily="@font/sfbold"
+                        android:fontFamily="@font/sf_pro_display_semibold"
                         android:text="Moderating "
                         android:textColor="@color/better_white"
-                        android:textSize="18dp" />
+                        android:textSize="@dimen/workspace_heading" />
 
                     <ImageView
                         android:id="@+id/channel_ic"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="3dp"
                         android:src="@drawable/baseline_assignment_ind_24"
                         app:tint="@color/better_white" />
 
@@ -187,9 +188,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/button_size_workspace"
+                    android:paddingBottom="@dimen/button_size_workspace"
                     android:gravity="start"
-                    android:paddingBottom="10dp"
                     android:weightSum="10"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -200,17 +201,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
-                        android:fontFamily="@font/sfbold"
+                        android:fontFamily="@font/sf_pro_display_semibold"
                         android:text="Opened by me "
                         android:textColor="@color/better_white"
-                        android:textSize="18dp" />
+                        android:textSize="@dimen/workspace_heading" />
 
                     <ImageView
                         android:id="@+id/teamsIc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="3dp"
                         android:src="@drawable/round_edit_24"
                         app:tint="@color/better_white" />
 
@@ -253,9 +253,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="@dimen/button_size_workspace"
                     android:gravity="start"
-                    android:paddingBottom="10dp"
+                    android:paddingBottom="@dimen/button_size_workspace"
                     android:weightSum="10"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -266,16 +266,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
-                        android:fontFamily="@font/sfbold"
-                        android:text="Favourites "
+                        android:fontFamily="@font/sf_pro_display_semibold"
+                        android:text="Favourites"
                         android:textColor="@color/better_white"
-                        android:textSize="18dp" />
+                        android:textSize="@dimen/workspace_heading" />
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="3dp"
                         android:src="@drawable/star_filled"
                         app:tint="@color/better_white" />
 

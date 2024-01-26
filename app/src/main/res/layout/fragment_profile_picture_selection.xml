@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/darkbg_main">
+    android:background="@color/secondary_bg">
 
     <include
         android:id="@+id/toolbar"
@@ -81,7 +81,7 @@
                 android:background="@drawable/solid_bg_white"
                 android:text="Set photo"
                 android:textAllCaps="false"
-                android:textColor="@color/darkbg_main"
+                android:textColor="@color/secondary_bg"
                 android:textSize="22dp" />
 
 

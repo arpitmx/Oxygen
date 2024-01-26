@@ -5,7 +5,7 @@
     android:id="@+id/segment_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/darkbg_main"
+    android:background="@color/secondary_bg"
     android:orientation="vertical">
 
     <LinearLayout
@@ -106,7 +106,7 @@
             android:visibility="gone">
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:background="@color/darkbg_main"
+                android:background="@color/secondary_bg"
                 android:gravity="center_vertical"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"

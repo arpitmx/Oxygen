@@ -24,6 +24,7 @@ import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.set180
@@ -96,6 +97,10 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
     }
 
     private fun setUpViews(){
+        
+        binding.parent.gone()
+        binding.parent.animFadein(requireContext(),300)
+        binding.parent.visible()
 
         binding.assigned.statParent.setOnClickThrottleBounceListener {
             startActivity("WorkspaceAssigned")
@@ -118,6 +123,7 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         binding.favs.setOnClickThrottleBounceListener {
             startActivity("Favs")
         }
+
         binding.assignedGrid.setOnClickListener {
             binding.arrowStats.set180(requireContext())
             if(!isGridVisible){
@@ -226,7 +232,7 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
             binding.assigned.statCount.text="${assignedTasks.size} tasks"
 
             binding.ongoing.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_ongoing_24))
-            binding.ongoing.statTitle.text="Working"
+            binding.ongoing.statTitle.text="Working on"
             binding.ongoing.statCount.text="${workingTasks.size} tasks"
 
             binding.review.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_review_24))

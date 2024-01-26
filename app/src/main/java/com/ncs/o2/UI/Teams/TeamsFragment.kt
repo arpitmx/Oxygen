@@ -20,6 +20,7 @@ import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
@@ -51,22 +52,22 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.OnChannelAdded{
+class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.OnChannelAdded {
 
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
+
     @Inject
-    lateinit var db:TasksDatabase
-    lateinit var binding:FragmentTeamsBinding
+    lateinit var db: TasksDatabase
+    lateinit var binding: FragmentTeamsBinding
     private val activityBinding: MainActivity by lazy {
         (requireActivity() as MainActivity)
     }
 
-    private var isVisible=true
-    private var isStatsVisible=true
-    private var isTeamsVisible=false
-
+    private var isVisible = true
+    private var isStatsVisible = true
+    private var isTeamsVisible = false
 
 
     override fun onCreateView(
@@ -81,8 +82,11 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        binding.extendedChannels.visible()
+        binding.parent.gone()
+        binding.parent.animFadein(requireContext(), 300)
+        binding.parent.visible()
 
+        binding.extendedChannels.visible()
 
         activityBinding.binding.gioActionbar.btnMoreTeams.setOnClickThrottleBounceListener {
             val moreTeamsOptionBottomSheet =
@@ -90,18 +94,14 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
             moreTeamsOptionBottomSheet.show(requireFragmentManager(), "more")
         }
 
-
-
-
-        if (PrefManager.getLastChannelTimeStamp(PrefManager.getcurrentProject()).seconds.toInt()==0){
+        if (PrefManager.getLastChannelTimeStamp(PrefManager.getcurrentProject()).seconds.toInt() == 0) {
             fetchChannels()
-        }
-        else{
-            Log.d("channelFetch","fetch from cache")
+        } else {
+            Log.d("channelFetch", "fetch from cache")
             val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
             val newList = oldList.toMutableList().sortedByDescending { it.timestamp }
-            Log.d("channelFetch","fetch from cache new list: \n ${newList.toString()}")
-            if (newList.isNotEmpty()){
+            Log.d("channelFetch", "fetch from cache new list: \n ${newList.toString()}")
+            if (newList.isNotEmpty()) {
                 binding.placeholder.gone()
                 binding.channelsRv.visible()
                 setRecyclerView(newList.distinctBy { it.channel_id })
@@ -111,42 +111,39 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
 
         binding.stats.setOnClickListener {
             binding.arrowStats.set180(requireContext())
-            if(!isStatsVisible){
-                isStatsVisible=true
+            if (!isStatsVisible) {
+                isStatsVisible = true
                 binding.extendedStats.visible()
-            }
-            else{
-                isStatsVisible=false
+            } else {
+                isStatsVisible = false
                 binding.extendedStats.gone()
             }
         }
 
         binding.teams.setOnClickListener {
             binding.arrowTeam.set180(requireContext())
-            if(!isTeamsVisible){
-                isTeamsVisible=true
+            if (!isTeamsVisible) {
+                isTeamsVisible = true
                 binding.extendedTeam.visible()
-            }
-            else{
-                isTeamsVisible=false
+            } else {
+                isTeamsVisible = false
                 binding.extendedTeam.gone()
             }
         }
 
         binding.channels.setOnClickListener {
             binding.arrow.set180(requireContext())
-            if (!isVisible){
-                isVisible=true
+            if (!isVisible) {
+                isVisible = true
                 binding.extendedChannels.visible()
-                if (PrefManager.getLastChannelTimeStamp(PrefManager.getcurrentProject()).seconds.toInt()==0){
+                if (PrefManager.getLastChannelTimeStamp(PrefManager.getcurrentProject()).seconds.toInt() == 0) {
                     fetchChannels()
-                }
-                else{
-                    Log.d("channelFetch","fetch from cache")
+                } else {
+                    Log.d("channelFetch", "fetch from cache")
                     val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
                     val newList = oldList.toMutableList().sortedByDescending { it.timestamp }
-                    Log.d("channelFetch","fetch from cache new list: \n ${newList.toString()}")
-                    if (newList.isNotEmpty()){
+                    Log.d("channelFetch", "fetch from cache new list: \n ${newList.toString()}")
+                    if (newList.isNotEmpty()) {
                         binding.placeholder.gone()
                         binding.channelsRv.visible()
                         setRecyclerView(newList.distinctBy { it.channel_id })
@@ -154,9 +151,8 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
                 }
                 fetchNewChannels()
 
-            }
-            else{
-                isVisible=false
+            } else {
+                isVisible = false
                 binding.extendedChannels.gone()
             }
         }
@@ -201,8 +197,8 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         }
 
         binding.addTeamMembers.setOnClickThrottleBounceListener {
-            val link=PrefManager.getProjectDeepLink(PrefManager.getcurrentProject())
-            Log.d("deeplink",link)
+            val link = PrefManager.getProjectDeepLink(PrefManager.getcurrentProject())
+            Log.d("deeplink", link)
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/plain"
             intent.putExtra(Intent.EXTRA_TEXT, link)
@@ -215,7 +211,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
 
     }
 
-    private fun syncCache(projectName:String){
+    private fun syncCache(projectName: String) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Please wait, Syncing Tasks")
         progressDialog.setCancelable(false)
@@ -232,7 +228,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
 
                     is ServerResult.Failure -> {
                         progressDialog.dismiss()
-                        binding.swiperefresh.isRefreshing=false
+                        binding.swiperefresh.isRefreshing = false
                         requireActivity().recreate()
 
                     }
@@ -246,16 +242,17 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
                     is ServerResult.Success -> {
 
                         val tasks = taskResult.data
-                        if (tasks.isNotEmpty()){
-                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
-                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                        if (tasks.isNotEmpty()) {
+                            val newList = taskResult.data.toMutableList()
+                                .sortedByDescending { it.last_updated }
+                            PrefManager.setLastTaskTimeStamp(projectName, newList[0].last_updated!!)
                             for (task in tasks) {
                                 db.tasksDao().insert(task)
                             }
                         }
                         progressDialog.dismiss()
                         requireActivity().recreate()
-                        binding.swiperefresh.isRefreshing=false
+                        binding.swiperefresh.isRefreshing = false
 
                     }
 
@@ -269,24 +266,33 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
     }
 
 
-
-
-    fun fetchNewChannels(){
+    fun fetchNewChannels() {
         repository.getNewChannels(
             PrefManager.getcurrentProject()
         ) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     binding.progressBar.gone()
-                    if (result.data.isNotEmpty()){
-                        Log.d("channelFetch","fetch new from firebase")
-                        val data=result.data.sortedByDescending { it.timestamp }
-                        val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
-                        val newList = (oldList.toMutableList() + result.data).sortedByDescending { it.timestamp }
-                        Log.d("channelFetch","fetch new from firebase old list: \n ${oldList.toString()}")
-                        Log.d("channelFetch","fetch new from firebase new list: \n ${newList.toString()}")
-                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(),newList)
-                        PrefManager.setLastChannelTimeStamp(PrefManager.getcurrentProject(),newList[0].timestamp!!)
+                    if (result.data.isNotEmpty()) {
+                        Log.d("channelFetch", "fetch new from firebase")
+                        val data = result.data.sortedByDescending { it.timestamp }
+                        val oldList =
+                            PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+                        val newList =
+                            (oldList.toMutableList() + result.data).sortedByDescending { it.timestamp }
+                        Log.d(
+                            "channelFetch",
+                            "fetch new from firebase old list: \n ${oldList.toString()}"
+                        )
+                        Log.d(
+                            "channelFetch",
+                            "fetch new from firebase new list: \n ${newList.toString()}"
+                        )
+                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(), newList)
+                        PrefManager.setLastChannelTimeStamp(
+                            PrefManager.getcurrentProject(),
+                            newList[0].timestamp!!
+                        )
                         setRecyclerView(newList.distinctBy { it.channel_id })
                     }
                 }
@@ -303,28 +309,38 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         }
     }
 
-    fun fetchChannels(){
+    fun fetchChannels() {
         repository.getChannels(
             PrefManager.getcurrentProject()
         ) { result ->
             when (result) {
                 is ServerResult.Success -> {
                     binding.progressBar.gone()
-                    if (result.data.isEmpty()){
+                    if (result.data.isEmpty()) {
                         postDefaultChannel()
-                    }
-                    else{
-                        Log.d("channelFetch","fetch from firebase")
+                    } else {
+                        Log.d("channelFetch", "fetch from firebase")
                         binding.placeholder.gone()
                         binding.channelsRv.visible()
-                        val data=result.data.sortedByDescending { it.timestamp }
-                        val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
-                        val newList = (oldList.toMutableList() + result.data).sortedByDescending { it.timestamp }
-                        Log.d("channelFetch","fetch from firebase old list: \n ${oldList.toString()}")
-                        Log.d("channelFetch","fetch from firebase new list: \n ${newList.toString()}")
+                        val data = result.data.sortedByDescending { it.timestamp }
+                        val oldList =
+                            PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+                        val newList =
+                            (oldList.toMutableList() + result.data).sortedByDescending { it.timestamp }
+                        Log.d(
+                            "channelFetch",
+                            "fetch from firebase old list: \n ${oldList.toString()}"
+                        )
+                        Log.d(
+                            "channelFetch",
+                            "fetch from firebase new list: \n ${newList.toString()}"
+                        )
 
-                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(),newList)
-                        PrefManager.setLastChannelTimeStamp(PrefManager.getcurrentProject(),data[0].timestamp!!)
+                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(), newList)
+                        PrefManager.setLastChannelTimeStamp(
+                            PrefManager.getcurrentProject(),
+                            data[0].timestamp!!
+                        )
                         setRecyclerView(newList.distinctBy { it.channel_id })
 
                     }
@@ -343,8 +359,8 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         }
     }
 
-    private fun postDefaultChannel(){
-        val channel= Channel(
+    private fun postDefaultChannel() {
+        val channel = Channel(
             channel_name = "General",
             channel_desc = "General Description",
             channel_id = "General${RandomIDGenerator.generateRandomTaskId(4)}",
@@ -353,7 +369,7 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         )
 
         CoroutineScope(Dispatchers.Main).launch {
-            repository.postChannel(channel,PrefManager.getcurrentProject()) { result ->
+            repository.postChannel(channel, PrefManager.getcurrentProject()) { result ->
 
                 when (result) {
 
@@ -367,10 +383,15 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
 
                     is ServerResult.Success -> {
                         binding.progressBar.gone()
-                        val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
-                        val newList = (oldList.toMutableList() + channel).sortedByDescending { it.timestamp }
-                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(),newList)
-                        PrefManager.setLastChannelTimeStamp(PrefManager.getcurrentProject(),channel.timestamp!!)
+                        val oldList =
+                            PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+                        val newList =
+                            (oldList.toMutableList() + channel).sortedByDescending { it.timestamp }
+                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(), newList)
+                        PrefManager.setLastChannelTimeStamp(
+                            PrefManager.getcurrentProject(),
+                            channel.timestamp!!
+                        )
                         setRecyclerView(newList.distinctBy { it.channel_id })
                     }
                 }
@@ -378,32 +399,37 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         }
     }
 
-    fun setUpProjectStats(){
+    fun setUpProjectStats() {
         CoroutineScope(Dispatchers.IO).launch {
-            val favs=PrefManager.getProjectFavourites(PrefManager.getcurrentProject())
-            val submittedTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),1)
-            val openTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),2)
-            val ongoingTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),3)
-            val reviewTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),4)
-            val completedTasks=db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(),5)
+            val favs = PrefManager.getProjectFavourites(PrefManager.getcurrentProject())
+            val submittedTasks =
+                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 1)
+            val openTasks =
+                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 2)
+            val ongoingTasks =
+                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 3)
+            val reviewTasks =
+                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 4)
+            val completedTasks =
+                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 5)
 
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
 
                 binding.pending.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_access_time_filled_24))
-                binding.pending.statTitle.text="Pending"
-                binding.pending.statCount.text="${submittedTasks!!.size+openTasks!!.size} tasks"
+                binding.pending.statTitle.text = "Pending"
+                binding.pending.statCount.text = "${submittedTasks!!.size + openTasks!!.size} tasks"
 
                 binding.ongoing.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_ongoing_24))
-                binding.ongoing.statTitle.text="Ongoing"
-                binding.ongoing.statCount.text="${ongoingTasks!!.size} tasks"
+                binding.ongoing.statTitle.text = "Ongoing"
+                binding.ongoing.statCount.text = "${ongoingTasks!!.size} tasks"
 
                 binding.review.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_review_24))
-                binding.review.statTitle.text="Review"
-                binding.review.statCount.text="${reviewTasks!!.size} tasks"
+                binding.review.statTitle.text = "Review"
+                binding.review.statCount.text = "${reviewTasks!!.size} tasks"
 
                 binding.completed.statIcon.setImageDrawable(resources.getDrawable(R.drawable.round_task_alt_24))
-                binding.completed.statTitle.text="Completed"
-                binding.completed.statCount.text="${completedTasks!!.size} tasks"
+                binding.completed.statTitle.text = "Completed"
+                binding.completed.statCount.text = "${completedTasks!!.size} tasks"
             }
 
         }
@@ -412,9 +438,9 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
     }
 
 
-    fun setRecyclerView(dataList: List<Channel>){
-        val recyclerView=binding.channelsRv
-        val adapter = ChannelsAdapter(dataList.toMutableList(),this)
+    fun setRecyclerView(dataList: List<Channel>) {
+        val recyclerView = binding.channelsRv
+        val adapter = ChannelsAdapter(dataList.toMutableList(), this)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         recyclerView.layoutManager = linearLayoutManager
@@ -422,10 +448,11 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         recyclerView.visible()
     }
 
-    private fun manageviews(){
+    private fun manageviews() {
         val drawerLayout = activityBinding.binding.drawer
         activityBinding.binding.gioActionbar.btnHamTeams.setOnClickThrottleBounceListener {
-            val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
+            val gravity =
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
         }
         activityBinding.binding.gioActionbar.tabLayout.gone()
@@ -436,10 +463,12 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
         activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
         activityBinding.binding.gioActionbar.constraintLayoutTeams.visible()
         activityBinding.binding.gioActionbar.btnMoreTeams.visible()
-        activityBinding.binding.gioActionbar.projectName.text=PrefManager.getcurrentProject()
+        activityBinding.binding.gioActionbar.projectName.text = PrefManager.getcurrentProject()
         activityBinding.binding.gioActionbar.projectIcon.load(
             PrefManager.getProjectIconUrl(
-                PrefManager.getcurrentProject()),resources.getDrawable(R.drawable.placeholder_image))
+                PrefManager.getcurrentProject()
+            ), resources.getDrawable(R.drawable.placeholder_image)
+        )
     }
 
     override fun onChannelClick(channel: Channel) {
@@ -452,8 +481,8 @@ class TeamsFragment : Fragment(),ChannelsAdapter.OnClick ,TeamsPagemoreOptions.O
     override fun onChannel(channel: Channel) {
         val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
         val newList = (oldList.toMutableList() + channel).sortedByDescending { it.timestamp }
-        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(),newList)
-        PrefManager.setLastChannelTimeStamp(PrefManager.getcurrentProject(),channel.timestamp!!)
+        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(), newList)
+        PrefManager.setLastChannelTimeStamp(PrefManager.getcurrentProject(), channel.timestamp!!)
         setRecyclerView(newList.distinctBy { it.channel_id })
     }
 

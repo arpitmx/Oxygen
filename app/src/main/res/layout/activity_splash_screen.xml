@@ -38,7 +38,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/darkbg_main" />
+            app:tint="@color/secondary_bg" />
 
     </FrameLayout>
 

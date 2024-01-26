@@ -3,9 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/layout"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/primary_bg"
     android:orientation="horizontal"
     android:weightSum="10"
+
+
+
+
     >
 
     <de.hdodenhof.circleimageview.CircleImageView
