@@ -1360,6 +1360,8 @@ class FirestoreRepository @Inject constructor(
                     val firebaseID = document.getString(Endpoints.User.EMAIL) ?: "mohit@mail"
                     val profileDPUrl = document.getString(Endpoints.User.DP_URL) ?: ""
                     val name = document.getString(Endpoints.User.USERNAME) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
+                    val fullName = document.getString(Endpoints.User.FULLNAME)
+
                     var time:Timestamp=Timestamp.now()
                     if ( document.get(Endpoints.User.TIMESTAMP).isNull){
                         time=Timestamp.now()
@@ -1381,6 +1383,7 @@ class FirestoreRepository @Inject constructor(
                         designation = designation,
                         role = role,
                         fcmToken = fcmToken,
+                        fullName = fullName
                     )
 
                     serverResult(ServerResult.Success(user))
@@ -1392,6 +1395,9 @@ class FirestoreRepository @Inject constructor(
                 serverResult(ServerResult.Failure(exception))
             }
     }
+
+
+
 
     override fun getUserTasks(
         sectionName: String,

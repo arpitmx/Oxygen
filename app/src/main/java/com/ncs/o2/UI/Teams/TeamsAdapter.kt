@@ -76,7 +76,7 @@ class TeamsAdapter(
             .error(R.drawable.profile_pic_placeholder)
             .into(holder.binding.userDp)
 
-        holder.binding.userName.text=contributor.username
+        holder.binding.userName.text=contributor.fullName
         holder.binding.email.text = contributor.firebaseID
         holder.binding.role.text = "Role ${contributor.role.toString()}"
 

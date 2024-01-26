@@ -33,5 +33,6 @@ data class User (
         val designation:String?= null,
         val fcmToken: String?= null,
         var email : String?= null,
+        var fullName:String?=null,
         @Exclude var isChecked : Boolean = false,
         )

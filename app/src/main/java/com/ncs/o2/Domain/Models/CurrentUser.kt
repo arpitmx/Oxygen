@@ -18,6 +18,7 @@ Tasks FUTURE ADDITION :
 
 */
 data class CurrentUser (
+            val FULLNAME:String = "",
             val EMAIL: String = "",
             val USERNAME: String = "",
             val PROJECTS: List<String> = listOf(),

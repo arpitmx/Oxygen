@@ -2,10 +2,16 @@ package com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.ui.graphics.Color
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
@@ -13,6 +19,7 @@ import com.ncs.o2.Data.Room.MessageRepository.UsersDao
 import com.ncs.o2.Domain.Models.Enums.MessageType
 import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
@@ -30,8 +37,10 @@ import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.ChatMessageReplyItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonVisitor
 import timber.log.Timber
 import java.util.Date
+import java.util.regex.Pattern
 
 
 /*
@@ -95,6 +104,8 @@ class ChatAdapter(
             val senderId = msgList[position].senderId
             val localUser = users.find { it.EMAIL == senderId }
 
+
+
             if (localUser != null) {
                 setChatItem(localUser, binding, position)
                 Log.d("DB", "fetching from local")
@@ -153,7 +164,6 @@ class ChatAdapter(
 
             val replyingToMessageID : String = msgList[position].additionalData?.get("replyingTo").toString()
             val replyingToMessage = msgList.find { it.messageId == replyingToMessageID }
-
 
             binding.referenceToUsername.text = replyingToMessage?.senderId
             binding.referenceText.text = replyingToMessage?.content
@@ -253,7 +263,8 @@ class ChatAdapter(
     }
 
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
-        setMessageView(msgList[position], binding)
+//        setMessageView(msgList[position], binding)
+        setMessageView(msgList[position].content,binding)
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.tvName.text = user.USERNAME
@@ -482,12 +493,46 @@ class ChatAdapter(
         }
     }
 
+    private fun processSpan(message: String) : SpannableStringBuilder{
+        val spannable = SpannableStringBuilder(message)
+        val mentionedUsers: MutableList<String> = mutableListOf()
+
+        val mentionPattern = Pattern.compile("@(\\w+)")
+        val mentionMatcher = mentionPattern.matcher(message)
+
+        while (mentionMatcher.find()) {
+            val user = mentionMatcher.group(1)
+            mentionedUsers.add(user)
+            val startIndex = mentionMatcher.start()
+            val endIndex = message.indexOf(" ", startIndex).takeIf { it != -1 } ?: mentionMatcher.end()
 
 
-    private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
-        markwon.setMarkdown(binding.descriptionTv, message.content)
+            spannable.setSpan(
+                StyleSpan(Typeface.BOLD),
+                startIndex,
+                endIndex,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                ForegroundColorSpan(context.resources.getColor(R.color.primary)),
+                startIndex,
+                endIndex,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+        }
+        return spannable
+    }
+
+    private fun setMessageView(message: String, binding: ChatMessageItemBinding) {
+
+
+        markwon.setParsedMarkdown(binding.descriptionTv, processSpan(message))
         binding.descriptionTv.visible()
     }
+
+
+
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
         markwon.setMarkdown(binding.descriptionTv, message.content)

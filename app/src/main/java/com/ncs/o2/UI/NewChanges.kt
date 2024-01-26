@@ -58,7 +58,7 @@ class NewChanges : AppCompatActivity() {
                 "- Made general improvements in UX\n" +
                 "\n" +
                 "### How to Update\n" +
-                "- Latest Version of O2 is 24.1.24, it can be downloaded from the release page, find version 24.1.16 at [Release Page](https://github.com/arpitmx/Oxygen/releases)\n" +
+                "- Latest Version of O2 is 24.1.24, it can be downloaded from the release page, find version 24.1.24 at [Release Page](https://github.com/arpitmx/Oxygen/releases)\n" +
                 "\n" +
                 "### Feedback\n" +
                 "- Feedback is the key to enhancing user experience, it is our appeal to the users for providing any constructive feedback about any issues faced by them.\n" +

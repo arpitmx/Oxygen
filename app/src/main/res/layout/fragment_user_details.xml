@@ -58,6 +58,81 @@
             android:text="Fill in the \nfollowing details" />
 
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/layout_in_between_margins"
+            android:layout_below="@id/et_name"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_username"
+                style="@style/EditTextStyle"
+                android:hint="@string/username"
+                android:inputType="textEmailAddress"
+                android:maxLength="16"
+                android:textColor="@color/primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ProgressBar
+                android:id="@+id/progressbar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:indeterminate="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="7dp"
+                android:visibility="gone"
+                android:indeterminateTint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="@+id/et_username"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/et_username" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+        <TextView
+            android:id="@+id/count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:gravity="end"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/account"
+            android:textSize="12dp"
+            android:text="0/16"
+            android:padding="5dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+        <TextView
+            android:id="@+id/error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="14dp"
+            android:text="*Error"
+            android:padding="5dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_name"
             style="@style/EditTextStyle"
@@ -66,6 +141,8 @@
             android:hint="@string/full_name_hint"
             android:textColor="@color/primary"
             android:inputType="textEmailAddress" />
+
+
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_designation"
@@ -92,6 +169,9 @@
             />
 
 
+
+
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_login"
             style="@style/SolidButtonStyle"
@@ -100,9 +180,13 @@
             android:layout_marginTop="30dp"
             android:background="@drawable/solid_bg_orange"
             android:text="@string/next"
+            android:visibility="visible"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="22dp" />
+
+
+
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>
