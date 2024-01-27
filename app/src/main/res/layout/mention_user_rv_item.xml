@@ -5,7 +5,10 @@
     android:orientation="horizontal"
     android:padding="5dp"
     android:id="@+id/parent"
-    android:background="@color/secondary_bg">
+    android:foreground="@drawable/ripplecustom"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@color/mention_list_rv_child_bg">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="40dp"

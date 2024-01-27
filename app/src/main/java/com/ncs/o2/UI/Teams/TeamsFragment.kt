@@ -32,6 +32,7 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
+import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.Adapters.BottomSheetAdapter
@@ -460,7 +461,14 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
                 if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
         }
+
+        activityBinding.binding.gioActionbar.refresh.setOnClickThrottleBounceListener {
+            startActivity(Intent(requireContext(),CreateTaskActivity::class.java))
+        }
+
         activityBinding.binding.gioActionbar.tabLayout.gone()
+        activityBinding.binding.gioActionbar.line.visible()
+        activityBinding.binding.gioActionbar.refresh.visible()
         activityBinding.binding.gioActionbar.searchCont.visible()
         activityBinding.binding.gioActionbar.actionbar.visible()
         activityBinding.binding.gioActionbar.constraintLayout2.gone()

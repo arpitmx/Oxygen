@@ -80,6 +80,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.datafaker.Faker
 import timber.log.Timber
 import java.io.ByteArrayInputStream
@@ -249,6 +250,8 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     @Later("1. Check if the request has already made, if made then set text and clickability on the button accordingly")
     private fun setUpViews() {
+
+        OverScrollDecoratorHelper.setUpOverScroll(binding.detailsScrollview)
         val currentUser = PrefManager.getcurrentUserdetails()
 
         binding.progressBar.visible()

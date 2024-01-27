@@ -307,31 +307,15 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
-
-            <!--            <de.hdodenhof.circleimageview.CircleImageView-->
-            <!--                android:id="@+id/asignee_dp"-->
-            <!--                android:layout_width="40dp"-->
-            <!--                android:scaleY="0.8"-->
-            <!--                android:layout_marginStart="2dp"-->
-            <!--                android:scaleX="0.8"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:layout_alignParentTop="true"-->
-            <!--                android:layout_alignParentEnd="true"-->
-            <!--                android:layout_alignParentBottom="false"-->
-            <!--                android:src="@drawable/apphd"-->
-            <!--                app:layout_constraintEnd_toStartOf="@+id/create_task_button"-->
-            <!--                app:layout_constraintTop_toTopOf="parent" />-->
-
             <androidx.cardview.widget.CardView
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/label_cardview_green"
-                app:cardCornerRadius="10dp"
-                >
+                app:cardCornerRadius="10dp">
 
-                <de.hdodenhof.circleimageview.CircleImageView
+                <ImageView
                     android:id="@+id/projectIcon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -366,6 +350,7 @@
             android:layout_marginStart="10dp"
             android:paddingTop="@dimen/padding_bottom_offset"
             android:src="@drawable/ham"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -447,6 +432,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:background="@drawable/red_circle_bubble"
+                android:elevation="2dp"
                 android:fontFamily="@font/sf_pro_display_semibold"
                 android:gravity="center"
                 android:minWidth="18dp"
@@ -471,6 +457,8 @@
                 android:src="@drawable/notifications"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/primary" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageButton
@@ -510,16 +498,10 @@
     <LinearLayout
         android:id="@+id/search_cont"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
+        android:layout_height="60dp"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="visible">
 
-        <!--        <include-->
-        <!--            layout="@layout/task_item_legend"-->
-        <!--            android:layout_height="55dp"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:elevation="5dp"-->
-        <!--            />-->
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/search_bar"
             android:layout_width="0dp"
@@ -527,9 +509,9 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="7dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="7dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="9"
-            android:background="@drawable/item_bg_curve"
+            android:background="@drawable/dark_bg_rounded_corner_lighter"
             android:drawableStart="@drawable/ic_searchico"
             android:drawablePadding="15dp"
             android:drawableTint="#DEE3E3E3"
@@ -555,20 +537,20 @@
             android:id="@+id/refresh"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginTop="7dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="9dp"
             android:layout_marginEnd="15dp"
-            android:layout_marginBottom="7dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1.2"
-            android:background="@drawable/item_bg_curve"
             android:scaleX="0.8"
+            android:visibility="visible"
+            android:background="@drawable/dark_bg_rounded_corner_lighter"
             android:scaleY="0.8"
-            android:src="@drawable/baseline_refresh_24"
+            android:src="@drawable/outline_add_24"
             app:tint="@color/primary" />
 
 
     </LinearLayout>
-
 
     <View
         android:id="@+id/line"
