@@ -89,6 +89,7 @@
                 app:itemIconSize="25sp"
                 app:itemActiveIndicatorStyle="@color/primary"
                 app:itemIconTint="@drawable/itembg"
+                app:itemRippleColor="@color/dim_primary"
                 app:menu="@menu/bottom_navigation_menu" />
 
 

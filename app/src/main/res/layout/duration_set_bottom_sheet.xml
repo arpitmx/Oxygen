@@ -31,7 +31,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_keyboard_arrow_down_24"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
         <TextView
             android:layout_width="0dp"
@@ -54,7 +54,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/done"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -113,7 +113,7 @@
             android:background="@drawable/item_bg_curve"
             android:fontFamily="@font/sf_pro_display_semibold"
             android:textColor="@color/account"
-            android:buttonTint="@color/dim_purple"
+            android:buttonTint="@color/dim_primary"
             android:paddingStart="10dp"
             />
 
@@ -131,7 +131,7 @@
             android:fontFamily="@font/sf_pro_display_semibold"
             android:background="@drawable/item_bg_curve"
             android:textColor="@color/account"
-            android:buttonTint="@color/dim_purple"
+            android:buttonTint="@color/dim_primary"
             android:paddingStart="10dp"
             />
         <RadioButton
@@ -147,7 +147,7 @@
             android:textSize="18dp"
             android:background="@drawable/item_bg_curve"
             android:textColor="@color/account"
-            android:buttonTint="@color/dim_purple"
+            android:buttonTint="@color/dim_primary"
             android:paddingStart="10dp"
             />
         <RadioButton
@@ -164,7 +164,7 @@
             android:textSize="18dp"
             android:fontFamily="@font/sf_pro_display_semibold"
             android:textColor="@color/account"
-            android:buttonTint="@color/dim_purple"
+            android:buttonTint="@color/dim_primary"
             android:paddingStart="10dp"
             />
     </RadioGroup>

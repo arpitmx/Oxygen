@@ -17,7 +17,7 @@
         android:id="@+id/teams_page"
         android:enabled="true"
         android:icon="@drawable/baseline_groups_24"
-        android:title="Teams" />
+        android:title="@string/bottom_nav_project" />
 
     <item
         android:id="@+id/bottom_search"

@@ -8,11 +8,12 @@
     android:paddingBottom="30dp"
     >
 
-
     <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/purple"
+        android:layout_width="40dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/card_view_bottomsheet_background"
+        android:layout_gravity="center_horizontal"
         />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -20,6 +21,7 @@
         android:layout_height="50dp"
         android:weightSum="10"
         >
+
 
         <ImageButton
             android:id="@+id/close_btn"
@@ -31,7 +33,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_keyboard_arrow_down_24"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
         <TextView
             android:layout_width="0dp"
@@ -54,9 +56,10 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/outline_add_24"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
 
     <View
         android:layout_width="match_parent"
@@ -111,7 +114,7 @@
         android:paddingEnd="20dp"
         android:text="@string/submit"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="@color/primary_bg"
         android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

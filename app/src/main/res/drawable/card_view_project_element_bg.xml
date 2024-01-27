@@ -4,7 +4,7 @@
     <solid android:color="@color/project_element_bg"/>
     <corners android:radius="5sp"/>
     <stroke
-        android:color="#2A89D387"
+        android:color="@color/dimmer_primary"
         android:width="2dp"
         />
 

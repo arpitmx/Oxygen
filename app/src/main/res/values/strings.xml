@@ -92,7 +92,7 @@
     <string name="set_description_here">Set Description here...</string>
     <string name="section">Section</string>
     <string name="segment">Segment</string>
-    <string name="project">Project</string>
+    <string name="bottom_nav_project">Project</string>
     <string name="status">Status</string>
     <string name="state">State</string>
     <string name="type">Type</string>

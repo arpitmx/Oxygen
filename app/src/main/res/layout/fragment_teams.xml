@@ -60,7 +60,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_semibold"
-                                android:text="@string/project"
+                                android:text="@string/bottom_nav_project"
                                 android:textColor="@color/better_white"
                                 android:textSize="18dp" />
 
@@ -353,7 +353,7 @@
                             android:layout_marginStart="15dp"
                             android:background="@drawable/channel_button_border"
                             android:src="@drawable/baseline_subdirectory_arrow_right_24"
-                            app:tint="@color/dim_purple" />
+                            app:tint="@color/dim_primary" />
 
                         <TextView
                             android:id="@+id/channel_name"

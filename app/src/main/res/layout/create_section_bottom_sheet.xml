@@ -26,7 +26,7 @@
             android:id="@+id/progressbar"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:indeterminateTint="@color/dim_purple"
+            android:indeterminateTint="@color/dim_primary"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_marginStart="15dp"
@@ -35,7 +35,7 @@
             android:layout_marginBottom="5dp"
             android:layout_marginEnd="10dp"
             android:background="@null"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
         <TextView
             android:layout_width="0dp"
@@ -58,7 +58,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_close_24"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

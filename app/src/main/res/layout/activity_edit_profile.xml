@@ -36,7 +36,7 @@
             android:src="@drawable/curves"
             android:translationY="150dp"
             android:translationX="100dp"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/containerLayout"

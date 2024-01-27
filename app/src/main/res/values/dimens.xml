@@ -33,5 +33,6 @@
     <dimen name="chat_margin">15dp</dimen>
     <dimen name="workspace_heading">19dp</dimen>
     <dimen name="button_size_workspace">15dp</dimen>
+    <dimen name="bottom_sheet_holder_height">3dp</dimen>
 
 </resources>

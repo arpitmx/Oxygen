@@ -4,65 +4,9 @@
     android:minHeight="150dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:layout_marginTop="5dp"
     android:background="@color/secondary_bg_black"
     >
-
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/purple"
-        />
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:weightSum="10"
-        >
-
-        <ImageButton
-            android:id="@+id/close_btn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="@null"
-            android:src="@drawable/baseline_keyboard_arrow_down_24"
-            app:tint="@color/dim_purple" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="9"
-            android:fontFamily="@font/sf_pro_display_semibold"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:text="More Options"
-            android:textColor="@color/better_white"
-            android:textSize="18dp" />
-
-
-        <ImageButton
-            android:id="@+id/add_project"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:visibility="invisible"
-            android:background="@null"
-            android:src="@drawable/outline_add_24"
-            app:tint="@color/dim_purple" />
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/card_bg"
-        />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -70,6 +14,65 @@
         android:visibility="visible"
         android:layout_height="wrap_content"
         android:id="@+id/buttons">
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="3dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/card_view_bottomsheet_background"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:weightSum="10"
+            >
+
+            <ImageButton
+                android:id="@+id/close_btn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@null"
+                android:src="@drawable/baseline_keyboard_arrow_down_24"
+                app:tint="@color/dim_primary" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="9"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:text="More Options"
+                android:textColor="@color/better_white"
+                android:textSize="18dp" />
+
+
+            <ImageButton
+                android:id="@+id/add_project"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:visibility="invisible"
+                android:background="@null"
+                android:src="@drawable/outline_add_24"
+                app:tint="@color/dim_primary" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/card_bg"
+            />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="vertical"
