@@ -32,7 +32,7 @@
             android:layout_toEndOf="@+id/difficulty"
             android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
-            android:background="@drawable/item_bg_curve"
+            android:background="@drawable/item_bg_curve_dark"
             android:text="#12345"
             android:textColor="#858585"
             android:textSize="14dp"

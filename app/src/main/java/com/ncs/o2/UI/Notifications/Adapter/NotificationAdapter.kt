@@ -197,7 +197,7 @@ class NotificationAdapter(
 
         fun bind(notification: Notification) {
             binding.difficulty.setBackgroundResource(R.drawable.label_cardview_yellow)
-            binding.difficulty.text="@Workspace Update"
+            binding.difficulty.text="Workspace"
             binding.difficulty.setTextColor(context.resources.getColor(R.color.secondary_bg))
             binding.taskId.text = notification.taskID
             binding.durationTv.text = DateTimeUtils.getTimeAgo(notification.timeStamp)
