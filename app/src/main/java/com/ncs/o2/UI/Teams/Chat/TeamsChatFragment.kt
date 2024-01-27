@@ -754,6 +754,8 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                         binding.placeholder.gone()
                                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                                         PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
+                                        PrefManager.setChannelNotiTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
+
                                     }
                                 }
                             }
@@ -796,6 +798,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                                 binding.placeholder.gone()
                                 recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                                 PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
+                                PrefManager.setChannelNotiTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
 
                             }
 
@@ -840,6 +843,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                         val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
                         chatAdapter.appendMessages(result.data)
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                        PrefManager.setChannelNotiTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
                         PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),activityBinding.channelName,messagedata[0].timestamp!!)
                     }
 

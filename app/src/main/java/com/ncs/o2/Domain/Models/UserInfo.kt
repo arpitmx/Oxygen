@@ -6,6 +6,6 @@ data class UserInfo(
     val BIO:String?="",
     val DESIGNATION:String?="",
     val DP_URL:String?=null,
-
+    val FULLNAME:String?="",
 
 )

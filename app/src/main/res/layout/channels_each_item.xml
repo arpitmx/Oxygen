@@ -44,6 +44,29 @@
             android:textColor="@color/better_white"
             android:textSize="18dp" />
 
+        <LinearLayout
+            android:layout_width="20dp"
+            android:layout_marginEnd="12dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/notificationCountParent"
+            android:visibility="gone"
+            android:layout_height="20dp"
+            android:background="@drawable/notifications_bg">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="10"
+                android:id="@+id/notificationCount"
+                android:gravity="center"
+                android:textColor="@color/better_white"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:textSize="11dp"/>
+
+
+
+        </LinearLayout>
 
     </LinearLayout>
 

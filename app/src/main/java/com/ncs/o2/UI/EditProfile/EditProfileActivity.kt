@@ -62,7 +62,7 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
     private var bitmap: Bitmap?=null
     private var newImageUrl: String?= null
     private var newBio: String?= null
-    var newUsername: String?= null
+    var newFullName: String?= null
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     private val intentFilter by lazy{
         IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
@@ -86,9 +86,6 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
                         newUserInfo= userInfo
                         setOldUserDetails(response)
                         hideProgressBar()
-                        Toast.makeText(this, response.USERNAME.toString(), Toast.LENGTH_SHORT)
-                            .show()
-
                         binding.btnEdit.isEnabled = true
                         binding.btnEdit.isClickable = true
                         binding.btnEdit.setText(R.string.edit)
@@ -108,7 +105,7 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
 
 
             binding.etName.text?.trim()?.let {
-                newUsername= binding.etName.text.toString()
+                newFullName= binding.etName.text.toString()
             }
 
             val newDesignation= binding.etDesignation.text.toString() ?: null
@@ -118,10 +115,12 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
             }
 
             newUserInfo= UserInfo(
-                newUsername ?: userInfo.USERNAME,
-                newBio ?: userInfo.BIO,
-                newDesignation ?: userInfo.DESIGNATION,
-                newImageUrl ?: userInfo.DP_URL
+                USERNAME = userInfo.USERNAME,
+                BIO = newBio ?: userInfo.BIO,
+                DESIGNATION = newDesignation ?: userInfo.DESIGNATION,
+                DP_URL = newImageUrl ?: userInfo.DP_URL,
+                FULLNAME = newFullName ?: userInfo.USERNAME
+
             )
 
             if(bitmap!= null){
@@ -139,7 +138,7 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
 
     private fun setOldUserDetails(userInfo: UserInfo){
 
-        userInfo.USERNAME?.let {
+        userInfo.FULLNAME?.let {
             binding.etName.setText(it)
         }
         userInfo.DESIGNATION?.let {

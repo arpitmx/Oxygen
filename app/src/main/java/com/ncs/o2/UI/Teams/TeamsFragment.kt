@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.SwitchFunctions
+import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Channel
@@ -65,7 +66,8 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     private val activityBinding: MainActivity by lazy {
         (requireActivity() as MainActivity)
     }
-
+    @Inject
+    lateinit var msgDB:MessageDatabase
     private var isVisible = true
     private var isStatsVisible = true
     private var isTeamsVisible = false
@@ -77,6 +79,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     ): View? {
         binding = FragmentTeamsBinding.inflate(inflater, container, false)
         manageviews()
+
         setUpProjectStats()
         return binding.root
     }
@@ -86,6 +89,11 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
         OverScrollDecoratorHelper.setUpOverScroll(binding.parent)
         OverScrollDecoratorHelper.setUpOverScroll(binding.extendedStats)
+
+        val channels=PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+        for (ch in channels){
+            getNewMessages(ch.channel_name)
+        }
 
         binding.parent.gone()
         binding.parent.animFadein(requireContext(), 300)
@@ -271,6 +279,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     }
 
 
+
     fun fetchNewChannels() {
         repository.getNewChannels(
             PrefManager.getcurrentProject()
@@ -442,10 +451,33 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
     }
 
+    fun getNewMessages(channelName:String){
+        repository.getNewTeamsMessages(PrefManager.getcurrentProject(),channelName) { result ->
+            when (result) {
+                is ServerResult.Success -> {
+                    if (result.data.isNotEmpty()){
+                        val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
+                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),channelName,messagedata[0].timestamp!!)
+                        setRecyclerView(PrefManager.getProjectChannels(PrefManager.getcurrentProject()).distinctBy { it.channel_id })
+                    }
+
+                }
+
+                is ServerResult.Failure -> {
+                    val errorMessage = result.exception.message
+                }
+
+                is ServerResult.Progress -> {
+
+                }
+            }
+        }
+    }
+
 
     fun setRecyclerView(dataList: List<Channel>) {
         val recyclerView = binding.channelsRv
-        val adapter = ChannelsAdapter(dataList.toMutableList(), this)
+        val adapter = ChannelsAdapter(dataList.toMutableList(), this,msgDB)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         recyclerView.layoutManager = linearLayoutManager

@@ -535,7 +535,7 @@ class ChatAdapter(
 
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
-        markwon.setMarkdown(binding.descriptionTv, message.content)
+        markwon.setParsedMarkdown(binding.descriptionTv, processSpan(message.content))
         binding.descriptionTv.visible()
 
     }
