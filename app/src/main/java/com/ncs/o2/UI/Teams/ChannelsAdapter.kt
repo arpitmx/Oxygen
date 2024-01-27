@@ -1,11 +1,13 @@
 package com.ncs.o2.UI.Teams
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScrollCaptureCallback
 import android.view.ViewGroup
 import androidx.core.app.NotificationCompat.MessagingStyle.Message
 import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Domain.Models.Channel
@@ -43,12 +45,14 @@ class ChannelsAdapter(
         holder.binding.channelName.text=dataList[position].channel_name
 
         val lastTimestamp=PrefManager.getChannelNotiTimestamp(currentProject,currentChannel)
+        Log.d("messageCountLast","$currentChannel ${lastTimestamp.toString()}")
 
         CoroutineScope(Dispatchers.IO).launch {
             var count=0
             val msgList=db.teamsMessagesDao().getMessagesForProject(currentProject,currentChannel)
             for (msg in msgList.sortedByDescending { it.timestamp }){
-                if (msg.timestamp!! >lastTimestamp){
+                if (msg.timestamp!! > lastTimestamp && msg.senderId!=PrefManager.getCurrentUserEmail()){
+                    Log.d("messageCountMSG","$currentChannel ${msg.timestamp.toString()}")
                     count++
                 }
             }
@@ -68,6 +72,8 @@ class ChannelsAdapter(
             callback.onChannelClick(dataList[position])
             holder.binding.notificationCount.text="0"
             holder.binding.notificationCountParent.gone()
+            PrefManager.setChannelNotiTimestamp(PrefManager.getcurrentProject(),currentChannel,
+                Timestamp.now())
 
         }
 

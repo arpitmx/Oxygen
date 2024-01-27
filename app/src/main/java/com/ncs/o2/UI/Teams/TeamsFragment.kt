@@ -85,16 +85,22 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        manageviews()
+        val channels=PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+        for (ch in channels){
+            getNewMessages(ch.channel_name)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
 
         OverScrollDecoratorHelper.setUpOverScroll(binding.parent)
         OverScrollDecoratorHelper.setUpOverScroll(binding.extendedStats)
 
-        val channels=PrefManager.getProjectChannels(PrefManager.getcurrentProject())
-        for (ch in channels){
-            getNewMessages(ch.channel_name)
-        }
+
 
         binding.parent.gone()
         binding.parent.animFadein(requireContext(), 300)
@@ -453,25 +459,33 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     }
 
     fun getNewMessages(channelName:String){
-        repository.getNewTeamsMessages(PrefManager.getcurrentProject(),channelName) { result ->
-            when (result) {
-                is ServerResult.Success -> {
-                    if (result.data.isNotEmpty()){
-                        val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
-                        PrefManager.setChannelTimestamp(PrefManager.getcurrentProject(),channelName,messagedata[0].timestamp!!)
-                        setRecyclerView(PrefManager.getProjectChannels(PrefManager.getcurrentProject()).distinctBy { it.channel_id })
+            repository.getNewTeamsMessages(PrefManager.getcurrentProject(), channelName) { result ->
+                when (result) {
+                    is ServerResult.Success -> {
+                        if (result.data.isNotEmpty()) {
+                            val messagedata =
+                                result.data.toMutableList().sortedByDescending { it.timestamp }
+                            Log.d("messageCount", messagedata.toString())
+                            PrefManager.setChannelTimestamp(
+                                PrefManager.getcurrentProject(),
+                                channelName,
+                                messagedata[0].timestamp!!
+                            )
+                            setRecyclerView(
+                                PrefManager.getProjectChannels(PrefManager.getcurrentProject()).distinctBy { it.channel_name })
+                        }
+
                     }
 
+                    is ServerResult.Failure -> {
+                        val errorMessage = result.exception.message
+                    }
+
+                    is ServerResult.Progress -> {
+
+                    }
                 }
 
-                is ServerResult.Failure -> {
-                    val errorMessage = result.exception.message
-                }
-
-                is ServerResult.Progress -> {
-
-                }
-            }
         }
     }
 
