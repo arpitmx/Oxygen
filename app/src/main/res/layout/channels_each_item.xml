@@ -43,24 +43,28 @@
             android:textSize="18dp" />
 
         <LinearLayout
-            android:layout_width="20dp"
+            android:layout_width="wrap_content"
             android:layout_marginEnd="12dp"
             android:layout_gravity="center"
             android:gravity="center"
             android:id="@+id/notificationCountParent"
             android:visibility="gone"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/notifications_bg">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="10"
+                android:text="9"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
                 android:id="@+id/notificationCount"
                 android:gravity="center"
                 android:textColor="@color/better_white"
                 android:fontFamily="@font/sf_pro_display_semibold"
-                android:textSize="11dp"/>
+                android:textSize="12dp"/>
 
 
 

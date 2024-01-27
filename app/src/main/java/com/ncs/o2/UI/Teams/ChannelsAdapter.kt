@@ -53,8 +53,12 @@ class ChannelsAdapter(
                 }
             }
             withContext(Dispatchers.Main){
-                if (count>0){
+                if (count in 1..99){
                     holder.binding.notificationCount.text=count.toString()
+                    holder.binding.notificationCountParent.visible()
+                }
+                if (count>=100){
+                    holder.binding.notificationCount.text="100+"
                     holder.binding.notificationCountParent.visible()
                 }
             }
