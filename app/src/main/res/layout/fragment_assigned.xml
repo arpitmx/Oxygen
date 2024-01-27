@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swiperefresh"
+    android:background="@color/primary_bg"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,7 +16,6 @@
             android:id="@+id/parent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="55dp"
             android:background="@color/primary_bg"
             android:scrollbars="none"
             tools:context=".UI.Teams.TeamsFragment">
@@ -28,98 +28,110 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/assignedGrid"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:weightSum="10"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:fontFamily="@font/sf_pro_display_semibold"
-                            android:text="Assigned"
-                            android:textColor="@color/better_white"
-                            android:textSize="@dimen/workspace_heading" />
-
-                        <ImageView
-                            android:id="@+id/stats_ic"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:src="@drawable/baseline_business_center_24"
-                            app:tint="@color/better_white" />
-
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/arrow_stats"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="22dp"
-                        android:src="@drawable/baseline_keyboard_arrow_up_24"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/better_white" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <HorizontalScrollView
-                    android:id="@+id/extended_assigned"
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:clipToPadding="false"
-                    android:nestedScrollingEnabled="true"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="15dp"
-                    android:scrollbars="none"
-                    android:visibility="visible">
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/dark_bg_rounded_corner"
+                    >
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/assignedGrid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_marginStart="10dp"
+                        >
 
-                        <include
-                            android:id="@+id/assigned"
-                            layout="@layout/each_assigned_workspace" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:weightSum="10"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
 
-                        <include
-                            android:id="@+id/ongoing"
-                            layout="@layout/each_assigned_workspace" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:fontFamily="@font/sf_pro_display_medium"
+                                android:text="Assigned"
+                                android:textColor="@color/better_white"
+                                android:textSize="@dimen/workspace_heading" />
 
-                        <include
-                            android:id="@+id/review"
-                            layout="@layout/each_assigned_workspace" />
+                            <ImageView
+                                android:id="@+id/stats_ic"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:src="@drawable/baseline_business_center_24"
+                                app:tint="@color/unselected_tab_color" />
 
-                        <include
-                            android:id="@+id/completed"
-                            layout="@layout/each_assigned_workspace" />
-                    </LinearLayout>
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/arrow_stats"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="22dp"
+                            android:background="@drawable/card_view_chatbox_options"
+                            android:src="@drawable/baseline_keyboard_arrow_up_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/primary" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <HorizontalScrollView
+                        android:id="@+id/extended_assigned"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:clipToPadding="false"
+                        android:nestedScrollingEnabled="true"
+                        android:paddingStart="10dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="15dp"
+                        android:paddingBottom="10dp"
+                        android:scrollbars="none"
+                        android:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            >
+
+                            <include
+                                android:id="@+id/assigned"
+                                layout="@layout/each_assigned_workspace" />
+
+                            <include
+                                android:id="@+id/ongoing"
+                                layout="@layout/each_assigned_workspace" />
+
+                            <include
+                                android:id="@+id/review"
+                                layout="@layout/each_assigned_workspace" />
+
+                            <include
+                                android:id="@+id/completed"
+                                layout="@layout/each_assigned_workspace" />
+                        </LinearLayout>
 
 
-                </HorizontalScrollView>
+                    </HorizontalScrollView>
 
-                <View
-                    android:id="@+id/line3"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/border_grey" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <LinearLayout
                     android:id="@+id/moderating"
@@ -129,6 +141,10 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
+                        android:background="@drawable/dark_bg_rounded_corner"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_height="wrap_content">
 
                         <LinearLayout
@@ -147,7 +163,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="20dp"
-                                android:fontFamily="@font/sf_pro_display_semibold"
+                                android:fontFamily="@font/sf_pro_display_medium"
                                 android:text="Moderating "
                                 android:textColor="@color/better_white"
                                 android:textSize="@dimen/workspace_heading" />
@@ -157,8 +173,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="5dp"
+                                android:layout_marginTop="2dp"
+                                app:tint="@color/unselected_tab_color"
                                 android:src="@drawable/baseline_assignment_ind_24"
-                                app:tint="@color/better_white" />
+                                />
 
 
                         </LinearLayout>
@@ -168,17 +186,19 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="22dp"
+                            android:background="@drawable/card_view_chatbox_options"
                             android:src="@drawable/baseline_keyboard_arrow_right_24"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/better_white" />
+                            app:tint="@color/primary" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:id="@+id/line"
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
+                        android:visibility="invisible"
                         android:background="@color/border_grey" />
                 </LinearLayout>
 
@@ -190,7 +210,12 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/dark_bg_rounded_corner"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="10dp"
+                        >
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -209,7 +234,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="20dp"
-                                android:fontFamily="@font/sf_pro_display_semibold"
+                                android:fontFamily="@font/sf_pro_display_medium"
                                 android:text="Opened by me "
                                 android:textColor="@color/better_white"
                                 android:textSize="@dimen/workspace_heading" />
@@ -219,8 +244,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="5dp"
+                                android:layout_marginTop="2dp"
+                                app:tint="@color/unselected_tab_color"
                                 android:src="@drawable/round_edit_24"
-                                app:tint="@color/better_white" />
+                                />
 
 
                         </LinearLayout>
@@ -230,11 +257,12 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="22dp"
+                            android:background="@drawable/card_view_chatbox_options"
                             android:src="@drawable/baseline_keyboard_arrow_right_24"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/better_white" />
+                            app:tint="@color/primary" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -242,6 +270,7 @@
                         android:id="@+id/line2"
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
+                        android:visibility="invisible"
                         android:background="@color/border_grey" />
                 </LinearLayout>
 
@@ -254,7 +283,12 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/teams"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/dark_bg_rounded_corner"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="10dp"
+                        >
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -273,7 +307,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="20dp"
-                                android:fontFamily="@font/sf_pro_display_semibold"
+                                android:fontFamily="@font/sf_pro_display_medium"
                                 android:text="Favourites"
                                 android:textColor="@color/better_white"
                                 android:textSize="@dimen/workspace_heading" />
@@ -282,8 +316,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="5dp"
+                                android:layout_marginTop="2dp"
+                                app:tint="@color/unselected_tab_color"
                                 android:src="@drawable/star_filled"
-                                app:tint="@color/better_white" />
+                               />
 
 
                         </LinearLayout>
@@ -296,13 +332,15 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/better_white" />
+                            android:background="@drawable/card_view_chatbox_options"
+                            app:tint="@color/primary" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
+                        android:visibility="invisible"
                         android:background="@color/border_grey" />
                 </LinearLayout>
 

@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:background="@color/primary_bg"
     android:orientation="vertical"
-    tools:context=".UI.SearchScreen.SearchFragment">
+    tools:context=".UI.SearchScreen.SearchFragment"
+    android:id="@+id/parent"
+    >
 
     <LinearLayout
         android:id="@+id/searchParent"

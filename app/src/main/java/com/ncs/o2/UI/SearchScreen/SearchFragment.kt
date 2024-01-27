@@ -31,6 +31,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -147,6 +148,11 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
 
     }
     private fun initViews(){
+
+        binding.parent.gone()
+        binding.parent.animFadein(requireContext(),300)
+        binding.parent.visible()
+
         binding.searchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
