@@ -19,6 +19,8 @@
         android:weightSum="10"
         >
 
+
+
         <ImageButton
             android:id="@+id/close_btn"
             android:layout_width="0dp"

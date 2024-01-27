@@ -16,9 +16,8 @@
         android:id="@+id/buttons">
 
         <View
-            android:layout_width="40dp"
+            android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_marginTop="5dp"
             android:background="@drawable/card_view_bottomsheet_background"
             android:layout_gravity="center_horizontal"
             />

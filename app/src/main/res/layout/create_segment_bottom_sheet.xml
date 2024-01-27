@@ -12,7 +12,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/purple"
+        android:background="@color/primary"
         />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -256,7 +256,7 @@
             android:layout_marginTop="10dp"
             android:text="Next"
             android:gravity="center"
-            android:textColor="@color/better_white"
+            android:textColor="@color/primary_bg"
             android:textAllCaps="false"
             android:fontFamily="@font/sf_pro_display_medium"
             android:textSize="18dp"
