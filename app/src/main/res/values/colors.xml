@@ -8,6 +8,9 @@
 
     <color name="primary">#9FFF76</color>
     <color name="darkTheme_bg">#242222</color>
+    <color name="dim_primary">#D584DE5D</color>
+    <color name="dimmer_primary">#4859953F</color>
+    <color name="purple">@color/primary</color>
 
     <color name="secondary_bg">#1C1C1C</color>
     <color name="primary_bg">#161616</color>
@@ -40,8 +43,7 @@
     <color name="starts_in">#DCFFF7</color>
     <color name="prioritymax">#F30056</color>
     <color name="pureblack">#000000</color>
-    <color name="dim_purple">#C3BCED</color>
-    <color name="purple">#C06AFD</color>
+
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
     <color name="light_blue_A200">#FF40C4FF</color>

@@ -1,4 +1,6 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
+
+import android.R
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -6,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
+
 class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListener) : BottomSheetDialogFragment(){
 
     lateinit var binding:ProjectAddBottomSheetBinding
@@ -40,6 +42,7 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
 
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -125,7 +128,10 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                                                                     if (task.isSuccessful) {
                                                                         Log.d("FCM", "Subscribed to topic successfully")
                                                                     } else {
-                                                                        Log.d("FCM", "Failed to subscribe to topic",)
+                                                                        Log.d(
+                                                                            "FCM",
+                                                                            "Failed to subscribe to topic"
+                                                                        )
                                                                     }
                                                                 }
                                                             projectAddedListener.onProjectAdded(
