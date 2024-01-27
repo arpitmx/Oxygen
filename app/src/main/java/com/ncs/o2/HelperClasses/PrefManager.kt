@@ -69,9 +69,13 @@ object PrefManager {
 
     private val projectIdTaskIdMapKey = "project_id_task_id_map"
     private val projectIdChannelIdMapKey = "project_id_channel_id_map"
+    private val projectIdChannelIdNotiMapKey = "project_id_channel_id_noti_map"
+
 
     private lateinit var projectIdTaskIdMap: MutableMap<String, Timestamp>
     private lateinit var projectIdChannelIdMap: MutableMap<String, Timestamp>
+    private lateinit var projectIdChannelIdNotiMap: MutableMap<String, Timestamp>
+
 
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(Endpoints.SharedPref.SHAREDPREFERENCES, Context.MODE_PRIVATE)
@@ -162,6 +166,16 @@ object PrefManager {
         ProjectDeepLinkMap = savedProjectDeeplinkMapString?.let {
             try {
                 Gson().fromJson(it, object : TypeToken<MutableMap<String, String>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+
+        val savedLastChannelsNotiTimeStampMapString = sharedPreferences.getString(
+            projectIdChannelIdNotiMapKey, null)
+        projectIdChannelIdNotiMap = savedLastChannelsNotiTimeStampMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
             } catch (e: JsonSyntaxException) {
                 mutableMapOf()
             }
@@ -660,6 +674,24 @@ object PrefManager {
     fun getChannelTimestamp(projectId: String, channelID: String): Timestamp {
         val id = "$projectId$channelID"
         return projectIdChannelIdMap[id] ?: Timestamp(0, 0)
+    }
+
+    fun setChannelNotiTimestamp(projectId: String, channelID: String, timestamp: Timestamp) {
+        val id = "$projectId$channelID"
+        projectIdChannelIdNotiMap[id] = timestamp
+        saveProjectIdChannelIdNotiMapToPreferences()
+    }
+
+
+    fun getChannelNotiTimestamp(projectId: String, channelID: String): Timestamp {
+        val id = "$projectId$channelID"
+        return projectIdChannelIdNotiMap[id] ?: Timestamp(0, 0)
+    }
+
+    private fun saveProjectIdChannelIdNotiMapToPreferences() {
+        val projectIdChannelIdMapString = Gson().toJson(projectIdChannelIdNotiMap)
+        editor.putString(projectIdChannelIdNotiMapKey, projectIdChannelIdMapString)
+        editor.apply()
     }
 
     private fun saveProjectIdChannelIdMapToPreferences() {

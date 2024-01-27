@@ -857,7 +857,8 @@ class FirestoreRepository @Inject constructor(
             "USERNAME" to userInfo.USERNAME,
             "BIO" to userInfo.BIO,
             "DESIGNATION" to userInfo.DESIGNATION,
-            "DP_URL" to userInfo.DP_URL
+            "DP_URL" to userInfo.DP_URL,
+            "FULLNAME" to userInfo.FULLNAME
         )
 
         firestore.collection(Endpoints.USERS)

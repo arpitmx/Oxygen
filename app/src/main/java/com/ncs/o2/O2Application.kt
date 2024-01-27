@@ -27,6 +27,8 @@ import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Workers.FCMWorker
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Api.NotificationApiService
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +103,8 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
         for (project in projectsList){
             initializeListner(project)
             initializeTagListner(project)
+
+
         }
 
         if (userID.isNotEmpty()){
@@ -424,6 +428,9 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
         }
 
     }
+
+
+
 
 
 }
