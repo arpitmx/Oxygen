@@ -39,7 +39,7 @@
             android:layout_marginStart="10dp"
             android:background="@null"
             android:src="@drawable/baseline_close_24"
-            app:tint="@color/dim_purple"
+            app:tint="@color/dim_primary"
             app:layout_constraintEnd_toEndOf="parent"
             />
 

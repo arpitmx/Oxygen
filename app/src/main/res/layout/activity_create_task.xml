@@ -85,7 +85,7 @@
                                 android:layout_weight="4"
                                 android:maxLines="1"
                                 android:paddingStart="@dimen/padding_start_task_create"
-                                android:text="@string/project" />
+                                android:text="@string/bottom_nav_project" />
 
                             <TextView
                                 android:id="@+id/projectNameET"
@@ -801,7 +801,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:backgroundTint="@color/dim_purple"
+                            android:backgroundTint="@color/dim_primary"
                             android:text="Easy" />
 
                         <com.google.android.material.chip.Chip
@@ -810,7 +810,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="20dp"
-                            android:backgroundTint="@color/dim_purple"
+                            android:backgroundTint="@color/dim_primary"
                             android:text="Medium" />
 
                         <com.google.android.material.chip.Chip
@@ -819,7 +819,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="20dp"
-                            android:backgroundTint="@color/dim_purple"
+                            android:backgroundTint="@color/dim_primary"
                             android:text="Difficult" />
 
 

@@ -6,12 +6,13 @@
     android:background="@color/secondary_bg_black"
     >
 
-
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/purple"
+        android:layout_height="@dimen/bottom_sheet_holder_height"
+        android:background="@drawable/card_view_bottomsheet_background"
+        android:layout_gravity="center_horizontal"
         />
+
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -29,7 +30,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/baseline_keyboard_arrow_down_24"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
         <TextView
             android:layout_width="0dp"
@@ -53,7 +54,7 @@
             android:visibility="invisible"
             android:background="@null"
             android:src="@drawable/outline_add_24"
-            app:tint="@color/dim_purple" />
+            app:tint="@color/dim_primary" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
