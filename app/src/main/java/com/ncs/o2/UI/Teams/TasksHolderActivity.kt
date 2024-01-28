@@ -516,21 +516,21 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
     override fun onStop() {
         super.onStop()
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }

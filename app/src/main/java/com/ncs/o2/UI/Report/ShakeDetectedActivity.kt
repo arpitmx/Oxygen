@@ -15,6 +15,7 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Teams.Chat.TeamsChatFragment
+import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.ActivityShakeDetectedBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -25,7 +26,10 @@ import java.util.Date
 
 @AndroidEntryPoint
 class ShakeDetectedActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityShakeDetectedBinding
+    val binding: ActivityShakeDetectedBinding by lazy {
+        ActivityShakeDetectedBinding.inflate(layoutInflater)
+    }
+
     private val easyElements: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
@@ -34,7 +38,6 @@ class ShakeDetectedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityShakeDetectedBinding.inflate(layoutInflater)
         setContentView(binding.root)
         manageViews()
         val type=intent.getStringExtra("type")
@@ -43,7 +46,7 @@ class ShakeDetectedActivity : AppCompatActivity() {
         if (type=="settings"){
             shakePreferences()
         }
-        if (type=="report" && fileName!=null){
+        if (type=="report"){
             reportingFragment()
         }
 

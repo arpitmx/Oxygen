@@ -44,6 +44,8 @@ class ShakePrefrencesFragment() : Fragment() {
 
     private fun setUpViews(){
 
+        activityBinding.binding.gioActionbar.titleTv.text="Shake to report"
+
         val pref=PrefManager.getShakePref()
 
         if (pref){

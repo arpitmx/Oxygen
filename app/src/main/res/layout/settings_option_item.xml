@@ -6,7 +6,7 @@
     android:background="@color/darkbg_main_a80"
     android:padding="8dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/setting_icon"
         android:layout_width="30dp"
         android:layout_height="35dp"
@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:src="@drawable/placeholder_image"
-        android:tint="@color/white"/>
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/setting_title"
