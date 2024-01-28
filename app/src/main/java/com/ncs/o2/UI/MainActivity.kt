@@ -1,11 +1,14 @@
 package com.ncs.o2.UI
 
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.hardware.SensorManager
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
@@ -21,6 +24,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
@@ -41,7 +45,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
-import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
@@ -49,30 +52,29 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
-import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.Assigned.AssignedFragment
-import com.ncs.o2.UI.Assigned.WorkspaceFragment
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
-import com.ncs.o2.UI.Teams.Chat.TeamsChatFragment
 import com.ncs.o2.UI.Teams.TeamsFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
@@ -84,17 +86,18 @@ import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener,NetworkChangeReceiver.NetworkChangeCallback  {
+class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener,NetworkChangeReceiver.NetworkChangeCallback{
     lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
@@ -103,7 +106,11 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     val sharedViewModel: SharedViewModel by viewModels()
     var index:String?=null
+    private val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1
 
+    private lateinit var sensorManager: SensorManager
+
+    private lateinit var shakeDetector: ShakeDetector
     // ViewModels
     private val viewModel: MainActivityViewModel by viewModels()
 
@@ -200,6 +207,35 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
 
+    }
+
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
     }
 
     private fun setUpInitilisations(){
@@ -330,6 +366,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
     override fun onResume() {
         super.onResume()
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
+//        else{
+//            shakeDetector.unregisterListener()
+//        }
         registerReceiver(true)
         setNotificationCountOnActionBar()
         setUpInitilisations()
@@ -531,7 +574,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                     if (task.isSuccessful) {
                         Log.d("FCM", "Subscribed to topic successfully")
                     } else {
-                        Log.d("FCM", "Failed to subscribe to topic",)
+                        Log.d("FCM", "Failed to subscribe to topic")
                     }
                 }
             setUpTasks(projectID)
@@ -1112,7 +1155,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                                 if (task.isSuccessful) {
                                     Log.d("FCM", "Subscribed to topic successfully")
                                 } else {
-                                    Log.d("FCM", "Failed to subscribe to topic",)
+                                    Log.d("FCM", "Failed to subscribe to topic")
                                 }
                             }
                         val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
@@ -1260,17 +1303,25 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
-
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onOnlineModePositiveSelected() {
@@ -1286,4 +1337,46 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     override fun onOfflineModeNegativeSelected() {
         networkChangeReceiver.retryNetworkCheck()
     }
+
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            easyElements.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
+                moveToReport(filename)
+            },{
+                moveToShakeSettings()
+            })
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
+
+
 }

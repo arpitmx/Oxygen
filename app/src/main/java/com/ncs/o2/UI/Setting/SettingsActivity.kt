@@ -1,29 +1,39 @@
 package com.ncs.o2.UI.Setting
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Logs.LogsActivity
 import com.ncs.o2.UI.NewChanges
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
+import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.databinding.ActivitySettingsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,NetworkChangeReceiver.NetworkChangeCallback {
@@ -38,6 +48,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     private val  intentFilter by lazy {
         IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
     }
+    private lateinit var shakeDetector: ShakeDetector
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +72,9 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             settingTitle("Account"),
             settingOption("Log Out", R.drawable.logout, "") ,
             settingTitle("Logs"),
-            settingOption("Logs", R.drawable.baseline_assistant_24, "")
+            settingOption("Logs", R.drawable.baseline_assistant_24, ""),
+            settingTitle("Report"),
+            settingOption("Shake to Report", R.drawable.baseline_screen_rotation_24, "")
         )
 
 
@@ -85,6 +98,10 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
         super.onResume()
         val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(networkChangeReceiver, intentFilter)
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
     }
     override fun onBackPressed() {
         super.onBackPressed()
@@ -130,6 +147,12 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
                 Timber.tag(TAG).e("onClick: Exception + ${e}")
             }
         }
+        else if(Codes.STRINGS.clickedSetting == "Shake to Report"){
+            val intent = Intent(this, ShakeDetectedActivity::class.java)
+            intent.putExtra("type", "settings")
+            startActivity(intent)
+            this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+        }
     }
 
     private fun deleteCache(context: Context) {
@@ -168,6 +191,9 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onStart() {
@@ -178,11 +204,17 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onOnlineModePositiveSelected() {
@@ -215,5 +247,76 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     override fun onOfflineModeNegativeSelected() {
         networkChangeReceiver.retryNetworkCheck()
     }
+
+
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
+    }
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            util.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
+                moveToReport(filename)
+            },{
+                moveToShakeSettings()
+            })
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
+
+
 
 }

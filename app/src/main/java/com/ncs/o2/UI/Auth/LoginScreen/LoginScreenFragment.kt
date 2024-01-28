@@ -175,7 +175,6 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                                         PrefManager.setLastSegmentsTimeStamp(project,newList[0].creation_DATETIME!!)
                                                     }
                                                 }
-
                                             }
                                             val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
                                             if (fcmToken == null) {

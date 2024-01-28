@@ -4,10 +4,12 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -92,6 +94,7 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
 
         //CrashMan
         setUpCrashMan()
+
 
 
         if (BuildConfig.DEBUG)  {
@@ -387,9 +390,6 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
         }
 
     }
-
-
-
 
 
 }

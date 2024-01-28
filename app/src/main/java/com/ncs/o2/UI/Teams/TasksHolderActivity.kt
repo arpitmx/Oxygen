@@ -1,8 +1,10 @@
 package com.ncs.o2.UI.Teams
 
 import TaskListAdapter
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
@@ -21,21 +24,25 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Notifications.NotificationsViewModel
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityTasksHolderBinding
 import com.ncs.o2.databinding.ActivityTeamsBinding
+import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +50,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -57,6 +67,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
     var taskItems: MutableList<TaskItem> = mutableListOf()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val state = arrayOf(1)
+    private lateinit var shakeDetector: ShakeDetector
 
     private lateinit var tasks: ArrayList<Task>
     @Inject
@@ -72,6 +83,8 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
         type=intent.getStringExtra("type")
         index=intent.getStringExtra("index")
+
+
 
         if (type!=null){
             when(type) {
@@ -500,4 +513,101 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
 
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
+    }
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
+    }
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            moveToReport(filename)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
+
+
+
+
 }

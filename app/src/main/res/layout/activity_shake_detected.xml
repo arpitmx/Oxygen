@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".UI.Report.ShakeDetectedActivity">
+    <include
+        android:id="@+id/gio_actionbar"
+        layout="@layout/actionbar_create_task"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_53dp"
+        android:visibility="visible"
+        />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/shake_detected_fragment_container"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="true"
+        app:layout_constraintTop_toBottomOf="@+id/gio_actionbar" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

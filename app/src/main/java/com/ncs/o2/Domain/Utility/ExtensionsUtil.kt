@@ -12,6 +12,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -534,6 +535,17 @@ object ExtensionsUtil {
         val vibrationEffect = VibrationEffect.createOneShot(5L, VibrationEffect.DEFAULT_AMPLITUDE)
         vibrator.vibrate(vibrationEffect)
     }
+
+    fun Context.performShakeHapticFeedback() {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        val timings = longArrayOf(0, 500)
+        val amplitudes = intArrayOf(VibrationEffect.DEFAULT_AMPLITUDE, VibrationEffect.EFFECT_HEAVY_CLICK,)
+        val vibrationEffect = VibrationEffect.createWaveform(timings, amplitudes, -1)
+        vibrator.vibrate(vibrationEffect)
+    }
+
+
+
 
 
     fun TextInputEditText.appendTextAtCursor(textToAppend: String) {

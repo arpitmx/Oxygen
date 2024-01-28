@@ -3,30 +3,38 @@ package com.ncs.o2.UI.UpdateScreen
 
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.Timestamp
 import com.ncs.o2.Domain.Models.Update
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.popInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.databinding.ActivityUpdaterBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
@@ -47,6 +55,8 @@ class UpdaterActivity @Inject constructor() : AppCompatActivity() {
     private val PERMISSION_REQUEST_WRITE_STORAGE = WRITE_EXTERNAL_STORAGE
     private val permissions: Array<String> = arrayOf(PERMISSION_REQUEST_INSTALL_PACKAGES, PERMISSION_REQUEST_WRITE_STORAGE)
     private val RC_INSTALL_PACKAGE_PERM = 123
+
+    private lateinit var shakeDetector:ShakeDetector
 
 
     private val binding: ActivityUpdaterBinding by lazy {
@@ -73,6 +83,7 @@ class UpdaterActivity @Inject constructor() : AppCompatActivity() {
         } else {
             fileDownloadedView(true, cacheUri)
         }
+
     }
 
     private fun setUpScreen(){
@@ -381,4 +392,102 @@ class UpdaterActivity @Inject constructor() : AppCompatActivity() {
 
         }
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
+    }
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
+    }
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            util.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
+                moveToReport(filename)
+            },{
+                moveToShakeSettings()
+            })
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
+
+
 }
