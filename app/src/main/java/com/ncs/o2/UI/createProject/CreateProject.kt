@@ -401,7 +401,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -409,7 +409,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -417,7 +417,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }

@@ -156,7 +156,7 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -164,7 +164,7 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -172,7 +172,7 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -237,11 +237,8 @@ class AuthScreenActivity @Inject constructor() : AppCompatActivity(),NetworkChan
             fos.flush()
             fos.close()
             rootView.isDrawingCacheEnabled = false
-            utils.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
-                moveToReport(filename)
-            },{
-                moveToShakeSettings()
-            })
+            moveToReport(filename)
+
         } catch (e: IOException) {
             e.printStackTrace()
         }

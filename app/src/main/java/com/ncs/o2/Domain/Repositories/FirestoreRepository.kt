@@ -339,7 +339,7 @@ class FirestoreRepository @Inject constructor(
 
         val liveData = MutableLiveData<ServerResult<StorageReference>>()
         val imageFileName =
-            "${Endpoints.Storage.PROJECTS}/${projectId}/Issues"
+            "${Endpoints.Storage.PROJECTS}/${projectId}/Issues/${RandomIDGenerator.generateRandomTaskId(2)}"
 
         val imageRef = storageReference.child(imageFileName)
         val baos = ByteArrayOutputStream()

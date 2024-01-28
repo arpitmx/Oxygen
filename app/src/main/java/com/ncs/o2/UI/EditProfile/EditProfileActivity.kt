@@ -488,7 +488,7 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -496,7 +496,7 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
 
@@ -505,7 +505,7 @@ class EditProfileActivity : AppCompatActivity() , NetworkChangeReceiver.NetworkC
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }

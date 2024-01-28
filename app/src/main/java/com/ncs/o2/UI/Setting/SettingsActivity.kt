@@ -65,16 +65,23 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     private fun setUpRecyclerView(){
 
         val items = listOf(
+
             settingTitle("profile"),
             settingOption("Edit Profile", R.drawable.round_edit_24, ""),
+
             settingTitle("what's new"),
             settingOption("What's New", R.drawable.baseline_info_24, "Version 24.1.24"),
-            settingTitle("Account"),
-            settingOption("Log Out", R.drawable.logout, "") ,
+
+            settingTitle("Report & Feedback"),
+            settingOption("Feedback", R.drawable.baseline_feedback_24, ""),
+            settingOption("Shake to Report", R.drawable.baseline_screen_rotation_24, ""),
+
+
             settingTitle("Logs"),
             settingOption("Logs", R.drawable.baseline_assistant_24, ""),
-            settingTitle("Report"),
-            settingOption("Shake to Report", R.drawable.baseline_screen_rotation_24, "")
+
+            settingTitle("Account"),
+            settingOption("Log Out", R.drawable.logout, "") ,
         )
 
 
@@ -153,6 +160,12 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             startActivity(intent)
             this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
+        else if(Codes.STRINGS.clickedSetting == "Feedback"){
+            val intent = Intent(this, ShakeDetectedActivity::class.java)
+            intent.putExtra("type", "report")
+            startActivity(intent)
+            this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+        }
     }
 
     private fun deleteCache(context: Context) {
@@ -191,7 +204,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -204,7 +217,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -212,7 +225,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
-        if (PrefManager.getShakePref()){
+        if (PrefManager.getShakePref() && this::shakeDetector.isInitialized){
             shakeDetector.unregisterListener()
         }
     }
@@ -293,11 +306,8 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             fos.flush()
             fos.close()
             rootView.isDrawingCacheEnabled = false
-            util.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
-                moveToReport(filename)
-            },{
-                moveToShakeSettings()
-            })
+            moveToReport(filename)
+
         } catch (e: IOException) {
             e.printStackTrace()
         }

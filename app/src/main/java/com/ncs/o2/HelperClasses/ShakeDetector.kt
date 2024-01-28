@@ -5,6 +5,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import com.google.firebase.Timestamp
 
 class ShakeDetector(
     context: Context,
@@ -25,7 +26,7 @@ class ShakeDetector(
     private var lastZ: Float = 0.0f
 
     private var cooldownTime: Long = 0
-    private val cooldownInterval = 2000
+    private val cooldownInterval = 5000
 
     init {
         registerListener()
@@ -73,12 +74,12 @@ class ShakeDetector(
     }
 
     private fun isInCooldown(): Boolean {
-        val currentTime = System.currentTimeMillis()
+        val currentTime = Timestamp.now().seconds
         return currentTime - cooldownTime < cooldownInterval
     }
 
     private fun setCooldown() {
-        cooldownTime = System.currentTimeMillis()
+        cooldownTime = Timestamp.now().seconds
     }
 
     companion object {

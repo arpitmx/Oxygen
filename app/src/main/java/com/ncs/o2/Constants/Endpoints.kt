@@ -12,7 +12,7 @@ object Endpoints {
     const val defaultProject="Oxidizer"
     const val defaultSegment="Getting started"
     const val defaultLightSensi=10F
-    const val defaultMediumSensi=15F
+    const val defaultMediumSensi=13F
     const val defaultHeavySensi=20F
 
     object SharedPref {

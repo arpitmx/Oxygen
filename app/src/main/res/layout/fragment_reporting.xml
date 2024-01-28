@@ -12,40 +12,123 @@
     android:orientation="vertical"
     tools:context=".UI.Report.ReportingFragment">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:layout_width="match_parent"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/dark_bg_rounded_corner"
+        android:layout_height="150dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/placeholder"
+            android:text="You can add upto 3 optional \n images with this issue"
+            android:textSize="16dp"
+            android:visibility="gone"
+            android:gravity="center"
+            android:textColor="@color/account"
+            android:fontFamily="@font/sf_pro_display_medium"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:visibility="visible"
+        android:id="@+id/imagesCont"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dark_bg_rounded_corner"
+        android:scrollbars="none"
+        >
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:weightSum="10"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/dark_bg_rounded_corner"
+        android:id="@+id/imagePreview"
+
         >
 
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_weight="2"
+            android:visibility="visible"
             android:scaleType="centerCrop"
             android:src="@drawable/placeholder_image"
-            android:id="@+id/image"/>
+            android:id="@+id/image1"/>
 
-        <TextView
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_weight="2"
+            android:visibility="gone"
+            android:layout_marginStart="@dimen/_5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_image"
+            android:id="@+id/image2"/>
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_weight="2"
+            android:visibility="gone"
+            android:layout_marginStart="@dimen/_5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_image"
+            android:id="@+id/image3"/>
+
+        <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/account"
-            android:fontFamily="@font/sf_pro_display_semibold"
-            android:layout_margin="15dp"
-            android:layout_weight="8"
-            android:gravity="center"
             android:layout_gravity="center"
-            android:textAlignment="center"
-            android:text="This image will be sent \n with your report."/>
+            android:layout_marginStart="16dp"
+            android:id="@+id/delete_ic"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/baseline_delete_24"
+            android:background="@drawable/card_view_chatbox_options"
+            app:tint="@color/account" />
 
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:id="@+id/addImages"
+        android:background="@drawable/dark_bg_rounded_corner"
+        android:layout_margin="10dp"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:src="@drawable/baseline_attach_file_24"
+            android:background="@drawable/card_view_chatbox_options"
+            app:tint="@color/account" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Attach Image"
+            android:textSize="20dp"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center"
+            android:textColor="@color/account"
+            android:fontFamily="@font/sf_pro_display_medium"/>
+
+
+    </LinearLayout>
 
     <ProgressBar
         android:layout_width="match_parent"
@@ -65,7 +148,6 @@
         android:layout_marginEnd="10dp"
         android:padding="16dp"
         android:weightSum="10"
-        android:layout_marginTop="10dp"
         android:background="@drawable/dark_bg_rounded_corner"
         >
 
@@ -107,45 +189,14 @@
                 android:checkable="true"
                 android:textColor="@color/better_white"
                 app:chipBackgroundColor="@color/colorAccent"
-                android:text="Feature Request 👨‍💻"/>
+                android:text="Improvements 👨‍💻"/>
         </com.google.android.material.chip.ChipGroup>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Title"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/account"
-            android:fontFamily="@font/sf_pro_display_medium"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/title_editor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Title"
-            android:layout_marginTop="10dp"
-            app:endIconMode="clear_text"
-            app:hintEnabled="true"
-            app:hintTextColor="@color/darkTheme_bg">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:id="@+id/title"
-                android:layout_height="wrap_content"
-                android:background="@drawable/card_view_white"
-                android:fontFamily="@font/sf_pro_display_regular"
-                android:maxLines="2"
-                android:maxLength="100"
-                android:textAlignment="textStart"
-                android:textColor="@color/secondary_bg"
-                android:textSize="18dp" />
-
-        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Description"
+            android:text="Describe briefly"
             android:layout_marginTop="10dp"
             android:textColor="@color/account"
             android:fontFamily="@font/sf_pro_display_medium"/>
@@ -165,7 +216,7 @@
                 android:layout_width="match_parent"
                 android:id="@+id/desc"
                 android:layout_height="wrap_content"
-                android:minHeight="80dp"
+                android:minHeight="150dp"
                 android:background="@drawable/card_view_white"
                 android:fontFamily="@font/sf_pro_display_regular"
                 android:gravity="top|start"
@@ -214,6 +265,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:id="@+id/turnOff"
+        android:visibility="invisible"
         android:layout_marginTop="30dp"
         android:orientation="horizontal">
         <TextView
