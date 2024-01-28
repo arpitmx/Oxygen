@@ -80,9 +80,17 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     ): View? {
         binding = FragmentTeamsBinding.inflate(inflater, container, false)
         manageviews()
-
         setUpProjectStats()
         return binding.root
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val channels=PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+
+        for (ch in channels){
+            getNewMessages(ch.channel_name)
+        }
     }
 
     override fun onResume() {
@@ -459,6 +467,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     }
 
     fun getNewMessages(channelName:String){
+
             repository.getNewTeamsMessages(PrefManager.getcurrentProject(), channelName) { result ->
                 when (result) {
                     is ServerResult.Success -> {

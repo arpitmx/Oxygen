@@ -23,12 +23,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import br.tiagohm.markdownview.css.InternalStyleSheet
 import br.tiagohm.markdownview.css.styles.Github
 import com.google.ai.client.generativeai.GenerativeModel
+import com.google.firebase.Timestamp
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.BuildConfig
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressGoneSlide
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.progressVisible
@@ -40,7 +42,9 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.CodeViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
@@ -54,6 +58,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 
 @AndroidEntryPoint
@@ -77,6 +84,8 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
     private var bitmap: Bitmap? = null
+
+    private lateinit var shakeDetector: ShakeDetector
 
     private val issueTemplate = "" +
             "**Description:**\n" +
@@ -571,6 +580,103 @@ send.sendImages(imgArray);
             }
         }
     }
+
+
+    override fun onStop() {
+        super.onStop()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
+    }
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
+    }
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            utils.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
+                moveToReport(filename)
+            },{
+                moveToShakeSettings()
+            })
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
 
 
 }

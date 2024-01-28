@@ -1,21 +1,28 @@
 package com.ncs.o2.UI.CreateTask
 
+import android.app.Activity
+import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 //import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.UIComponents.Adapters.CheckListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CheckListBottomSheet
@@ -38,6 +45,9 @@ import io.noties.markwon.syntax.Prism4jThemeDarkula
 import io.noties.markwon.syntax.SyntaxHighlightPlugin
 import io.noties.prism4j.Prism4j
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -52,6 +62,8 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
         binding.checkListRecyclerview
     }
     private lateinit var listener: checkListListener
+
+    private lateinit var shakeDetector: ShakeDetector
 
     private var list:MutableList<CheckList> = mutableListOf()
     private lateinit var checkListAdapter:CheckListAdapter
@@ -145,6 +157,10 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
         super.onResume()
         val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(networkChangeReceiver, intentFilter)
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
     }
     interface checkListListener{
         fun sendcheckListarray(list: MutableList<CheckList>)
@@ -214,17 +230,25 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
-
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onOnlineModePositiveSelected() {
@@ -240,4 +264,72 @@ class ChecklistActivity : AppCompatActivity(),CheckListBottomSheet.checkListItem
     override fun onOfflineModeNegativeSelected() {
         networkChangeReceiver.retryNetworkCheck()
     }
+
+
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
+    }
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            moveToReport(filename)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
+
+
 }

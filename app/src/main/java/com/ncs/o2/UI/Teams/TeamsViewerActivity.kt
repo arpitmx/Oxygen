@@ -1,10 +1,15 @@
 package com.ncs.o2.UI.Teams
 
+import android.app.Activity
 import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
@@ -12,18 +17,26 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.databinding.ActivityTasksHolderBinding
 import com.ncs.o2.databinding.ActivityTeamsViewerBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 
 @AndroidEntryPoint
@@ -33,6 +46,10 @@ class TeamsViewerActivity : AppCompatActivity() {
     }
     val userList:MutableList<User> = mutableListOf()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    private val easyElements: GlobalUtils.EasyElements by lazy {
+        GlobalUtils.EasyElements(this)
+    }
+    private lateinit var shakeDetector: ShakeDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +59,37 @@ class TeamsViewerActivity : AppCompatActivity() {
             onBackPressed()
         }
         binding.projectIcon.load(PrefManager.getProjectIconUrl(PrefManager.getcurrentProject()),resources.getDrawable(R.drawable.placeholder_image))
+
     }
 
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
+    }
     private fun fetchContributors(){
         firestoreRepository.getProjectContributors(PrefManager.getcurrentProject()) { result ->
             when (result) {
@@ -113,4 +159,75 @@ class TeamsViewerActivity : AppCompatActivity() {
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
+    }
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            easyElements.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
+                moveToReport(filename)
+            },{
+                moveToShakeSettings()
+            })
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
+
+
+
 }

@@ -1,7 +1,10 @@
 package com.ncs.o2.UI.Notifications
 
+import android.app.Activity
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
@@ -19,21 +22,27 @@ import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -45,6 +54,9 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     private val utils: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(this)
     }
+
+    private lateinit var shakeDetector: ShakeDetector
+
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     private val viewModel: NotificationsViewModel by viewModels()
 
@@ -100,6 +112,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     val intent = Intent(this, TeamsActivity::class.java)
                     Log.d("teamsChannelID",channelID.toString())
                     intent.putExtra("channel_name", channelID)
+                    intent.putExtra("type", "channel")
+
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
@@ -109,6 +123,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                     val intent = Intent(this, TeamsActivity::class.java)
                     Log.d("teamsChannelID",channelID.toString())
                     intent.putExtra("channel_name", channelID)
+                    intent.putExtra("type", "channel")
+
                     startActivity(intent)
                     this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
                 }
@@ -152,6 +168,35 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         }
         setUpView()
         viewModel.fetchNotifications()
+    }
+
+    private fun initShake(){
+        val shakePref=PrefManager.getShakePref()
+        Log.d("shakePref",shakePref.toString())
+        if (shakePref){
+
+            val sensi=PrefManager.getShakeSensitivity()
+            when(sensi){
+                1->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultLightSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                2->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultMediumSensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+                3->{
+                    shakeDetector = ShakeDetector(this, Endpoints.defaultHeavySensi,onShake = {
+                        performShakeHapticFeedback()
+                        takeScreenshot(this)
+                    })
+                }
+            }
+        }
     }
     private fun updateProjectCache(projectName:String){
         PrefManager.setcurrentProject(projectName)
@@ -320,6 +365,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                 val intent = Intent(this, TeamsActivity::class.java)
                 Log.d("channele name",notification.channelID)
                 intent.putExtra("channel_name", notification.channelID)
+                intent.putExtra("type", "channel")
+
                 startActivity(intent)
                 this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
             }
@@ -351,17 +398,25 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     override fun onStop() {
         super.onStop()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onPause() {
         super.onPause()
         registerReceiver(false)
-
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         registerReceiver(false)
+        if (PrefManager.getShakePref()){
+            shakeDetector.unregisterListener()
+        }
     }
     override fun onOnlineModePositiveSelected() {
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
@@ -378,8 +433,52 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     }
     override fun onResume() {
         super.onResume()
+        if (PrefManager.getShakePref()){
+            initShake()
+            shakeDetector.registerListener()
+        }
         val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(networkChangeReceiver, intentFilter)
     }
+
+    fun takeScreenshot(activity: Activity) {
+        Log.e("takeScreenshot", activity.localClassName)
+        val rootView = activity.window.decorView.rootView
+        rootView.isDrawingCacheEnabled = true
+        val bitmap = rootView.drawingCache
+        val currentTime = Timestamp.now().seconds
+        val filename = "screenshot_$currentTime.png"
+        val internalStorageDir = activity.filesDir
+        val file = File(internalStorageDir, filename)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            rootView.isDrawingCacheEnabled = false
+            utils.twoBtnDialog("Shake to report", msg = "Shake was detected, as a result screenshot of the previous screen was taken, do you want to report it as a bug/feature ? ","Report","Turn OFF",{
+                moveToReport(filename)
+            },{
+                moveToShakeSettings()
+            })
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    fun moveToReport(filename: String) {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("filename", filename)
+        intent.putExtra("type","report")
+        startActivity(intent)
+    }
+
+    fun moveToShakeSettings() {
+        val intent = Intent(this, ShakeDetectedActivity::class.java)
+        intent.putExtra("type","settings")
+        startActivity(intent)
+    }
+
+
+
 
 }

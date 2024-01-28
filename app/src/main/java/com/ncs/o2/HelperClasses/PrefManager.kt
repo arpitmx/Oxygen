@@ -20,6 +20,7 @@ import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.versa.Constants.Endpoints
 import java.sql.Time
 import java.util.Date
+import java.util.concurrent.ConcurrentHashMap
 
 /*
 File : SharedPrefHelper -> com.ncs.o2.HelperClasses
@@ -60,7 +61,7 @@ object PrefManager {
     private lateinit var LastTaskTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastTagTimestampMap: MutableMap<String, Timestamp>
     private lateinit var LastTeamsTimestampMap: MutableMap<String, Timestamp>
-    private lateinit var LastSegmentsTimestampMap: MutableMap<String, Timestamp>
+    private lateinit var LastSegmentsTimestampMap: ConcurrentHashMap<String, Timestamp>
     private lateinit var LastChannelTimestampMap: MutableMap<String, Timestamp>
 
     private lateinit var ProjectIconUrlMap: MutableMap<String, String>
@@ -124,13 +125,15 @@ object PrefManager {
 
         val savedLastSegmentsTimeStampMapString = sharedPreferences.getString(
             lastSegmentsTimestampMapKey, null)
+
         LastSegmentsTimestampMap = savedLastSegmentsTimeStampMapString?.let {
             try {
-                Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+                Gson().fromJson(it, object : TypeToken<ConcurrentHashMap<String, Timestamp>>() {}.type)
+                    ?: ConcurrentHashMap()
             } catch (e: JsonSyntaxException) {
-                mutableMapOf()
+                ConcurrentHashMap()
             }
-        } ?: mutableMapOf()
+        } ?: ConcurrentHashMap()
 
         val savedProjectIconUrlMapString = sharedPreferences.getString(
             projectIconUrlMapKey, null)
@@ -758,5 +761,24 @@ object PrefManager {
         editor.putString(projectDeeplinkMapKey, hashMapString)
         editor.apply()
     }
+    fun getShakePref(): Boolean {
+        return sharedPreferences.getBoolean("shake", true)
+    }
+
+    fun setShakePref(bool:Boolean) {
+        editor.putBoolean("shake", bool)
+        editor.apply()
+    }
+
+    fun getShakeSensitivity(): Int {
+        return sharedPreferences.getInt("shakesensi", 2)
+    }
+
+    fun setShakeSensitivity(sensi:Int) {
+        editor.putInt("shakesensi", sensi)
+        editor.apply()
+    }
+
+
 
 }
