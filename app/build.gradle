@@ -6,6 +6,8 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'com.google.firebase.firebase-perf'
     id 'kotlin-parcelize'
+    id 'com.google.firebase.crashlytics'
+
 
 
 }
@@ -219,6 +221,8 @@ dependencies {
     implementation("com.google.firebase:firebase-perf")
     //Firebase Dynamic links
     implementation 'com.google.firebase:firebase-dynamic-links'
+    //Firebase Crashylitics
+
 
 
 
