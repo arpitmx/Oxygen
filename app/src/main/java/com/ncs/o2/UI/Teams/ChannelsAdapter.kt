@@ -6,6 +6,7 @@ import android.view.ScrollCaptureCallback
 import android.view.ViewGroup
 import androidx.core.app.NotificationCompat.MessagingStyle.Message
 import androidx.core.view.get
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.Pref
@@ -48,14 +49,16 @@ class ChannelsAdapter(
         Log.d("messageCountLast","$currentChannel ${lastTimestamp.toString()}")
 
         CoroutineScope(Dispatchers.IO).launch {
+
             var count=0
-            val msgList=db.teamsMessagesDao().getMessagesForProject(currentProject,currentChannel)
+            val msgList= db.teamsMessagesDao().getMessagesForProject(currentProject,currentChannel)
             for (msg in msgList.sortedByDescending { it.timestamp }){
                 if (msg.timestamp!! > lastTimestamp && msg.senderId!=PrefManager.getCurrentUserEmail()){
                     Log.d("messageCountMSG","$currentChannel ${msg.timestamp.toString()}")
                     count++
                 }
             }
+
             withContext(Dispatchers.Main){
                 if (count in 1..99){
                     holder.binding.notificationCount.text=count.toString()

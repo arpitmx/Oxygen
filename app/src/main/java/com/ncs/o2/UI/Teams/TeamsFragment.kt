@@ -108,8 +108,6 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
         OverScrollDecoratorHelper.setUpOverScroll(binding.parent)
         OverScrollDecoratorHelper.setUpOverScroll(binding.extendedStats)
 
-
-
         binding.parent.gone()
         binding.parent.animFadein(requireContext(), 300)
         binding.parent.visible()
@@ -135,6 +133,8 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
                 setRecyclerView(newList.distinctBy { it.channel_id })
             }
         }
+
+
         fetchNewChannels()
 
         binding.stats.setOnClickListener {
@@ -225,6 +225,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
         }
 
         binding.addTeamMembers.setOnClickThrottleBounceListener {
+
             val link = PrefManager.getProjectDeepLink(PrefManager.getcurrentProject())
             Log.d("deeplink", link)
             val intent = Intent(Intent.ACTION_SEND)
@@ -538,6 +539,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
             ), resources.getDrawable(R.drawable.placeholder_image)
         )
     }
+
 
     override fun onChannelClick(channel: Channel) {
         val intent = Intent(requireContext(), TeamsActivity::class.java)
