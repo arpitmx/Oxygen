@@ -126,4 +126,38 @@
         android:layout_height="2dp"
         android:background="@color/border_grey" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:id="@+id/message"
+        android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Shake for around 3 times to trigger \nshake to report mechanism"
+        android:textColor="@color/account"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:textSize="14dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="To prevent accidental triggers keep sensitivity at medium"
+        android:textColor="@color/account"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:textSize="11dp"/>
+
+    </LinearLayout>
+
+
+
 </LinearLayout>
