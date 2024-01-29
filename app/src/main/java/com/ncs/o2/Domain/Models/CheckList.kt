@@ -9,5 +9,5 @@ data class CheckList(
     val title:String = "",
     val desc:String = "",
     var done:Boolean = false,
-    val index:Int=0,
+    var index:Int=0,
 ):Parcelable

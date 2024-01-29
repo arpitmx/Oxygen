@@ -29,6 +29,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters.ChatAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.databinding.ChatImageItemBinding
@@ -47,7 +48,9 @@ class TeamsChatAdapter(
     var msgList: MutableList<Message>,
     val context: Context,
     private val onchatDoubleClickListner: onChatDoubleClickListner,
-    private val markwon: Markwon
+    private val markwon: Markwon,
+    private val onMessageLongPress: OnMessageLongPress
+
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var messageDatabase: MessageDatabase
@@ -91,6 +94,16 @@ class TeamsChatAdapter(
                     Log.d("DB", "fetching from db")
                     setChatItem(newUser, binding, position)
                 }
+            }
+
+            binding.parentMessageItem.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
+            }
+
+            binding.descriptionTv.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
             }
 
             binding.parentMessageItem.setOnDoubleClickListener {
@@ -156,6 +169,16 @@ class TeamsChatAdapter(
                     Timber.tag("DB").d("fetching from db")
                     setChatReplyItem(newUser, binding, position)
                 }
+            }
+
+            binding.parentMessageItem.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
+            }
+
+            binding.descriptionTv.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
             }
 
             binding.parentMessageItem.setOnDoubleClickListener {
@@ -504,6 +527,9 @@ class TeamsChatAdapter(
     }
     interface onImageClicked{
         fun onImageClick(position: Int,imageUrls: List<String>)
+    }
+    interface OnMessageLongPress{
+        fun onLongPress(message: Message)
     }
     fun onImageClick(position: Int, imageUrls: List<String>) {
         val imageViewerIntent = Intent(context, ImageViewerActivity::class.java)

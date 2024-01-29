@@ -164,6 +164,24 @@ interface Repository {
         newPriority: String,
         projectName: String
     ): ServerResult<Boolean>
+
+    suspend fun updateType(
+        id: String,
+        newType: String,
+        projectName: String
+    ): ServerResult<Boolean>
+
+    suspend fun updateDifficulty(
+        id: String,
+        newDifficulty: String,
+        projectName: String
+    ): ServerResult<Boolean>
+
+    suspend fun updateDration(
+        id: String,
+        newDuration: String,
+        projectName: String
+    ): ServerResult<Boolean>
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
 

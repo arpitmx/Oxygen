@@ -2,11 +2,13 @@ package com.ncs.o2.UI.Report
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -39,9 +41,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
+import java.sql.Time
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -62,6 +69,8 @@ class ReportingFragment : Fragment() {
     var imagesPosted=0
     val urls:MutableList<String> = mutableListOf()
     val bitmaps:MutableList<Bitmap> = mutableListOf()
+     var defaultBitmap:Bitmap?=null
+    val uris:MutableList<Uri> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,6 +89,7 @@ class ReportingFragment : Fragment() {
             val file = File(internalStorageDir, activityBinding.fileName)
             if (file.exists()) {
                 bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                defaultBitmap=bitmap
                 imageCount++
                 bitmaps.add(bitmap)
             }
@@ -93,6 +103,7 @@ class ReportingFragment : Fragment() {
 
     private fun setImages(){
 
+        Log.d("bitmaps",bitmaps.toString())
 
         if (bitmaps.size==0){
             binding.imagesCont.gone()
@@ -154,6 +165,7 @@ class ReportingFragment : Fragment() {
                     val selectedImage = data?.data
                     bitmap = uriToBitmap(activityBinding.contentResolver, selectedImage!!)!!
                     bitmaps.add(bitmap)
+                    uris.add(selectedImage)
                     imageCount++
                     setImages()
                 }
@@ -183,6 +195,9 @@ class ReportingFragment : Fragment() {
 
         binding.deleteIc.setOnClickThrottleBounceListener {
             bitmaps.removeLast()
+            if(uris.isNotEmpty()){
+                uris.removeLast()
+            }
             imageCount--
             setImages()
         }
@@ -206,33 +221,71 @@ class ReportingFragment : Fragment() {
         }
 
         binding.image1.setOnClickThrottleBounceListener {
-            val _bitmap = bitmaps[0]
-            val stream = ByteArrayOutputStream()
-            _bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            val byteArray: ByteArray = stream.toByteArray()
-            val intent = Intent(requireContext(), ImageViewActivity::class.java)
-            intent.putExtra("bitmap", byteArray)
-            startActivity(intent)
+//            val _bitmap = bitmaps[0]
+//            val stream = ByteArrayOutputStream()
+//            _bitmap.compress(Bitmap.CompressFormat.PNG, 80, stream)
+//            val byteArray: ByteArray = stream.toByteArray()
+//            val intent = Intent(requireContext(), ImageViewActivity::class.java)
+//            intent.putExtra("bitmap", byteArray)
+//            startActivity(intent)
+
+            if (defaultBitmap!=null){
+                val _bitmap = bitmaps[0]
+                val stream = ByteArrayOutputStream()
+                _bitmap.compress(Bitmap.CompressFormat.PNG, 80, stream)
+                val byteArray: ByteArray = stream.toByteArray()
+                val intent = Intent(requireContext(), ImageViewActivity::class.java)
+                intent.putExtra("bitmap", byteArray)
+                startActivity(intent)
+            }
+            else{
+                val intent = Intent(requireContext(), ImageViewActivity::class.java)
+                intent.putExtra("uri", uris[0].toString())
+                startActivity(intent)
+            }
         }
 
         binding.image2.setOnClickThrottleBounceListener {
-            val _bitmap = bitmaps[1]
-            val stream = ByteArrayOutputStream()
-            _bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            val byteArray: ByteArray = stream.toByteArray()
-            val intent = Intent(requireContext(), ImageViewActivity::class.java)
-            intent.putExtra("bitmap", byteArray)
-            startActivity(intent)
+//            val _bitmap = bitmaps[1]
+//            val stream = ByteArrayOutputStream()
+//            _bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+//            val byteArray: ByteArray = stream.toByteArray()
+//            val intent = Intent(requireContext(), ImageViewActivity::class.java)
+//            intent.putExtra("bitmap", byteArray)
+//            startActivity(intent)
+
+            if (defaultBitmap!=null) {
+                val intent = Intent(requireContext(), ImageViewActivity::class.java)
+                intent.putExtra("uri", uris[0].toString())
+                startActivity(intent)
+            }
+            if (defaultBitmap==null) {
+                val intent = Intent(requireContext(), ImageViewActivity::class.java)
+                intent.putExtra("uri", uris[1].toString())
+                startActivity(intent)
+            }
+
         }
 
         binding.image3.setOnClickThrottleBounceListener {
-            val _bitmap = bitmaps[2]
-            val stream = ByteArrayOutputStream()
-            _bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            val byteArray: ByteArray = stream.toByteArray()
-            val intent = Intent(requireContext(), ImageViewActivity::class.java)
-            intent.putExtra("bitmap", byteArray)
-            startActivity(intent)
+//            val _bitmap = bitmaps[2]
+//            val stream = ByteArrayOutputStream()
+//            _bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+//            val byteArray: ByteArray = stream.toByteArray()
+//            val intent = Intent(requireContext(), ImageViewActivity::class.java)
+//            intent.putExtra("bitmap", byteArray)
+//            startActivity(intent)
+
+            if (defaultBitmap!=null) {
+                val intent = Intent(requireContext(), ImageViewActivity::class.java)
+                intent.putExtra("uri", uris[1].toString())
+                startActivity(intent)
+            }
+            if (defaultBitmap==null) {
+                val intent = Intent(requireContext(), ImageViewActivity::class.java)
+                intent.putExtra("uri", uris[2].toString())
+                startActivity(intent)
+            }
         }
 
         binding.chipGroup.setOnCheckedChangeListener { group, checkedId ->
@@ -321,8 +374,28 @@ class ReportingFragment : Fragment() {
         binding.progressbar.visible()
         var desc=binding.desc.text?.trim().toString()
         if (urls.isNotEmpty()){
-            for (url in urls){
-                desc="![Image](${url}) $desc"
+
+            if (urls.size==3){
+                val threeImage = "<div style=\"display: flex; justify-content: space-between;\">\n" +
+                        "  <img src=\"${urls[0]}\" alt=\"Image 1\" style=\"width: 33%; height: auto;\">\n" +
+                        "  <img src=\"${urls[1]}\" alt=\"Image 2\" style=\"width: 33%; height: auto;\">\n" +
+                        "  <img src=\"${urls[2]}\" alt=\"Image 3\" style=\"width: 33%; height: auto;\">\n" +
+                        "</div>"
+                desc="$threeImage $desc"
+
+            }
+            if (urls.size==2){
+                val twoImage = "<div style=\"display: flex; justify-content: space-between;\">\n" +
+                        "  <img src=\"${urls[0]}\" alt=\"Image 1\" style=\"width: 50%; height: auto;\">\n" +
+                        "  <img src=\"${urls[1]}\" alt=\"Image 2\" style=\"width: 50%; height: auto;\">\n" +
+                        "</div>"
+                desc="$twoImage $desc"
+            }
+            if (urls.size==1){
+                val oneImage = "<div style=\"display: flex; justify-content: space-between;\">\n" +
+                        "  <img src=\"${urls[0]}\" alt=\"Image 1\" style=\"width: 100%; height: auto;\">\n" +
+                        "</div>"
+                desc="$oneImage $desc"
             }
         }
         val words = binding.desc.text?.trim().toString().split(" ")
@@ -408,6 +481,9 @@ class ReportingFragment : Fragment() {
             else -> projectName
         }.toUpperCase()
     }
+
+
+
 
 
 }

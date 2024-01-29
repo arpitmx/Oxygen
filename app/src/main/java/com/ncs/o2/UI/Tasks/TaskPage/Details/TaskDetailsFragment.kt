@@ -71,6 +71,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.setDurationBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,7 +95,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
     AddTagsBottomSheet.getSelectedTagsCallback,
-    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapterOtherScreens.OnClick {
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapterOtherScreens.OnClick,setDurationBottomSheet.DurationAddedListener {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
@@ -184,6 +185,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             binding.assignee.isEnabled = false
             binding.section.isEnabled=false
             binding.priority.isEnabled=false
+            binding.taskType.isEnabled=false
+            binding.difficulty.isEnabled=false
+            binding.taskDuration.isEnabled=false
             binding.activity.setOnClickThrottleBounceListener {
                 val viewpager = tasksHolderBinding.binding.viewPager2
                 val next = viewpager.currentItem + 1
@@ -227,6 +231,15 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             binding.status.isEnabled=true
             binding.status.isClickable=true
 
+            binding.taskType.isEnabled=true
+            binding.taskType.isClickable=true
+
+            binding.difficulty.isEnabled=true
+            binding.difficulty.isClickable=true
+
+            binding.taskDuration.isEnabled=true
+            binding.taskDuration.isClickable=true
+
         }
         else if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
             binding.section.isEnabled=false
@@ -243,6 +256,15 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
             binding.status.isEnabled=false
             binding.status.isClickable=false
+
+            binding.taskType.isEnabled=false
+            binding.taskType.isClickable=false
+
+            binding.difficulty.isEnabled=false
+            binding.difficulty.isClickable=false
+
+            binding.taskDuration.isEnabled=false
+            binding.taskDuration.isClickable=false
 
         }
     }
@@ -301,6 +323,25 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                 BottomSheet(list, "PRIORITY", this)
             priorityBottomSheet.show(requireFragmentManager(), "PRIORITY")
         }
+        binding.taskType.setOnClickThrottleBounceListener {
+            list.clear()
+            list.addAll(listOf("Bug","Feature","Feature request","Task","Exception","Security","Performance"))
+            val priorityBottomSheet =
+                BottomSheet(list,"TYPE",this)
+            priorityBottomSheet.show(requireFragmentManager(), "TYPE")
+        }
+        binding.difficulty.setOnClickThrottleBounceListener {
+            list.clear()
+            list.addAll(listOf("Easy","Medium","Hard"))
+            val priorityBottomSheet =
+                BottomSheet(list,"DIFFICULTY",this)
+            priorityBottomSheet.show(requireFragmentManager(), "DIFFICULTY")
+        }
+        binding.taskDuration.setOnClickThrottleBounceListener {
+            val durationBottomSheet= setDurationBottomSheet(this)
+            durationBottomSheet.show(requireFragmentManager(),"TAG")
+        }
+
         binding.addContributorsBtn.setOnClickThrottleBounceListener {
 
             val list:MutableList<User> = mutableListOf()
@@ -606,6 +647,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     binding.assignee.isEnabled = true
                     binding.section.isEnabled=true
                     binding.priority.isEnabled=true
+                    binding.difficulty.isEnabled=true
+                    binding.taskType.isEnabled=true
+                    binding.taskDuration.isEnabled=true
                     activityBinding.binding.gioActionbar.btnModerator.visible()
                 }
                 else{
@@ -613,6 +657,9 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     binding.assignee.isEnabled = false
                     binding.section.isEnabled=false
                     binding.priority.isEnabled=false
+                    binding.difficulty.isEnabled=false
+                    binding.taskType.isEnabled=false
+                    binding.taskDuration.isEnabled=false
                     activityBinding.binding.gioActionbar.btnModerator.visible()
                 }
 
@@ -1589,6 +1636,113 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
                 }
             }
+            "TYPE" -> {
+                binding.typeInclude.tagText.text = text
+                binding.typeInclude.tagIcon.text = text.substring(0, 1)
+                viewLifecycleOwner.lifecycleScope.launch {
+
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            viewModel.updateType(
+                                taskID = activityBinding.taskId,
+                                newType = text,
+                                projectName = PrefManager.getcurrentProject()
+                            )
+                        }
+                        when (result) {
+
+                            is ServerResult.Failure -> {
+
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in Updating: ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+
+                                binding.progressBar.gone()
+
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
+
+                            is ServerResult.Success -> {
+
+                                binding.progressBar.gone()
+                                toast("Updated Task Type")
+
+                            }
+
+                        }
+
+                    } catch (e: Exception) {
+
+                        Timber.tag(TAG).e(e)
+                        binding.progressBar.gone()
+
+                    }
+
+                }
+            }
+            "DIFFICULTY" -> {
+                when(text){
+                    "Easy"->binding.difficultyInclude.tagIcon.background=this.resources.getDrawable(R.drawable.label_cardview_green)
+                    "Medium"->binding.difficultyInclude.tagIcon.background=this.resources.getDrawable(R.drawable.label_cardview_yellow)
+                    "Hard"->binding.difficultyInclude.tagIcon.background=this.resources.getDrawable(R.drawable.label_cardview_red)
+                }
+                binding.difficultyInclude.tagIcon.text=text.substring(0,1)
+                binding.difficultyInclude.tagText.text=text
+                viewLifecycleOwner.lifecycleScope.launch {
+
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            viewModel.updateDifficulty(
+                                taskID = activityBinding.taskId,
+                                newDifficulty = text,
+                                projectName = PrefManager.getcurrentProject()
+                            )
+                        }
+                        when (result) {
+
+                            is ServerResult.Failure -> {
+
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in Updating: ${result.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+
+                                binding.progressBar.gone()
+
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progressBar.visible()
+                            }
+
+                            is ServerResult.Success -> {
+
+                                binding.progressBar.gone()
+                                toast("Updated Task Difficulty")
+
+                            }
+
+                        }
+
+                    } catch (e: Exception) {
+
+                        Timber.tag(TAG).e(e)
+                        binding.progressBar.gone()
+
+                    }
+
+                }
+            }
             "STATE" ->  {
                 binding.stateInclude.tagText.text = text
                 binding.stateInclude.tagIcon.text = text.substring(0, 1)
@@ -1973,6 +2127,58 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             utils.showSnackbar(binding.root, "Failure in sending notifications", 5000)
         }
 
+    }
+
+    override fun onDurationAdded(duration: String) {
+        binding.taskDurationET.text = duration
+
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    viewModel.updateDuration(
+                        taskID = activityBinding.taskId,
+                        newDuration = duration,
+                        projectName = PrefManager.getcurrentProject()
+                    )
+                }
+                when (result) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in Updating: ${result.exception.message}",
+                            "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+
+                        binding.progressBar.gone()
+                        toast("Updated Task Duration")
+
+                    }
+
+                }
+
+            } catch (e: Exception) {
+
+                Timber.tag(TAG).e(e)
+                binding.progressBar.gone()
+
+            }
+
+        }
     }
 
 }

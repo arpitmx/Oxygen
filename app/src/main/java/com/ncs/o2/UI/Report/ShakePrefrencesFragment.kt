@@ -51,6 +51,7 @@ class ShakePrefrencesFragment() : Fragment() {
         if (pref){
             binding.simpleSwitch.isChecked=true
             binding.shakeControls.visible()
+            binding.message.visible()
             val sensi=PrefManager.getShakeSensitivity()
             when(sensi){
                 1->{
@@ -67,12 +68,15 @@ class ShakePrefrencesFragment() : Fragment() {
         else{
             binding.simpleSwitch.isChecked=false
             binding.shakeControls.gone()
+            binding.message.gone()
         }
 
         binding.simpleSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 PrefManager.setShakePref(true)
                 binding.shakeControls.visible()
+                binding.message.visible()
+
                 binding.light.setOnClickThrottleBounceListener{
                     PrefManager.setShakeSensitivity(1)
                     setUpViews()
@@ -91,6 +95,8 @@ class ShakePrefrencesFragment() : Fragment() {
             } else {
                 PrefManager.setShakePref(false)
                 binding.shakeControls.gone()
+                binding.message.gone()
+
             }
         }
         binding.light.setOnClickThrottleBounceListener{

@@ -78,6 +78,8 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.MessageMoreOptions
 import com.ncs.o2.databinding.FragmentTaskChatBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -115,7 +117,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
-    ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick {
+    ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,ChatAdapter.OnMessageLongPress {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
@@ -733,7 +735,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             onchatDoubleClickListner = this,
             markwon = markwon,
             moderatorList = moderatorList,
-            assignee = activityBinding.assignee
+            assignee = activityBinding.assignee,
+            onMessageLongPress = this
         )
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -1365,6 +1368,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         }
         binding.inputBox.editboxMessage.setText(newText.toString())
         binding.inputBox.editboxMessage.setSelection(newText.length)
+    }
+
+    override fun onLongPress(message: Message) {
+        requireContext().performHapticFeedback()
+        val moreOptionBottomSheet =
+            MessageMoreOptions(message,"Task Chat")
+        moreOptionBottomSheet.show(requireFragmentManager(), "Options")
     }
 
 }

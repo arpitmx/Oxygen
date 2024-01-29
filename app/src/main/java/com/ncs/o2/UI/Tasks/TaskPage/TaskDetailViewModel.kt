@@ -159,6 +159,15 @@ constructor(val notificationApiService: NotificationApiService,
     suspend fun updatePriority(taskID:String,newPriority:String,projectName: String):ServerResult<Boolean>{
         return firestoreRepository.updatePriority(id = taskID, newPriority = newPriority, projectName = projectName)
     }
+    suspend fun updateType(taskID:String,newType:String,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updateType(id = taskID, newType = newType, projectName = projectName)
+    }
+    suspend fun updateDifficulty(taskID:String,newDifficulty:String,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updateDifficulty(id = taskID, newDifficulty = newDifficulty, projectName = projectName)
+    }
+    suspend fun updateDuration(taskID:String,newDuration:String,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updateDration(id = taskID, newDuration = newDuration, projectName = projectName)
+    }
     suspend fun updateModerators(taskID:String,projectName: String,moderator:String):ServerResult<Unit>{
         return firestoreRepository.updateModerator(id = taskID, projectName = projectName,moderator=moderator)
     }

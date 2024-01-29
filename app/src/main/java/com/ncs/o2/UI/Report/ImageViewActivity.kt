@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.Report
 
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import com.google.android.material.snackbar.Snackbar
@@ -9,7 +10,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.bumptech.glide.Glide
 import com.igreenwood.loupe.Loupe
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.R
 import com.ncs.o2.databinding.ActivityImageViewBinding
@@ -28,6 +31,15 @@ class ImageViewActivity : AppCompatActivity() {
             val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
             binding.image.setImageBitmap(bitmap)
         }
+
+
+        val receivedUriString = intent.getStringExtra("uri")
+
+        if (!receivedUriString.isNullOrBlank()){
+            val imageUri = Uri.parse(receivedUriString)
+            Glide.with(this).load(imageUri).into(binding.image)
+        }
+
         val loupe=Loupe.create(binding.image, binding.container) {
             onViewTranslateListener = object : Loupe.OnViewTranslateListener {
 

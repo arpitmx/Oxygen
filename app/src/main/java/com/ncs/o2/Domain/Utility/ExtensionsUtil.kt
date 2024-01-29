@@ -2,6 +2,7 @@ package com.ncs.o2.Domain.Utility
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
@@ -18,6 +19,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -46,6 +48,7 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.bounce
 import com.ncs.o2.R
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -528,7 +531,6 @@ object ExtensionsUtil {
             }
         this.startAnimation(animation)
     }
-
     private const val SHORT_HAPTIC_FEEDBACK_DURATION = 5L
     fun Context.performHapticFeedback() {
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -612,6 +614,10 @@ object ExtensionsUtil {
             lastClickTime = clickTime
         }
     }
+
+
+
+
 
     fun deleteDownloadedFile(downloadID : Long, context: Context) {
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager

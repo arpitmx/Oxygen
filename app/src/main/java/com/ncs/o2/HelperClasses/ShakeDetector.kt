@@ -5,11 +5,10 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import com.google.firebase.Timestamp
 
 class ShakeDetector(
     context: Context,
-    private val sensitivity: Float,
+    sensitivity: Float,
     private val onShake: () -> Unit
 ) : SensorEventListener {
 
@@ -19,16 +18,14 @@ class ShakeDetector(
     private val accelerometer: Sensor? =
         sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-    private var lastTime: Long = 0
-    private var lastUpdate: Long = 0
-    private var lastX: Float = 0.0f
-    private var lastY: Float = 0.0f
-    private var lastZ: Float = 0.0f
-
-    private var cooldownTime: Long = 0
-    private val cooldownInterval = 5000
+    private var mThresholdAcceleration:Float = 0.0f
+    private var mSensorBundles :ArrayList<SensorBundle>
+    private val INTERVAL = 500
+    private val mLock: Any = Any()
 
     init {
+        mThresholdAcceleration=sensitivity
+        mSensorBundles=ArrayList()
         registerListener()
     }
 
@@ -44,45 +41,82 @@ class ShakeDetector(
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
-    override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            val currentTime = System.currentTimeMillis()
-            val timeDifference = currentTime - lastTime
+    override fun onSensorChanged(sensorEvent: SensorEvent) {
+        val sensorBundle = SensorBundle(
+            sensorEvent.values[0],
+            sensorEvent.values[1],
+            sensorEvent.values[2],
+            sensorEvent.timestamp
+        )
 
-            if (timeDifference > SHAKE_THRESHOLD_INTERVAL) {
-                val x = event.values[0]
-                val y = event.values[1]
-                val z = event.values[2]
-
-                val deltaX = x - lastX
-                val deltaY = y - lastY
-                val deltaZ = z - lastZ
-
-                val speed = Math.sqrt((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ).toDouble()).toFloat()
-
-                if (speed > sensitivity && !isInCooldown()) {
-                    onShake.invoke()
-                    setCooldown()
-                }
-
-                lastTime = currentTime
-                lastX = x
-                lastY = y
-                lastZ = z
+        synchronized(mLock) {
+            if (mSensorBundles.size == 0) {
+                mSensorBundles.add(sensorBundle)
             }
+            else if (sensorBundle.timestamp - mSensorBundles[mSensorBundles.size - 1].timestamp > INTERVAL) {
+                mSensorBundles.add(sensorBundle)
+            } else {
+
+            }
+        }
+
+        performCheck()
+    }
+
+    private fun performCheck() {
+        synchronized(mLock) {
+            val vector = intArrayOf(0, 0, 0)
+            val matrix = arrayOf(
+                intArrayOf(0, 0),
+                intArrayOf(0, 0),
+                intArrayOf(0, 0)
+            )
+
+            for (sensorBundle in mSensorBundles) {
+                if (sensorBundle.xAcc > mThresholdAcceleration && vector[0] < 1) {
+                    vector[0] = 1
+                    matrix[0][0]++
+                }
+                if (sensorBundle.xAcc < -mThresholdAcceleration && vector[0] > -1) {
+                    vector[0] = -1
+                    matrix[0][1]++
+                }
+                if (sensorBundle.yAcc > mThresholdAcceleration && vector[1] < 1) {
+                    vector[1] = 1
+                    matrix[1][0]++
+                }
+                if (sensorBundle.yAcc < -mThresholdAcceleration && vector[1] > -1) {
+                    vector[1] = -1
+                    matrix[1][1]++
+                }
+                if (sensorBundle.zAcc > mThresholdAcceleration && vector[2] < 1) {
+                    vector[2] = 1
+                    matrix[2][0]++
+                }
+                if (sensorBundle.zAcc < -mThresholdAcceleration && vector[2] > -1) {
+                    vector[2] = -1
+                    matrix[2][1]++
+                }
+            }
+
+            for (axis in matrix) {
+                for (direction in axis) {
+                    if (direction < 3) {
+                        return
+                    }
+                }
+            }
+
+            onShake.invoke()
+            mSensorBundles.clear()
         }
     }
 
-    private fun isInCooldown(): Boolean {
-        val currentTime = Timestamp.now().seconds
-        return currentTime - cooldownTime < cooldownInterval
-    }
-
-    private fun setCooldown() {
-        cooldownTime = Timestamp.now().seconds
-    }
-
-    companion object {
-        private const val SHAKE_THRESHOLD_INTERVAL = 1000
-    }
 }
+private data class SensorBundle(
+    val xAcc: Float,
+    val yAcc: Float,
+    val zAcc: Float,
+    val timestamp: Long
+)
+

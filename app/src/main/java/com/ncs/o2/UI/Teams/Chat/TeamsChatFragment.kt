@@ -77,6 +77,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.MessageMoreOptions
 import com.ncs.o2.databinding.FragmentTeamsChatBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -110,7 +111,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
-    TeamsChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick {
+    TeamsChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,TeamsChatAdapter.OnMessageLongPress {
 
     lateinit var binding: FragmentTeamsChatBinding
     private val activityBinding: TeamsActivity by lazy {
@@ -715,6 +716,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             context = requireContext(),
             onchatDoubleClickListner = this,
             markwon = markwon,
+            this
         )
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -1370,4 +1372,10 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
         binding.inputBox.editboxMessage.setSelection(newText.length)
     }
 
+    override fun onLongPress(message: Message) {
+        requireContext().performHapticFeedback()
+        val moreOptionBottomSheet =
+            MessageMoreOptions(message,"Channel Chat")
+        moreOptionBottomSheet.show(requireFragmentManager(), "Options")
+    }
 }
