@@ -130,6 +130,16 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             initViews()
         }
 
+        binding.swiperefresh.setOnRefreshListener {
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                getCheckList()
+            }
+            else{
+                binding.swiperefresh.isRefreshing=false
+                utils.showSnackbar(binding.root,"Can't refresh the page",2000)
+            }
+        }
+
         return binding.root
 
     }
@@ -205,6 +215,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                     }
 
                     is ServerResult.Success -> {
+                        binding.swiperefresh.isRefreshing=false
                         checkListArray.clear()
                         checkListArray.addAll(result.data)
                         setCheckListRecyclerView(result.data)

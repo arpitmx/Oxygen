@@ -142,7 +142,7 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
 
     override fun onClick(segment: SegmentItem, position: Int) {
         Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
-        if (type!="Create Task" && type!="Search"){
+        if (type!="Search"){
             PrefManager.setcurrentsegment(segment.segment_NAME)
             segmentName=segment.segment_NAME
             sendsectionList(PrefManager.getcurrentProject())

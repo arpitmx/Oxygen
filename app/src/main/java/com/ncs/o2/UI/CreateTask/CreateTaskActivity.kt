@@ -68,6 +68,7 @@ import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.CodeViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageAdapter
@@ -603,8 +604,9 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                                 }
                             }
                         }
+                        startActivity(Intent(this@CreateTaskActivity,MainActivity::class.java))
                         finish()
-                        startActivity(intent)
+
                     }
                 }
             }
@@ -628,10 +630,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     private fun createTask(){
         binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
-            if (binding.taskDurationET.text=="Select"){
-                toast("Add Task Duration")
-            }
-            else if (binding.segment.text=="Segment"){
+            if (binding.segment.text=="Segment"){
                 toast("Select Task Segment")
             }
             else if (binding.section.text=="Section"){
@@ -648,9 +647,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 val difficulty= SwitchFunctions.getNumDifficultyFromStringDifficulty(binding.difficultyInclude.tagText.text.toString())
                 val priority= SwitchFunctions.getNumPriorityFromStringPriority(binding.priorityInclude.tagText.text.toString())
                 val status= SwitchFunctions.getNumStateFromStringState(binding.stateInclude.tagText.text.toString())
-
                 val assigner=PrefManager.getcurrentUserdetails()
-                val duration=binding.taskDurationET
                 val tags=ArrayList<String>()
                 for (i in 0 until selectedTags.size){
                     tags.add(selectedTags[i].tagID!!)
@@ -676,7 +673,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         status = status,
                         assignee = assignee,
                         assigner = assigner.EMAIL,
-                        duration = duration.text.toString(),
+                        duration = if (binding.taskDurationET.text.toString()=="Select") "Not Set" else binding.taskDurationET.text.toString(),
                         time_STAMP = Timestamp.now(),
                         tags = tags.toList().ifEmpty { emptyList() },
                         project_ID = PrefManager.getcurrentProject(),
@@ -698,7 +695,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                         status = status,
                         assignee = "None",
                         assigner = assigner.EMAIL,
-                        duration = duration.text.toString(),
+                        duration = if (binding.taskDurationET.text.toString()=="Select") "Not Set" else binding.taskDurationET.text.toString(),
                         time_STAMP = Timestamp.now(),
                         tags = tags.toList().ifEmpty { emptyList() },
                         project_ID = PrefManager.getcurrentProject(),

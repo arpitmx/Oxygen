@@ -63,42 +63,44 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 3 -> binding.difficulty.background= ResourcesCompat.getDrawable(context.resources,R.drawable.label_cardview_red,null)
             }
 
-            CoroutineScope(Dispatchers.IO).launch{
+            CoroutineScope(Dispatchers.IO).launch {
 
                 val iterator = task.tagList.iterator()
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
                     val tagId = iterator.next()
-                    val tag=db.tagsDao().getTagbyId(tagId)
+                    val tag = db.tagsDao().getTagbyId(tagId)
 
                     if (!tag.isNull) {
                         tag?.checked = true
-                        selectedTags.add(tag!!)
+
+                        synchronized(selectedTags) {
+                            selectedTags.add(tag!!)
+                        }
                     }
                 }
 
-                withContext(Dispatchers.Main){
-                   // Timber.d("tagcheckfromDB", selectedTags.toString())
-                    setTagsView(selectedTags,binding,task)
+                withContext(Dispatchers.Main) {
+                    setTagsView(selectedTags.toList().toMutableList(), binding, task)
                 }
             }
         }
     }
 
-    private fun setTagsView(list: MutableList<Tag>,binding: TaskItemBinding,task: TaskItem) {
-
-        val newList:MutableList<Tag> = mutableListOf()
+    private fun setTagsView(list: MutableList<Tag>, binding: TaskItemBinding, task: TaskItem) {
         val tagIdSet = HashSet(task.tagList)
 
-        val itr = list.iterator()
+        synchronized(list) {
+            val iterator = list.iterator()
 
-        while(itr.hasNext()){
-            val tag = itr.next()
-            if(tagIdSet.contains(tag?.tagID)){
-                newList.add(tag)
+            while (iterator.hasNext()) {
+                val tag = iterator.next()
+                if (!tagIdSet.contains(tag?.tagID)) {
+                    iterator.remove()
+                }
             }
         }
 
-        val finalList= newList.distinctBy { it.tagID }
+        val finalList = list.distinctBy { it.tagID }
         val tagsRecyclerView = binding.tagRecyclerView
         val layoutManager = FlexboxLayoutManager(context)
 

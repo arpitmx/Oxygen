@@ -103,6 +103,7 @@ class ReportingFragment : Fragment() {
 
     private fun setImages(){
 
+        Log.d("bitmaps",bitmaps.toString())
 
         if (bitmaps.size==0){
             binding.imagesCont.gone()

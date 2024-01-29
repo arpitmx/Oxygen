@@ -69,7 +69,8 @@ class ChatAdapter(
     val moderatorList : MutableList<String>,
     val assignee : String,
     private val onchatDoubleClickListner: onChatDoubleClickListner,
-    private val markwon: Markwon
+    private val markwon: Markwon,
+    private val onMessageLongPress: OnMessageLongPress
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var messageDatabase: MessageDatabase
@@ -115,6 +116,16 @@ class ChatAdapter(
                     Log.d("DB", "fetching from db")
                     setChatItem(newUser, binding, position)
                 }
+            }
+
+            binding.parentMessageItem.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
+            }
+
+            binding.descriptionTv.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
             }
 
             binding.parentMessageItem.setOnDoubleClickListener {
@@ -179,6 +190,16 @@ class ChatAdapter(
                     Timber.tag("DB").d("fetching from db")
                     setChatReplyItem(newUser, binding, position)
                 }
+            }
+
+            binding.parentMessageItem.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
+            }
+
+            binding.descriptionTv.setOnLongClickListener {
+                onMessageLongPress.onLongPress(msgList[position])
+                true
             }
 
             binding.parentMessageItem.setOnDoubleClickListener {
@@ -606,6 +627,9 @@ class ChatAdapter(
     }
     interface onImageClicked{
         fun onImageClick(position: Int,imageUrls: List<String>)
+    }
+    interface OnMessageLongPress{
+        fun onLongPress(message: Message)
     }
     fun onImageClick(position: Int, imageUrls: List<String>) {
         val imageViewerIntent = Intent(context, ImageViewerActivity::class.java)

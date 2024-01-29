@@ -1327,6 +1327,8 @@ class FirestoreRepository @Inject constructor(
                     } else {
                         "mohit@mail.com"
                     }
+                    val lastupdated: Timestamp =
+                        (document.get("last_updated") ?: Timestamp.now()) as Timestamp
 
                     val taskItem = TaskItem(
                         title = title!!,
@@ -1334,7 +1336,8 @@ class FirestoreRepository @Inject constructor(
                         difficulty = difficulty.toString().toInt(),
                         timestamp = time,
                         assignee_id = assignerID,
-                        tagList = tags
+                        tagList = tags,
+                        last_updated = lastupdated
                     )
 
                     sectionList.add(taskItem)
@@ -2301,6 +2304,93 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateType(
+        id: String,
+        newType: String,
+        projectName: String
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+
+                val type = SwitchFunctions.getNumTypeFromStringType(newType)
+                transaction.update(projectDocumentRef, "type", type)
+                ServerLogger().addRead(1)
+                updateLastUpdated(projectName,transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun updateDifficulty(
+        id: String,
+        newDifficulty: String,
+        projectName: String
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+
+                val diff = SwitchFunctions.getNumDifficultyFromStringDifficulty(newDifficulty)
+                transaction.update(projectDocumentRef, "difficulty", diff)
+                ServerLogger().addRead(1)
+                updateLastUpdated(projectName,transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+    override suspend fun updateDration(
+        id: String,
+        newDuration: String,
+        projectName: String
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+
+                transaction.update(projectDocumentRef, "duration", newDuration)
+                ServerLogger().addRead(1)
+                updateLastUpdated(projectName,transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
+
     override fun getCheckList(
         projectName: String,
         taskId: String,
@@ -2313,12 +2403,24 @@ class FirestoreRepository @Inject constructor(
             .addOnSuccessListener {
                 ServerLogger().addRead(it.size())
                 val CheckListArray = mutableListOf<CheckList>()
+                val msgCheckLists = mutableListOf<CheckList>()
                 for (document in it.documents) {
                     val checkList = document.toObject(CheckList::class.java)
-                    checkList?.let {
-                        CheckListArray.add(checkList)
+                    if (checkList!!.index == -100) {
+                        msgCheckLists.add(checkList)
+                    } else {
+                        checkList.let {
+                            CheckListArray.add(checkList)
+                        }
                     }
-
+                }
+                if (msgCheckLists.isNotEmpty()){
+                    for (msg in msgCheckLists){
+                        msg.index=CheckListArray.size
+                        firestore.collection(Endpoints.PROJECTS).document(projectName)
+                            .collection(Endpoints.Project.TASKS).document(taskId).collection(Endpoints.Project.CHECKLIST).document(msg.id).update("index",CheckListArray.size)
+                        CheckListArray.add(msg)
+                    }
                 }
                 result(ServerResult.Success(CheckListArray))
             }
