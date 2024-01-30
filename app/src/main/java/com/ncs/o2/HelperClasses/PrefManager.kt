@@ -14,6 +14,7 @@ import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.state.SegmentItem
@@ -779,6 +780,25 @@ object PrefManager {
         editor.apply()
     }
 
+    private fun getProjectDataListKey(projectName: String): String {
+        return "project_data_list_$projectName"
+    }
 
+    fun saveProjectTodayTasks(projectName: String, dataList: List<TodayTasks>) {
+        val gson = Gson()
+        val dataListJson = gson.toJson(dataList)
+        editor.putString(getProjectDataListKey(projectName), dataListJson)
+        editor.apply()
+    }
 
+    fun getProjectTodayTasks(projectName: String): List<TodayTasks> {
+        val dataListJson = sharedPreferences.getString(getProjectDataListKey(projectName), null)
+        val gson = Gson()
+        val type = object : TypeToken<List<TodayTasks>>() {}.type
+        return if (dataListJson != null) {
+            gson.fromJson(dataListJson, type)
+        } else {
+            emptyList()
+        }
+    }
 }

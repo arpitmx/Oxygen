@@ -15,6 +15,7 @@ import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -71,6 +72,26 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
             }
 
         }
+
+        binding.today.setOnClickThrottleBounceListener {
+            val todays = PrefManager.getProjectTodayTasks(PrefManager.getcurrentProject()).toMutableList()
+
+            val isTaskAlreadyPresent = todays.any { it.taskID == activityBinding.taskId }
+
+            if (isTaskAlreadyPresent) {
+                toast("This task is already present in your today")
+            } else {
+                todays.add(TodayTasks(
+                    taskID = activityBinding.taskId,
+                    isCompleted = false
+                ))
+                PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(), todays)
+                toast("Task added to your today")
+            }
+
+            dismiss()
+        }
+
     }
 
     private fun shareTaskLink(link:String) {

@@ -175,6 +175,102 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:id="@+id/reply">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="24dp"
+                android:background="@color/secondary_bg_black"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@null"
+                        android:src="@drawable/baseline_reply_24"
+                        app:tint="@color/better_white" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:fontFamily="@font/sf_pro_display_semibold"
+                        android:text="Reply"
+                        android:textColor="@color/better_white"
+                        android:textSize="18dp" />
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/card_bg"
+                    />
+            </LinearLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:id="@+id/copy">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="24dp"
+                android:background="@color/secondary_bg_black"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@null"
+                        android:src="@drawable/baseline_content_copy_24"
+                        app:tint="@color/better_white" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:fontFamily="@font/sf_pro_display_semibold"
+                        android:text="Copy"
+                        android:textColor="@color/better_white"
+                        android:textSize="18dp" />
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/card_bg"
+                    />
+            </LinearLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
     </LinearLayout>
 
 </LinearLayout>

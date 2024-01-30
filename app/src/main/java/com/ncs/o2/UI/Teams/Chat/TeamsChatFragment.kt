@@ -111,7 +111,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
-    TeamsChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,TeamsChatAdapter.OnMessageLongPress {
+    TeamsChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,TeamsChatAdapter.OnMessageLongPress,MessageMoreOptions.OnReplyClick {
 
     lateinit var binding: FragmentTeamsChatBinding
     private val activityBinding: TeamsActivity by lazy {
@@ -1372,10 +1372,18 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
         binding.inputBox.editboxMessage.setSelection(newText.length)
     }
 
-    override fun onLongPress(message: Message) {
+    override fun onLongPress(message: Message,senderName: String) {
         requireContext().performHapticFeedback()
         val moreOptionBottomSheet =
-            MessageMoreOptions(message,"Channel Chat")
+            MessageMoreOptions(message,"Channel Chat",this, senderName)
         moreOptionBottomSheet.show(requireFragmentManager(), "Options")
+    }
+    override fun onReplyClicked(message: Message,senderName: String) {
+        binding.inputBox.replyingToUserTv.text = "Replying to @${senderName}"
+        binding.inputBox.referenceMsgTv.text = message.content
+        binding.inputBox.replyViewParent.visible()
+        binding.inputBox.replyViewParent.animFadein(requireContext(), 150)
+        requireActivity().performHapticFeedback()
+        replyingTo = message.messageId
     }
 }

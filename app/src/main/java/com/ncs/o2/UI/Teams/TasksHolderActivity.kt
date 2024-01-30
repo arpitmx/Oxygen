@@ -486,6 +486,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
                         }
                         progressDialog.dismiss()
                         startActivity(intent)
+                        finish()
                         binding.swiperefresh.isRefreshing=false
 
                     }

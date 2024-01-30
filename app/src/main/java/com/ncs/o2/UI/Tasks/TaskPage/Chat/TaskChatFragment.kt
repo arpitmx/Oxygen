@@ -117,7 +117,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
-    ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,ChatAdapter.OnMessageLongPress {
+    ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,ChatAdapter.OnMessageLongPress,MessageMoreOptions.OnReplyClick {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
@@ -1370,11 +1370,20 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         binding.inputBox.editboxMessage.setSelection(newText.length)
     }
 
-    override fun onLongPress(message: Message) {
+    override fun onLongPress(message: Message,senderName: String) {
         requireContext().performHapticFeedback()
         val moreOptionBottomSheet =
-            MessageMoreOptions(message,"Task Chat")
+            MessageMoreOptions(message,"Task Chat",this,senderName)
         moreOptionBottomSheet.show(requireFragmentManager(), "Options")
+    }
+
+    override fun onReplyClicked(message: Message,senderName: String) {
+        binding.inputBox.replyingToUserTv.text = "Replying to @${senderName}"
+        binding.inputBox.referenceMsgTv.text = message.content
+        binding.inputBox.replyViewParent.visible()
+        binding.inputBox.replyViewParent.animFadein(requireContext(), 150)
+        requireActivity().performHapticFeedback()
+        replyingTo = message.messageId
     }
 
 }

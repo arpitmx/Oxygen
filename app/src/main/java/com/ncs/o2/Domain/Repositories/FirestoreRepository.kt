@@ -2525,6 +2525,33 @@ class FirestoreRepository @Inject constructor(
             return ServerResult.Failure(e)
         }
     }
+
+    override suspend fun updateTitle(
+        taskId: String,
+        projectName: String,
+        newTitle: String,
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+                val documentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(projectName)
+                    .collection(Endpoints.Project.TASKS)
+                    .document(taskId)
+                ServerLogger().addRead(1)
+
+                transaction.update(documentRef, "title", newTitle)
+
+                updateLastUpdated(projectName, transaction)
+                updateTaskLastUpdated(projectName,transaction,taskId)
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
     override suspend fun updateMessage(
         taskId: String,
         projectName: String,

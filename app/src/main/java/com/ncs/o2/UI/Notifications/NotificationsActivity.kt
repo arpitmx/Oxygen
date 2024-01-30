@@ -84,6 +84,17 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         val channelID=intent.getStringExtra("channel_name")
         if (projectID!=null && taskID!=null && type!=null){
             when(type){
+                NotificationType.TASK_CHECKPOINT_NOTIFICATION.name->{
+                    finish()
+                    updateProjectCache(projectID)
+                    val intent = Intent(this, TaskDetailActivity::class.java)
+                    intent.putExtra("task_id", taskID)
+                    intent.putExtra("index", "2")
+                    intent.putExtra("type", "notifications")
+
+                    startActivity(intent)
+                    this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                }
                 NotificationType.TASK_COMMENT_NOTIFICATION.name->{
                     finish()
                     updateProjectCache(projectID)

@@ -32,6 +32,9 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.Assigned.TodayActivity"
+            android:exported="false" />
+        <activity
             android:name=".UI.Report.ImageViewActivity"
             android:exported="false"
             android:label="@string/title_activity_image_view"
