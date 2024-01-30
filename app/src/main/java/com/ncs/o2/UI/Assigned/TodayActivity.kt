@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.Assigned
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.TodayTasks
@@ -24,6 +26,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
+import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.ActivityTasksHolderBinding
 import com.ncs.o2.databinding.ActivityTodayBinding
@@ -33,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -70,7 +74,11 @@ class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,Toda
                     setTasks()
                 }, negative = {})
         }
+        binding.swiperefresh.setOnRefreshListener {
+            syncCache(PrefManager.getcurrentProject())
+        }
         setTasks()
+
 
     }
     private fun setTasks(){
@@ -85,6 +93,61 @@ class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,Toda
         }
     }
 
+    private fun syncCache(projectName:String){
+        val progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("Please wait, Syncing Tasks")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    firestoreRepository.getTasksinProjectAccordingtoTimeStamp(projectName)
+                }
+
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+                        progressDialog.dismiss()
+                        binding.swiperefresh.isRefreshing=false
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        progressDialog.show()
+                        progressDialog.setMessage("Please wait, Syncing Tasks")
+
+                    }
+
+                    is ServerResult.Success -> {
+
+                        val tasks = taskResult.data
+                        if (tasks.isNotEmpty()){
+                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
+                            for (task in tasks) {
+                                db.tasksDao().insert(task)
+                            }
+                        }
+                        progressDialog.dismiss()
+                        startActivity(intent)
+                        finish()
+                        binding.swiperefresh.isRefreshing=false
+
+                    }
+
+                }
+
+            } catch (e: java.lang.Exception) {
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+                progressDialog.dismiss()
+
+
+            }
+
+        }
+    }
     private fun setUpOnSuccessRV(list: MutableList<TodayTasks>){
         Log.d("Todays",list.toString())
         if (list.isEmpty()){
