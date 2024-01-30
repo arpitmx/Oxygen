@@ -142,7 +142,24 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
 
     override fun onClick(segment: SegmentItem, position: Int) {
         Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
-        if (type!="Search"){
+        val segments=PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+        val sections:MutableList<String> = mutableListOf()
+        for(seg in segments){
+            if (seg.segment_NAME==segment.segment_NAME){
+                sections.addAll(seg.sections.toSet().toMutableList())
+            }
+        }
+        sectionList=sections
+        Log.d("sectionsListsegment",segment.toString())
+        Log.d("sectionsList",sectionList.toString())
+
+        if (type!="Search" && type!="Quick Task" && type!="Create Task"){
+//            PrefManager.setcurrentsegment(segment.segment_NAME)
+            segmentName=segment.segment_NAME
+//            sendsectionList(PrefManager.getcurrentProject())
+//            PrefManager.putsectionsList(sectionList)
+        }
+        if (type=="MainActivity" || type=="Create Task" ){
             PrefManager.setcurrentsegment(segment.segment_NAME)
             segmentName=segment.segment_NAME
             sendsectionList(PrefManager.getcurrentProject())

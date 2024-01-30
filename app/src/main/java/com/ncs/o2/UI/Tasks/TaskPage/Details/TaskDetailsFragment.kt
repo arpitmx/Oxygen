@@ -70,6 +70,7 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.BottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.ModeratorsBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.EditTitleBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.sectionDisplayBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.setDurationBottomSheet
 import com.ncs.o2.databinding.FragmentTaskDetailsFrgamentBinding
@@ -95,7 +96,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     ImageAdapter.ImagesListner, AssigneeListBottomSheet.getassigneesCallback,
     AssigneeListBottomSheet.updateAssigneeCallback, BottomSheet.SendText,
     AddTagsBottomSheet.getSelectedTagsCallback,
-    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapterOtherScreens.OnClick,setDurationBottomSheet.DurationAddedListener {
+    ModeratorsBottomSheet.getContributorsCallback,sectionDisplayBottomSheet.SectionSelectionListener,TagAdapterOtherScreens.OnClick,setDurationBottomSheet.DurationAddedListener,EditTitleBottomSheet.OnTitleUpdate {
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
@@ -137,6 +138,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     private lateinit var markwon: Markwon
     private lateinit var mdEditor: MarkwonEditor
     private lateinit var activityViewListner: ViewVisibilityListner
+    private var taskSummary:String=""
 
     companion object {
         const val TAG = "TaskDetailsFragment"
@@ -186,6 +188,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             binding.section.isEnabled=false
             binding.priority.isEnabled=false
             binding.taskType.isEnabled=false
+            binding.titleTv.isEnabled=false
             binding.difficulty.isEnabled=false
             binding.taskDuration.isEnabled=false
             binding.activity.setOnClickThrottleBounceListener {
@@ -225,6 +228,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             binding.taskType.isEnabled=true
             binding.taskType.isClickable=true
 
+            binding.titleTv.isEnabled=true
+            binding.titleTv.isClickable=true
+
+
             binding.assignee.isEnabled=true
             binding.assignee.isClickable=true
 
@@ -250,6 +257,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
             binding.taskType.isEnabled=false
             binding.taskType.isClickable=false
+
+            binding.titleTv.isEnabled=false
+            binding.titleTv.isClickable=false
+
 
             binding.assignee.isEnabled=false
             binding.assignee.isClickable=false
@@ -297,9 +308,15 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             }
         }
 
+        binding.titleTv.setOnClickThrottleBounceListener {
+            val editTitleBottomSheet =
+                EditTitleBottomSheet(taskDetails.title,this)
+            editTitleBottomSheet.show(requireFragmentManager(), "Edit Title")
+        }
+
         binding.btnEditSummary.setOnClickThrottleBounceListener {
             val intent = Intent(requireActivity(), DescriptionEditorActivity::class.java)
-            intent.putExtra("summary", taskDetails.description)
+            intent.putExtra("summary", taskSummary)
             startActivityForResult(intent, 1)
         }
 
@@ -446,10 +463,18 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == AppCompatActivity.RESULT_OK) {
-            val summary = data?.getStringExtra("summary")
-            if (!summary.isNull){
+            val summary = data?.getStringExtra("summary")?.trim()
+            if (!summary.isNullOrBlank()){
+
                 val description=summary!!.trimIndent()
+                taskSummary=description
                 updateTaskSummary(task = taskDetails, newSummary = description)
+            }
+            else{
+                binding.summaryView.gone()
+                if (isModerator && PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                    binding.addSummary.visible()
+                }
             }
         }
     }
@@ -649,6 +674,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     binding.priority.isEnabled=true
                     binding.difficulty.isEnabled=true
                     binding.taskType.isEnabled=true
+                    binding.titleTv.isEnabled=true
                     binding.taskDuration.isEnabled=true
                     activityBinding.binding.gioActionbar.btnModerator.visible()
                 }
@@ -659,6 +685,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     binding.priority.isEnabled=false
                     binding.difficulty.isEnabled=false
                     binding.taskType.isEnabled=false
+                    binding.titleTv.isEnabled=false
                     binding.taskDuration.isEnabled=false
                     activityBinding.binding.gioActionbar.btnModerator.visible()
                 }
@@ -754,9 +781,29 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         fetchUsers()
         binding.titleTv.text = task.title
 
-        runDelayed(500) {
-            setUpTaskDescription(taskDetails.description!!)
+        if(taskDetails.description.isBlank()){
+            binding.summaryView.gone()
+            activityViewListner.showProgressbar(false)
+            if (isModerator && PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                binding.addSummary.visible()
+            }
         }
+        else{
+            binding.addSummary.gone()
+            binding.summaryView.visible()
+            taskSummary=taskDetails.description
+            runDelayed(500) {
+                setUpTaskDescription(taskDetails.description!!)
+            }
+        }
+
+        binding.addSummary.setOnClickThrottleBounceListener {
+            val intent = Intent(requireActivity(), DescriptionEditorActivity::class.java)
+            intent.putExtra("summary", taskDetails.description)
+            startActivityForResult(intent, 1)
+        }
+
+
 
         setCreator(task)
     }
@@ -1480,7 +1527,10 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     is ServerResult.Success -> {
                         binding.progressBar.gone()
                         toast("Updated Task Summary")
-                        binding.markdownView.loadMarkdown(newSummary)
+                        val task=taskDetails
+                        task.description=newSummary
+                        db.tasksDao().update(task)
+                        requireActivity().recreate()
 
                     }
 
@@ -2179,6 +2229,15 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             }
 
         }
+    }
+
+    override fun ontitleUpdated(title:String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val task=taskDetails
+            task.title=title
+            db.tasksDao().update(task)
+        }
+        binding.titleTv.text=title
     }
 
 }

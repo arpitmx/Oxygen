@@ -235,6 +235,12 @@ interface Repository {
         newSection:String,
     ): ServerResult<Boolean>
 
+    suspend fun updateTitle(
+        taskId: String,
+        projectName: String,
+        newTitle: String,
+    ): ServerResult<Boolean>
+
     suspend fun updateMessage(
         taskId: String,
         projectName: String,

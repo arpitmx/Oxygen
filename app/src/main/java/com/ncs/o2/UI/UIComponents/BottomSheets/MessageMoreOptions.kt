@@ -1,12 +1,19 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.Timestamp
+import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Models.CheckList
+import com.ncs.o2.Domain.Models.Message
+import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -14,6 +21,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
@@ -28,7 +36,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,private val openBy:String) : BottomSheetDialogFragment(){
+class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,private val openBy:String,private val onReplyClick: OnReplyClick,private val senderName:String) : BottomSheetDialogFragment(){
     @Inject
     lateinit var utils : GlobalUtils.EasyElements
     lateinit var binding:MsgMoreOptionsBinding
@@ -94,6 +102,19 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
             addQuickTaskBottomSheet.show(requireFragmentManager(), "Quick Task")
         }
 
+        binding.copy.setOnClickThrottleBounceListener {
+            dismiss()
+            val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText("Copied Text", message.content)
+            clipboardManager.setPrimaryClip(clipData)
+            toast("Message copied")
+        }
+
+        binding.reply.setOnClickThrottleBounceListener {
+            dismiss()
+            onReplyClick.onReplyClicked(message,senderName)
+        }
+
 
     }
 
@@ -132,6 +153,23 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
                         binding.progressBar.gone()
                         toast("Added message as a CheckList")
                         dismiss()
+                        val notification = composeNotification(
+                            NotificationType.TASK_CHECKPOINT_NOTIFICATION,
+                            message = checkList.desc
+                        )
+                        val filteredList = {
+                            val list = activityBinding.sharedViewModel.getList()
+                            if (list.contains(PrefManager.getUserFCMToken())) {
+                                list.remove(PrefManager.getUserFCMToken())
+                            }
+                            list
+
+                        }
+                        notification?.let {
+                            sendNotification(
+                                filteredList.invoke(), notification
+                            )
+                        }
                     }
 
                 }
@@ -146,7 +184,49 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
         }
     }
 
+    private fun sendNotification(receiverList: MutableList<String>, notification: Notification) {
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                for (receiverToken in receiverList) {
+                    NotificationsUtils.sendFCMNotification(
+                        receiverToken, notification = notification
+                    )
+                }
+
+            }
+
+        } catch (exception: Exception) {
+            Timber.tag("")
+            utils.showSnackbar(binding.root, "Failure in sending notifications", 5000)
+        }
+
+    }
+
+    private fun composeNotification(type: NotificationType, message: String): Notification? {
+
+        if (type == NotificationType.TASK_CHECKPOINT_NOTIFICATION) {
+
+            return Notification(
+                notificationID = RandomIDGenerator.generateRandomTaskId(6),
+                notificationType = NotificationType.TASK_CHECKPOINT_NOTIFICATION.name,
+                taskID = activityBinding.taskId,
+                message = message,
+                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} has added a checkpoint in ${activityBinding.taskId}",
+                fromUser = PrefManager.getcurrentUserdetails().EMAIL,
+                toUser = "None",
+                timeStamp = Timestamp.now().seconds,
+                projectID = PrefManager.getcurrentProject(),
+            )
+        }
+        return null
+    }
+
     private fun setBottomSheetConfig() {
         this.isCancelable = true
+    }
+
+    interface OnReplyClick{
+        fun onReplyClicked(message: Message,senderName: String)
     }
 }

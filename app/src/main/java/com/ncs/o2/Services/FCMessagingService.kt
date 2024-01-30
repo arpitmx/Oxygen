@@ -67,6 +67,16 @@ class FCMessagingService : FirebaseMessagingService() {
                     )
                     showNotification(notification = notif, context = applicationContext)
                 }
+                if (type == NotificationType.TASK_CHECKPOINT_NOTIFICATION.name){
+                    val notif = FCMNotification(
+                        notificationType = NotificationType.TASK_CHECKPOINT_NOTIFICATION,
+                        title =  title.orEmpty(),
+                        message = body.orEmpty(),
+                        taskID =  taskID.orEmpty(),
+                        projectID = projectID.orEmpty()
+                    )
+                    showNotification(notification = notif, context = applicationContext)
+                }
                 if (type == NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name){
                     val notif = FCMNotification(
                         notificationType = NotificationType.TASK_COMMENT_MENTION_NOTIFICATION,

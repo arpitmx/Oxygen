@@ -127,6 +127,11 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         binding.favs.setOnClickThrottleBounceListener {
             startActivity("Favs")
         }
+        binding.today.setOnClickThrottleBounceListener {
+            val intent = Intent(requireContext(), TodayActivity::class.java)
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+        }
 
         binding.assignedGrid.setOnClickListener {
             binding.arrowStats.set180(requireContext())

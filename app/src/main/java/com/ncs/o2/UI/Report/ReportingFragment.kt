@@ -304,16 +304,19 @@ class ReportingFragment : Fragment() {
 
 
         binding.submitIssue.setOnClickThrottleBounceListener{
-            binding.issueBody.gone()
+            binding.layout.gone()
             binding.progressbar.visible()
+
             if (type.isEmpty()){
-                binding.issueBody.visible()
+                binding.layout.visible()
                 binding.progressbar.gone()
+
                 toast("Issue Type is required")
             }
             else if (binding.desc.text?.trim().isNullOrBlank()){
-                binding.issueBody.visible()
+                binding.layout.visible()
                 binding.progressbar.gone()
+
                 toast("Description is required")
             }
             else{
@@ -346,8 +349,9 @@ class ReportingFragment : Fragment() {
 
 
     private fun getIconDownloadUrl(imageRef: StorageReference)  {
-        binding.issueBody.gone()
+        binding.layout.gone()
         binding.progressbar.visible()
+
         repository.getProjectIssueUrl(imageRef).observe(viewLifecycleOwner) { result ->
 
             when(result){
@@ -370,8 +374,9 @@ class ReportingFragment : Fragment() {
         }
     }
     private fun postIssue(urls:List<String>){
-        binding.issueBody.gone()
+        binding.layout.gone()
         binding.progressbar.visible()
+
         var desc=binding.desc.text?.trim().toString()
         if (urls.isNotEmpty()){
 
@@ -445,8 +450,9 @@ class ReportingFragment : Fragment() {
                     }
 
                     is ServerResult.Success -> {
-                        binding.issueBody.visible()
+                        binding.layout.visible()
                         binding.progressbar.gone()
+
                         toast("Issue Submitted")
                         startActivity(Intent(requireContext(),MainActivity::class.java))
                     }

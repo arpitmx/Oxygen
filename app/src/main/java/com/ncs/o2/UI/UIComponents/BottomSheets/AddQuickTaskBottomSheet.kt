@@ -73,7 +73,7 @@ class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Mess
         binding.title.setText(message.content)
 
         binding.segment.setOnClickThrottleBounceListener {
-            val segment = SegmentSelectionBottomSheet("Create Task")
+            val segment = SegmentSelectionBottomSheet("Quick Task")
             segment.segmentSelectionListener = this
             segment.sectionSelectionListener = this
             segment.show(requireFragmentManager(), "Segment Selection")
@@ -151,7 +151,6 @@ class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Mess
                         PrefManager.putDraftCheckLists(emptyList())
                         binding.body.visible()
                         binding.progressBar.gone()
-                        PrefManager.setcurrentsegment(binding.segment.text.toString())
                         toast("Task Created Successfully")
                         dismiss()
                     }

@@ -119,13 +119,31 @@ class ChatAdapter(
             }
 
             binding.parentMessageItem.setOnLongClickListener {
-                onMessageLongPress.onLongPress(msgList[position])
-                true
+                if (localUser != null) {
+                    onMessageLongPress.onLongPress(msgList[position],localUser.USERNAME!!)
+                    true
+
+                } else {
+                    fetchUser(senderId) {
+                        onMessageLongPress.onLongPress(msgList[position],it.USERNAME!!)
+                    }
+                    true
+                }
+
             }
 
             binding.descriptionTv.setOnLongClickListener {
-                onMessageLongPress.onLongPress(msgList[position])
-                true
+                if (localUser != null) {
+                    onMessageLongPress.onLongPress(msgList[position],localUser.USERNAME!!)
+                    true
+
+                } else {
+                    fetchUser(senderId) {
+                        onMessageLongPress.onLongPress(msgList[position],it.USERNAME!!)
+                    }
+                    true
+                }
+
             }
 
             binding.parentMessageItem.setOnDoubleClickListener {
@@ -193,13 +211,31 @@ class ChatAdapter(
             }
 
             binding.parentMessageItem.setOnLongClickListener {
-                onMessageLongPress.onLongPress(msgList[position])
-                true
+                if (localUser != null) {
+                    onMessageLongPress.onLongPress(msgList[position],localUser.USERNAME!!)
+                    true
+
+                } else {
+                    fetchUser(senderId) {
+                        onMessageLongPress.onLongPress(msgList[position],it.USERNAME!!)
+                    }
+                    true
+                }
+
             }
 
             binding.descriptionTv.setOnLongClickListener {
-                onMessageLongPress.onLongPress(msgList[position])
-                true
+                if (localUser != null) {
+                    onMessageLongPress.onLongPress(msgList[position],localUser.USERNAME!!)
+                    true
+
+                } else {
+                    fetchUser(senderId) {
+                        onMessageLongPress.onLongPress(msgList[position],it.USERNAME!!)
+                    }
+                    true
+                }
+
             }
 
             binding.parentMessageItem.setOnDoubleClickListener {
@@ -629,7 +665,7 @@ class ChatAdapter(
         fun onImageClick(position: Int,imageUrls: List<String>)
     }
     interface OnMessageLongPress{
-        fun onLongPress(message: Message)
+        fun onLongPress(message: Message,senderName: String)
     }
     fun onImageClick(position: Int, imageUrls: List<String>) {
         val imageViewerIntent = Intent(context, ImageViewerActivity::class.java)

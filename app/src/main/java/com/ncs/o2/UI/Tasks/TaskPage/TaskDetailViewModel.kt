@@ -175,6 +175,9 @@ constructor(val notificationApiService: NotificationApiService,
     suspend fun updateSection(taskID:String,projectName: String,newSection:String):ServerResult<Boolean>{
         return firestoreRepository.updateSection(taskId = taskID, projectName = projectName,newSection=newSection)
     }
+    suspend fun updateTitle(taskID:String,projectName: String,newTitle:String):ServerResult<Boolean>{
+        return firestoreRepository.updateTitle(taskId = taskID, projectName = projectName,newTitle=newTitle)
+    }
     suspend fun addNewModerators(taskID:String,projectName: String,moderator:MutableList<String>,unselected:MutableList<String>):ServerResult<Boolean>{
         return firestoreRepository.addNewModerator(id = taskID, projectName = projectName, newModerators =moderator,unselected=unselected)
     }

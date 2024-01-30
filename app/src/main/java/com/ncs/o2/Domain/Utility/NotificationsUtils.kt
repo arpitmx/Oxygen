@@ -183,6 +183,24 @@ object NotificationsUtils {
             return payload
         }
 
+        if (notification.notificationType == NotificationType.TASK_CHECKPOINT_NOTIFICATION.name) {
+
+            val payload = JsonObject()
+            val data = JsonObject()
+
+            payload.addProperty(N.TO, token)
+            data.addProperty(N.TITLE, notification.title)
+            data.addProperty(N.BODY, notification.message)
+            data.addProperty(N.TYPE, notification.notificationType)
+            data.addProperty(N.TASKID, notification.taskID)
+            data.addProperty(N.project_id,notification.projectID)
+
+            payload.add(N.DATA, data)
+
+            return payload
+        }
+
+
 
         if (notification.notificationType == NotificationType.TASK_ASSIGNED_NOTIFICATION.name) {
 
