@@ -925,6 +925,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
+                        binding.inputBox.editboxMessage.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
                         clearReplying()
 
                         CoroutineScope(Dispatchers.IO).launch {
@@ -1373,7 +1375,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     override fun onLongPress(message: Message,senderName: String) {
         requireContext().performHapticFeedback()
         val moreOptionBottomSheet =
-            MessageMoreOptions(message,"Task Chat",this,senderName)
+            MessageMoreOptions(message,"Task Chat",this,senderName,activityBinding.segmentName,activityBinding.sectionName)
         moreOptionBottomSheet.show(requireFragmentManager(), "Options")
     }
 

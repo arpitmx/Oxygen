@@ -2,6 +2,7 @@ package com.ncs.o2.UI.UIComponents.Adapters
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 
 /*

@@ -17,6 +17,7 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
+import com.ncs.o2.Domain.Models.UserNote
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.versa.Constants.Endpoints
 import java.sql.Time
@@ -292,6 +293,19 @@ object PrefManager {
     }
     fun getcurrentsegment():String {
         return sharedPreferences.getString("segment",Endpoints.defaultSegment)!!
+    }
+
+    fun setcurrentsection(section: String?) {
+        val existingSectio = sharedPreferences.getString("section__", null)
+        if (existingSectio != null) {
+            editor.putString("section__", section)
+        } else {
+            editor.putString("section__", section)
+        }
+        editor.apply()
+    }
+    fun getcurrentsection():String {
+        return sharedPreferences.getString("section__",getsectionsList()[0])!!
     }
     fun setcurrentUserdetails(user:CurrentUser){
         editor.putString(Endpoints.User.USERNAME,user.USERNAME)
@@ -795,6 +809,28 @@ object PrefManager {
         val dataListJson = sharedPreferences.getString(getProjectDataListKey(projectName), null)
         val gson = Gson()
         val type = object : TypeToken<List<TodayTasks>>() {}.type
+        return if (dataListJson != null) {
+            gson.fromJson(dataListJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun getProjectUserNotesKey(projectName: String): String {
+        return "project_user_notes_$projectName"
+    }
+
+    fun saveProjectUserNotes(projectName: String, dataList: List<UserNote>) {
+        val gson = Gson()
+        val dataListJson = gson.toJson(dataList)
+        editor.putString(getProjectUserNotesKey(projectName), dataListJson)
+        editor.apply()
+    }
+
+    fun getProjectUserNotes(projectName: String): List<UserNote> {
+        val dataListJson = sharedPreferences.getString(getProjectUserNotesKey(projectName), null)
+        val gson = Gson()
+        val type = object : TypeToken<List<UserNote>>() {}.type
         return if (dataListJson != null) {
             gson.fromJson(dataListJson, type)
         } else {

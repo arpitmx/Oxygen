@@ -45,6 +45,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.Enums.MessageType
+import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
@@ -79,6 +81,7 @@ import com.ncs.o2.UI.Teams.TeamsFragment
 import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddQuickTaskBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
@@ -382,6 +385,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     private fun setUpActionBar() {
         binding.gioActionbar.actionbar.visible()
         binding.gioActionbar.btnMore.visible()
+        binding.gioActionbar.btnQuickTask.visible()
 
         // Set up the action bar, navigation drawer, and other UI components
 
@@ -401,6 +405,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             val moreProjetcOptionBottomSheet =
                 MoreProjectOptionsBottomSheet()
             moreProjetcOptionBottomSheet.show(supportFragmentManager, "more")
+        }
+
+        binding.gioActionbar.btnQuickTask.setOnClickListener {
+            val quickTaskBottomSheet =
+                AddQuickTaskBottomSheet(Message(messageId = "", messageType = MessageType.NORMAL_MSG, timestamp = Timestamp.now(), senderId = "", additionalData = emptyMap(), content = ""))
+            quickTaskBottomSheet.show(supportFragmentManager, "quickTask")
         }
 
         binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {

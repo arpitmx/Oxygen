@@ -180,7 +180,6 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
 
     private fun setupRecyclerView() {
-
         if (db.tasksDao().isNull) {
             taskList = ArrayList()
             Log.d("fetch", "fetching from firestore")
@@ -342,6 +341,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     }
 
     fun fetchfromdb() {
+
         viewModel.getTasksForSegmentFromDB(
             projectName,
             segmentName,

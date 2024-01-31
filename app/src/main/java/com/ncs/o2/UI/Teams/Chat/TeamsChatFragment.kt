@@ -892,6 +892,8 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
 
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
+                        binding.inputBox.editboxMessage.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
                         clearReplying()
                         recyclerView.visible()
                         binding.placeholder.gone()

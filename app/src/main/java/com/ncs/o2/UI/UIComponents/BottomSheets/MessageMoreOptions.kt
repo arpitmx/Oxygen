@@ -36,7 +36,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,private val openBy:String,private val onReplyClick: OnReplyClick,private val senderName:String) : BottomSheetDialogFragment(){
+class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,private val openBy:String,private val onReplyClick: OnReplyClick,private val senderName:String,
+                         val segmentName: String?=null,val sectionName: String?=null) : BottomSheetDialogFragment(){
     @Inject
     lateinit var utils : GlobalUtils.EasyElements
     lateinit var binding:MsgMoreOptionsBinding
@@ -98,7 +99,7 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
 
         binding.createTask.setOnClickThrottleBounceListener {
             dismiss()
-            val addQuickTaskBottomSheet = AddQuickTaskBottomSheet(message)
+            val addQuickTaskBottomSheet = AddQuickTaskBottomSheet(message,segmentName,sectionName)
             addQuickTaskBottomSheet.show(requireFragmentManager(), "Quick Task")
         }
 

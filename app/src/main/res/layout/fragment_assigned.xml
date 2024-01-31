@@ -134,6 +134,130 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <LinearLayout
+                    android:id="@+id/today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/dark_bg_rounded_corner"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical">
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:orientation="horizontal"
+                            android:paddingTop="@dimen/button_size_workspace"
+                            android:paddingBottom="@dimen/button_size_workspace"
+                            android:weightSum="10"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:fontFamily="@font/sf_pro_display_medium"
+                                android:text="Today"
+                                android:textColor="@color/better_white"
+                                android:textSize="@dimen/workspace_heading" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginTop="2dp"
+                                app:tint="@color/unselected_tab_color"
+                                android:src="@drawable/baseline_access_time_24"
+                                />
+
+
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/primary"
+                            android:text="5/10"
+                            android:visibility="gone"
+                            android:id="@+id/todaytasksCount"
+                            android:fontFamily="@font/sfbold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:layout_marginEnd="62dp"/>
+
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="22dp"
+                            android:src="@drawable/baseline_keyboard_arrow_right_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:background="@drawable/card_view_chatbox_options"
+                            app:tint="@color/primary" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:visibility="invisible"
+                        android:background="@color/border_grey" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/primary"
+                            android:text="50%"
+                            android:textSize="16dp"
+                            android:textAlignment="center"
+                            android:id="@+id/percentageCount"
+                            android:layout_marginStart="20dp"
+                            android:visibility="gone"
+                            android:fontFamily="@font/sfbold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                           />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:id="@+id/todayProgress"
+                        android:visibility="gone"
+                        app:trackThickness="10dp"
+                        app:trackColor="@color/account"
+                        android:layout_marginTop="9dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="20dp"
+                        app:indicatorColor="@color/primary"
+                        app:trackCornerRadius="5dp"/>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </LinearLayout>
+
+
+                <LinearLayout
                     android:id="@+id/moderating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -344,74 +468,6 @@
                         android:background="@color/border_grey" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/today"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/dark_bg_rounded_corner"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="10dp"
-                        >
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="start"
-                            android:orientation="horizontal"
-                            android:paddingTop="@dimen/button_size_workspace"
-                            android:paddingBottom="@dimen/button_size_workspace"
-                            android:weightSum="10"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="20dp"
-                                android:fontFamily="@font/sf_pro_display_medium"
-                                android:text="Today"
-                                android:textColor="@color/better_white"
-                                android:textSize="@dimen/workspace_heading" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="5dp"
-                                android:layout_marginTop="2dp"
-                                app:tint="@color/unselected_tab_color"
-                                android:src="@drawable/baseline_access_time_24"
-                                />
-
-
-                        </LinearLayout>
-
-                        <ImageView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="22dp"
-                            android:src="@drawable/baseline_keyboard_arrow_right_24"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            android:background="@drawable/card_view_chatbox_options"
-                            app:tint="@color/primary" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:visibility="invisible"
-                        android:background="@color/border_grey" />
-                </LinearLayout>
 
             </LinearLayout>
 
