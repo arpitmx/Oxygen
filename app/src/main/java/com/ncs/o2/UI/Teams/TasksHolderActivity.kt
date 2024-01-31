@@ -62,14 +62,10 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
     }
     private val viewModel: TaskSectionViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
-    private lateinit var taskListAdapter: TaskListAdapter
-    private lateinit var taskList: ArrayList<TaskItem>
     var taskItems: MutableList<TaskItem> = mutableListOf()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val state = arrayOf(1)
     private lateinit var shakeDetector: ShakeDetector
-
-    private lateinit var tasks: ArrayList<Task>
     @Inject
     lateinit var db: TasksDatabase
     @Inject
@@ -84,9 +80,16 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         type=intent.getStringExtra("type")
         index=intent.getStringExtra("index")
 
+        binding.swiperefresh.setOnRefreshListener {
+            syncCache(PrefManager.getcurrentProject())
+        }
 
+        binding.btnBack.setOnClickThrottleBounceListener{
+            onBackPressed()
+        }
 
-        if (type!=null){
+    }
+    private fun performTaskFetch(type:String){
             when(type) {
                 "Favs" -> {
                     binding.title.text = "Favourite"
@@ -167,15 +170,6 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
                     finish()
                 }
             }
-        }
-
-        binding.swiperefresh.setOnRefreshListener {
-            syncCache(PrefManager.getcurrentProject())
-        }
-
-        binding.btnBack.setOnClickThrottleBounceListener{
-            onBackPressed()
-        }
 
     }
 
@@ -213,6 +207,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
         }
     }
+
 
     private fun setUpOnSuccessRV(list: MutableList<Task>){
         if (list.isEmpty()){
@@ -538,6 +533,10 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
     override fun onResume() {
         super.onResume()
+        if (type!=null) {
+            taskItems.clear()
+            performTaskFetch(type!!)
+        }
         if (PrefManager.getShakePref()){
             initShake()
             shakeDetector.registerListener()
@@ -602,13 +601,8 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
     fun moveToShakeSettings() {
         val intent = Intent(this, ShakeDetectedActivity::class.java)
-        intent.putExtra("type","settings")
+        intent.putExtra("type", "settings")
         startActivity(intent)
     }
-
-
-
-
-
 
 }

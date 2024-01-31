@@ -40,6 +40,7 @@ import io.noties.markwon.Markwon
 import io.noties.markwon.MarkwonVisitor
 import timber.log.Timber
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 
@@ -368,7 +369,12 @@ class ChatAdapter(
         }
 
         // Removing dp and changing some layout if the previous message is sent from same user
-        if (msgList[position - 1].senderId == msgList[position].senderId) {
+        val timestamp1 = msgList[position].timestamp?.toDate()?.time
+        val timestamp2 = msgList[position - 1].timestamp?.toDate()?.time
+        val timeDifferenceMillis = timestamp1?.minus(timestamp2!!)
+        val timeDifferenceMinutes = timeDifferenceMillis?.let { TimeUnit.MILLISECONDS.toMinutes(it) }
+
+        if (msgList[position - 1].senderId == msgList[position].senderId && timeDifferenceMinutes!! < 10) {
             binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
             binding.tvName.gone()
             binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
@@ -439,7 +445,11 @@ class ChatAdapter(
         }
 
         // Removing dp and changing some layout if the previous message is sent from same user
-        if (msgList[position - 1].senderId == msgList[position].senderId) {
+        val timestamp1 = msgList[position].timestamp?.toDate()?.time
+        val timestamp2 = msgList[position - 1].timestamp?.toDate()?.time
+        val timeDifferenceMillis = timestamp1?.minus(timestamp2!!)
+        val timeDifferenceMinutes = timeDifferenceMillis?.let { TimeUnit.MILLISECONDS.toMinutes(it) }
+        if (msgList[position - 1].senderId == msgList[position].senderId && timeDifferenceMinutes!! < 10) {
             binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
             binding.tvName.gone()
             binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
@@ -476,7 +486,12 @@ class ChatAdapter(
     private fun setReplyDPHeader(position: Int, binding: ChatMessageReplyItemBinding, user: UserInMessage) {
 
         // Removing dp and changing some layout if the previous message is sent from same user
-        if (msgList[position - 1].senderId == msgList[position].senderId) {
+        val timestamp1 = msgList[position].timestamp?.toDate()?.time
+        val timestamp2 = msgList[position - 1].timestamp?.toDate()?.time
+        val timeDifferenceMillis = timestamp1?.minus(timestamp2!!)
+        val timeDifferenceMinutes = timeDifferenceMillis?.let { TimeUnit.MILLISECONDS.toMinutes(it) }
+
+        if (msgList[position - 1].senderId == msgList[position].senderId && (timeDifferenceMinutes!! < 10)) {
             binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
             binding.tvName.gone()
             binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER

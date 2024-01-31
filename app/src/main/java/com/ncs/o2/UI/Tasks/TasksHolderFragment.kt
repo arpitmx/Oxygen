@@ -115,8 +115,8 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         activityBinding.gioActionbar.actionbar.visible()
         activityBinding.gioActionbar.constraintLayoutsearch.gone()
         activityBinding.gioActionbar.constraintLayoutTeams.gone()
-
         setUpBackPress()
+
     }
 
     private fun setUpBackPress() {
@@ -132,7 +132,6 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
     }
 
     private fun setUpViewPager(list:MutableList<String>) {
-
         val adapter = TaskSectionViewPagerAdapter(this, list.size,list)
         binding.viewPager2.adapter = adapter
         binding.viewPager2.offscreenPageLimit = 4
@@ -159,6 +158,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
             viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
+                    PrefManager.setcurrentsection(list[position])
                     updateTabColors(position)
                 }
             })

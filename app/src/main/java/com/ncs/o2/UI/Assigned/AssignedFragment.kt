@@ -51,6 +51,7 @@ import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 
 @AndroidEntryPoint
@@ -148,8 +149,17 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         binding.swiperefresh.setOnRefreshListener {
             syncCache(PrefManager.getcurrentProject())
         }
+
+
+
+
+
     }
 
+    override fun onResume() {
+        super.onResume()
+        setUpUserWorkspace()
+    }
     private fun syncCache(projectName:String){
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Please wait, Syncing Tasks")
@@ -236,23 +246,49 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
             val reviewTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 4, assignee = PrefManager.getCurrentUserEmail())
             val completedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 5, assignee = PrefManager.getCurrentUserEmail())
 
-            binding.assigned.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_active_24))
-            binding.assigned.statTitle.text="Assigned"
-            binding.assigned.statCount.text="${assignedTasks.size} tasks"
+            withContext(Dispatchers.Main){
+                binding.assigned.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_active_24))
+                binding.assigned.statTitle.text="Assigned"
+                binding.assigned.statCount.text="${assignedTasks.size} tasks"
 
-            binding.ongoing.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_ongoing_24))
-            binding.ongoing.statTitle.text="Working on"
-            binding.ongoing.statCount.text="${workingTasks.size} tasks"
+                binding.ongoing.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_ongoing_24))
+                binding.ongoing.statTitle.text="Working on"
+                binding.ongoing.statCount.text="${workingTasks.size} tasks"
 
-            binding.review.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_review_24))
-            binding.review.statTitle.text="Reviewing"
-            binding.review.statCount.text="${reviewTasks.size} tasks"
+                binding.review.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_review_24))
+                binding.review.statTitle.text="Reviewing"
+                binding.review.statCount.text="${reviewTasks.size} tasks"
 
-            binding.completed.statIcon.setImageDrawable(resources.getDrawable(R.drawable.round_task_alt_24))
-            binding.completed.statTitle.text="Completed"
-            binding.completed.statCount.text="${completedTasks.size} tasks"
+                binding.completed.statIcon.setImageDrawable(resources.getDrawable(R.drawable.round_task_alt_24))
+                binding.completed.statTitle.text="Completed"
+                binding.completed.statCount.text="${completedTasks.size} tasks"
 
+            }
+        }
+        val todays=PrefManager.getProjectTodayTasks(PrefManager.getcurrentProject())
 
+        if (todays.isNotEmpty()){
+            binding.todaytasksCount.visible()
+            binding.todayProgress.visible()
+            binding.percentageCount.visible()
+
+            val completed=todays.count{ it.isCompleted }
+            val total=todays.size
+            binding.todaytasksCount.text="${completed}/${total}"
+
+            val progressFraction: Float = if (total > 0) {
+                completed.toFloat() / total
+            } else {
+                0f
+            }
+            val progressPercentage: Int = (progressFraction * 100).roundToInt()
+            binding.todayProgress.progress = progressPercentage
+            binding.percentageCount.text="$progressPercentage%"
+        }
+        else{
+            binding.todaytasksCount.gone()
+            binding.todayProgress.gone()
+            binding.percentageCount.gone()
         }
     }
 

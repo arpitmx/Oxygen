@@ -11,6 +11,7 @@ import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
 import com.ncs.o2.Constants.NotificationType
+import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Message) : BottomSheetDialogFragment(),SegmentSelectionBottomSheet.SegmentSelectionListener,
+class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Message,val segmentName: String?=null,val sectionName: String?=null) : BottomSheetDialogFragment(),SegmentSelectionBottomSheet.SegmentSelectionListener,
     SegmentSelectionBottomSheet.sendSectionsListListner,sectionDisplayBottomSheet.SectionSelectionListener{
     @Inject
     lateinit var utils : GlobalUtils.EasyElements
@@ -71,6 +72,19 @@ class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Mess
     private fun setUpViews(){
 
         binding.title.setText(message.content)
+
+
+        if (segmentName!=null && sectionName!=null){
+            binding.segment.text=segmentName
+            binding.section.text=sectionName
+        }
+        else{
+            val currSegment=PrefManager.getcurrentsegment()
+            if (currSegment!="Select Segment"){
+                binding.segment.text=currSegment
+                binding.section.text=PrefManager.getcurrentsection()
+            }
+        }
 
         binding.segment.setOnClickThrottleBounceListener {
             val segment = SegmentSelectionBottomSheet("Quick Task")

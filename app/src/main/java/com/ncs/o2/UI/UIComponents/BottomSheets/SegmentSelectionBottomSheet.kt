@@ -161,6 +161,7 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
         }
         if (type=="MainActivity" || type=="Create Task" ){
             PrefManager.setcurrentsegment(segment.segment_NAME)
+            PrefManager.setcurrentsection(sectionList[0])
             segmentName=segment.segment_NAME
             sendsectionList(PrefManager.getcurrentProject())
             PrefManager.putsectionsList(sectionList)

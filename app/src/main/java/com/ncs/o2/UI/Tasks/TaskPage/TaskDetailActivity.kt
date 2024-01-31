@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
+import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -32,6 +33,9 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsBottomSheet
 import com.ncs.o2.databinding.ActivityTaskDetailBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -47,7 +51,9 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         ActivityTaskDetailBinding.inflate(layoutInflater)
     }
     lateinit var taskId:String
-     var type: String? =null
+    lateinit var segmentName:String
+    lateinit var sectionName:String
+    var type: String? =null
     var index:String?=null
     lateinit var isworkspace:String
     var users:MutableList<UserInMessage> = mutableListOf()
@@ -57,6 +63,8 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     var assignee:String=""
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
 
+    @Inject
+    lateinit var db:TasksDatabase
     private lateinit var shakeDetector: ShakeDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +75,14 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
 
             taskId = intent.getStringExtra("task_id")!!
             val _type=intent.getStringExtra("type")
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val task = db.tasksDao().getTasksbyId(taskId, PrefManager.getcurrentProject())
+                segmentName=task!!.segment
+                sectionName= task.section
+                moderatorsList=task.moderators.toMutableList()
+                assignee=task.assignee
+            }
 
             if (_type!=null){
                 type=_type

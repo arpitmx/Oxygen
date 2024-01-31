@@ -1,24 +1,29 @@
 package com.ncs.o2.UI.Assigned
 
+import android.animation.AnimatorListenerAdapter
 import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.animation.Animator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieListener
 import com.google.firebase.firestore.FirebaseFirestore
-import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
-import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.TodayTasks
+import com.ncs.o2.Domain.Models.UserNote
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -28,6 +33,7 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.UIComponents.BottomSheets.AddUserNotesBottomSheet
 import com.ncs.o2.databinding.ActivityTasksHolderBinding
 import com.ncs.o2.databinding.ActivityTodayBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -41,7 +47,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,TodayTasksAdpater.SwipeListener {
+class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,TodayTasksAdpater.SwipeListener,AddUserNotesBottomSheet.OnNoteCreated {
 
     val binding: ActivityTodayBinding by lazy {
         ActivityTodayBinding.inflate(layoutInflater)
@@ -77,10 +83,17 @@ class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,Toda
         binding.swiperefresh.setOnRefreshListener {
             syncCache(PrefManager.getcurrentProject())
         }
+        binding.btnAddNotes.setOnClickListener {
+            val addUserNotesBottomSheet=AddUserNotesBottomSheet(this,UserNote(id = "", desc = ""))
+            addUserNotesBottomSheet.show(supportFragmentManager,"Add Notes")
+        }
+
+
         setTasks()
 
 
     }
+
     private fun setTasks(){
         if (PrefManager.getProjectTodayTasks(PrefManager.getcurrentProject()).isEmpty()) {
             binding.layout.gone()
@@ -169,9 +182,9 @@ class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,Toda
                 db,
                 this,
                 recyclerView,
-                 viewModel
+                 viewModel,
+                 this
             )
-            taskadapter.setOnClickListener(this)
 
 
             val layoutManager =
@@ -213,11 +226,25 @@ class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,Toda
         overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
     }
 
-    override fun onCLick(position: Int, task: TodayTasks) {
-        val intent = Intent(this, TaskDetailActivity::class.java)
-        intent.putExtra("task_id", task.taskID)
-        startActivity(intent)
-        this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+    override fun onCLick(task: TodayTasks) {
+        if (task.taskID[0]!='#'){
+            val userNotes=PrefManager.getProjectUserNotes(PrefManager.getcurrentProject())
+            var note:UserNote?=null
+
+            for (n in userNotes){
+                if (n.id==task.taskID){
+                    note=n
+                }
+            }
+            val addUserNotesBottomSheet=AddUserNotesBottomSheet(this,note!!)
+            addUserNotesBottomSheet.show(supportFragmentManager,"Add Notes")
+        }
+        else{
+            val intent = Intent(this, TaskDetailActivity::class.java)
+            intent.putExtra("task_id", task.taskID)
+            startActivity(intent)
+            this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+        }
     }
 
     override fun onleftSwipe(task: TodayTasks, position: Int) {
@@ -243,6 +270,11 @@ class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,Toda
 //            val toUpdate = todays[position]
 //            toUpdate.isCompleted = true
 //            todays[position]=toUpdate
+            binding.anim.visible()
+            runDelayed(4800) {
+                binding.anim.gone()
+            }
+
             PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),_todays)
             taskadapter.notifyDataSetChanged()
             taskadapter.setTasks(_todays.sortedBy { it.isCompleted }.distinctBy { it.taskID }.toMutableList())
@@ -308,6 +340,10 @@ class TodayActivity : AppCompatActivity(),TodayTasksAdpater.OnClickListener,Toda
         }
         util.showSnackbar(binding.root,"Removed from Today",2000)
 
+    }
+
+    override fun noteCreated(userNote: UserNote) {
+        setTasks()
     }
 
 

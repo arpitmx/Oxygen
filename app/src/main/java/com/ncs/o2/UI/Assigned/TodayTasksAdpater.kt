@@ -28,15 +28,22 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Models.UserNote
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickFadeInListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
+import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.TaskItemBinding
+import com.ncs.o2.databinding.TodayTaskItemBinding
+import com.ncs.o2.databinding.UserTaskLayoutBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,11 +57,10 @@ class TodayTasksAdpater(
     val db: TasksDatabase,
     val callback:SwipeListener,
     recyclerView: RecyclerView,
-    val viewModel: TaskSectionViewModel
-) : RecyclerView.Adapter<TodayTasksAdpater.TaskItemViewHolder>() {
+    val viewModel: TaskSectionViewModel,
+    val onClickListener: OnClickListener
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val selectedTags = mutableListOf<Tag>()
-    private var onClickListener: OnClickListener? = null
 
     private val itemTouchHelper by lazy {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
@@ -184,7 +190,114 @@ class TodayTasksAdpater(
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
-    inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
+    inner class TaskItemViewHolder(private val binding: TodayTaskItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.root.setOnLongClickListener {
+                startDrag()
+                true
+            }
+
+        }
+
+        private fun startDrag() {
+            itemTouchHelper.startDrag(this)
+        }
+
+        fun bind(task1: TodayTasks) {
+            if (task1.taskID[0]=='#') {
+                fetchTasksForID(task1.taskID) {
+                    Log.d("Todays", it.toString())
+                    binding.root.setOnClickThrottleBounceListener{
+                        onClickListener.onCLick(task1)
+                    }
+                    val task = TaskItem(
+                        title = it.title,
+                        id = it.id,
+                        assignee_id = it.assignee,
+                        difficulty = it.difficulty,
+                        timestamp = it.time_STAMP,
+                        completed = if (SwitchFunctions.getStringStateFromNumState(it.status) == "Completed") true else false,
+                        tagList = it.tags,
+                        last_updated = it.last_updated
+                    )
+
+                    if (!task1.isCompleted) {
+                        binding.taskId.paintFlags =
+                            binding.taskId.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                        binding.taskTitle.paintFlags =
+                            binding.taskTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    } else {
+                        binding.taskId.paintFlags =
+                            binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        binding.taskTitle.paintFlags =
+                            binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    }
+                    binding.taskId.visible()
+                    binding.difficulty.visible()
+                    binding.difficulty2.gone()
+
+                    binding.taskId.text = task.id
+                    binding.taskTitle.text = task.title
+                    binding.difficulty.text = task.getDifficultyString()
+
+                    when (task.difficulty) {
+                        1 -> binding.difficulty.background =
+                            ResourcesCompat.getDrawable(
+                                context.resources,
+                                R.drawable.label_cardview_green,
+                                null
+                            )
+
+                        2 -> binding.difficulty.background =
+                            ResourcesCompat.getDrawable(
+                                context.resources,
+                                R.drawable.label_cardview_yellow,
+                                null
+                            )
+
+                        3 -> binding.difficulty.background =
+                            ResourcesCompat.getDrawable(
+                                context.resources,
+                                R.drawable.label_cardview_red,
+                                null
+                            )
+                    }
+
+                }
+            }
+            else{
+                val userNotes=PrefManager.getProjectUserNotes(PrefManager.getcurrentProject())
+                var note:UserNote?=null
+
+                for (n in userNotes){
+                    if (n.id==task1.taskID){
+                        note=n
+                    }
+                }
+                binding.taskId.gone()
+                binding.difficulty.gone()
+                binding.difficulty2.visible()
+
+                if (!note.isNull){
+                    if (!task1.isCompleted) {
+                        binding.taskId.paintFlags = binding.taskId.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                        binding.taskTitle.paintFlags = binding.taskTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    } else {
+                        binding.taskId.paintFlags = binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        binding.taskTitle.paintFlags = binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    }
+                    binding.taskTitle.text = note?.desc
+                }
+                binding.root.setOnClickThrottleBounceListener{
+                    onClickListener.onCLick(task1)
+                }
+            }
+        }
+    }
+
+    inner class UserTaskItemViewHolder(private val binding: UserTaskLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
@@ -198,27 +311,18 @@ class TodayTasksAdpater(
             itemTouchHelper.startDrag(this)
         }
 
-        fun bind(task1: TodayTasks, user: User) {
-            fetchTasksForID(task1.taskID){
-                Log.d("Todays",it.toString())
+        fun bind(task1: TodayTasks) {
 
-                val task=TaskItem(
-                    title = it.title,
-                    id = it.id,
-                    assignee_id = it.assignee,
-                    difficulty = it.difficulty,
-                    timestamp = it.time_STAMP,
-                    completed = if (SwitchFunctions.getStringStateFromNumState(it.status) == "Completed") true else false ,
-                    tagList = it.tags,
-                    last_updated = it.last_updated
-                )
+            val userNotes=PrefManager.getProjectUserNotes(PrefManager.getcurrentProject())
+            var note:UserNote?=null
 
-                if (user.profileDPUrl != null && (context as? Activity)?.isDestroyed != true) {
-                    binding.asigneeDp.loadProfileImg(user.profileDPUrl.toString())
-                } else {
-                    binding.asigneeDp.setImageDrawable(context.getDrawable(R.drawable.profile_pic_placeholder))
+            for (n in userNotes){
+                if (n.id==task1.taskID){
+                    note=n
                 }
+            }
 
+            if (!note.isNull){
                 if (!task1.isCompleted) {
                     binding.taskId.paintFlags = binding.taskId.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                     binding.taskTitle.paintFlags = binding.taskTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
@@ -226,74 +330,11 @@ class TodayTasksAdpater(
                     binding.taskId.paintFlags = binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     binding.taskTitle.paintFlags = binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 }
-
-
-
-                binding.taskDuration.text = DateTimeUtils.getTimeAgo(task.timestamp!!.seconds)
-                binding.taskId.text = task.id
-                binding.taskTitle.text = task.title
-                binding.difficulty.text = task.getDifficultyString()
-
-                when (task.difficulty) {
-                    1 -> binding.difficulty.background =
-                        ResourcesCompat.getDrawable(context.resources, R.drawable.label_cardview_green, null)
-                    2 -> binding.difficulty.background =
-                        ResourcesCompat.getDrawable(context.resources, R.drawable.label_cardview_yellow, null)
-                    3 -> binding.difficulty.background =
-                        ResourcesCompat.getDrawable(context.resources, R.drawable.label_cardview_red, null)
-                }
-
-                CoroutineScope(Dispatchers.IO).launch {
-
-                    val iterator = task.tagList.iterator()
-                    while (iterator.hasNext()) {
-                        val tagId = iterator.next()
-                        val tag = db.tagsDao().getTagbyId(tagId)
-
-                        if (!tag.isNull) {
-                            tag?.checked = true
-
-                            synchronized(selectedTags) {
-                                selectedTags.add(tag!!)
-                            }
-                        }
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        setTagsView(selectedTags.toList().toMutableList(), binding, task)
-                    }
-                }
-
+                binding.taskId.text = note?.id
+                binding.taskTitle.text = note?.desc
             }
         }
     }
-
-    private fun setTagsView(list: MutableList<Tag>, binding: TaskItemBinding, task: TaskItem) {
-        val tagIdSet = HashSet(task.tagList)
-
-        synchronized(list) {
-            val iterator = list.iterator()
-
-            while (iterator.hasNext()) {
-                val tag = iterator.next()
-                if (!tagIdSet.contains(tag?.tagID)) {
-                    iterator.remove()
-                }
-            }
-        }
-
-        val finalList = list.distinctBy { it.tagID }
-        val tagsRecyclerView = binding.tagRecyclerView
-        val layoutManager = FlexboxLayoutManager(context)
-
-        layoutManager.flexDirection = FlexDirection.ROW
-        layoutManager.flexWrap = FlexWrap.WRAP
-        tagsRecyclerView.layoutManager = layoutManager
-        val adapter = TagAdapterHomeScreen(finalList)
-        tagsRecyclerView.adapter = adapter
-    }
-
-
 
     fun setTasks(newTaskList: List<TodayTasks>) {
         val diffCallback = TaskDiffCallback(taskList, newTaskList)
@@ -303,38 +344,34 @@ class TodayTasksAdpater(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemViewHolder {
-        val binding = TaskItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TaskItemViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            0->{
+                TaskItemViewHolder(
+                    TodayTaskItemBinding.inflate(
+                    LayoutInflater.from(context),
+                    parent,
+                    false
+                ))
+            }
+            else ->{
+                throw IllegalArgumentException("Invalid view type")
+            }
+        }
+
     }
 
     override fun getItemCount(): Int {
         return taskList.size
     }
 
-    override fun onBindViewHolder(holder: TaskItemViewHolder, position: Int) {
-        fetchTasksForID(taskList[position].taskID){
-            Log.d("Todays",it.toString())
-
-            fetchAssigneeDetails(it.assignee) { user ->
-                holder.bind(taskList[position], user)
-            }
-
-            holder.itemView.setOnClickFadeInListener {
-                if (onClickListener != null) {
-                    onClickListener!!.onCLick(position, taskList[position])
-                }
-            }
-        }
-
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder as TaskItemViewHolder).bind(taskList[position])
     }
 
-    fun setOnClickListener(onClickListener: OnClickListener) {
-        this.onClickListener = onClickListener
-    }
 
     interface OnClickListener {
-        fun onCLick(position: Int, task: TodayTasks)
+        fun onCLick( task: TodayTasks)
     }
 
     private class TaskDiffCallback(private val oldList: List<TodayTasks>, private val newList: List<TodayTasks>) : DiffUtil.Callback() {
@@ -360,45 +397,6 @@ class TodayTasksAdpater(
         }
     }
 
-    private fun fetchAssigneeDetails(assigneeId: String, onUserFetched: (User) -> Unit) {
-        if (assigneeId != "None" && assigneeId != "") {
-            repository.getUserInfobyId(assigneeId) { result ->
-                when (result) {
-                    is ServerResult.Success -> {
-                        val user = result.data
-                        if (user != null) {
-                            onUserFetched(user)
-                        }
-                    }
-
-                    is ServerResult.Failure -> {
-                        // Handle failure
-                    }
-
-                    is ServerResult.Progress -> {
-                        // Handle progress
-                    }
-
-                    else -> {
-                        // Handle other cases
-                    }
-                }
-            }
-        } else {
-            onUserFetched(User(
-                firebaseID = null,
-                profileDPUrl = null,
-                profileIDUrl = null,
-                post = null,
-                username = null,
-                role = null,
-                timestamp = null,
-                designation = null,
-                fcmToken = null,
-                isChecked = false
-            ))
-        }
-    }
     interface SwipeListener{
         fun onleftSwipe(task: TodayTasks,position: Int)
         fun onrightSwipe(task: TodayTasks,position: Int)
