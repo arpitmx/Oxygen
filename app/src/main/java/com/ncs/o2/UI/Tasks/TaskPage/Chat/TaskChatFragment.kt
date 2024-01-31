@@ -925,7 +925,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
-                        binding.inputBox.editboxMessage.setLines(1)
+                        binding.inputBox.editboxMessage.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
                         clearReplying()
 
                         CoroutineScope(Dispatchers.IO).launch {
