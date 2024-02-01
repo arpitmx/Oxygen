@@ -56,82 +56,96 @@ class TodayTasksAdpater(
     val taskList: MutableList<TodayTasks>,
     val db: TasksDatabase,
     val callback:SwipeListener,
-    recyclerView: RecyclerView,
+    val recyclerView: RecyclerView,
     val viewModel: TaskSectionViewModel,
-    val onClickListener: OnClickListener
+    val onClickListener: OnClickListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private var itemTouchHelper: ItemTouchHelper? = null
 
-    private val itemTouchHelper by lazy {
-        val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    private fun createItemTouchHelper(updatedTaskList: List<TodayTasks>) {
+        val simpleItemTouchCallback = SimpleItemTouchCallback(updatedTaskList)
+
+        itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
+        itemTouchHelper?.attachToRecyclerView(recyclerView)
+    }
+
+    inner class SimpleItemTouchCallback(
+        private val updatedTaskList: List<TodayTasks>
+    ) : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    ) {
+
+        override fun isLongPressDragEnabled(): Boolean {
+            context.performHapticFeedback()
+            return true
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val fromPosition = viewHolder.adapterPosition
+            val toPosition = target.adapterPosition
+
+            if (fromPosition < toPosition) {
+                for (i in fromPosition until toPosition) {
+                    Collections.swap(taskList, i, i + 1)
+                    PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),taskList)
+                }
+            } else {
+                for (i in fromPosition downTo toPosition + 1) {
+                    Collections.swap(taskList, i, i - 1)
+                    PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),taskList)
+
+                }
+            }
+
+            notifyItemMoved(fromPosition, toPosition)
+            return true
+        }
+
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = viewHolder.bindingAdapterPosition
+            when (direction) {
+                ItemTouchHelper.LEFT -> {
+                    callback.onleftSwipe(taskList[position],position)
+                }
+                ItemTouchHelper.RIGHT -> {
+                    callback.onrightSwipe(taskList[position],position)
+                }
+            }
+        }
+
+        override fun onChildDraw(
+            c: Canvas,
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            dX: Float,
+            dY: Float,
+            actionState: Int,
+            isCurrentlyActive: Boolean
         ) {
-            override fun isLongPressDragEnabled(): Boolean {
-                context.performHapticFeedback()
-                return true
-            }
+            val itemView = viewHolder.itemView
+            val background = ColorDrawable(ContextCompat.getColor(context, R.color.primary))
+            var icon = ContextCompat.getDrawable(context, R.drawable.baseline_check)
 
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                val fromPosition = viewHolder.adapterPosition
-                val toPosition = target.adapterPosition
+            val position=viewHolder.bindingAdapterPosition
 
-                if (fromPosition < toPosition) {
-                    for (i in fromPosition until toPosition) {
-                        Collections.swap(taskList, i, i + 1)
-                        PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),taskList)
-                    }
-                } else {
-                    for (i in fromPosition downTo toPosition + 1) {
-                        Collections.swap(taskList, i, i - 1)
-                        PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),taskList)
+            val taskListCopy = ArrayList(updatedTaskList)
+            Log.d("position",position.toString())
+            Log.d("position_up",updatedTaskList.toString())
 
-                    }
-                }
-
-                notifyItemMoved(fromPosition, toPosition)
-                return true
-            }
-
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.bindingAdapterPosition
-                when (direction) {
-                    ItemTouchHelper.LEFT -> {
-                        callback.onleftSwipe(taskList[position],position)
-                    }
-                    ItemTouchHelper.RIGHT -> {
-                        callback.onrightSwipe(taskList[position],position)
-                    }
-                }
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                val itemView = viewHolder.itemView
-                val background = ColorDrawable(ContextCompat.getColor(context, R.color.primary))
-                var icon = ContextCompat.getDrawable(context, R.drawable.baseline_check)
-
-                val position=viewHolder.adapterPosition
-
-
-
+            if (position in 0 until taskListCopy.size) {
+                val currentTask = taskListCopy[position]
                 if (dX > 0) {
                     background.color = Color.RED
                     icon = ContextCompat.getDrawable(context, R.drawable.baseline_delete_24)
                 } else {
-                    if (taskList[position].isCompleted){
+                    if (currentTask.isCompleted){
                         background.color = ContextCompat.getColor(context, R.color.account)
                         icon = ContextCompat.getDrawable(context, R.drawable.baseline_reply_24)
                     }
@@ -175,20 +189,17 @@ class TodayTasksAdpater(
                 icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
                 icon.draw(c)
 
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
 
-        }
 
-        ItemTouchHelper(simpleItemTouchCallback).apply {
-            attachToRecyclerView(recyclerView)
+
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
     }
 
-    init {
 
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-    }
+
+
 
     inner class TaskItemViewHolder(private val binding: TodayTaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -202,7 +213,7 @@ class TodayTasksAdpater(
         }
 
         private fun startDrag() {
-            itemTouchHelper.startDrag(this)
+            itemTouchHelper?.startDrag(this)
         }
 
         fun bind(task1: TodayTasks) {
@@ -308,7 +319,7 @@ class TodayTasksAdpater(
         }
 
         private fun startDrag() {
-            itemTouchHelper.startDrag(this)
+            itemTouchHelper?.startDrag(this)
         }
 
         fun bind(task1: TodayTasks) {
@@ -341,7 +352,10 @@ class TodayTasksAdpater(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         taskList.clear()
         taskList.addAll(newTaskList.sortedBy { it.isCompleted }.distinctBy { it.taskID }.toMutableList())
+        notifyDataSetChanged()
+        createItemTouchHelper(taskList)
         diffResult.dispatchUpdatesTo(this)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

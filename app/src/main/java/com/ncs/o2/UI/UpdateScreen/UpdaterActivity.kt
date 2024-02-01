@@ -18,11 +18,14 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Domain.Models.Update
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.popInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
@@ -182,6 +185,10 @@ class UpdaterActivity @Inject constructor() : AppCompatActivity() {
             if (packageManager.canRequestPackageInstalls()) {
                 startDownloadProcess(APK_URL)
                 if (updateGlo!!.CLEAR_MEMORY){
+                    if (!FirebaseAuth.getInstance().currentUser.isNull){
+                        FirebaseAuth.getInstance().signOut()
+                        PrefManager.logout()
+                    }
                     deleteCache(this)
                 }
             } else {
@@ -367,6 +374,7 @@ class UpdaterActivity @Inject constructor() : AppCompatActivity() {
         try {
             if (uri != null) {
 
+                PrefManager.setPopUpVisibility(true)
                 Timber.tag("Download Manager").d("Installing...")
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(uri, "application/vnd.android.package-archive")

@@ -401,13 +401,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         binding.gioActionbar.titleTv.animFadein(this, 500)
         binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
 
-        binding.gioActionbar.btnMore.setOnClickListener {
+        binding.gioActionbar.btnMore.setOnClickThrottleBounceListener {
             val moreProjetcOptionBottomSheet =
                 MoreProjectOptionsBottomSheet()
             moreProjetcOptionBottomSheet.show(supportFragmentManager, "more")
         }
 
-        binding.gioActionbar.btnQuickTask.setOnClickListener {
+        binding.gioActionbar.btnQuickTask.setOnClickThrottleBounceListener {
             val quickTaskBottomSheet =
                 AddQuickTaskBottomSheet(Message(messageId = "", messageType = MessageType.NORMAL_MSG, timestamp = Timestamp.now(), senderId = "", additionalData = emptyMap(), content = ""))
             quickTaskBottomSheet.show(supportFragmentManager, "quickTask")

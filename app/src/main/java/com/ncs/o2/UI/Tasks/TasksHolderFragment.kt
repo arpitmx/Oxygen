@@ -224,6 +224,4 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
     }
 
 
-
-
 }

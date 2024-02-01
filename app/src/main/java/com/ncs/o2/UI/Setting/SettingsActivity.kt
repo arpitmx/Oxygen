@@ -128,6 +128,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
         }
         else if (Codes.STRINGS.clickedSetting == "What's New"){
             startActivity(Intent(this, NewChanges::class.java))
+
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
         else if (Codes.STRINGS.clickedSetting == "Logs"){
@@ -140,6 +141,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
                 util.dialog("Log out","You really want to log out?", "Yes","No",
                     {
                         auth.signOut()
+                        PrefManager.logout()
                         deleteCache(this)
                         val intent = Intent(this, AuthScreenActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
