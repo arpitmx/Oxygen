@@ -63,7 +63,7 @@ class TodayTasksAdpater(
 
     private var itemTouchHelper: ItemTouchHelper? = null
 
-    private fun createItemTouchHelper(updatedTaskList: List<TodayTasks>) {
+    fun createItemTouchHelper(updatedTaskList: List<TodayTasks>) {
         val simpleItemTouchCallback = SimpleItemTouchCallback(updatedTaskList)
 
         itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
@@ -77,34 +77,40 @@ class TodayTasksAdpater(
         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
     ) {
 
+        private var isDragEnabled = false
+
         override fun isLongPressDragEnabled(): Boolean {
             context.performHapticFeedback()
             return true
         }
+
 
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            val fromPosition = viewHolder.adapterPosition
-            val toPosition = target.adapterPosition
+            if (isDragEnabled) {
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
 
-            if (fromPosition < toPosition) {
-                for (i in fromPosition until toPosition) {
-                    Collections.swap(taskList, i, i + 1)
-                    PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),taskList)
-                }
-            } else {
-                for (i in fromPosition downTo toPosition + 1) {
-                    Collections.swap(taskList, i, i - 1)
-                    PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),taskList)
+                if (fromPosition < toPosition) {
+                    for (i in fromPosition until toPosition) {
+                        Collections.swap(taskList, i, i + 1)
+                        PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(), taskList)
+                    }
+                } else {
+                    for (i in fromPosition downTo toPosition + 1) {
+                        Collections.swap(taskList, i, i - 1)
+                        PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(), taskList)
 
+                    }
                 }
+
+                notifyItemMoved(fromPosition, toPosition)
+                return true
             }
-
-            notifyItemMoved(fromPosition, toPosition)
-            return true
+            return false
         }
 
 
@@ -112,10 +118,11 @@ class TodayTasksAdpater(
             val position = viewHolder.bindingAdapterPosition
             when (direction) {
                 ItemTouchHelper.LEFT -> {
-                    callback.onleftSwipe(taskList[position],position)
+                    callback.onleftSwipe(taskList[position], position)
                 }
+
                 ItemTouchHelper.RIGHT -> {
-                    callback.onrightSwipe(taskList[position],position)
+                    callback.onrightSwipe(taskList[position], position)
                 }
             }
         }
@@ -133,11 +140,11 @@ class TodayTasksAdpater(
             val background = ColorDrawable(ContextCompat.getColor(context, R.color.primary))
             var icon = ContextCompat.getDrawable(context, R.drawable.baseline_check)
 
-            val position=viewHolder.bindingAdapterPosition
+            val position = viewHolder.bindingAdapterPosition
 
             val taskListCopy = ArrayList(updatedTaskList)
-            Log.d("position",position.toString())
-            Log.d("position_up",updatedTaskList.toString())
+            Log.d("position", position.toString())
+            Log.d("position_up", updatedTaskList.toString())
 
             if (position in 0 until taskListCopy.size) {
                 val currentTask = taskListCopy[position]
@@ -145,11 +152,10 @@ class TodayTasksAdpater(
                     background.color = Color.RED
                     icon = ContextCompat.getDrawable(context, R.drawable.baseline_delete_24)
                 } else {
-                    if (currentTask.isCompleted){
+                    if (currentTask.isCompleted) {
                         background.color = ContextCompat.getColor(context, R.color.account)
                         icon = ContextCompat.getDrawable(context, R.drawable.baseline_reply_24)
-                    }
-                    else{
+                    } else {
                         background.color = ContextCompat.getColor(context, R.color.primary)
                         icon = ContextCompat.getDrawable(context, R.drawable.baseline_check)
                     }
@@ -195,6 +201,17 @@ class TodayTasksAdpater(
 
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                isDragEnabled = true
+            }
+            super.onSelectedChanged(viewHolder, actionState)
+        }
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            super.clearView(recyclerView, viewHolder)
+            isDragEnabled = false
+        }
     }
 
 
@@ -205,15 +222,8 @@ class TodayTasksAdpater(
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.root.setOnLongClickListener {
-                startDrag()
-                true
-            }
 
-        }
 
-        private fun startDrag() {
-            itemTouchHelper?.startDrag(this)
         }
 
         fun bind(task1: TodayTasks) {
@@ -353,7 +363,7 @@ class TodayTasksAdpater(
         taskList.clear()
         taskList.addAll(newTaskList.sortedBy { it.isCompleted }.distinctBy { it.taskID }.toMutableList())
         notifyDataSetChanged()
-        createItemTouchHelper(taskList)
+//        createItemTouchHelper(taskList)
         diffResult.dispatchUpdatesTo(this)
 
     }
