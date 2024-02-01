@@ -1,9 +1,12 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Models.UserNote
@@ -53,7 +56,14 @@ class AddUserNotesBottomSheet(val callback:OnNoteCreated,val u_note: UserNote) :
     }
     private fun setUpViews(){
 
+
         binding.desc.setText(u_note.desc)
+
+        binding.desc.setSelection(binding.desc.text!!.length)
+        binding.desc.postDelayed({
+            binding.desc.requestFocus()
+            showKeyboard(binding.desc)
+        }, 200)
 
         binding.submit.setOnClickThrottleBounceListener {
             if (binding.desc.text?.trim().toString().isBlank()){
@@ -76,7 +86,7 @@ class AddUserNotesBottomSheet(val callback:OnNoteCreated,val u_note: UserNote) :
                     userNote.id=u_note.id
                     oldNotes.add(userNote)
                     PrefManager.saveProjectUserNotes(PrefManager.getcurrentProject(),oldNotes)
-                    toast("Note Updated")
+                    toast("Task Updated")
                     callback.noteCreated(userNote)
                     dismiss()
                 }
@@ -86,7 +96,7 @@ class AddUserNotesBottomSheet(val callback:OnNoteCreated,val u_note: UserNote) :
 
                     PrefManager.saveProjectUserNotes(PrefManager.getcurrentProject(),oldNotes)
                     PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),todays)
-                    toast("Note Added")
+                    toast("Task Created")
                     callback.noteCreated(userNote)
                     dismiss()
                 }
@@ -97,7 +107,10 @@ class AddUserNotesBottomSheet(val callback:OnNoteCreated,val u_note: UserNote) :
     private fun setBottomSheetConfig() {
         this.isCancelable = true
     }
-
+    private fun showKeyboard(editText: EditText) {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+    }
     interface OnNoteCreated{
         fun noteCreated(userNote: UserNote)
     }

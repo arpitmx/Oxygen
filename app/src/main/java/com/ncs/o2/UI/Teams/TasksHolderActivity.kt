@@ -79,6 +79,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
         type=intent.getStringExtra("type")
         index=intent.getStringExtra("index")
+        performTaskFetch(type!!)
 
         binding.swiperefresh.setOnRefreshListener {
             syncCache(PrefManager.getcurrentProject())
@@ -90,86 +91,86 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
     }
     private fun performTaskFetch(type:String){
-            when(type) {
-                "Favs" -> {
-                    binding.title.text = "Favourite"
+        when(type) {
+            "Favs" -> {
+                binding.title.text = "Favourite"
 
-                    if (PrefManager.getProjectFavourites(PrefManager.getcurrentProject()).isEmpty()) {
-                        binding.layout.gone()
-                        binding.recyclerView.gone()
-                        binding.progressbarBlock.gone()
-                        binding.placeholder.visible()
-                    } else {
-                        for (id in PrefManager.getProjectFavourites(PrefManager.getcurrentProject())) {
-                            fetchTasksforID(id)
-                        }
+                if (PrefManager.getProjectFavourites(PrefManager.getcurrentProject()).isEmpty()) {
+                    binding.layout.gone()
+                    binding.recyclerView.gone()
+                    binding.progressbarBlock.gone()
+                    binding.placeholder.visible()
+                } else {
+                    for (id in PrefManager.getProjectFavourites(PrefManager.getcurrentProject())) {
+                        fetchTasksforID(id)
                     }
                 }
-
-                "Pending" -> {
-                    binding.title.text = "Pending"
-
-                    FetchTasksforState(1)
-                    FetchTasksforState(2)
-                }
-
-                "Ongoing" -> {
-                    binding.title.text = "Ongoing"
-
-                    FetchTasksforState(3)
-
-                }
-
-                "Review" -> {
-                    binding.title.text = "Review"
-
-                    FetchTasksforState(4)
-
-                }
-
-                "Completed" -> {
-                    binding.title.text = "Completed"
-
-                    FetchTasksforState(5)
-
-                }
-
-                "WorkspaceAssigned" -> {
-                    binding.title.text = "Assigned"
-                    FetchTasksforStateandAssignee(2)
-
-                }
-
-                "WorkspaceWorking" ->{
-                    binding.title.text = "Working"
-                    FetchTasksforStateandAssignee(3)
-                }
-
-                "WorkspaceReview" ->{
-                    binding.title.text = "Under Review"
-                    FetchTasksforStateandAssignee(4)
-                }
-
-                "WorkspaceCompleted" ->{
-                    binding.title.text = "Completed"
-                    FetchTasksforStateandAssignee(5)
-                }
-
-                "moderating" ->{
-                    binding.title.text = "Moderating"
-                    FetchTasksforModerators()
-
-                }
-
-                "opened" ->{
-                    binding.title.text = "Opened by me"
-                    FetchTasksforAssigner()
-                }
-
-                else -> {
-                    finish()
-                }
             }
+
+            "Pending" -> {
+                binding.title.text = "Pending"
+
+                FetchTasksforState(1)
+                FetchTasksforState(2)
+            }
+
+            "Ongoing" -> {
+                binding.title.text = "Ongoing"
+
+                FetchTasksforState(3)
+
+            }
+
+            "Review" -> {
+                binding.title.text = "Review"
+
+                FetchTasksforState(4)
+
+            }
+
+            "Completed" -> {
+                binding.title.text = "Completed"
+
+                FetchTasksforState(5)
+
+            }
+
+            "WorkspaceAssigned" -> {
+                binding.title.text = "Assigned"
+                FetchTasksforStateandAssignee(2)
+
+            }
+
+            "WorkspaceWorking" ->{
+                binding.title.text = "Working"
+                FetchTasksforStateandAssignee(3)
+            }
+
+            "WorkspaceReview" ->{
+                binding.title.text = "Under Review"
+                FetchTasksforStateandAssignee(4)
+            }
+
+            "WorkspaceCompleted" ->{
+                binding.title.text = "Completed"
+                FetchTasksforStateandAssignee(5)
+            }
+
+            "moderating" ->{
+                binding.title.text = "Moderating"
+                FetchTasksforModerators()
+
+            }
+
+            "opened" ->{
+                binding.title.text = "Opened by me"
+                FetchTasksforAssigner()
+            }
+
+            else -> {
+                finish()
+            }
+        }
 
     }
 
@@ -533,10 +534,10 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
     override fun onResume() {
         super.onResume()
-        if (type!=null) {
-            taskItems.clear()
-            performTaskFetch(type!!)
-        }
+//        if (type!=null) {
+//            taskItems.clear()
+//            performTaskFetch(type!!)
+//        }
         if (PrefManager.getShakePref()){
             initShake()
             shakeDetector.registerListener()

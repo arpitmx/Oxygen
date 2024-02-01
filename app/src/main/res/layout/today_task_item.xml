@@ -36,21 +36,22 @@
             android:textSize="14dp"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+        <TextView
             android:id="@+id/difficulty2"
-            android:layout_width="22dp"
-            android:visibility="gone"
-            android:layout_height="22dp"
-            android:layout_alignParentStart="true"
-            android:fontFamily="@font/sf_pro_display_semibold"
-            android:layout_marginTop="@dimen/margin_top"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_toEndOf="@+id/difficulty"
+            android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
-            android:src="@drawable/baseline_subdirectory_arrow_right_24"
-            android:layout_alignParentTop="true"
-            android:textColor="@color/darkTheme_bg"
+            android:visibility="gone"
+            android:text="Task"
+            android:layout_marginTop="@dimen/margin_top"
+            android:textColor="#858585"
+            android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/difficulty"
@@ -65,6 +66,7 @@
             android:layout_alignParentTop="true"
             android:textColor="@color/darkTheme_bg"
             android:textSize="14dp"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

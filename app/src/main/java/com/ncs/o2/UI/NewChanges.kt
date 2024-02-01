@@ -14,6 +14,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.invisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.CodeViewerActivity
 import com.ncs.o2.databinding.ActivityNewChangesBinding
@@ -22,10 +23,18 @@ import com.ncs.versa.Constants.Endpoints
 class NewChanges : AppCompatActivity() {
 
     private lateinit var binding: ActivityNewChangesBinding
+    var type:String?=""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityNewChangesBinding.inflate(layoutInflater)
+        type=intent.getStringExtra("type")
+
+        if (type=="popup"){
+            PrefManager.setPopUpVisibility(false)
+        }
+
+
         setViews()
         val desc="## Release Notes [24.1.24] - [24/01/2024]\n" +
                 "\n" +
@@ -190,7 +199,14 @@ class NewChanges : AppCompatActivity() {
     }
     override fun onBackPressed() {
         super.onBackPressed()
-        overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
-        finish()
+        if (type=="popup"){
+            startActivity(Intent(this@NewChanges, MainActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+        }
+        else{
+            overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
+            finish()
+        }
+
     }
 }

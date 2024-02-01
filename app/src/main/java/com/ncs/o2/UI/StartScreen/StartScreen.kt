@@ -62,6 +62,7 @@ import com.ncs.o2.Services.Updater.UpdateDownloaderService
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.NewChanges
 import com.ncs.o2.UI.O2Bot.O2Bot
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
@@ -323,13 +324,25 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                         startActivity(intent)
                         finishAffinity()
                     } else {
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                        overridePendingTransition(
-                            R.anim.fadein,
-                            R.anim.fadeout
-                        )
-                        finishAffinity()
+                        if (PrefManager.getPopUpVisibility()){
+                            val intent = Intent(this, NewChanges::class.java)
+                            intent.putExtra("type","popup")
+                            startActivity(intent)
+                            overridePendingTransition(
+                                R.anim.faster_slide_bottom_to_up,
+                                R.anim.faster_slide_bottom_to_up
+                            )
+                            finishAffinity()
+                        }
+                        else{
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            overridePendingTransition(
+                                R.anim.fadein,
+                                R.anim.fadeout
+                            )
+                            finishAffinity()
+                        }
                     }
                 }
             }

@@ -1,6 +1,5 @@
 package com.ncs.o2.HelperClasses
 
-import android.app.DownloadManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
@@ -15,12 +14,9 @@ import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TodayTasks
-import com.ncs.o2.Domain.Models.User
-import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.UserNote
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.versa.Constants.Endpoints
-import java.sql.Time
 import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 
@@ -836,5 +832,18 @@ object PrefManager {
         } else {
             emptyList()
         }
+    }
+    fun logout() {
+        editor.clear()
+        editor.apply()
+    }
+
+    fun getPopUpVisibility(): Boolean {
+        return sharedPreferences.getBoolean("popUp", false)
+    }
+
+    fun setPopUpVisibility(bool:Boolean) {
+        editor.putBoolean("popUp", bool)
+        editor.apply()
     }
 }

@@ -2,11 +2,14 @@ package com.ncs.o2.UI.UIComponents.BottomSheets
 
 
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
@@ -71,8 +74,15 @@ class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Mess
     }
     private fun setUpViews(){
 
+
+
         binding.title.setText(message.content)
 
+        binding.title.setSelection(binding.title.text!!.length)
+        binding.title.postDelayed({
+            binding.title.requestFocus()
+            showKeyboard(binding.title)
+        }, 200)
 
         if (segmentName!=null && sectionName!=null){
             binding.segment.text=segmentName
@@ -210,6 +220,10 @@ class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Mess
         binding.section.text="Section"
     }
 
+    private fun showKeyboard(editText: EditText) {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+    }
     override fun sendSectionsList(list: MutableList<String>) {
     }
 
