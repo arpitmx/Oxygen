@@ -74,9 +74,7 @@ class TodayFragment : Fragment(),TodayTasksAdpater.OnClickListener,TodayTasksAdp
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.swiperefresh.setOnRefreshListener {
-            syncCache(PrefManager.getcurrentProject())
-        }
+
         setTasks()
 
         activityBinding.btnAddNotes.setOnClickThrottleBounceListener {
@@ -129,8 +127,8 @@ class TodayFragment : Fragment(),TodayTasksAdpater.OnClickListener,TodayTasksAdp
             with(recyclerView) {
                 this.layoutManager = layoutManager
                 adapter = taskadapter
-                edgeEffectFactory = BounceEdgeEffectFactory()
             }
+            taskadapter.createItemTouchHelper(taskadapter.taskList)
 
             recyclerView.addOnScrollListener(object :
                 RecyclerView.OnScrollListener() {
@@ -157,60 +155,6 @@ class TodayFragment : Fragment(),TodayTasksAdpater.OnClickListener,TodayTasksAdp
         }
     }
 
-    private fun syncCache(projectName:String){
-        val progressDialog = ProgressDialog(requireContext())
-        progressDialog.setMessage("Please wait, Syncing Tasks")
-        progressDialog.setCancelable(false)
-        progressDialog.show()
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-
-                val taskResult = withContext(Dispatchers.IO) {
-                    firestoreRepository.getTasksinProjectAccordingtoTimeStamp(projectName)
-                }
-
-
-                when (taskResult) {
-
-                    is ServerResult.Failure -> {
-                        progressDialog.dismiss()
-                        binding.swiperefresh.isRefreshing=false
-
-                    }
-
-                    is ServerResult.Progress -> {
-                        progressDialog.show()
-                        progressDialog.setMessage("Please wait, Syncing Tasks")
-
-                    }
-
-                    is ServerResult.Success -> {
-
-                        val tasks = taskResult.data
-                        if (tasks.isNotEmpty()){
-                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
-                            PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
-                            for (task in tasks) {
-                                db.tasksDao().insert(task)
-                            }
-                        }
-                        progressDialog.dismiss()
-                        requireActivity().recreate()
-                        binding.swiperefresh.isRefreshing=false
-
-                    }
-
-                }
-
-            } catch (e: java.lang.Exception) {
-                Timber.tag(TaskDetailsFragment.TAG).e(e)
-                progressDialog.dismiss()
-
-
-            }
-
-        }
-    }
     override fun onCLick(task: TodayTasks) {
         if (task.taskID[0]!='#'){
             val userNotes=PrefManager.getProjectUserNotes(PrefManager.getcurrentProject())

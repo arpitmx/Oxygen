@@ -1,15 +1,12 @@
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:id="@+id/swiperefresh"
+<androidx.appcompat.widget.LinearLayoutCompat android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/pureblack"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/pureblack"
-        android:orientation="vertical">
 
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -24,6 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:elevation="2dp"
                 android:visibility="gone"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
@@ -123,4 +121,3 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
