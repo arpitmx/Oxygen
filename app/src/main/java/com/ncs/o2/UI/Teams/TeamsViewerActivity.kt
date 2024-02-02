@@ -7,12 +7,15 @@ import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -60,7 +63,28 @@ class TeamsViewerActivity : AppCompatActivity() {
         }
         binding.projectIcon.load(PrefManager.getProjectIconUrl(PrefManager.getcurrentProject()),resources.getDrawable(R.drawable.placeholder_image))
 
+        binding.searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                searchQuery(s?.toString()!!)
+            }
+        })
     }
+
+    private fun searchQuery(text:String){
+        var filter: MutableList<User> = mutableListOf()
+
+        filter = userList.filter {
+                    it.fullName!!.contains(text, ignoreCase = true)
+        }.toMutableList()
+
+        setRecyclerView(filter)
+
+    }
+
 
     private fun initShake(){
         val shakePref=PrefManager.getShakePref()
@@ -147,13 +171,20 @@ class TeamsViewerActivity : AppCompatActivity() {
         }
     }
     fun setRecyclerView(dataList: List<User>){
-        val recyclerView=binding.recyclerView
-        val adapter = TeamsAdapter(dataList.toMutableList())
-        val linearLayoutManager = LinearLayoutManager(this)
-        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView.layoutManager = linearLayoutManager
-        recyclerView.adapter = adapter
-        recyclerView.visible()
+        if (dataList.isEmpty()){
+            binding.recyclerView.gone()
+            binding.placeholder.visible()
+        }
+        else{
+            val recyclerView=binding.recyclerView
+            val adapter = TeamsAdapter(dataList.toMutableList())
+            val linearLayoutManager = LinearLayoutManager(this)
+            linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView.layoutManager = linearLayoutManager
+            recyclerView.adapter = adapter
+            recyclerView.visible()
+            binding.placeholder.gone()
+        }
     }
     override fun onBackPressed() {
         super.onBackPressed()

@@ -124,7 +124,7 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
             try {
                 val result = withContext(Dispatchers.IO) {
                     firestoreRepository.createNewCheckList(
-                        taskId = activityBinding.taskId,
+                        taskId = activityBinding.taskId!!,
                         projectName = PrefManager.getcurrentProject(),
                         checkList = checkList)
 
@@ -211,7 +211,7 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_CHECKPOINT_NOTIFICATION.name,
-                taskID = activityBinding.taskId,
+                taskID = activityBinding.taskId!!,
                 message = message,
                 title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} has added a checkpoint in ${activityBinding.taskId}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
