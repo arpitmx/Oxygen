@@ -50,7 +50,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     val binding: ActivityTaskDetailBinding by lazy {
         ActivityTaskDetailBinding.inflate(layoutInflater)
     }
-    lateinit var taskId:String
+    var taskId:String?=null
     lateinit var segmentName:String
     lateinit var sectionName:String
     var type: String? =null
@@ -77,11 +77,13 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
             val _type=intent.getStringExtra("type")
 
             CoroutineScope(Dispatchers.IO).launch {
-                val task = db.tasksDao().getTasksbyId(taskId, PrefManager.getcurrentProject())
-                segmentName=task!!.segment
-                sectionName= task.section
-                moderatorsList=task.moderators.toMutableList()
-                assignee=task.assignee
+                if (taskId!=null){
+                    val task = db.tasksDao().getTasksbyId(taskId!!, PrefManager.getcurrentProject())
+                    segmentName=task!!.segment
+                    sectionName= task.section
+                    moderatorsList=task.moderators.toMutableList()
+                    assignee=task.assignee
+                }
             }
 
             if (_type!=null){
@@ -128,7 +130,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
             }
             else{
                 val newList=favs.toMutableList()
-                newList.add(taskId)
+                newList.add(taskId!!)
                 Log.d("favsss",newList.toString())
                 favs=newList
                 PrefManager.saveProjectFavourites(PrefManager.getcurrentProject(),newList)

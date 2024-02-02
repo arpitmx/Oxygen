@@ -197,7 +197,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
         CoroutineScope(Dispatchers.Main).launch {
 
             firestoreRepository.getCheckList(
-                projectName = PrefManager.getcurrentProject(), taskId = activityBinding.taskId) { result ->
+                projectName = PrefManager.getcurrentProject(), taskId = activityBinding.taskId!!) { result ->
 
                 when (result) {
 
@@ -249,7 +249,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 try {
                     val result = withContext(Dispatchers.IO) {
                         firestoreRepository.updateCheckListCompletion(
-                            taskId = activityBinding.taskId,
+                            taskId = activityBinding.taskId!!,
                             projectName = PrefManager.getcurrentProject(),
                             id = id, done = isChecked
                         )
@@ -343,7 +343,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                     try {
                         val result = withContext(Dispatchers.IO) {
                             firestoreRepository.updateCheckListCompletion(
-                                taskId = activityBinding.taskId,
+                                taskId = activityBinding.taskId!!,
                                 projectName = PrefManager.getcurrentProject(),
                                 id = id, done = isChecked
                             )
@@ -473,7 +473,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 try {
                     val result = withContext(Dispatchers.IO) {
                         firestoreRepository.updateCheckList(
-                            taskId = activityBinding.taskId,
+                            taskId = activityBinding.taskId!!,
                             projectName = PrefManager.getcurrentProject(),
                             id = checkList.id, checkList)
 
@@ -556,7 +556,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 try {
                     val result = withContext(Dispatchers.IO) {
                         firestoreRepository.createNewCheckList(
-                            taskId = activityBinding.taskId,
+                            taskId = activityBinding.taskId!!,
                             projectName = PrefManager.getcurrentProject(),
                             checkList = checkList)
 
@@ -631,7 +631,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_CHECKLIST_UPDATE.name,
-                taskID = activityBinding.taskId,
+                taskID = activityBinding.taskId!!,
                 message = message,
                 title = "${PrefManager.getcurrentProject()} | Checklist updated in ${activityBinding.taskId}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
@@ -647,7 +647,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_CHECKLIST_UPDATE.name,
-                taskID = activityBinding.taskId,
+                taskID = activityBinding.taskId!!,
                 message = message,
                 title =
                 if (isComplete) "${PrefManager.getcurrentProject()} | Marked as completed"

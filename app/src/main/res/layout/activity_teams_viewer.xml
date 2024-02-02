@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:weightSum="10"
     android:layout_height="match_parent"
     android:background="@color/darkbg_main_a80"
     android:orientation="vertical"
@@ -10,7 +11,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -129,10 +130,121 @@
         android:layout_height="wrap_content"
         android:paddingBottom="100dp"
         android:clipToPadding="false"
+        android:layout_weight="10"
+        android:visibility="visible"
         android:layoutAnimation="@anim/layout_animation_fadein"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
         tools:listitem="@layout/team_memebers_rv_each_item" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:paddingBottom="100dp"
+        android:layout_weight="10"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:src="@drawable/tasks_placeholder_grey"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/sf_pro_display_regular"
+            android:gravity="center"
+            android:text="No Users found..."
+            android:textColor="@color/account"
+            android:textSize="16dp"
+            android:translationY="-30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+
+    <LinearLayout
+        android:id="@+id/searchParent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondary_bg"
+        android:elevation="5dp"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/border_grey" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="15dp"
+            android:weightSum="10">
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/search_bar"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_weight="8.5"
+                android:background="@drawable/item_bg_curve"
+                android:drawablePadding="15dp"
+                android:drawableTint="#DEE3E3E3"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:fontFamily="@font/sf_pro_display_regular"
+                android:gravity="start|center_vertical"
+                android:hint="Search team"
+                android:inputType="textAutoCorrect"
+                android:paddingStart="15dp"
+                android:paddingBottom="1dp"
+                android:textAllCaps="false"
+                android:textColor="#DEE3E3E3"
+                android:textColorHint="@color/account"
+                android:textSize="18dp"
+                android:transitionName="searchActivityTransition"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/searchButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/item_bg_curve"
+                android:padding="15dp"
+                android:src="@drawable/ic_searchico"
+                app:tint="@color/primary" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

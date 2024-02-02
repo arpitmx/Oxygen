@@ -65,7 +65,7 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
             if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE){
                 binding.progressBar.visible()
                 binding.buttons.gone()
-                createTaskLink(activityBinding.taskId)
+                createTaskLink(activityBinding.taskId!!)
             }
             else{
                 toast("Error Creating task link, you are offline")
@@ -82,7 +82,7 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
                 toast("This task is already present in your today")
             } else {
                 todays.add(TodayTasks(
-                    taskID = activityBinding.taskId,
+                    taskID = activityBinding.taskId!!,
                     isCompleted = false
                 ))
                 PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(), todays)

@@ -96,7 +96,7 @@ class TasksDetailsHolderFragment : Fragment() {
                 }
                 1-> {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val messages=db.messagesDao().getMessagesForTask(PrefManager.getcurrentProject(),activityBinding.taskId)
+                        val messages=db.messagesDao().getMessagesForTask(PrefManager.getcurrentProject(),activityBinding.taskId!!)
                         withContext(Dispatchers.Main){
                             if (messages.isEmpty()){
                                 countParent.gone()

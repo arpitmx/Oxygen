@@ -84,7 +84,7 @@ class EditTitleBottomSheet(private val title: String,private val onTitleUpdate: 
             try {
                 val result = withContext(Dispatchers.IO) {
                     viewModel.updateTitle(
-                        taskID = activityBinding.taskId,
+                        taskID = activityBinding.taskId!!,
                         projectName = PrefManager.getcurrentProject(),
                         newTitle = newTitle
                     )

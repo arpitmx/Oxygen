@@ -462,6 +462,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         if (isChecked) {
             if (type=="ASSIGNEE"){
                 binding.clear.visible()
+                selectedAssignee.clear()
                 selectedAssignee.add(assignee)
                 binding.assignee.text=assignee.username
                 setSelectedButtonColor(binding.assignee)
@@ -470,6 +471,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             }
             if (type=="CREATED BY"){
                 binding.clear.visible()
+                selectedAssignee2.clear()
                 selectedAssignee2.add(assignee)
                 binding.created.text=assignee.username
                 setSelectedButtonColor(binding.created)
@@ -477,13 +479,13 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         }
         else{
             if (type=="ASSIGNEE"){
-                selectedAssignee.remove(assignee)
+//                selectedAssignee.remove(assignee)
                 binding.assignee.text="Assignee"
                 setUnSelectedButtonColor(binding.assignee)
             }
             if (type=="CREATED BY"){
-                selectedAssignee2.remove(assignee)
-                binding.created.text="Assignee"
+//                selectedAssignee2.remove(assignee)
+                binding.created.text="Created by"
                 setUnSelectedButtonColor(binding.created)
             }
 

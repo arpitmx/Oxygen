@@ -187,7 +187,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             binding.inputBox.segmentParent.gone()
 
         }
-        setDetails(activityBinding.taskId)
+        setDetails(activityBinding.taskId!!)
         setUpChatbox()
         setUpRecyclerview()
         initViews()
@@ -741,12 +741,14 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
         CoroutineScope(Dispatchers.IO).launch {
+
             if (PrefManager.getTaskTimestamp(
                     PrefManager.getcurrentProject(),
                     activityBinding.taskId
                 ).seconds.toInt() == 0
             ) {
                 Log.d("messageFetch", "messageFetch from firebase")
+
                 chatViewModel.getMessages(PrefManager.getcurrentProject(), task.id) { result ->
                     when (result) {
                         is ServerResult.Success -> {
@@ -762,8 +764,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                             MessageProjectTaskAssociation(
                                                 messageId = message.messageId,
                                                 projectId = PrefManager.getcurrentProject(),
+
                                                 taskId = activityBinding.taskId
                                             )
+
                                         )
                                     }
                                     withContext(Dispatchers.Main) {
@@ -774,11 +778,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                         recyclerView.visible()
                                         binding.placeholder.gone()
                                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+
                                         PrefManager.setTaskTimestamp(
                                             PrefManager.getcurrentProject(),
                                             activityBinding.taskId,
                                             messagedata[0].timestamp!!
                                         )
+
                                     }
                                 }
                             }
@@ -824,6 +830,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 recyclerView.visible()
                                 binding.placeholder.gone()
                                 recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+
                                 PrefManager.setTaskTimestamp(
                                     PrefManager.getcurrentProject(),
                                     activityBinding.taskId,
@@ -835,6 +842,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                         task.id
                                     ).toString()
                                 )
+
                             }
 
                         }
@@ -880,6 +888,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             result.data.toMutableList().sortedByDescending { it.timestamp }
 
                         CoroutineScope(Dispatchers.IO).launch {
+
                             val messages = messageDatabase.messagesDao().getMessagesForTask(
                                 PrefManager.getcurrentProject(),
                                 activityBinding.taskId
@@ -891,17 +900,20 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 } else {
                                     activityBinding.binding.tabLayout.getTabAt(1)!!.text =
                                         "Activity (${messages.size})"
+
                                 }
                             }
                         }
 
                         chatAdapter.appendMessages(result.data)
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+
                         PrefManager.setTaskTimestamp(
                             PrefManager.getcurrentProject(),
                             activityBinding.taskId,
                             messagedata[0].timestamp!!
                         )
+
                     }
 
                 }
@@ -957,6 +969,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDatabase.messagesDao().insert(message)
+
                             val messages = messageDatabase.messagesDao().getMessagesForTask(
                                 PrefManager.getcurrentProject(),
                                 activityBinding.taskId
@@ -968,6 +981,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 } else {
                                     activityBinding.binding.tabLayout.getTabAt(1)!!.text =
                                         "Activity (${messages.size})"
+
                                 }
                             }
                         }

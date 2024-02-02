@@ -172,7 +172,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             manageEdits()
             setUpViews()
             runDelayed(100) {
-                setDetails(activityBinding.taskId)
+                setDetails(activityBinding.taskId!!)
             }
             val viewpager = tasksHolderBinding.binding.viewPager2
             if (!activityBinding.index.isNull){
@@ -380,7 +380,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     try {
                         val result = withContext(Dispatchers.IO) {
                             viewModel.updateModerators(
-                                taskID = activityBinding.taskId,
+                                taskID = activityBinding.taskId!!,
                                 projectName = PrefManager.getcurrentProject(),
                                 moderator = currentUser.EMAIL
                             )
@@ -412,7 +412,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                                 binding.progressBar.gone()
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val task = db.tasksDao().getTasksbyId(
-                                        activityBinding.taskId,
+                                        activityBinding.taskId!!,
                                         PrefManager.getcurrentProject()
                                     )
                                     task?.moderators = listOf(currentUser.EMAIL)
@@ -450,7 +450,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         }
         binding.swiperefresh.setOnRefreshListener {
             if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
-                fetchTaskAgain(activityBinding.taskId)
+                fetchTaskAgain(activityBinding.taskId!!)
             }
             else{
                 binding.swiperefresh.isRefreshing=false
@@ -1551,7 +1551,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             try {
                 val result = withContext(Dispatchers.IO) {
                     viewModel.updateTask(
-                        taskID = activityBinding.taskId,
+                        taskID = activityBinding.taskId!!,
                         projectName = PrefManager.getcurrentProject(),
                         NewAssignee = if (assignee.firebaseID == "") "None" else assignee.firebaseID!!,
                         OldAssignee = if (taskDetails.assignee!! == "None") "None" else taskDetails.assignee!!
@@ -1643,7 +1643,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     try {
                         val result = withContext(Dispatchers.IO) {
                             viewModel.updatePriority(
-                                taskID = activityBinding.taskId,
+                                taskID = activityBinding.taskId!!,
                                 newPriority = text,
                                 projectName = PrefManager.getcurrentProject()
                             )
@@ -1694,7 +1694,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     try {
                         val result = withContext(Dispatchers.IO) {
                             viewModel.updateType(
-                                taskID = activityBinding.taskId,
+                                taskID = activityBinding.taskId!!,
                                 newType = text,
                                 projectName = PrefManager.getcurrentProject()
                             )
@@ -1750,7 +1750,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     try {
                         val result = withContext(Dispatchers.IO) {
                             viewModel.updateDifficulty(
-                                taskID = activityBinding.taskId,
+                                taskID = activityBinding.taskId!!,
                                 newDifficulty = text,
                                 projectName = PrefManager.getcurrentProject()
                             )
@@ -1801,7 +1801,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     try {
                         val result = withContext(Dispatchers.IO) {
                             viewModel.updateState(
-                                taskID = activityBinding.taskId,
+                                taskID = activityBinding.taskId!!,
                                 userID = taskDetails.assignee!!,
                                 newState = text,
                                 projectName = PrefManager.getcurrentProject()
@@ -1917,7 +1917,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             try {
                 val result = withContext(Dispatchers.IO) {
                     viewModel.addNewModerators(
-                        taskID = activityBinding.taskId,
+                        taskID = activityBinding.taskId!!,
                         projectName = PrefManager.getcurrentProject(),
                         moderator = selected,
                         unselected = unselected
@@ -1950,7 +1950,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         binding.progressBar.gone()
                         toast("Updated new Moderators")
                         CoroutineScope(Dispatchers.IO).launch {
-                            val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
+                            val task = db.tasksDao().getTasksbyId(activityBinding.taskId!!, PrefManager.getcurrentProject())
                             val moderatorsListDB=task?.moderators?.toMutableList()
                             if (unselected.isNotEmpty()){
                                 for (i in 0 until unselected.size){
@@ -1991,7 +1991,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             try {
                 val result = withContext(Dispatchers.IO) {
                     viewModel.updateSection(
-                        taskID = activityBinding.taskId,
+                        taskID = activityBinding.taskId!!,
                         projectName = PrefManager.getcurrentProject(),
                         newSection = sectionName
                     )
@@ -2075,7 +2075,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             try {
                 val result = withContext(Dispatchers.IO) {
                     viewModel.updateTags(
-                        newTags = idList, projectName = PrefManager.getcurrentProject(), taskID = activityBinding.taskId
+                        newTags = idList, projectName = PrefManager.getcurrentProject(), taskID = activityBinding.taskId!!
                     )
 
                 }
@@ -2103,7 +2103,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                         binding.progressBar.gone()
                         toast("Updated Tags")
                         CoroutineScope(Dispatchers.IO).launch {
-                            val task = db.tasksDao().getTasksbyId(activityBinding.taskId, PrefManager.getcurrentProject())
+                            val task = db.tasksDao().getTasksbyId(activityBinding.taskId!!, PrefManager.getcurrentProject())
                             task?.tags=idList
                             db.tasksDao().update(task!!)
                             withContext(Dispatchers.Main) {
@@ -2129,7 +2129,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION.name,
-                taskID = activityBinding.taskId,
+                taskID = activityBinding.taskId!!,
                 message = message,
                 title = "${PrefManager.getcurrentProject()} | You are assigned in the task ${activityBinding.taskId}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
@@ -2147,7 +2147,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.WORKSPACE_TASK_UPDATE.name,
-                taskID = activityBinding.taskId,
+                taskID = activityBinding.taskId!!,
                 message = message,
                 title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} changed state of ${activityBinding.taskId} to ${newState}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
@@ -2187,7 +2187,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
             try {
                 val result = withContext(Dispatchers.IO) {
                     viewModel.updateDuration(
-                        taskID = activityBinding.taskId,
+                        taskID = activityBinding.taskId!!,
                         newDuration = duration,
                         projectName = PrefManager.getcurrentProject()
                     )

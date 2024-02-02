@@ -5,10 +5,17 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,8 +25,10 @@ import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Tag
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -36,12 +45,17 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Notifications.NotificationsViewModel
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
+import com.ncs.o2.UI.SearchScreen.SearchViewModel
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.UIComponents.BottomSheets.FilterBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.FilterTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
+import com.ncs.o2.UI.UIComponents.BottomSheets.UserListBottomSheet
 import com.ncs.o2.databinding.ActivityTasksHolderBinding
 import com.ncs.o2.databinding.ActivityTeamsBinding
+import com.ncs.o2.databinding.FragmentSearchBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,11 +70,16 @@ import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener {
+class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener, FilterBottomSheet.SendText,
+    UserListBottomSheet.getassigneesCallback, UserListBottomSheet.updateAssigneeCallback,SegmentSelectionBottomSheet.SegmentSelectionListener,
+    FilterTagsBottomSheet.getSelectedTagsCallback,
+    SegmentSelectionBottomSheet.sendSectionsListListner {
     val binding: ActivityTasksHolderBinding by lazy {
         ActivityTasksHolderBinding.inflate(layoutInflater)
     }
     private val viewModel: TaskSectionViewModel by viewModels()
+    private val viewModel1: SearchViewModel by viewModels()
+
     private lateinit var recyclerView: RecyclerView
     var taskItems: MutableList<TaskItem> = mutableListOf()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
@@ -72,6 +91,18 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
     lateinit var util: GlobalUtils.EasyElements
     var type: String? =null
     var index: String? =null
+
+    private var list:MutableList<String> = mutableListOf()
+    private var OList: MutableList<User> = mutableListOf()
+    private var OList2: MutableList<User> = mutableListOf()
+    private var tagIdList: ArrayList<String> = ArrayList()
+    private val selectedAssignee:MutableList<User> = mutableListOf()
+    private val selectedAssignee2:MutableList<User> = mutableListOf()
+    private var selectedSegment=""
+    private var TagList: MutableList<Tag> = mutableListOf()
+    private val selectedTags = mutableListOf<Tag>()
+    private  var taskList: MutableList<Task> = mutableListOf()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,7 +120,127 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             onBackPressed()
         }
 
+        filterButtons()
+
+
+        binding.searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                searchQuery(s?.toString()!!)
+            }
+        })
+        binding.searchButton.setOnClickThrottleBounceListener {
+            searchQuery(binding.searchBar.text?.toString()!!)
+        }
+        binding.clear.setOnClickThrottleBounceListener {
+            setDefault()
+            binding.searchBar.text!!.clear()
+            searchQuery(binding.searchBar.text?.toString()!!)
+        }
+
+        initView()
     }
+
+    private fun initView(){
+        binding.searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                searchQuery(s?.toString()!!)
+            }
+        })
+        binding.searchButton.setOnClickThrottleBounceListener {
+            searchQuery(binding.searchBar.text?.toString()!!)
+        }
+    }
+
+    private fun searchQuery(text:String){
+        binding.recyclerView.gone()
+        binding.placeholder.gone()
+        binding.progressBar.visible()
+        binding.resultsParent.visible()
+
+        val state =
+            SwitchFunctions.getNumStateFromStringState(binding.state.text.toString())
+        val type =
+            SwitchFunctions.getNumTypeFromStringType(binding.type.text.toString())
+        var assignee = ""
+        var creator = ""
+        var segment = ""
+
+        if (binding.assignee.text == "Assignee") {
+            assignee = ""
+        } else {
+            assignee = selectedAssignee[0].firebaseID!!
+        }
+
+        if (binding.segment.text == "Segment") {
+            segment = ""
+        } else {
+            segment = selectedSegment
+        }
+        if (!binding.searchBar.text?.toString().isNullOrEmpty()) {
+            binding.clear.visible()
+        }
+
+
+        if (binding.created.text == "Created by") {
+            creator = ""
+        } else {
+            creator = selectedAssignee2[0].firebaseID!!
+        }
+
+//        val filter=taskList.filter {task ->
+//            val taskState=task.status
+//            val taskassignee=task.assignee
+//            val tasksegment=task.segment
+//            val tasktype=task.type
+//            val createBy=task.assigner
+//
+//                    (state==0 || state==taskState)&&
+//                    (assignee.isEmpty() || assignee==taskassignee)&&
+//                    (segment.isEmpty() || segment==tasksegment)&&
+//                    (type==0 || type==tasktype)&&
+//                    (creator.isEmpty() || creator==createBy)
+//        }
+
+        var filter: MutableList<Task> = mutableListOf()
+
+        filter = taskList.filter {
+            (state == 0 || it.status == state) &&
+                    (assignee.isEmpty() || it.assignee == assignee) &&
+                    (segment.isEmpty() || it.segment == segment) &&
+                    (type == 0 || it.type == type) &&
+                    (creator.isEmpty() || it.assigner == creator)&&
+                    (it.id.contains(text, ignoreCase = true) || it.description.contains(text, ignoreCase = true))
+
+        }.toMutableList()
+
+        var finalFilter:MutableList<Task> = mutableListOf()
+        if (selectedTags.isNotEmpty()){
+            for (i in 0 until filter.size){
+                if (filter[i].tags.contains(selectedTags[0].tagID)){
+                    finalFilter.add(filter[i])
+                }
+            }
+        }
+        else{
+            finalFilter=filter
+        }
+
+
+        Log.d("filterActivity", finalFilter.toString())
+
+        setUpOnSuccessRV(finalFilter)
+
+
+    }
+
     private fun performTaskFetch(type:String){
         when(type) {
             "Favs" -> {
@@ -109,51 +260,60 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
 
             "Pending" -> {
                 binding.title.text = "Pending"
-
+                binding.state.gone()
                 FetchTasksforState(1)
                 FetchTasksforState(2)
             }
 
             "Ongoing" -> {
                 binding.title.text = "Ongoing"
-
+                binding.state.gone()
                 FetchTasksforState(3)
 
             }
 
             "Review" -> {
                 binding.title.text = "Review"
-
                 FetchTasksforState(4)
+                binding.state.gone()
+
 
             }
 
             "Completed" -> {
                 binding.title.text = "Completed"
-
                 FetchTasksforState(5)
+                binding.state.gone()
 
             }
 
             "WorkspaceAssigned" -> {
                 binding.title.text = "Assigned"
                 FetchTasksforStateandAssignee(2)
+                binding.state.gone()
+                binding.assignee.gone()
 
             }
 
             "WorkspaceWorking" ->{
                 binding.title.text = "Working"
                 FetchTasksforStateandAssignee(3)
+                binding.state.gone()
+                binding.assignee.gone()
             }
 
             "WorkspaceReview" ->{
                 binding.title.text = "Under Review"
                 FetchTasksforStateandAssignee(4)
+                binding.state.gone()
+                binding.assignee.gone()
             }
 
             "WorkspaceCompleted" ->{
                 binding.title.text = "Completed"
                 FetchTasksforStateandAssignee(5)
+                binding.state.gone()
+                binding.assignee.gone()
             }
 
             "moderating" ->{
@@ -165,6 +325,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             "opened" ->{
                 binding.title.text = "Opened by me"
                 FetchTasksforAssigner()
+                binding.created.gone()
             }
 
             else -> {
@@ -216,13 +377,24 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             binding.recyclerView.gone()
             binding.progressbarBlock.gone()
             binding.placeholder.visible()
+            binding.progressBar.gone()
         }
         else{
             binding.layout.visible()
             binding.recyclerView.visible()
             binding.progressbarBlock.gone()
+            binding.progressBar.gone()
             binding.placeholder.gone()
+            binding.results.visible()
+            binding.results.text="Matches ${list.size.toString()} tasks"
+            if (ifDefault()){
+                binding.clear.gone()
+            }
+            else{
+                binding.clear.visible()
+            }
             recyclerView = binding.recyclerView
+            taskItems.clear()
             taskItems.addAll(list.map { task ->
                 TaskItem(
                     title = task.title!!,
@@ -286,8 +458,10 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         ) { result ->
             when (result) {
                 is DBResult.Success -> {
+                    taskList.clear()
+                    taskList.addAll(result.data.toMutableList())
 
-                    setUpOnSuccessRV(result.data.toMutableList())
+                    setUpOnSuccessRV(taskList)
 
                 }
 
@@ -316,8 +490,9 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         ) { result ->
             when (result) {
                 is DBResult.Success -> {
-
-                    setUpOnSuccessRV(result.data.toMutableList())
+                    taskList.clear()
+                    taskList.addAll(result.data.toMutableList())
+                    setUpOnSuccessRV(taskList)
 
 
 
@@ -358,7 +533,9 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
                             }
                         }
                         withContext(Dispatchers.Main) {
-                            setUpOnSuccessRV(list.toMutableList())
+                            taskList.clear()
+                            taskList.addAll(list.toMutableList())
+                            setUpOnSuccessRV(taskList)
                         }
                     }
 
@@ -390,8 +567,10 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         ) { result ->
             when (result) {
                 is DBResult.Success -> {
+                    taskList.clear()
+                    taskList.addAll(result.data.toMutableList())
 
-                    setUpOnSuccessRV(result.data.toMutableList())
+                    setUpOnSuccessRV(taskList)
 
 
 
@@ -421,8 +600,8 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         ) { result ->
             when (result) {
                 is DBResult.Success -> {
-
-                    setUpOnSuccessRV(listOf(result.data).toMutableList())
+                    taskList.addAll(listOf(result.data))
+                    setUpOnSuccessRV(taskList)
 
                 }
 
@@ -572,6 +751,35 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         }
     }
 
+
+    private fun setDefault(){
+        binding.tags.text="Tags"
+        binding.state.text="State"
+        binding.assignee.text="Assignee"
+        binding.segment.text="Segment"
+        binding.type.text="Type"
+        binding.created.text="Created by"
+
+        setUnSelectedButtonColor(binding.tags)
+        setUnSelectedButtonColor(binding.state)
+        setUnSelectedButtonColor(binding.assignee)
+        setUnSelectedButtonColor(binding.segment)
+        setUnSelectedButtonColor(binding.type)
+        setUnSelectedButtonColor(binding.created)
+
+        binding.clear.gone()
+
+    }
+
+    private fun ifDefault() : Boolean{
+        return  binding.tags.text=="Tags"&&
+                binding.state.text=="State" &&
+                binding.assignee.text=="Assignee" &&
+                binding.segment.text=="Segment" &&
+                binding.type.text=="Type"&&
+                binding.created.text=="Created by"
+    }
+
     fun takeScreenshot(activity: Activity) {
         Log.e("takeScreenshot", activity.localClassName)
         val rootView = activity.window.decorView.rootView
@@ -593,6 +801,8 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
             e.printStackTrace()
         }
     }
+
+
     fun moveToReport(filename: String) {
         val intent = Intent(this, ShakeDetectedActivity::class.java)
         intent.putExtra("filename", filename)
@@ -606,4 +816,165 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener 
         startActivity(intent)
     }
 
+    private fun filterButtons(){
+        binding.state.setOnClickThrottleBounceListener{
+            list.clear()
+            list.addAll(listOf("Submitted","Open","Working","Review","Completed"))
+            val filterBottomSheet =
+                FilterBottomSheet(list,"STATE",this)
+            filterBottomSheet.show(supportFragmentManager, "PRIORITY")
+        }
+        binding.type.setOnClickThrottleBounceListener{
+            list.clear()
+            list.addAll(listOf("Bug","Feature","Feature request","Task","Exception","Security","Performance"))
+            val filterBottomSheet =
+                FilterBottomSheet(list,"TYPE",this)
+            filterBottomSheet.show(supportFragmentManager, "PRIORITY")
+        }
+        binding.assignee.setOnClickThrottleBounceListener {
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+
+                val assigneeListBottomSheet =
+                    UserListBottomSheet(OList, selectedAssignee, this, this, "ASSIGNEE")
+                assigneeListBottomSheet.show(supportFragmentManager, "assigneelist")
+            }
+            else{
+                toast("Can't fetch Assignee")
+            }
+        }
+        binding.created.setOnClickThrottleBounceListener {
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+
+                val assigneeListBottomSheet =
+                    UserListBottomSheet(OList2, selectedAssignee2, this, this, "CREATED BY")
+                assigneeListBottomSheet.show(supportFragmentManager, "assigneelist")
+            }
+            else{
+                toast("Can't fetch Creators")
+            }
+
+        }
+        binding.segment.setOnClickThrottleBounceListener {
+            val segment = SegmentSelectionBottomSheet("Search")
+            segment.segmentSelectionListener = this
+            segment.sectionSelectionListener = this
+            segment.show(supportFragmentManager, "Segment Selection")
+        }
+        binding.tags.setOnClickThrottleBounceListener {
+            val filterTagsBottomSheet =
+                FilterTagsBottomSheet(TagList, this, selectedTags)
+            filterTagsBottomSheet.show(supportFragmentManager, "OList")
+        }
+    }
+
+
+    override fun onAssigneeTListUpdated(TList: MutableList<User>) {
+    }
+
+    override fun updateAssignee(assignee: User) {
+    }
+
+    override fun onSegmentSelected(segmentName: String) {
+        binding.clear.visible()
+        binding.segment.text=segmentName
+        selectedSegment=segmentName
+        setSelectedButtonColor(binding.segment)
+    }
+
+    override fun sendSectionsList(list: MutableList<String>) {
+    }
+
+    override fun onSelectedTags(tag: Tag, isChecked: Boolean) {
+        binding.clear.visible()
+        if (isChecked) {
+            selectedTags.add(tag)
+            tag.tagID?.let { tagIdList.add(it) }
+            binding.tags.text=tag.tagText
+            setSelectedButtonColor(binding.tags)
+        } else {
+            selectedTags.remove(tag)
+            tag.tagID?.let { tagIdList.remove(it) }
+            binding.tags.text="Tags"
+            setUnSelectedButtonColor(binding.tags)
+
+        }
+
+    }
+
+    override fun onTagListUpdated(tagList: MutableList<Tag>) {
+        TagList.clear()
+        TagList = tagList
+    }
+
+    private fun setSelectedButtonColor(button: AppCompatButton) {
+        button.setBackgroundResource(R.drawable.item_bg_curve_selected)
+        val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
+        drawable?.colorFilter = PorterDuffColorFilter(
+            ContextCompat.getColor(this, R.color.secondary_bg),
+            PorterDuff.Mode.SRC_IN
+        )
+        button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+        button.setTextColor(ContextCompat.getColor(this, R.color.secondary_bg))
+    }
+
+
+    private fun setUnSelectedButtonColor(button: AppCompatButton){
+        button.setBackgroundDrawable(resources.getDrawable(R.drawable.item_bg_curve))
+        val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
+        drawable?.colorFilter = PorterDuffColorFilter(
+            ContextCompat.getColor(this, R.color.better_white),
+            PorterDuff.Mode.SRC_IN
+        )
+        button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+        button.setTextColor(resources.getColor(R.color.better_white))
+    }
+
+    override fun stringtext(text: String, type: String) {
+        binding.clear.visible()
+        when (type) {
+            "STATE" -> {
+                binding.state.text = text
+                setSelectedButtonColor(binding.state)
+            }
+
+            "TYPE" -> {
+                binding.type.text = text
+                setSelectedButtonColor(binding.type)
+            }
+        }
+    }
+
+    override fun sendassignee(assignee: User, isChecked: Boolean, position: Int, type: String) {
+        if (isChecked) {
+            if (type=="ASSIGNEE"){
+                binding.clear.visible()
+                selectedAssignee.clear()
+                selectedAssignee.add(assignee)
+                binding.assignee.text=assignee.username
+                setSelectedButtonColor(binding.assignee)
+
+
+            }
+            if (type=="CREATED BY"){
+                binding.clear.visible()
+                selectedAssignee2.clear()
+                selectedAssignee2.add(assignee)
+                binding.created.text=assignee.username
+                setSelectedButtonColor(binding.created)
+            }
+        }
+        else{
+            if (type=="ASSIGNEE"){
+//                selectedAssignee.remove(assignee)
+                binding.assignee.text="Assignee"
+                setUnSelectedButtonColor(binding.assignee)
+            }
+            if (type=="CREATED BY"){
+//                selectedAssignee2.remove(assignee)
+                binding.created.text="Created by"
+                setUnSelectedButtonColor(binding.created)
+            }
+
+        }
+    }
 }
