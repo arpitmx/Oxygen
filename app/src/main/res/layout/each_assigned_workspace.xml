@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="135dp"
+    android:layout_width="125dp"
     android:id="@+id/stat_parent"
     android:background="@drawable/card_view_project_element_bg"
     android:orientation="vertical"
@@ -10,13 +10,13 @@
     android:foreground="@drawable/ripplecustom"
     android:clickable="true"
     android:focusable="true"
-    android:layout_height="165dp">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:id="@+id/stat_icon"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="35dp"
         android:layout_marginStart="8dp"
         android:src="@drawable/baseline_active_24"
         app:tint="@color/better_white" />
@@ -26,11 +26,11 @@
         android:layout_height="wrap_content"
         android:textColor="@color/better_white"
         android:text="Active"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:id="@+id/stat_title"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="8dp"
-        android:fontFamily="@font/sf_pro_display_medium"
+        android:fontFamily="@font/sf_pro_display_regular"
         android:layout_marginStart="8dp"/>
 
     <TextView
@@ -38,10 +38,11 @@
         android:layout_height="wrap_content"
         android:textColor="@color/primary"
         android:text="4 tasks"
-        android:textSize="18dp"
+        android:textSize="16dp"
         android:id="@+id/stat_count"
         android:layout_marginTop="2dp"
-        android:fontFamily="@font/sf_pro_display_medium"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="@font/sf_pro_display_regular"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         />

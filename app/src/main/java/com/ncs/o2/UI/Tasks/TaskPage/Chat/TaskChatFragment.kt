@@ -117,16 +117,19 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
-    ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,ChatAdapter.OnMessageLongPress,MessageMoreOptions.OnReplyClick {
+    ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick, ChatAdapter.OnMessageLongPress,
+    MessageMoreOptions.OnReplyClick {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
 
     @Inject
     lateinit var utils: GlobalUtils.EasyElements
+
     @Inject
-    lateinit var tasksDB:TasksDatabase
+    lateinit var tasksDB: TasksDatabase
     lateinit var binding: FragmentTaskChatBinding
+
     @Inject
     lateinit var messageDatabase: MessageDatabase
     lateinit var db: UsersDao
@@ -177,11 +180,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+        if (PrefManager.getAppMode() == Endpoints.ONLINE_MODE) {
             binding.inputBox.segmentParent.visible()
 
-        }
-        else{
+        } else {
             binding.inputBox.segmentParent.gone()
 
         }
@@ -199,18 +201,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private fun initViews() {
 
 
-
-            val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.inputBox.editboxMessage, InputMethodManager.SHOW_IMPLICIT)
 
         binding.chatboxOptionBox.gone()
         mentionedUsers.clear()
         mentionAdapter = MentionUsersAdapter(emptyList<User>().toMutableList(), this)
-
-
-
-
-
 
 
         binding.inputBox.progressBarSendMsg.gone()
@@ -251,7 +247,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                         mentionedUsers.add(cont)
                                         val list = mentionedUsers.distinctBy { it.firebaseID }
                                             .toMutableList()
-                                        Log.d("listcheck", list.toString())
+                                        Timber.tag("listcheck").d(list.toString())
                                     }
                                 }
                                 filterList(mention, mentionedUsers)
@@ -278,7 +274,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             } else {
                 util.showSnackbar(binding.root, "Message can't be empty", 500)
             }
-
 
         }
 
@@ -351,7 +346,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         val filteredList = contributorsData.filter { contributor ->
             contributor.username!!.contains(query, ignoreCase = true)
         }
-        val uniqueList=filteredList.toSet().toMutableList()
+        val uniqueList = filteredList.toSet().toMutableList()
         mentionAdapter.updateList(uniqueList)
     }
 
@@ -380,12 +375,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 timestamp = Timestamp.now(),
                 additionalData = additionalData,
 
-            )
+                )
             postMessage(message)
-
         }
-
-
     }
 
 
@@ -529,7 +521,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             content = imageUrl,
             messageType = MessageType.IMAGE_MSG,
             timestamp = Timestamp.now(),
-            )
+        )
         postMessage(message)
     }
 
@@ -635,6 +627,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }
         }
     }
+
     private fun fetchContributors() {
         firestoreRepository.getContributors(PrefManager.getcurrentProject()) { serverResult ->
             when (serverResult) {
@@ -748,8 +741,14 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
         CoroutineScope(Dispatchers.IO).launch {
-            if (PrefManager.getTaskTimestamp(PrefManager.getcurrentProject(),activityBinding.taskId!!).seconds.toInt()==0){
-                Log.d("messageFetch","messageFetch from firebase")
+
+            if (PrefManager.getTaskTimestamp(
+                    PrefManager.getcurrentProject(),
+                    activityBinding.taskId
+                ).seconds.toInt() == 0
+            ) {
+                Log.d("messageFetch", "messageFetch from firebase")
+
                 chatViewModel.getMessages(PrefManager.getcurrentProject(), task.id) { result ->
                     when (result) {
                         is ServerResult.Success -> {
@@ -759,23 +758,33 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 binding.placeholder.visible()
                             } else {
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    for (message in result.data){
+                                    for (message in result.data) {
                                         messageDatabase.messagesDao().insert(message)
                                         messageDatabase.messagesDao().insertAssociation(
                                             MessageProjectTaskAssociation(
                                                 messageId = message.messageId,
                                                 projectId = PrefManager.getcurrentProject(),
-                                                taskId = activityBinding.taskId!! )
+
+                                                taskId = activityBinding.taskId
+                                            )
+
                                         )
                                     }
-                                    withContext(Dispatchers.Main){
-                                        val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
+                                    withContext(Dispatchers.Main) {
+                                        val messagedata = result.data.toMutableList()
+                                            .sortedByDescending { it.timestamp }
                                         chatAdapter.appendMessages(result.data)
                                         binding.progress.gone()
                                         recyclerView.visible()
                                         binding.placeholder.gone()
                                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                                        PrefManager.setTaskTimestamp(PrefManager.getcurrentProject(),activityBinding.taskId!!,messagedata[0].timestamp!!)
+
+                                        PrefManager.setTaskTimestamp(
+                                            PrefManager.getcurrentProject(),
+                                            activityBinding.taskId,
+                                            messagedata[0].timestamp!!
+                                        )
+
                                     }
                                 }
                             }
@@ -786,7 +795,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             binding.progress.gone()
                             val errorMessage = result.exception.message
                             GlobalUtils.EasyElements(requireContext()).singleBtnDialog(
-                                "Failure", "Failed to load messages with error: $errorMessage", "Okay"
+                                "Failure",
+                                "Failed to load messages with error: $errorMessage",
+                                "Okay"
                             ) {
                                 requireActivity().finish()
                             }
@@ -799,7 +810,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                     }
 
                 }
-            }else {
+            } else {
                 Log.d("messageFetch", "messageFetch from db ")
                 chatViewModel.getMessagesforProjectandTask(
                     PrefManager.getcurrentProject(),
@@ -812,15 +823,26 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 recyclerView.gone()
                                 binding.placeholder.visible()
                             } else {
-                                val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
+                                val messagedata =
+                                    result.data.toMutableList().sortedByDescending { it.timestamp }
                                 chatAdapter.appendMessages(result.data)
                                 binding.progress.gone()
                                 recyclerView.visible()
                                 binding.placeholder.gone()
                                 recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                                PrefManager.setTaskTimestamp(PrefManager.getcurrentProject(),activityBinding.taskId!!,messagedata[0].timestamp!!)
-                                Log.d("messageFetch",PrefManager.getTaskTimestamp(PrefManager.getcurrentProject(),
-                                    task.id).toString())
+
+                                PrefManager.setTaskTimestamp(
+                                    PrefManager.getcurrentProject(),
+                                    activityBinding.taskId,
+                                    messagedata[0].timestamp!!
+                                )
+                                Log.d(
+                                    "messageFetch", PrefManager.getTaskTimestamp(
+                                        PrefManager.getcurrentProject(),
+                                        task.id
+                                    ).toString()
+                                )
+
                             }
 
                         }
@@ -856,27 +878,42 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     }
 
-    fun getNewMessages(){
+    private fun getNewMessages() {
         chatViewModel.getNewMessages(PrefManager.getcurrentProject(), task.id) { result ->
             when (result) {
                 is ServerResult.Success -> {
-                    if (result.data.isNotEmpty()){
-                        val messagedata=result.data.toMutableList().sortedByDescending { it.timestamp }
+                    if (result.data.isNotEmpty()) {
+
+                        val messagedata =
+                            result.data.toMutableList().sortedByDescending { it.timestamp }
+
                         CoroutineScope(Dispatchers.IO).launch {
-                            val messages=messageDatabase.messagesDao().getMessagesForTask(PrefManager.getcurrentProject(),activityBinding.taskId!!)
-                            withContext(Dispatchers.Main){
-                                if (messages.isEmpty()){
-                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity"
-                                }
-                                else{
-                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity (${messages.size})"
+
+                            val messages = messageDatabase.messagesDao().getMessagesForTask(
+                                PrefManager.getcurrentProject(),
+                                activityBinding.taskId
+                            )
+                            withContext(Dispatchers.Main) {
+                                if (messages.isEmpty()) {
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text =
+                                        "Activity"
+                                } else {
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text =
+                                        "Activity (${messages.size})"
+
                                 }
                             }
                         }
 
                         chatAdapter.appendMessages(result.data)
                         recyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                        PrefManager.setTaskTimestamp(PrefManager.getcurrentProject(),activityBinding.taskId!!,messagedata[0].timestamp!!)
+
+                        PrefManager.setTaskTimestamp(
+                            PrefManager.getcurrentProject(),
+                            activityBinding.taskId,
+                            messagedata[0].timestamp!!
+                        )
+
                     }
 
                 }
@@ -925,19 +962,26 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                         binding.inputBox.progressBarSendMsg.gone()
                         binding.inputBox.editboxMessage.text!!.clear()
-                        binding.inputBox.editboxMessage.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                        binding.inputBox.editboxMessage.layoutParams.height =
+                            ViewGroup.LayoutParams.WRAP_CONTENT
 
                         clearReplying()
 
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDatabase.messagesDao().insert(message)
-                            val messages=messageDatabase.messagesDao().getMessagesForTask(PrefManager.getcurrentProject(),activityBinding.taskId!!)
-                            withContext(Dispatchers.Main){
-                                if (messages.isEmpty()){
-                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity"
-                                }
-                                else{
-                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text="Activity (${messages.size})"
+
+                            val messages = messageDatabase.messagesDao().getMessagesForTask(
+                                PrefManager.getcurrentProject(),
+                                activityBinding.taskId
+                            )
+                            withContext(Dispatchers.Main) {
+                                if (messages.isEmpty()) {
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text =
+                                        "Activity"
+                                } else {
+                                    activityBinding.binding.tabLayout.getTabAt(1)!!.text =
+                                        "Activity (${messages.size})"
+
                                 }
                             }
                         }
@@ -979,6 +1023,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                         NotificationType.TASK_COMMENT_MENTION_NOTIFICATION,
                                         message = trimmedMsg
                                     )
+
                                     val mentionedUserTokenList: List<String> =
                                         list.map { it.fcmToken!! }
                                     Log.d("listcheck", list.toString())
@@ -1050,7 +1095,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 }
                             }
 
-
                         }
                         if (message.messageType == MessageType.IMAGE_MSG) {
 
@@ -1095,9 +1139,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_COMMENT_NOTIFICATION.name,
-                taskID = task.id,
-                message = message,
-                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} commented ${task.id}",
+                taskID = task.id+": ${task.title}",
+                message = "${PrefManager.getcurrentUserdetails().USERNAME}: $message",
+                title = "${PrefManager.getcurrentProject()} | ${task.id} | ${task.title}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
@@ -1115,8 +1159,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name,
                 taskID = task.id,
-                message = message,
-                title = "${PrefManager.getcurrentProject()} | @${PrefManager.getcurrentUserdetails().USERNAME} mentioned $usernames",
+                message = "${PrefManager.getcurrentUserdetails().USERNAME} mentioned: $message",
+                title = "${PrefManager.getcurrentProject()} | ${task.id} | ${task.title}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
@@ -1149,67 +1193,69 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun setDetails(id: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            if (tasksDB.tasksDao().getTasksbyId(tasksId = id, projectId = PrefManager.getcurrentProject()).isNull){
-                Log.d("taskFetchTest","fetch from firebase")
-                viewLifecycleOwner.lifecycleScope.launch {
-
-                        try {
-
-                            val taskResult = withContext(Dispatchers.IO) {
-                                viewModel.getTasksById(id, PrefManager.getcurrentProject())
-                            }
-
-                            Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
-
-                            when (taskResult) {
-
-                                is ServerResult.Failure -> {
-                                    binding.progress.gone()
-
-                                    utils.singleBtnDialog(
-                                        "Failure",
-                                        "Failure in Task exception : ${taskResult.exception.message}",
-                                        "Okay"
-                                    ) {
-                                        requireActivity().finish()
-                                    }
-
-
-                                }
-
-                                is ServerResult.Progress -> {
-                                    binding.progress.visible()
-                                }
-
-                                is ServerResult.Success -> {
-                                    binding.progress.gone()
-                                    task = taskResult.data
-                                    tasksDB.tasksDao().insert(task)
-                                    setMessages()
-                                }
-
-                            }
-
-                        } catch (e: Exception) {
-
-                            Timber.tag(TaskDetailsFragment.TAG).e(e)
-                            binding.progress.gone()
-
-                            utils.singleBtnDialog(
-                                "Failure", "Failure in Task exception : ${e.message}", "Okay"
-                            ) {
-                                requireActivity().finish()
-                            }
-                        }
-                }
-            }else{
-
-                Log.d("taskFetchTest","fetch from db")
+            if (tasksDB.tasksDao()
+                    .getTasksbyId(tasksId = id, projectId = PrefManager.getcurrentProject()).isNull
+            ) {
+                Log.d("taskFetchTest", "fetch from firebase")
                 viewLifecycleOwner.lifecycleScope.launch {
 
                     try {
 
-                        viewModel.getTaskbyIdFromDB(PrefManager.getcurrentProject(),id){
+                        val taskResult = withContext(Dispatchers.IO) {
+                            viewModel.getTasksById(id, PrefManager.getcurrentProject())
+                        }
+
+                        Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
+
+                        when (taskResult) {
+
+                            is ServerResult.Failure -> {
+                                binding.progress.gone()
+
+                                utils.singleBtnDialog(
+                                    "Failure",
+                                    "Failure in Task exception : ${taskResult.exception.message}",
+                                    "Okay"
+                                ) {
+                                    requireActivity().finish()
+                                }
+
+
+                            }
+
+                            is ServerResult.Progress -> {
+                                binding.progress.visible()
+                            }
+
+                            is ServerResult.Success -> {
+                                binding.progress.gone()
+                                task = taskResult.data
+                                tasksDB.tasksDao().insert(task)
+                                setMessages()
+                            }
+
+                        }
+
+                    } catch (e: Exception) {
+
+                        Timber.tag(TaskDetailsFragment.TAG).e(e)
+                        binding.progress.gone()
+
+                        utils.singleBtnDialog(
+                            "Failure", "Failure in Task exception : ${e.message}", "Okay"
+                        ) {
+                            requireActivity().finish()
+                        }
+                    }
+                }
+            } else {
+
+                Log.d("taskFetchTest", "fetch from db")
+                viewLifecycleOwner.lifecycleScope.launch {
+
+                    try {
+
+                        viewModel.getTaskbyIdFromDB(PrefManager.getcurrentProject(), id) {
                             when (it) {
 
                                 is DBResult.Failure -> {
@@ -1239,7 +1285,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 else -> {}
                             }
                         }
-
 
 
                     } catch (e: Exception) {
@@ -1372,14 +1417,21 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         binding.inputBox.editboxMessage.setSelection(newText.length)
     }
 
-    override fun onLongPress(message: Message,senderName: String) {
+    override fun onLongPress(message: Message, senderName: String) {
         requireContext().performHapticFeedback()
         val moreOptionBottomSheet =
-            MessageMoreOptions(message,"Task Chat",this,senderName,activityBinding.segmentName,activityBinding.sectionName)
+            MessageMoreOptions(
+                message,
+                "Task Chat",
+                this,
+                senderName,
+                activityBinding.segmentName,
+                activityBinding.sectionName
+            )
         moreOptionBottomSheet.show(requireFragmentManager(), "Options")
     }
 
-    override fun onReplyClicked(message: Message,senderName: String) {
+    override fun onReplyClicked(message: Message, senderName: String) {
         binding.inputBox.replyingToUserTv.text = "Replying to @${senderName}"
         binding.inputBox.referenceMsgTv.text = message.content
         binding.inputBox.replyViewParent.visible()

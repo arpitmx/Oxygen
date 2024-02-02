@@ -411,8 +411,6 @@ class ChatAdapter(
             binding.assigneeTag.gone()
         }
 
-
-
     }
 
     private fun setNormalMsgDPHeader(position: Int, binding: ChatMessageItemBinding, user: UserInMessage) {

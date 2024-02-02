@@ -100,12 +100,14 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
 
     private fun setUpViews(){
 
+
+        binding.parentScrollview.gone()
+        binding.parentScrollview.animFadein(requireContext(),300)
+        binding.parentScrollview.visible()
+
+
         OverScrollDecoratorHelper.setUpOverScroll(binding.parentScrollview)
         OverScrollDecoratorHelper.setUpOverScroll(binding.extendedAssigned)
-
-        binding.parent.gone()
-        binding.parent.animFadein(requireContext(),300)
-        binding.parent.visible()
 
         binding.assigned.statParent.setOnClickThrottleBounceListener {
             startActivity("WorkspaceAssigned")
@@ -149,10 +151,6 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         binding.swiperefresh.setOnRefreshListener {
             syncCache(PrefManager.getcurrentProject())
         }
-
-
-
-
 
     }
 
@@ -241,6 +239,7 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
     }
     private fun setUpUserWorkspace(){
         CoroutineScope(Dispatchers.IO).launch {
+
             val assignedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 2, assignee = PrefManager.getCurrentUserEmail())
             val workingTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 3, assignee = PrefManager.getCurrentUserEmail())
             val reviewTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 4, assignee = PrefManager.getCurrentUserEmail())

@@ -1,4 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="white">#FFFFFFFF</color>
+    <!--    <color name="primary">#FFB84D</color>-->
+    <!--    <color name="primary">#7CB7FF</color>-->
+    <!--    <color name="primary">#86ff7c</color>-->
+    <!--    <color name="primary">#FF2DDC</color>-->
+
+    <color name="primary">#9FFF76</color>
+    <color name="darkTheme_bg">#242222</color>
+    <color name="dim_primary">#D584DE5D</color>
+    <color name="dimmer_primary">#4859953F</color>
+    <color name="purple">@color/primary</color>
+
+    <color name="secondary_bg">#1C1C1C</color>
+    <color name="primary_bg">#161616</color>
+
+    <color name="darkbg_main_a80">#131313</color>
+    <color name="chat_bg">#1E1E1E</color>
+
+
+    <color name="secondaryPink">#ff89b3</color>
+    <color name="secondaryBlue">#0061ff</color>
+    <color name="primarybg">#303030</color>
+    <color name="secondarybg">#0d0c0b</color>
+
+
+
+    <color name="green">@color/primary</color>
+    <color name="yello">@color/s3bg</color>
+    <color name="red">@color/secondaryPink</color>
+    <color name="redx">#FF5252</color>
+
+
+    <color name="s1bg">#A7FFA5</color>
+    <color name="s2bg">#F19FFF</color>
+    <color name="s3bg">#FFE871</color>
+
+    <color name="secondary_bg_black">#202020</color>
+    <color name="item_bg_glow">#1D2930</color>
+    <color name="better_white">#E3E1E1</color>
+    <color name="card_bg">#3F4041</color>
+    <color name="starts_in">#DCFFF7</color>
+    <color name="prioritymax">#F30056</color>
+    <color name="pureblack">#000000</color>
+
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
+
+
+    <color name="bot_bubble_bg">#FFF8E1</color>
+    <color name="black200">#4A4A4A</color>
+    <color name="chat_progress_bg">#8A1E71FF</color>
+
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#ff563f</color>
+    <color name="primary_txt">#212121</color>
+    <color name="orange">#ff563f</color>
+    <color name="fb_blue">#475993</color>
+    <color name="edit_text_hint">#999999</color>
+    <color name="edit_text_txt">#999999</color>
+    <color name="edit_text_bg">#f5f5f5</color>
+    <color name="divider">#f5f5f5</color>
+    <color name="divider_or">#999999</color>
+    <color name="account">#999999</color>
+    <color name="border_grey">#3E656668</color>
+    <color name="border_zero_alpha">#2E2E2E</color>
+    <color name="grey_100">#000000</color>
+    <color name="positiveButtonTextColor">#000000</color>
+    <color name="negativeButtonTextColor">#000000</color>
+    <color name="bottomSheetDividerColor">@color/primarybg</color>
     <color name="mod">#69EDFF</color>
+    <color name="selected_tab_color">@color/primary</color>
+    <color name="unselected_tab_color">@color/account</color>
+    <color name="darkbgmain_darker">#232323</color>
+    <color name="project_element_bg">#A61A1A1A</color>
+    <color name="mention_list_rv_child_bg">#232323</color>
+
+
+
 </resources>
