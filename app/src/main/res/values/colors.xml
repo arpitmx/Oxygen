@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#FFFFFFFF</color>
-<!--    <color name="primary">#FFB84D</color>-->
-<!--    <color name="primary">#7CB7FF</color>-->
-<!--    <color name="primary">#86ff7c</color>-->
-<!--    <color name="primary">#FF2DDC</color>-->
+    <!--    <color name="primary">#FFB84D</color>-->
+    <!--    <color name="primary">#7CB7FF</color>-->
+    <!--    <color name="primary">#86ff7c</color>-->
+    <!--    <color name="primary">#FF2DDC</color>-->
 
     <color name="primary">#9FFF76</color>
     <color name="darkTheme_bg">#242222</color>

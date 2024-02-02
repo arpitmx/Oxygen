@@ -1,4 +1,4 @@
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swiperefresh"
@@ -10,25 +10,18 @@
     <ScrollView
         android:id="@+id/parent_scrollview"
         android:layout_width="match_parent"
-        android:paddingBottom="58dp"
+        android:paddingBottom="50dp"
         android:clipToPadding="false"
+        android:elevation="3dp"
         android:layout_height="match_parent"
         >
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/parent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/primary_bg"
-            android:scrollbars="none"
-            tools:context=".UI.Teams.TeamsFragment">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:elevation="2dp"
+               >
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
@@ -142,14 +135,13 @@
                     android:background="@drawable/dark_bg_rounded_corner"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="8dp"
+                    android:foreground="@drawable/ripplecustom"
                     android:layout_marginEnd="10dp"
                     android:orientation="vertical">
-
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-
                         >
 
                         <LinearLayout
@@ -184,7 +176,6 @@
                                 />
 
 
-
                         </LinearLayout>
 
                         <TextView
@@ -194,12 +185,11 @@
                             android:text="5/10"
                             android:visibility="gone"
                             android:id="@+id/todaytasksCount"
-                            android:fontFamily="@font/sfbold"
+                            android:fontFamily="@font/sf_pro_display_semibold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             android:layout_marginEnd="62dp"/>
-
 
                         <ImageView
                             android:layout_width="0dp"
@@ -235,7 +225,7 @@
                             android:id="@+id/percentageCount"
                             android:layout_marginStart="20dp"
                             android:visibility="gone"
-                            android:fontFamily="@font/sfbold"
+                            android:fontFamily="@font/sf_pro_display_semibold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -247,7 +237,7 @@
                         android:id="@+id/todayProgress"
                         android:visibility="gone"
                         app:trackThickness="10dp"
-                        app:trackColor="@color/account"
+                        app:trackColor="@color/dimmer_primary"
                         android:layout_marginTop="9dp"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="20dp"
@@ -271,6 +261,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="10dp"
+                        android:foreground="@drawable/ripplecustom"
                         android:layout_height="wrap_content">
 
                         <LinearLayout
@@ -339,6 +330,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/dark_bg_rounded_corner"
                         android:layout_marginStart="10dp"
+                        android:foreground="@drawable/ripplecustom"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="10dp"
                         >
@@ -351,6 +343,7 @@
                             android:paddingTop="@dimen/button_size_workspace"
                             android:paddingBottom="@dimen/button_size_workspace"
                             android:weightSum="10"
+
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -411,6 +404,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/dark_bg_rounded_corner"
+                        android:foreground="@drawable/ripplecustom"
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="10dp"
@@ -470,12 +464,9 @@
                         android:background="@color/border_grey" />
                 </LinearLayout>
 
-
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
 
-    </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

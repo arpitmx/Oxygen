@@ -124,6 +124,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
         PrefManager.resetReadCount()
         PrefManager.setOfflineDialogShown(false)
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+
         if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
             initialise()
         }
@@ -274,13 +275,13 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
     private fun setBallAnimator() {
 
-
         ball = binding.fragContainer
         ball.visible()
         ball.animFadein(this,500)
-
         ball.rotateInfinity(this)
         val maxsize = 15f
+
+
 
         valueAnimator = ValueAnimator.ofFloat(2f, maxsize)
         valueAnimator.setDuration(300L)
@@ -312,6 +313,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
 
     private fun startMainActivity() {
+
 
         if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE) {
 
@@ -822,7 +824,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                                 is ServerResult.Success -> {
                                     // Toast.makeText(this, "You have ${pushResult.data} new notifications", Toast.LENGTH_SHORT).show()
 
-                                    util.showSnackbar(binding.root, "O2 is ready", 1000)
+                                   // util.showSnackbar(binding.root, "O2 is ready", 1000)
                                     stopAnimAndStartActivity()
                                 }
 
@@ -831,7 +833,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
 
                     } else {
-                        util.showSnackbar(binding.root, "O2 is ready", 1000)
+                      //  util.showSnackbar(binding.root, "O2 is ready", 1000)
                         stopAnimAndStartActivity()
                     }
 

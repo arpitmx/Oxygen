@@ -3,7 +3,6 @@
     <style name="Base.Theme.O2" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/secondary_bg</item>
         <item name="android:navigationBarColor">@color/secondary_bg</item>
-
     </style>
 
     <style name="Theme.O2" parent="Base.Theme.O2" />
@@ -33,8 +32,9 @@
     </style>
     <!-- Base application theme. -->
     <style name="Base.O2SplashTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
+
 
 </resources>
