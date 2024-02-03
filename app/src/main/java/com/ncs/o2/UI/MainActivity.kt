@@ -28,11 +28,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -73,6 +79,7 @@ import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
+import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
@@ -126,6 +133,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         GlobalUtils.EasyElements(this)
     }
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    lateinit var navController: NavController
+    private val viewModel2: TaskSectionViewModel by viewModels()
 
 
     @Inject
@@ -154,20 +163,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
         projects=ArrayList()
         registerReceiver(true)
-
-        val _index= intent.getStringExtra("index")
-        if (_index!=null && _index=="2"){
-            binding.bottomNav.getMenu().getItem(0).setChecked(true)
-            movetoteamspage()
-        }
-        if (_index!=null && _index=="1"){
-            binding.bottomNav.getMenu().getItem(1).setChecked(true)
-            movetoworkspacepage()
-        }
-
-        if (_index==null){
-            binding.bottomNav.getMenu().getItem(0).setChecked(true)
-        }
 
         if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
             binding.gioActionbar.offlineIndicator.visible()
@@ -209,6 +204,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             Log.d("projectCheck",PrefManager.getProjectIconUrl(project).toString())
         }
 
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
+        navController = navHostFragment.navController
+        val bottomNav = binding.bottomNav
+        bottomNav.setupWithNavController(navController)
+
+        val search=intent.getStringExtra("search")
+        if (search!=null && search=="GoToSearch") {
+            val tagText = intent.getStringExtra("tagText")
+            val bundle = bundleOf("tagID" to tagText)
+            navController.navigate(R.id.bottom_search,bundle)
+        }
 
     }
 
@@ -252,12 +258,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         })
 
 
-        val searchFragment = intent.getStringExtra("search")
-        if (searchFragment != null) {
-            when (searchFragment) {
-                "GoToSearch" -> movetosearch(intent.getStringExtra("tagText"))
-            }
-        }
         for (project in PrefManager.getProjectsList()){
             Log.d("projectSegments",PrefManager.getProjectSegments(project).toString())
         }
@@ -266,13 +266,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
     private fun manageViews(){
         setNotificationCountOnActionBar()
         binding.gioActionbar.tabLayout.gone()
-        movetoteamspage()
+//        movetoteamspage()
     }
 
     private fun updateUIBasedOnSegment(newSegment: String) {
         setNotificationCountOnActionBar()
         binding.gioActionbar.tabLayout.gone()
-        movetoteamspage()
+//        movetoteamspage()
     }
 
 
@@ -282,9 +282,79 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         // Set up various views and components
         setUpProjects()
         setUpActionBar()
-        setBottomNavBar()
         setUpViewsOnClicks()
         setupProjectsList()
+        setBottomNavBar()
+
+    }
+
+    fun setBottomNavBar() {
+
+        bottmNav = binding.bottomNav
+
+        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+            bottmNav.setOnItemSelectedListener { menuItem ->
+
+                when (menuItem.itemId) {
+
+                    R.id.assigned_item -> {
+                        navController.navigate(R.id.assigned_item)
+                        true
+                    }
+
+                    R.id.bottom_search -> {
+                        navController.navigate(R.id.bottom_search)
+                        true
+                    }
+
+                    R.id.teams_page -> {
+                        navController.navigate(R.id.teams_page)
+                        true
+                    }
+
+                    R.id.task_item -> {
+                        navController.navigate(R.id.task_item)
+                        true
+                    }
+                    else ->{
+                        startActivity(Intent(this,CreateTaskActivity::class.java))
+                        false
+                    }
+                }
+
+            }
+        }else{
+            bottmNav.setOnItemSelectedListener { menuItem ->
+
+                when (menuItem.itemId) {
+
+                    R.id.assigned_item -> {
+                        easyElements.showSnackbar(binding.root,"Workspace is not available in offline mode",3000)
+                        false
+                    }
+
+                    R.id.bottom_search -> {
+                        navController.navigate(R.id.bottom_search)
+                        true
+                    }
+
+                    R.id.teams_page -> {
+                        navController.navigate(R.id.teams_page)
+                        true
+                    }
+
+                    R.id.task_item -> {
+                        navController.navigate(R.id.task_item)
+                        true
+                    }
+                    else ->{
+                        easyElements.showSnackbar(binding.root,"Task Creation is not available in offline mode",3000)
+                        false
+                    }
+                }
+            }
+        }
+
 
     }
 
@@ -335,7 +405,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
         // Set up the action bar, navigation drawer, and other UI components
 
-        search = binding.gioActionbar.searchCont
         setNotificationCountOnActionBar()
 
 
@@ -419,11 +488,9 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             }
 
         }
-        binding.gioActionbar.searchBar.setOnClickThrottleBounceListener {
-            replaceFragment(SearchFragment())
-            bottmNav.selectedItemId = R.id.bottom_search
-        }
+
     }
+
 
     private fun setNotificationCountOnActionBar() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -505,8 +572,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
         // Handle click on a project in the list
         PrefManager.setcurrentsegment("Select Segment")
-        viewModel.updateCurrentSegment("Select Segment")
-
+        viewModel2.updateCurrentSegment("Select Segment")
+        navController.navigate(R.id.teams_page)
         binding.gioActionbar.titleTv.text=PrefManager.getcurrentsegment()
         PrefManager.setcurrentProject(projectID)
         PrefManager.setRadioButton(position)
@@ -526,9 +593,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             setUpTags(projectName = projectID)
 
         }
-
-
-
     }
 
 
@@ -733,95 +797,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         }
     }
 
-
-
-
-
-
-
     override fun onProjectAdded(userProjects: ArrayList<String>) {
         Log.d("projectCheck",PrefManager.getProjectsList().toString())
         PrefManager.putProjectsList(userProjects)
         Log.d("projectCheck",PrefManager.getProjectsList().toString())
         setupProjectsList()
         projectListAdapter.notifyDataSetChanged()
-    }
-
-    fun setBottomNavBar() {
-
-        bottmNav = binding.bottomNav
-
-        if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
-            bottmNav.setOnItemSelectedListener { menuItem ->
-
-                when (menuItem.itemId) {
-
-                    R.id.assigned_item -> {
-                        replaceFragment(AssignedFragment())
-                        true
-                    }
-
-                    R.id.bottom_search -> {
-                        replaceFragment(SearchFragment())
-                        true
-                    }
-
-                    R.id.teams_page -> {
-                        replaceFragment(TeamsFragment())
-                        true
-                    }
-
-                    R.id.task_item -> {
-                        replaceFragment(TasksHolderFragment())
-                        true
-                    }
-                    else ->{
-                        startActivity(Intent(this,CreateTaskActivity::class.java))
-                        false
-                    }
-                }
-
-            }
-        }else{
-            bottmNav.setOnItemSelectedListener { menuItem ->
-
-                when (menuItem.itemId) {
-
-                    R.id.assigned_item -> {
-                        easyElements.showSnackbar(binding.root,"Workspace is not available in offline mode",3000)
-                        false
-                    }
-
-                    R.id.bottom_search -> {
-                        replaceFragment(SearchFragment())
-                        true
-                    }
-
-                    R.id.teams_page -> {
-                        replaceFragment(TeamsFragment())
-                        true
-                    }
-
-                    R.id.task_item -> {
-                        replaceFragment(TasksHolderFragment())
-                        true
-                    }
-                    else ->{
-                        easyElements.showSnackbar(binding.root,"Task Creation is not available in offline mode",3000)
-                        false
-                    }
-                }
-            }
-        }
-
-
-    }
-    private fun replaceFragment(fragment: Fragment) {
-
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.nav_host_fragment_activity_main, fragment)
-        fragmentTransaction.commit()
-
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -1119,49 +1100,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         }
     }
 
-    private fun movetosearch(tagText: String?) {
-        val transaction = supportFragmentManager.beginTransaction()
-        val fragment = SearchFragment()
-        val bundle = Bundle()
-        bundle.putString("tagText", tagText)
-        fragment.arguments = bundle
-
-        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-
-        binding.bottomNav.menu.getItem(3).isChecked = true
-        binding.bottomNav.menu.getItem(3).setIcon(R.drawable.ic_searchico)
-    }
-
-    private fun movetotaskspage() {
-        val transaction = supportFragmentManager.beginTransaction()
-        val fragment = TasksHolderFragment()
-        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-        binding.bottomNav.menu.getItem(2).isChecked = true
-        binding.bottomNav.menu.getItem(2).setIcon(R.drawable.baseline_article_24)
-    }
-
-    private fun movetoteamspage() {
-        val transaction = supportFragmentManager.beginTransaction()
-        val fragment = TeamsFragment()
-        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-        binding.bottomNav.menu.getItem(0).isChecked = true
-        binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_groups_24)
-    }
-    private fun movetoworkspacepage() {
-        val transaction = supportFragmentManager.beginTransaction()
-        val fragment = AssignedFragment()
-        transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-        binding.bottomNav.menu.getItem(1).isChecked = true
-        binding.bottomNav.menu.getItem(1).setIcon(R.drawable.baseline_business_center_24)
-    }
 
     override fun onBackPressed() {
         if (doubleBackPress) {

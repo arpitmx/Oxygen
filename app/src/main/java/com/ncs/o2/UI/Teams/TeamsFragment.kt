@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -236,6 +237,10 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
         binding.swiperefresh.setOnRefreshListener {
             syncCache(PrefManager.getcurrentProject())
+        }
+
+        activityBinding.binding.gioActionbar.searchBar.setOnClickThrottleBounceListener {
+            activityBinding.navController.navigate(R.id.action_teams_to_search, bundleOf())
         }
 
     }

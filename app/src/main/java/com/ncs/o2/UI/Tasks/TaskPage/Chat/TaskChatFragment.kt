@@ -744,7 +744,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
             if (PrefManager.getTaskTimestamp(
                     PrefManager.getcurrentProject(),
-                    activityBinding.taskId
+                    activityBinding.taskId!!
                 ).seconds.toInt() == 0
             ) {
                 Log.d("messageFetch", "messageFetch from firebase")
@@ -765,7 +765,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                                 messageId = message.messageId,
                                                 projectId = PrefManager.getcurrentProject(),
 
-                                                taskId = activityBinding.taskId
+                                                taskId = activityBinding.taskId!!
                                             )
 
                                         )
@@ -781,7 +781,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                                         PrefManager.setTaskTimestamp(
                                             PrefManager.getcurrentProject(),
-                                            activityBinding.taskId,
+                                            activityBinding.taskId!!,
                                             messagedata[0].timestamp!!
                                         )
 
@@ -833,7 +833,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                                 PrefManager.setTaskTimestamp(
                                     PrefManager.getcurrentProject(),
-                                    activityBinding.taskId,
+                                    activityBinding.taskId!!,
                                     messagedata[0].timestamp!!
                                 )
                                 Log.d(
@@ -891,7 +891,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                             val messages = messageDatabase.messagesDao().getMessagesForTask(
                                 PrefManager.getcurrentProject(),
-                                activityBinding.taskId
+                                activityBinding.taskId!!
                             )
                             withContext(Dispatchers.Main) {
                                 if (messages.isEmpty()) {
@@ -910,7 +910,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                         PrefManager.setTaskTimestamp(
                             PrefManager.getcurrentProject(),
-                            activityBinding.taskId,
+                            activityBinding.taskId!!,
                             messagedata[0].timestamp!!
                         )
 
@@ -972,7 +972,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
                             val messages = messageDatabase.messagesDao().getMessagesForTask(
                                 PrefManager.getcurrentProject(),
-                                activityBinding.taskId
+                                activityBinding.taskId!!
                             )
                             withContext(Dispatchers.Main) {
                                 if (messages.isEmpty()) {
