@@ -36,6 +36,8 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideUpAndVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -89,7 +91,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
     lateinit var db: TasksDatabase
     @Inject
     lateinit var util: GlobalUtils.EasyElements
-    var type: String? =null
+    var _type: String? =null
     var index: String? =null
 
     private var list:MutableList<String> = mutableListOf()
@@ -102,15 +104,15 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
     private var TagList: MutableList<Tag> = mutableListOf()
     private val selectedTags = mutableListOf<Tag>()
     private  var taskList: MutableList<Task> = mutableListOf()
-
+    private var isFilterVisible=false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        type=intent.getStringExtra("type")
+        _type=intent.getStringExtra("type")
         index=intent.getStringExtra("index")
-        performTaskFetch(type!!)
+        performTaskFetch(_type!!)
 
         binding.swiperefresh.setOnRefreshListener {
             syncCache(PrefManager.getcurrentProject())
@@ -136,27 +138,25 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             searchQuery(binding.searchBar.text?.toString()!!)
         }
         binding.clear.setOnClickThrottleBounceListener {
+            selectedAssignee.clear()
+            selectedAssignee2.clear()
+            selectedTags.clear()
+            tagIdList.clear()
             setDefault()
             binding.searchBar.text!!.clear()
             searchQuery(binding.searchBar.text?.toString()!!)
         }
-
-        initView()
-    }
-
-    private fun initView(){
-        binding.searchBar.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                searchQuery(s?.toString()!!)
+        binding.filters.setOnClickThrottleBounceListener {
+            if (isFilterVisible){
+                isFilterVisible=false
+                binding.filtersParent.slideDownAndGone(100)
             }
-        })
-        binding.searchButton.setOnClickThrottleBounceListener {
-            searchQuery(binding.searchBar.text?.toString()!!)
+            else{
+                isFilterVisible=true
+                binding.filtersParent.slideUpAndVisible(100)
+            }
         }
+
     }
 
     private fun searchQuery(text:String){
@@ -211,15 +211,37 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
 
         var filter: MutableList<Task> = mutableListOf()
 
-        filter = taskList.filter {
-            (state == 0 || it.status == state) &&
-                    (assignee.isEmpty() || it.assignee == assignee) &&
-                    (segment.isEmpty() || it.segment == segment) &&
-                    (type == 0 || it.type == type) &&
-                    (creator.isEmpty() || it.assigner == creator)&&
-                    (it.id.contains(text, ignoreCase = true) || it.description.contains(text, ignoreCase = true))
+        if ( _type=="Pending"){
 
-        }.toMutableList()
+
+            filter = taskList.filter {
+                (state == 0 || it.status == 1 || it.status==2)&&
+                        (assignee.isEmpty() || it.assignee == assignee) &&
+                        (segment.isEmpty() || it.segment == segment) &&
+                        (type == 0 || it.type == type) &&
+                        (creator.isEmpty() || it.assigner == creator)&&
+                        (it.id.contains(text, ignoreCase = true) || it.description.contains(text, ignoreCase = true))
+
+            }.toMutableList()
+
+
+            Log.d("listsize",filter.size.toString())
+
+
+        }
+        else{
+            filter = taskList.filter {
+                (state == 0 || it.status == state) &&
+                        (assignee.isEmpty() || it.assignee == assignee) &&
+                        (segment.isEmpty() || it.segment == segment) &&
+                        (type == 0 || it.type == type) &&
+                        (creator.isEmpty() || it.assigner == creator)&&
+                        (it.id.contains(text, ignoreCase = true) || it.description.contains(text, ignoreCase = true))
+
+            }.toMutableList()
+        }
+
+
 
         var finalFilter:MutableList<Task> = mutableListOf()
         if (selectedTags.isNotEmpty()){
@@ -262,7 +284,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                 binding.title.text = "Pending"
                 binding.state.gone()
                 FetchTasksforState(1)
-                FetchTasksforState(2)
+
             }
 
             "Ongoing" -> {
@@ -378,8 +400,12 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             binding.progressbarBlock.gone()
             binding.placeholder.visible()
             binding.progressBar.gone()
+            binding.results.visible()
+            binding.results.text="Matches 0 tasks"
         }
         else{
+            Log.d("lissttt",list.size.toString())
+            Log.d("lissttt",list.toString())
             binding.layout.visible()
             binding.recyclerView.visible()
             binding.progressbarBlock.gone()
@@ -485,36 +511,71 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
     }
 
     private fun FetchTasksforState(status:Int){
-        viewModel.getTasksForStateFromDB(
-            PrefManager.getcurrentProject(),status
-        ) { result ->
-            when (result) {
-                is DBResult.Success -> {
-                    taskList.clear()
-                    taskList.addAll(result.data.toMutableList())
-                    setUpOnSuccessRV(taskList)
+        if (status==1){
+            for (i in 1..2){
+                viewModel.getTasksForStateFromDB(
+                    PrefManager.getcurrentProject(),i
+                ) { result ->
+                    when (result) {
+                        is DBResult.Success -> {
+                            taskList.addAll(result.data.toMutableList())
+                            setUpOnSuccessRV(taskList)
 
+                        }
 
+                        is DBResult.Failure -> {
+                            val errorMessage = result.exception.message
+                            showLoader(-1)
+                            util.singleBtnDialog(
+                                "Failure",
+                                "Failure in loading tasks, try again : ${errorMessage}", "Reload"
+                            ) {
+                                FetchTasksforState(status)
+                            }
+                        }
 
-                }
+                        is DBResult.Progress -> {
+                            showLoader(1)
+                        }
 
-                is DBResult.Failure -> {
-                    val errorMessage = result.exception.message
-                    showLoader(-1)
-                    util.singleBtnDialog(
-                        "Failure",
-                        "Failure in loading tasks, try again : ${errorMessage}", "Reload"
-                    ) {
-                        FetchTasksforState(status)
                     }
                 }
+            }
 
-                is DBResult.Progress -> {
-                    showLoader(1)
+        }
+        else{
+            viewModel.getTasksForStateFromDB(
+                PrefManager.getcurrentProject(),status
+            ) { result ->
+                when (result) {
+                    is DBResult.Success -> {
+                        taskList.clear()
+                        taskList.addAll(result.data.toMutableList())
+                        setUpOnSuccessRV(taskList)
+
+
+
+                    }
+
+                    is DBResult.Failure -> {
+                        val errorMessage = result.exception.message
+                        showLoader(-1)
+                        util.singleBtnDialog(
+                            "Failure",
+                            "Failure in loading tasks, try again : ${errorMessage}", "Reload"
+                        ) {
+                            FetchTasksforState(status)
+                        }
+                    }
+
+                    is DBResult.Progress -> {
+                        showLoader(1)
+                    }
+
                 }
-
             }
         }
+
     }
 
     private fun FetchTasksforModerators(){

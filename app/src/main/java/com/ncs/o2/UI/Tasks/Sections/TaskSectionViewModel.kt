@@ -44,6 +44,11 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
 
     var sectionName: String? = null
 
+
+    private val _currentSegment = MutableLiveData<String>()
+    val currentSegment: LiveData<String> get() = _currentSegment
+
+
     fun getTasksItemsForSegment(
         projectName: String,
         segmentName: String,
@@ -135,6 +140,11 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
             taskRepository.getTasksItemsOpenedBy(projectName,assigneer,resultCallback)
         }
     }
+
+    fun updateCurrentSegment(newSegment: String) {
+        _currentSegment.value = newSegment
+    }
+
 
 
 }
