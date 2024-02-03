@@ -100,7 +100,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBottomSheet.SegmentSelectionListener,AddProjectBottomSheet.ProjectAddedListener,NetworkChangeReceiver.NetworkChangeCallback{
+class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.ProjectAddedListener,NetworkChangeReceiver.NetworkChangeCallback{
     lateinit var projectListAdapter: ListAdapter
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
         val _index= intent.getStringExtra("index")
         if (_index!=null && _index=="2"){
-            binding.bottomNav.getMenu().getItem(2).setChecked(true)
+            binding.bottomNav.getMenu().getItem(0).setChecked(true)
             movetoteamspage()
         }
         if (_index!=null && _index=="1"){
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         }
 
         if (_index==null){
-            binding.bottomNav.getMenu().getItem(2).setChecked(true)
+            binding.bottomNav.getMenu().getItem(0).setChecked(true)
         }
 
         if (PrefManager.getAppMode()==Endpoints.OFFLINE_MODE){
@@ -264,69 +264,15 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
     }
 
     private fun manageViews(){
-        if (PrefManager.getcurrentsegment()== "Select Segment") {
-
-            binding.placeholderText.visible()
-            binding.navHostFragmentActivityMain.gone()
-            binding.bottomNavParent.gone()
-
-            with(binding.gioActionbar) {
-                line.gone()
-                tabLayout.gone()
-                searchCont.gone()
-                tabLayout.gone()
-                searchCont.gone()
-                actionbar.visible()
-                constraintLayout2.visible()
-                constraintLayoutsearch.gone()
-                constraintLayoutworkspace.gone()
-                constraintLayoutTeams.gone()
-                notificationCont.gone()
-            }
-
-        } else {
-
-            binding.placeholderText.gone()
-            binding.navHostFragmentActivityMain.visible()
-            binding.bottomNavParent.visible()
-
-            binding.gioActionbar.line.visible()
-            binding.gioActionbar.notificationCont.visible()
-            setNotificationCountOnActionBar()
-        }
+        setNotificationCountOnActionBar()
+        binding.gioActionbar.tabLayout.gone()
+        movetoteamspage()
     }
 
     private fun updateUIBasedOnSegment(newSegment: String) {
-
-        if (newSegment == "Select Segment") {
-
-            binding.placeholderText.visible()
-            binding.navHostFragmentActivityMain.gone()
-            binding.bottomNavParent.gone()
-
-            with(binding.gioActionbar) {
-                tabLayout.gone()
-                searchCont.gone()
-                line.gone()
-                actionbar.visible()
-                constraintLayout2.visible()
-                constraintLayoutsearch.gone()
-                constraintLayoutworkspace.gone()
-                constraintLayoutTeams.gone()
-                notificationCont.gone()
-            }
-
-
-        } else {
-
-            binding.placeholderText.gone()
-            binding.navHostFragmentActivityMain.visible()
-            binding.gioActionbar.line.visible()
-            binding.bottomNavParent.visible()
-            binding.gioActionbar.notificationCont.visible()
-            setNotificationCountOnActionBar()
-
-        }
+        setNotificationCountOnActionBar()
+        binding.gioActionbar.tabLayout.gone()
+        movetoteamspage()
     }
 
 
@@ -413,17 +359,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
             quickTaskBottomSheet.show(supportFragmentManager, "quickTask")
         }
 
-        binding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
-
-            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-            segment.segmentSelectionListener = this
-
-            // Show a segment selection bottom sheet
-            this.performHapticFeedback()
-            segment.show(supportFragmentManager, "Segment Selection")
-            binding.gioActionbar.switchSegmentButton.rotate180(this)
-
-        }
 
         binding.gioActionbar.btnHam.setOnClickThrottleBounceListener {
 
@@ -598,24 +533,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
 
 
-    override fun onSegmentSelected(segmentName: String) {
 
-        // Handle segment selection
-        binding.gioActionbar.tabLayout.gone()
-        binding.gioActionbar.titleTv.text = segmentName
-        segmentText.value = segmentName
-        viewModel.updateCurrentSegment(segmentName)
-        runDelayed(1000){
-            binding.gioActionbar.tabLayout.visible()
-        }
-        if (segmentName=="Select Segment"){
-            binding.gioActionbar.tabLayout.gone()
-            binding.gioActionbar.searchCont.gone()
-        }
-        else{
-            movetotaskspage()
-        }
-    }
 
     private fun setUpTasks(projectName: String) {
         val dao = db.tasksDao()
@@ -638,11 +556,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                             progressDialog.dismiss()
                             val drawerLayout = binding.drawer
                             drawerLayout.closeDrawer(GravityCompat.START)
-                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-                            segment.segmentSelectionListener = this@MainActivity
-                            segment.show(supportFragmentManager, "Segment Selection")
-                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
-
                         }
 
                         is ServerResult.Progress -> {
@@ -662,10 +575,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
                             val drawerLayout = binding.drawer
                             drawerLayout.closeDrawer(GravityCompat.START)
-                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-                            segment.segmentSelectionListener = this@MainActivity
-                            segment.show(supportFragmentManager, "Segment Selection")
-                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
                         }
 
                     }
@@ -695,11 +604,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
                             progressDialog.dismiss()
                             val drawerLayout = binding.drawer
                             drawerLayout.closeDrawer(GravityCompat.START)
-                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-                            segment.segmentSelectionListener = this@MainActivity
-                            segment.show(supportFragmentManager, "Segment Selection")
-                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
-
                         }
 
                         is ServerResult.Progress -> {
@@ -722,12 +626,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
 
                             val drawerLayout = binding.drawer
                             drawerLayout.closeDrawer(GravityCompat.START)
-                            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-                            segment.segmentSelectionListener = this@MainActivity
-                            segment.show(supportFragmentManager, "Segment Selection")
-                            binding.gioActionbar.switchSegmentButton.rotate180(this@MainActivity)
-
-
                         }
 
                     }
@@ -1242,8 +1140,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
-        binding.bottomNav.menu.getItem(0).isChecked = true
-        binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
+        binding.bottomNav.menu.getItem(2).isChecked = true
+        binding.bottomNav.menu.getItem(2).setIcon(R.drawable.baseline_article_24)
     }
 
     private fun movetoteamspage() {
@@ -1252,8 +1150,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback, SegmentSelectionBotto
         transaction.replace(R.id.nav_host_fragment_activity_main, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
-        binding.bottomNav.menu.getItem(2).isChecked = true
-        binding.bottomNav.menu.getItem(2).setIcon(R.drawable.baseline_groups_24)
+        binding.bottomNav.menu.getItem(0).isChecked = true
+        binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_groups_24)
     }
     private fun movetoworkspacepage() {
         val transaction = supportFragmentManager.beginTransaction()

@@ -228,9 +228,8 @@
             android:id="@+id/resultsParent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:paddingStart="15dp"
+            android:visibility="visible"
             android:paddingEnd="15dp">
 
             <TextView
@@ -242,6 +241,7 @@
                 android:textColor="@color/better_white"
                 android:textSize="14dp"
                 android:visibility="gone"
+                android:layout_marginTop="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -254,6 +254,7 @@
                 android:text="Clear filters"
                 android:textColor="@color/redx"
                 android:textSize="14dp"
+                android:layout_marginTop="10dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -266,6 +267,9 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:id="@+id/filtersParent"
+            android:layout_marginTop="10dp"
             android:scrollbars="none">
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -278,7 +282,7 @@
                     android:id="@+id/tags"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="10dp"
                     android:background="@drawable/item_bg_curve"
                     android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
                     android:drawablePadding="@dimen/_5dp"
@@ -358,6 +362,7 @@
                     android:background="@drawable/item_bg_curve"
                     android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
                     android:drawablePadding="@dimen/_5dp"
+                    android:layout_marginEnd="10dp"
                     android:drawableTint="@color/better_white"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
@@ -375,15 +380,26 @@
             android:layout_marginBottom="15dp"
             android:weightSum="10">
 
+            <ImageView
+                android:id="@+id/filters"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_weight="1.2"
+                android:background="@drawable/item_bg_curve"
+                android:padding="6dp"
+                android:src="@drawable/filter"
+                app:tint="@color/primary" />
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/search_bar"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="15dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_weight="8.5"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="7.6"
                 android:background="@drawable/item_bg_curve"
                 android:drawablePadding="15dp"
                 android:drawableTint="#DEE3E3E3"
@@ -408,12 +424,12 @@
             <ImageView
                 android:id="@+id/searchButton"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_weight="1.5"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1.2"
                 android:background="@drawable/item_bg_curve"
-                android:padding="15dp"
+                android:padding="9dp"
                 android:src="@drawable/ic_searchico"
                 app:tint="@color/primary" />
         </LinearLayout>

@@ -1139,7 +1139,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TASK_COMMENT_NOTIFICATION.name,
-                taskID = task.id+": ${task.title}",
+                taskID = task.id,
                 message = "${PrefManager.getcurrentUserdetails().USERNAME}: $message",
                 title = "${PrefManager.getcurrentProject()} | ${task.id} | ${task.title}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,

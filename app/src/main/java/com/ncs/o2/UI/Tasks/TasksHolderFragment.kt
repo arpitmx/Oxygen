@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -24,7 +25,11 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setBackgroundDrawable
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
@@ -47,17 +52,14 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner {
+class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner,SegmentSelectionBottomSheet.SegmentSelectionListener {
 
 
     lateinit var binding: FragmentTasksHolderBinding
     private val activityBinding: ActivityMainBinding by lazy {
         (requireActivity() as MainActivity).binding
     }
-    private lateinit var segmentName:String
-    private val mainActivity: MainActivity by lazy {
-        requireActivity() as MainActivity
-    }
+
     @Inject
     lateinit var firestoreRepository: FirestoreRepository
     @Inject
@@ -77,46 +79,90 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        segmentName=PrefManager.getcurrentsegment()
 
-
-        activityBinding.gioActionbar.searchCont.gone()
-
-        if (segmentName=="Select Segment"){
-            activityBinding.gioActionbar.tabLayout.gone()
-        }
-        else{
-            activityBinding.gioActionbar.tabLayout.visible()
-        }
-        val sectionsList = PrefManager.getsectionsList().toMutableList()
-
-        PrefManager.list.observe(viewLifecycleOwner) { newList ->
-            setUpViewPager(newList.toMutableList())
-        }
-
-        PrefManager.selectedPosition.observe(viewLifecycleOwner) { newPosition ->
-            setUpViewPager(sectionsList)
-        }
-        mainActivity.segmentText.observe(viewLifecycleOwner) { newSegmentText ->
-            segmentName = newSegmentText
-            setUpViewPager(sectionsList)
-            if (segmentName=="Select Segment"){
-                activityBinding.gioActionbar.tabLayout.gone()
-                activityBinding.gioActionbar.searchCont.gone()
-            }
-            else{
-                activityBinding.gioActionbar.tabLayout.visible()
-            }
-        }
-
-        setUpViewPager(sectionsList)
-        activityBinding.gioActionbar.constraintLayout2.visible()
-        activityBinding.gioActionbar.constraintLayoutworkspace.gone()
-        activityBinding.gioActionbar.actionbar.visible()
-        activityBinding.gioActionbar.constraintLayoutsearch.gone()
-        activityBinding.gioActionbar.constraintLayoutTeams.gone()
         setUpBackPress()
 
+        activityBinding.gioActionbar.segmentParent.setOnClickThrottleBounceListener {
+
+            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+            segment.segmentSelectionListener = this
+            requireContext().performHapticFeedback()
+            segment.show(requireFragmentManager(), "Segment Selection")
+            activityBinding.gioActionbar.switchSegmentButton.rotate180(requireContext())
+
+        }
+
+        viewModel.currentSegment.observe(viewLifecycleOwner, Observer { newSegment ->
+            updateUIBasedOnSegment(newSegment)
+        })
+
+    }
+
+    private fun updateUIBasedOnSegment(newSegment: String) {
+
+        if (newSegment== "Select Segment") {
+
+            binding.placeholderText.visible()
+            binding.viewPager2.gone()
+            with(activityBinding.gioActionbar) {
+                tabLayout.gone()
+                searchCont.gone()
+                actionbar.visible()
+                constraintLayout2.visible()
+                constraintLayoutsearch.gone()
+                constraintLayoutworkspace.gone()
+                constraintLayoutTeams.gone()
+                notificationCont.gone()
+            }
+            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+            segment.segmentSelectionListener = this
+            segment.show(requireFragmentManager(), "Segment Selection")
+            activityBinding.gioActionbar.switchSegmentButton.rotate180(requireContext())
+
+
+        } else {
+            val sectionsList = PrefManager.getsectionsList().toMutableList()
+            binding.placeholderText.gone()
+            binding.viewPager2.visible()
+            activityBinding.gioActionbar.notificationCont.visible()
+            activityBinding.gioActionbar.tabLayout.visible()
+            setUpViewPager(sectionsList)
+
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (PrefManager.getcurrentsegment()== "Select Segment") {
+
+            binding.placeholderText.visible()
+            binding.viewPager2.gone()
+            with(activityBinding.gioActionbar) {
+                tabLayout.gone()
+                searchCont.gone()
+                actionbar.visible()
+                constraintLayout2.visible()
+                constraintLayoutsearch.gone()
+                constraintLayoutworkspace.gone()
+                constraintLayoutTeams.gone()
+                notificationCont.gone()
+            }
+            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+            segment.segmentSelectionListener = this
+            segment.show(requireFragmentManager(), "Segment Selection")
+            activityBinding.gioActionbar.switchSegmentButton.rotate180(requireContext())
+
+
+        } else {
+            val sectionsList = PrefManager.getsectionsList().toMutableList()
+            setUpViewPager(sectionsList)
+            binding.placeholderText.gone()
+            binding.viewPager2.visible()
+
+            activityBinding.gioActionbar.notificationCont.visible()
+            activityBinding.gioActionbar.tabLayout.visible()
+
+        }
     }
 
     private fun setUpBackPress() {
@@ -170,7 +216,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
                         position.let { currentPosition ->
                             val tasks = db.tasksDao().getTasks(
                                 PrefManager.getcurrentProject(),
-                                segmentName,
+                                PrefManager.getcurrentsegment(),
                                 list[currentPosition]
                             )
 
@@ -223,5 +269,40 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         sectionsList=list
     }
 
+    override fun onSegmentSelected(segmentName: String) {
+        activityBinding.gioActionbar.titleTv.text = segmentName
+
+        viewModel.updateCurrentSegment(segmentName)
+
+
+        if (segmentName=="Select Segment"){
+            binding.placeholderText.visible()
+            binding.viewPager2.gone()
+
+            with(activityBinding.gioActionbar) {
+                tabLayout.gone()
+                searchCont.gone()
+                actionbar.visible()
+                constraintLayout2.visible()
+                constraintLayoutsearch.gone()
+                constraintLayoutworkspace.gone()
+                constraintLayoutTeams.gone()
+            }
+            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+            segment.segmentSelectionListener = this
+            segment.show(requireFragmentManager(), "Segment Selection")
+            activityBinding.gioActionbar.switchSegmentButton.rotate180(requireContext())
+        }
+        else{
+            processedPositions.clear()
+            binding.placeholderText.gone()
+            binding.viewPager2.visible()
+
+            activityBinding.gioActionbar.tabLayout.visible()
+            Log.d("sectionsafter",PrefManager.getsectionsList().toString())
+            setUpViewPager(PrefManager.getsectionsList().toMutableList())
+        }
+
+    }
 
 }

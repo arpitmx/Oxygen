@@ -82,6 +82,9 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         val taskID=intent.getStringExtra("taskID")
         type=intent.getStringExtra("type")
         val channelID=intent.getStringExtra("channel_name")
+        Log.d("notificaions",projectID.toString())
+        Log.d("notificaions",taskID.toString())
+
         if (projectID!=null && taskID!=null && type!=null){
             when(type){
                 NotificationType.TASK_CHECKPOINT_NOTIFICATION.name->{

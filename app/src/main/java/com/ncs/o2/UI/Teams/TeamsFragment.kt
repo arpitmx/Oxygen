@@ -443,6 +443,9 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
             val completedTasks =
                 db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 5)
 
+            Log.d("listsizeTeams",submittedTasks.size.toString())
+            Log.d("listsizeTeams",openTasks.size.toString())
+
             withContext(Dispatchers.Main) {
 
                 binding.pending.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_access_time_filled_24))

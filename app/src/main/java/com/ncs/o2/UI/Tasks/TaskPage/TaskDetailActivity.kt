@@ -50,7 +50,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     val binding: ActivityTaskDetailBinding by lazy {
         ActivityTaskDetailBinding.inflate(layoutInflater)
     }
-    var taskId:String?=null
+    lateinit var taskId:String
     lateinit var segmentName:String
     lateinit var sectionName:String
     var type: String? =null
@@ -77,13 +77,11 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
             val _type=intent.getStringExtra("type")
 
             CoroutineScope(Dispatchers.IO).launch {
-                if (taskId!=null){
-                    val task = db.tasksDao().getTasksbyId(taskId!!, PrefManager.getcurrentProject())
-                    segmentName=task!!.segment
-                    sectionName= task.section
-                    moderatorsList=task.moderators.toMutableList()
-                    assignee=task.assignee
-                }
+                val task = db.tasksDao().getTasksbyId(taskId!!, PrefManager.getcurrentProject())
+                segmentName=task!!.segment
+                sectionName= task.section
+                moderatorsList=task.moderators.toMutableList()
+                assignee=task.assignee
             }
 
             if (_type!=null){

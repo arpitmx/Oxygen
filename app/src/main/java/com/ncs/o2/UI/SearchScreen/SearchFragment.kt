@@ -326,7 +326,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                                         assignee_id = task.assignee!!,
                                         difficulty = task.difficulty!!,
                                         timestamp = task.time_STAMP,
-                                        completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!)=="Completed") true else false,
+                                        completed = SwitchFunctions.getStringStateFromNumState(task.status)=="Completed",
                                         tagList = task.tags,
                                         last_updated = task.last_updated
                                     )

@@ -47,6 +47,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 binding.asigneeDp.setImageDrawable(context.getDrawable(R.drawable.profile_pic_placeholder))
             }
 
+
             if (task.completed){
                 binding.taskId.paintFlags=binding.taskId.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.taskTitle.paintFlags=binding.taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG

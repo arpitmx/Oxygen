@@ -39,6 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:defaultNavHost="true"
+                    android:background="@color/primary_bg"
                     android:visibility="visible"
                     app:navGraph="@navigation/nav_graph" />
 
