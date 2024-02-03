@@ -27,7 +27,7 @@
         android:title="@string/bottom_nav_search" />
 
     <item
-        android:id="@+id/tast_creation_item"
+        android:id="@+id/createTaskActivity"
         android:enabled="true"
         android:icon="@drawable/baseline_add_box_24"
         android:title="@string/create_task" />
