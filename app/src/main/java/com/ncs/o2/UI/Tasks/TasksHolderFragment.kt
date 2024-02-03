@@ -76,6 +76,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTasksHolderBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -94,9 +95,15 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
         }
 
+
+        processedPositions.clear()
+        updateUIBasedOnSegment(PrefManager.getcurrentsegment())
+
         viewModel.currentSegment.observe(viewLifecycleOwner, Observer { newSegment ->
             updateUIBasedOnSegment(newSegment)
         })
+
+
 
     }
 
@@ -104,6 +111,10 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
         if (newSegment== "Select Segment") {
 
+            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
+            segment.segmentSelectionListener = this
+            segment.show(requireFragmentManager(), "Segment Selection")
+            activityBinding.gioActionbar.switchSegmentButton.rotate180(requireContext())
             binding.placeholderText.visible()
             binding.viewPager2.gone()
             with(activityBinding.gioActionbar) {
@@ -116,10 +127,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
                 constraintLayoutTeams.gone()
                 notificationCont.gone()
             }
-            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-            segment.segmentSelectionListener = this
-            segment.show(requireFragmentManager(), "Segment Selection")
-            activityBinding.gioActionbar.switchSegmentButton.rotate180(requireContext())
+
 
 
         } else {
@@ -135,36 +143,13 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
     override fun onResume() {
         super.onResume()
-        if (PrefManager.getcurrentsegment()== "Select Segment") {
-
-            binding.placeholderText.visible()
-            binding.viewPager2.gone()
-            with(activityBinding.gioActionbar) {
-                tabLayout.gone()
-                searchCont.gone()
-                actionbar.visible()
-                constraintLayout2.visible()
-                constraintLayoutsearch.gone()
-                constraintLayoutworkspace.gone()
-                constraintLayoutTeams.gone()
-                notificationCont.gone()
-            }
-            val segment = SegmentSelectionBottomSheet(type = "MainActivity")
-            segment.segmentSelectionListener = this
-            segment.show(requireFragmentManager(), "Segment Selection")
-            activityBinding.gioActionbar.switchSegmentButton.rotate180(requireContext())
-
-
-        } else {
-            val sectionsList = PrefManager.getsectionsList().toMutableList()
-            setUpViewPager(sectionsList)
-            binding.placeholderText.gone()
-            binding.viewPager2.visible()
-
-            activityBinding.gioActionbar.notificationCont.visible()
-            activityBinding.gioActionbar.tabLayout.visible()
-
+        if (PrefManager.getcurrentsegment()=="Select Segment"){
+            activityBinding.gioActionbar.tabLayout.gone()
         }
+        else{
+            activityBinding.gioActionbar.tabLayout.visible()
+        }
+
     }
 
     private fun setUpBackPress() {

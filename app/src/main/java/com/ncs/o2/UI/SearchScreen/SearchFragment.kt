@@ -80,8 +80,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     @Inject
     lateinit var db:TasksDatabase
 
-    private val activityBinding: ActivityMainBinding by lazy {
-        (requireActivity() as MainActivity).binding
+    private val activityBinding: MainActivity by lazy {
+        (requireActivity() as MainActivity)
     }
 
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
@@ -96,24 +96,42 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
-        if (!argumentsLoaded) {
-            val tagText = arguments?.getString("tagText")
-            if (tagText != null) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    val list = db.tagsDao().getAllTag()
-                    var tag: Tag
-                    for (i in 0 until list?.size!!) {
-                        if (list[i].tagID == tagText) {
-                            list[i].checked=true
-                            selectedTags.add(list[i])
-                            searchQuery("")
-                            binding.tags.text = list[i].tagText
-                            setSelectedButtonColor(binding.tags)
-                            binding.clear.visible()
-                        }
+//        if (!argumentsLoaded) {
+//            val tagID = arguments?.getString("tagID")
+//            if (tagID != null) {
+//                CoroutineScope(Dispatchers.Main).launch {
+//                    val list = db.tagsDao().getAllTag()
+//                    var tag: Tag
+//                    for (i in 0 until list?.size!!) {
+//                        if (list[i].tagID == tagID) {
+//                            list[i].checked=true
+//                            selectedTags.add(list[i])
+//                            searchQuery("")
+//                            binding.tags.text = list[i].tagText
+//                            setSelectedButtonColor(binding.tags)
+//                            binding.clear.visible()
+//                        }
+//                    }
+//                }
+//                argumentsLoaded = false
+//            }
+//        }
+        val tagID = arguments?.getString("tagID")
+        if (tagID != null) {
+            CoroutineScope(Dispatchers.Main).launch {
+                val list = db.tagsDao().getAllTag()
+                var tag: Tag
+                for (i in 0 until list?.size!!) {
+                    if (list[i].tagID == tagID) {
+                        list[i].checked=true
+                        selectedTags.add(list[i])
+                        searchQuery("")
+                        binding.tags.text = list[i].tagText
+                        setSelectedButtonColor(binding.tags)
+                        binding.clear.visible()
                     }
                 }
-                argumentsLoaded = false            }
+            }
         }
         return binding.root
     }
@@ -128,23 +146,25 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         defaultButtons()
         filterButtons()
         initViews()
-        argumentsLoaded = true
+
+
 
     }
 
     private fun manageviews(){
-        val drawerLayout = activityBinding.drawer
-        activityBinding.gioActionbar.btnHamSearch.setOnClickThrottleBounceListener {
+        val drawerLayout = activityBinding.binding.drawer
+        activityBinding.binding.gioActionbar.btnHamSearch.setOnClickThrottleBounceListener {
             val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
         }
-        activityBinding.gioActionbar.tabLayout.gone()
-        activityBinding.gioActionbar.searchCont.gone()
-        activityBinding.gioActionbar.actionbar.visible()
-        activityBinding.gioActionbar.constraintLayout2.gone()
-        activityBinding.gioActionbar.constraintLayoutsearch.visible()
-        activityBinding.gioActionbar.constraintLayoutworkspace.gone()
-        activityBinding.gioActionbar.constraintLayoutTeams.gone()
+        activityBinding.binding.gioActionbar.line.gone()
+        activityBinding.binding.gioActionbar.tabLayout.gone()
+        activityBinding.binding.gioActionbar.searchCont.gone()
+        activityBinding.binding.gioActionbar.actionbar.visible()
+        activityBinding.binding.gioActionbar.constraintLayout2.gone()
+        activityBinding.binding.gioActionbar.constraintLayoutsearch.visible()
+        activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
+        activityBinding.binding.gioActionbar.constraintLayoutTeams.gone()
 
     }
     private fun initViews(){
@@ -360,7 +380,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     }
     private fun defaultButtons(){
         binding.clear.setOnClickThrottleBounceListener {
-            movetosearch()
+            activityBinding.navController.navigate(R.id.action_restart_search)
         }
     }
     private fun filterButtons(){
@@ -544,15 +564,6 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         TagList.clear()
         TagList = tagList
     }
-    private fun movetosearch() {
-        val transaction = fragmentManager?.beginTransaction()
-        val fragment = SearchFragment()
-        transaction?.replace(R.id.nav_host_fragment_activity_main, fragment)
-        transaction?.addToBackStack(null)
-        transaction?.commit()
 
-        activityBinding.bottomNav.menu.getItem(3).isChecked = true
-        activityBinding.bottomNav.menu.getItem(3).setIcon(R.drawable.ic_searchico)
-    }
 }
 

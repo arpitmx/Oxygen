@@ -3,7 +3,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/project">
+    app:startDestination="@id/teams_page">
+
+    <fragment
+        android:id="@+id/teams_page"
+        android:name="com.ncs.o2.UI.Teams.TeamsFragment"
+        android:label="teams_page"
+        tools:layout="@layout/fragment_teams" >
+        <action
+            android:id="@+id/action_teams_to_search"
+            app:destination="@id/bottom_search"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/assigned_item"
+        android:name="com.ncs.o2.UI.Assigned.AssignedFragment"
+        android:label="fragment_assigned"
+        tools:layout="@layout/fragment_assigned" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/bottom_search"
+        android:name="com.ncs.o2.UI.SearchScreen.SearchFragment"
+        android:label="fragment_done"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_search_to_teams"
+            app:destination="@id/teams_page"
+            />
+        <action
+            android:id="@+id/action_restart_search"
+            app:destination="@id/bottom_search"
+            />
+        <argument
+            android:name="tagID"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/task_item"
@@ -11,37 +47,12 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_tasks_holder" >
 
-        <action
-            android:id="@+id/action_task_item_to_assignedFragment"
-            app:destination="@id/assigned_item" />
-    </fragment>
-    <fragment
-        android:id="@+id/assigned_item"
-        android:name="com.ncs.o2.UI.Assigned.AssignedFragment"
-        android:label="fragment_assigned"
-        tools:layout="@layout/fragment_assigned" >
-        <action
-            android:id="@+id/action_assignedFragment_to_doneFragment"
-            app:destination="@id/done_item" />
-    </fragment>
-    <fragment
-        android:id="@+id/bottom_search"
-        android:name="com.ncs.o2.UI.DoneScreen.DoneFragment"
-        android:label="fragment_done"
-        tools:layout="@layout/fragment_search" >
-        <action
-            android:id="@+id/action_doneFragment_to_task_item"
-            app:destination="@id/task_item" />
     </fragment>
 
-    <fragment
-        android:id="@+id/project"
-        android:name="com.ncs.o2.UI.Teams.TeamsFragment"
-        android:label="teams_page"
-        tools:layout="@layout/fragment_teams" >
-        <action
-            android:id="@+id/action_doneFragment_to_task_item"
-            app:destination="@id/task_item" />
-    </fragment>
+    <activity
+        android:id="@+id/createTaskActivity"
+        android:name="com.ncs.o2.UI.CreateTask.CreateTaskActivity"
+        android:label="CreateTaskActivity" />
+
 
 </navigation>
