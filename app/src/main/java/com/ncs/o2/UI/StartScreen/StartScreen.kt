@@ -42,6 +42,8 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.blink
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.blinkinfi
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.deleteDownloadedFile
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -106,7 +108,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
     }
 
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
-
     val sharedViewModel: SharedViewModel by viewModels()
 
 
@@ -124,6 +125,9 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
         PrefManager.resetReadCount()
         PrefManager.setOfflineDialogShown(false)
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
+        binding.fragLogoContainer.blinkinfi(this)
+
+        binding.fragLogoContainer.visible()
 
         if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
             initialise()
@@ -276,6 +280,8 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
     private fun setBallAnimator() {
 
         ball = binding.fragContainer
+        binding.fragLogoContainer.clearAnimation()
+        binding.fragLogoContainer.gone()
         ball.visible()
         ball.animFadein(this,500)
         ball.rotateInfinity(this)

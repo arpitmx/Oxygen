@@ -30,10 +30,12 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setBackgroundDrawable
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.Sections.DragHelper
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.TaskSectionViewPagerAdapter
@@ -52,7 +54,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner,SegmentSelectionBottomSheet.SegmentSelectionListener {
+class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner,SegmentSelectionBottomSheet.SegmentSelectionListener, DragHelper.TabChangeListener {
 
 
     lateinit var binding: FragmentTasksHolderBinding
@@ -302,6 +304,34 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
             Log.d("sectionsafter",PrefManager.getsectionsList().toString())
             setUpViewPager(PrefManager.getsectionsList().toMutableList())
         }
+
+    }
+
+    override fun switchToNextTab() {
+        with(binding.viewPager2){
+            val nextItem = currentItem + 1
+            if (nextItem < (adapter?.itemCount ?: 0)) {
+                setCurrentItem(nextItem,true)
+            } else {
+                toast("No more boards..")
+            }
+        }
+    }
+
+    override fun switchToPreviousTab() {
+
+        with(binding.viewPager2){
+            val previousItem = currentItem - 1
+            if (previousItem >= 0) {
+                setCurrentItem(previousItem,true)
+            } else {
+                toast("No more boards..")
+            }
+        }
+
+    }
+
+    override fun smoothScrollby(dx: Float, dy: Float) {
 
     }
 

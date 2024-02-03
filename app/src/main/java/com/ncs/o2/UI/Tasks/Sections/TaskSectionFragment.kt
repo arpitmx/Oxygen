@@ -2,6 +2,7 @@ package com.ncs.o2.UI.Tasks.Sections
 
 import TaskListAdapter
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,8 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
@@ -49,8 +52,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
+    private lateinit var taskHolderFragment: TasksHolderFragment
+
+
     companion object {
-        fun newInstance(sectionName: String, ): TaskSectionFragment {
+        fun newInstance(sectionName: String): TaskSectionFragment {
             val fragment = TaskSectionFragment()
             val args = Bundle()
             args.putString("sectionName", sectionName)
@@ -93,8 +99,6 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     }
 
 
-
-
     private val searchCont by lazy {
         activityBinding.binding.gioActionbar.searchCont
     }
@@ -105,6 +109,17 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+    }
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (parentFragment is TasksHolderFragment) {
+            taskHolderFragment = parentFragment as TasksHolderFragment
+        } else {
+            throw IllegalArgumentException("Context must implement TabChangeListener")
+        }
 
     }
 
@@ -123,13 +138,17 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     }
 
     private fun manageViews(){
-        activityBinding.binding.gioActionbar.tabLayout.visible()
-        activityBinding.binding.gioActionbar.actionbar.visible()
-        activityBinding.binding.gioActionbar.constraintLayout2.visible()
-        activityBinding.binding.gioActionbar.searchCont.gone()
-        activityBinding.binding.gioActionbar.constraintLayoutsearch.gone()
-        activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
-        activityBinding.binding.gioActionbar.constraintLayoutTeams.gone()
+
+        with(activityBinding.binding.gioActionbar){
+            tabLayout.visible()
+            actionbar.visible()
+            constraintLayout2.visible()
+            searchCont.gone()
+            constraintLayoutsearch.gone()
+            constraintLayoutworkspace.gone()
+            constraintLayoutTeams.gone()
+        }
+
     }
 
     private fun setupViews() {
@@ -179,20 +198,27 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     }
 
 
+
     private fun setupRecyclerView() {
+
+
+        // Using server
         if (db.tasksDao().isNull) {
+
             taskList = ArrayList()
-            Log.d("fetch", "fetching from firestore")
+            Timber.tag("fetch").d("fetching from firestore")
+
             viewModel.getTasksItemsForSegment(
                 projectName,
                 segmentName,
                 viewModel.sectionName!!
             ) { result ->
+
                 when (result) {
+
                     is ServerResult.Success -> {
 
                         showLoader(1)
-
                         val task = result.data
                         taskList.clear()
 
@@ -207,8 +233,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                         } else {
 
                             recyclerView = binding.recyclerView
-                            taskListAdapter =
-                                TaskListAdapter(firestoreRepository, requireContext(), taskList, db)
+                            taskListAdapter = TaskListAdapter(firestoreRepository, requireContext(), taskList, db)
                             taskListAdapter.setOnClickListener(this)
                             val layoutManager =
                                 LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -219,34 +244,10 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                                 edgeEffectFactory = BounceEdgeEffectFactory()
                             }
 
-                            recyclerView.addOnScrollListener(object :
-                                RecyclerView.OnScrollListener() {
-                                override fun onScrollStateChanged(
-                                    recyclerView: RecyclerView,
-                                    newState: Int
-                                ) {
-                                    super.onScrollStateChanged(recyclerView, newState)
-                                    state[0] = newState
-                                }
-
-                                override fun onScrolled(
-                                    recyclerView: RecyclerView,
-                                    dx: Int,
-                                    dy: Int
-                                ) {
-                                    super.onScrolled(recyclerView, dx, dy)
-                                    if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                        hideSearch()
-                                    } else if (dy < -10) {
-                                        showSearch()
-                                    }
-                                }
-                            })
-
                             taskListAdapter.setTaskList(taskList)
                             taskListAdapter.notifyDataSetChanged()
-                            showLoader(0)
 
+                            showLoader(0)
 
                         }
 
@@ -270,10 +271,10 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                 }
 
             }
-        } else {
 
+        } else {
             tasks = ArrayList()
-            Log.d("fetch", "fetching from DB")
+            Timber.tag("fetch").d("fetching from DB")
             fetchfromdb()
         }
 
@@ -322,6 +323,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                                 db.tasksDao().insert(task)
                             }
                         }
+
                         progressDialog.dismiss()
                         toast("Page refreshed")
                         requireActivity().recreate()
@@ -353,7 +355,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                     showLoader(1)
 
                     val task = result.data
-                    Log.d("fetch", task.toString())
+                    Timber.tag("fetch").d(task.toString())
 
                     tasks.clear()
 
@@ -366,24 +368,31 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                     } else {
 
                         recyclerView = binding.recyclerView
+
+                        val itemTouchHelper = ItemTouchHelper(DragHelper(taskHolderFragment))
+                        itemTouchHelper.attachToRecyclerView(recyclerView)
+
+
                         val taskItems: List<TaskItem> = result.data.map { task ->
                             TaskItem(
-                                title = task.title!!,
+                                title = task.title,
                                 id = task.id,
-                                assignee_id = task.assignee!!,
-                                difficulty = task.difficulty!!,
+                                assignee_id = task.assignee,
+                                difficulty = task.difficulty,
                                 timestamp = task.time_STAMP,
                                 completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
                                 tagList = task.tags,
                                 last_updated = task.last_updated
                             )
                         }
+
                         val taskadapter = TaskListAdapter(
                             firestoreRepository,
                             requireContext(),
                             taskItems.sortedByDescending { it.last_updated }.toMutableList(),
                             db
                         )
+
                         taskadapter.setOnClickListener(this)
                         val layoutManager =
                             LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -394,30 +403,6 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                             edgeEffectFactory = BounceEdgeEffectFactory()
                         }
                         taskadapter.notifyDataSetChanged()
-
-                        recyclerView.addOnScrollListener(object :
-                            RecyclerView.OnScrollListener() {
-                            override fun onScrollStateChanged(
-                                recyclerView: RecyclerView,
-                                newState: Int
-                            ) {
-                                super.onScrollStateChanged(recyclerView, newState)
-                                state[0] = newState
-                            }
-
-                            override fun onScrolled(
-                                recyclerView: RecyclerView,
-                                dx: Int,
-                                dy: Int
-                            ) {
-                                super.onScrolled(recyclerView, dx, dy)
-                                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
-                                    hideSearch()
-                                } else if (dy < -10) {
-                                    showSearch()
-                                }
-                            }
-                        })
                         showLoader(0)
 
                     }

@@ -363,6 +363,7 @@ send.sendImages(imgArray);
 """
     private fun setUpTaskDescription(description: String) {
         binding.summaryEt.gone()
+
         val css: InternalStyleSheet = Github()
 
         with(css) {

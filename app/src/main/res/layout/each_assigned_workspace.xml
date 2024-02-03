@@ -13,11 +13,11 @@
     android:layout_height="wrap_content">
 
     <ImageView
+        android:id="@+id/stat_icon"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:id="@+id/stat_icon"
-        android:layout_marginTop="35dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="35dp"
         android:src="@drawable/baseline_active_24"
         app:tint="@color/better_white" />
 
@@ -26,11 +26,11 @@
         android:layout_height="wrap_content"
         android:textColor="@color/better_white"
         android:text="Active"
-        android:textSize="18dp"
+        android:textSize="17dp"
         android:id="@+id/stat_title"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="8dp"
-        android:fontFamily="@font/sf_pro_display_regular"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:layout_marginStart="8dp"/>
 
     <TextView
