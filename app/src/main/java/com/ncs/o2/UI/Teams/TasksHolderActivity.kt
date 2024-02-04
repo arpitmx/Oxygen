@@ -153,7 +153,50 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             tagIdList.clear()
             setDefault()
             binding.searchBar.text!!.clear()
-            searchQuery(binding.searchBar.text?.toString()!!)
+            if (_type!="moderating"){
+                searchQuery(binding.searchBar.text?.toString()!!)
+            }
+            else{
+                taskList.clear()
+                performTaskFetch(_type!!)
+                runDelayed(800) {
+                    when(viewModel.currentSelected){
+                        "all"->{
+                            setSelectedColor(binding.all)
+                            searchQuery(binding.searchBar.text.toString())
+                        }
+                        "pending"->{
+                            setSelectedColor(binding.pending)
+                            taskList=taskList.filter { it.status==1 || it.status==2 }.sortedByDescending { it.last_updated }.toMutableList()
+                            runDelayed(800) {
+                                searchQuery(binding.searchBar.text.toString())
+                            }
+                        }
+                        "working"->{
+                            setSelectedColor(binding.working)
+                            taskList=taskList.filter { it.status==3 }.sortedByDescending { it.last_updated }.toMutableList()
+                            runDelayed(800) {
+                                searchQuery(binding.searchBar.text.toString())
+                            }
+                        }
+                        "review"->{
+                            setSelectedColor(binding.review)
+
+                            taskList=taskList.filter { it.status==4 }.sortedByDescending { it.last_updated }.toMutableList()
+                            runDelayed(800) {
+                                searchQuery(binding.searchBar.text.toString())
+                            }
+                        }
+                        "completed"->{
+                            setSelectedColor(binding.completed)
+                            taskList=taskList.filter { it.status==5 }.sortedByDescending { it.last_updated }.toMutableList()
+                            runDelayed(800) {
+                                searchQuery(binding.searchBar.text.toString())
+                            }
+                        }
+                    }
+                }
+            }
         }
         binding.filters.setOnClickThrottleBounceListener {
             if (isFilterVisible){
