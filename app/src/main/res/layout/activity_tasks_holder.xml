@@ -67,11 +67,104 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:background="@color/secondary_bg"
+                android:layout_marginBottom="15dp"
+                android:id="@+id/moderatorFilter"
+                android:scrollbars="none">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/item_bg_curve_selected"
+                        android:drawablePadding="@dimen/_5dp"
+                        android:drawableTint="@color/better_white"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:text="All"
+                        android:textAllCaps="false"
+                        android:textColor="@color/secondary_bg" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/pending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/item_bg_curve"
+                        android:drawablePadding="@dimen/_5dp"
+                        android:drawableTint="@color/better_white"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:text="Pending"
+                        android:textAllCaps="false"
+                        android:textColor="@color/better_white" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/working"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/item_bg_curve"
+                        android:drawablePadding="@dimen/_5dp"
+                        android:drawableTint="@color/better_white"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:text="Work Going"
+                        android:textAllCaps="false"
+                        android:textColor="@color/better_white" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/review"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/item_bg_curve"
+                        android:drawablePadding="@dimen/_5dp"
+                        android:drawableTint="@color/better_white"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:text="To Review"
+                        android:textAllCaps="false"
+                        android:textColor="@color/better_white" />
+
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/completed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/item_bg_curve"
+                        android:drawablePadding="@dimen/_5dp"
+                        android:drawableTint="@color/better_white"
+                        android:paddingStart="20dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingEnd="20dp"
+                        android:text="Completed"
+                        android:textAllCaps="false"
+                        android:textColor="@color/better_white" />
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </HorizontalScrollView>
+
             <View
                 android:id="@+id/line"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:background="@color/border_grey" />
+
+
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -126,7 +219,7 @@
                         android:elevation="10dp"
                         android:scaleX="1.5"
                         android:scaleY="1.5"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
