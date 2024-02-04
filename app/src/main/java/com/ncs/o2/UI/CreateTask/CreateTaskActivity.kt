@@ -40,6 +40,9 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
@@ -64,6 +67,7 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.Domain.Utility.RandomIDGenerator.generateTaskID
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ShakeDetector
@@ -553,25 +557,30 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 when (result) {
 
                     is ServerResult.Failure -> {
-                        binding.progressBar.gone()
+                        binding.gioActionbar.actionBarProgress.gone()
+                        binding.gioActionbar.btnDone.visible()
                     }
 
                     ServerResult.Progress -> {
                         binding.progressBar.visible()
+
                     }
 
                     is ServerResult.Success -> {
                         PrefManager.putDraftTask(Task())
                         PrefManager.putDraftCheckLists(emptyList())
-                        binding.progressBar.gone()
+                        binding.gioActionbar.actionBarProgress.gone()
+                        binding.gioActionbar.btnDone.visible()
+
                         PrefManager.setcurrentsegment(binding.segment.text.toString())
                         toast("Task Created Successfully")
                         if (task.assignee!="None"){
                             val notification = composeNotification(
                                 NotificationType.TASK_ASSIGNED_NOTIFICATION,
-                                message = "You are assigned as an assignee in the task ${task.id} in the project ${PrefManager.getcurrentProject()}",
+                                message = "${PrefManager.getcurrentUserdetails().USERNAME} : You are assigned as an assignee in the task ${task.id} in the project ${PrefManager.getcurrentProject()}",
                                 assignee = task.assignee!!,
-                                taskID = task.id
+                                taskID = task.id,
+                                title=task.title
                             )
                             repository.insertNotification(selectedAssignee[0].firebaseID!!, notification = notification!!) { res ->
                                 when (res) {
@@ -630,84 +639,127 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
 
     private fun createTask(){
         binding.gioActionbar.btnDone.setOnClickThrottleBounceListener {
+            binding.gioActionbar.btnDone.gone()
             if (binding.segment.text=="Segment"){
                 toast("Select Task Segment")
+                binding.gioActionbar.btnDone.visible()
+
             }
             else if (binding.section.text=="Section"){
                 toast("Select Task Section")
+                binding.gioActionbar.btnDone.visible()
+
             }
             else if (binding.title.text.isNullOrBlank()){
                 toast("Enter Task Title")
+                binding.gioActionbar.btnDone.visible()
+
             }
             else if(description.isNull){
                 toast("Task Summary is required")
+                binding.gioActionbar.btnDone.visible()
+
             }
             else{
-                val title=binding.title.text
-                val difficulty= SwitchFunctions.getNumDifficultyFromStringDifficulty(binding.difficultyInclude.tagText.text.toString())
-                val priority= SwitchFunctions.getNumPriorityFromStringPriority(binding.priorityInclude.tagText.text.toString())
-                val status= SwitchFunctions.getNumStateFromStringState(binding.stateInclude.tagText.text.toString())
-                val assigner=PrefManager.getcurrentUserdetails()
-                val tags=ArrayList<String>()
-                for (i in 0 until selectedTags.size){
-                    tags.add(selectedTags[i].tagID!!)
+                binding.gioActionbar.actionBarProgress.visible()
+                generateUniqueTaskID(PrefManager.getcurrentProject()){
+                    startPostTask(it)
                 }
-                val segment=binding.segment.text
-                val section=binding.section.text
-                val type= SwitchFunctions.getNumTypeFromStringType(binding.typeInclude.tagText.text.toString())
-                val id= generateTaskID(PrefManager.getcurrentProject())
-                if (PrefManager.getcurrentUserdetails().ROLE>=2){
-                    val assignee:String
-                    if (selectedAssignee.isNotEmpty()) {
-                        assignee = selectedAssignee[0].firebaseID!!
-                    }
-                    else{
-                        assignee="None"
-                    }
-                    val task= Task(
-                        title = title.toString(),
-                        description = description!!,
-                        id = id,
-                        difficulty = difficulty,
-                        priority = priority,
-                        status = status,
-                        assignee = assignee,
-                        assigner = assigner.EMAIL,
-                        duration = if (binding.taskDurationET.text.toString()=="Select") "Not Set" else binding.taskDurationET.text.toString(),
-                        time_STAMP = Timestamp.now(),
-                        tags = tags.toList().ifEmpty { emptyList() },
-                        project_ID = PrefManager.getcurrentProject(),
-                        segment = segment.toString(),
-                        section = section.toString(),
-                        type = type,
-                        moderators = contributorList,
-                        last_updated = Timestamp.now()
-                    )
-                    postTask(task,checkListArray)
-                }
-                else{
-                    val task= Task(
-                        title = title.toString(),
-                        description = description!!,
-                        id = id,
-                        difficulty = difficulty,
-                        priority = priority,
-                        status = status,
-                        assignee = "None",
-                        assigner = assigner.EMAIL,
-                        duration = if (binding.taskDurationET.text.toString()=="Select") "Not Set" else binding.taskDurationET.text.toString(),
-                        time_STAMP = Timestamp.now(),
-                        tags = tags.toList().ifEmpty { emptyList() },
-                        project_ID = PrefManager.getcurrentProject(),
-                        segment = segment.toString(),
-                        section = section.toString(),
-                        type = type,
-                        moderators = emptyList(),
-                        last_updated = Timestamp.now()
-                    )
-                    postTask(task,checkListArray)
-                }
+
             }
+        }
+    }
+
+    private fun startPostTask(id:String){
+        val title=binding.title.text
+        val difficulty= SwitchFunctions.getNumDifficultyFromStringDifficulty(binding.difficultyInclude.tagText.text.toString())
+        val priority= SwitchFunctions.getNumPriorityFromStringPriority(binding.priorityInclude.tagText.text.toString())
+        val status= SwitchFunctions.getNumStateFromStringState(binding.stateInclude.tagText.text.toString())
+        val assigner=PrefManager.getcurrentUserdetails()
+        val tags=ArrayList<String>()
+        for (i in 0 until selectedTags.size){
+            tags.add(selectedTags[i].tagID!!)
+        }
+        val segment=binding.segment.text
+        val section=binding.section.text
+        val type= SwitchFunctions.getNumTypeFromStringType(binding.typeInclude.tagText.text.toString())
+        if (PrefManager.getcurrentUserdetails().ROLE>=2){
+            val assignee:String
+            if (selectedAssignee.isNotEmpty()) {
+                assignee = selectedAssignee[0].firebaseID!!
+            }
+            else{
+                assignee="None"
+            }
+            val task= Task(
+                title = title.toString(),
+                description = description!!,
+                id = id,
+                difficulty = difficulty,
+                priority = priority,
+                status = status,
+                assignee = assignee,
+                assigner = assigner.EMAIL,
+                duration = if (binding.taskDurationET.text.toString()=="Select") "Not Set" else binding.taskDurationET.text.toString(),
+                time_STAMP = Timestamp.now(),
+                tags = tags.toList().ifEmpty { emptyList() },
+                project_ID = PrefManager.getcurrentProject(),
+                segment = segment.toString(),
+                section = section.toString(),
+                type = type,
+                moderators = contributorList,
+                last_updated = Timestamp.now()
+            )
+            postTask(task,checkListArray)
+        }
+        else{
+            val task= Task(
+                title = title.toString(),
+                description = description!!,
+                id = id,
+                difficulty = difficulty,
+                priority = priority,
+                status = status,
+                assignee = "None",
+                assigner = assigner.EMAIL,
+                duration = if (binding.taskDurationET.text.toString()=="Select") "Not Set" else binding.taskDurationET.text.toString(),
+                time_STAMP = Timestamp.now(),
+                tags = tags.toList().ifEmpty { emptyList() },
+                project_ID = PrefManager.getcurrentProject(),
+                segment = segment.toString(),
+                section = section.toString(),
+                type = type,
+                moderators = emptyList(),
+                last_updated = Timestamp.now()
+            )
+            postTask(task,checkListArray)
+        }
+    }
+
+    fun generateUniqueTaskID(currentProject: String,result : (String) -> Unit) {
+        var generatedID: String
+        do {
+            generatedID = generateTaskID(currentProject)
+            val taskExists = checkIfTaskExists(generatedID)
+
+        } while (taskExists)
+
+        result(generatedID)
+    }
+
+    fun checkIfTaskExists(taskID: String): Boolean {
+        val firestore = FirebaseFirestore.getInstance()
+        val tasksCollection: CollectionReference = firestore
+            .collection(Endpoints.PROJECTS)
+            .document(PrefManager.getcurrentProject())
+            .collection(Endpoints.Project.TASKS)
+        val query = tasksCollection.whereEqualTo("id", taskID)
+        return try {
+            val querySnapshot: QuerySnapshot = query.get().result
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 
@@ -1608,7 +1660,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
         )
 
     }
-    private fun composeNotification(type: NotificationType, message: String, assignee: String,taskID:String): Notification? {
+    private fun composeNotification(type: NotificationType, message: String, assignee: String,taskID:String,title:String): Notification? {
 
         if (type == NotificationType.TASK_ASSIGNED_NOTIFICATION) {
             return Notification(
@@ -1616,7 +1668,7 @@ class CreateTaskActivity : AppCompatActivity(), ContributorAdapter.OnProfileClic
                 notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION.name,
                 taskID = taskID,
                 message = message,
-                title = "${PrefManager.getcurrentProject()} | You are assigned in the task $taskID",
+                title = "${PrefManager.getcurrentProject()} | $taskId | $title",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = assignee ,
                 timeStamp = Timestamp.now().seconds,

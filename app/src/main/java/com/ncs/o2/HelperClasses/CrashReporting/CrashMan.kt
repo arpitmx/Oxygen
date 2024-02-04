@@ -8,7 +8,9 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.ncs.o2.Domain.Models.CrashReport
 import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
@@ -16,8 +18,10 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.Domain.Utility.RandomIDGenerator.generateTaskID
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.Notifications.NotificationsActivity
+import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -139,7 +143,6 @@ class CrashMan(val context: Context) : Thread.UncaughtExceptionHandler {
 
         val repository = FirestoreRepository(FirebaseFirestore.getInstance())
 
-        val id = RandomIDGenerator.generateTaskID(PrefManager.getcurrentProject())
         var title: String = "Crash : " + extractFirstNWords(error, 3)
         var description: String = summary
 
@@ -159,52 +162,84 @@ class CrashMan(val context: Context) : Thread.UncaughtExceptionHandler {
         var section: String = "Issues Found"
         var type: Int = 1
         val last_updated: Timestamp = Timestamp.now()
+        generateUniqueTaskID(PrefManager.getcurrentProject()) { id ->
+            val task = Task(
+                id = id,
+                title = title,
+                description = description,
+                difficulty = difficulty,
+                priority = priority,
+                status = status,
+                assignee = assignee,
+                assigner = assigner,
+                moderators = moderators,
+                time_STAMP = time_STAMP,
+                duration = duration,
+                tags = tags,
+                project_ID = project_ID,
+                segment = segment,
+                last_updated = last_updated,
+                type = type,
+                section = section
+            )
 
-        val task = Task(
-            id = id,
-            title = title,
-            description = description,
-            difficulty = difficulty,
-            priority = priority,
-            status = status,
-            assignee = assignee,
-            assigner = assigner,
-            moderators = moderators,
-            time_STAMP = time_STAMP,
-            duration = duration,
-            tags = tags,
-            project_ID = project_ID,
-            segment = segment,
-            last_updated = last_updated,
-            type = type,
-            section = section
-        )
+            CoroutineScope(Dispatchers.Main).launch {
+                repository.postTask(task, mutableListOf()) { serverResult ->
+                    when (serverResult) {
+                        is ServerResult.Success -> {
 
-        repository.postTask(task, mutableListOf()) { serverResult ->
-            when (serverResult) {
-                is ServerResult.Success -> {
+                            Toast.makeText(context, "Crash log sent..", Toast.LENGTH_SHORT).show()
+                            Timber.tag(TAG).d("Error Reported.")
+                            terminateApp()
+                        }
 
-                    Toast.makeText(context, "Crash log sent..", Toast.LENGTH_SHORT).show()
-                    Timber.tag(TAG).d("Error Reported.")
-                    terminateApp()
-                }
+                        is ServerResult.Progress -> {
 
-                is ServerResult.Progress -> {
+                        }
 
-                }
+                        is ServerResult.Failure -> {
+                            Toast.makeText(context, "Failed to send logs..", Toast.LENGTH_SHORT).show()
+                            Timber.tag(TAG).d("Failure in reporting error.")
 
-                is ServerResult.Failure -> {
-                    Toast.makeText(context, "Failed to send logs..", Toast.LENGTH_SHORT).show()
-                    Timber.tag(TAG).d("Failure in reporting error.")
+                            Timber.tag(TAG).d("Error : $errorMessage")
 
-                    Timber.tag(TAG).d("Error : $errorMessage")
-
-                    terminateApp()
+                            terminateApp()
+                        }
+                    }
                 }
             }
         }
 
     }
+
+    fun generateUniqueTaskID(currentProject: String,result : (String) -> Unit) {
+        var generatedID: String
+        do {
+            generatedID = generateTaskID(currentProject)
+            val taskExists = checkIfTaskExists(generatedID)
+
+        } while (taskExists)
+
+        result(generatedID)
+    }
+
+    fun checkIfTaskExists(taskID: String): Boolean {
+        val firestore = FirebaseFirestore.getInstance()
+        val tasksCollection: CollectionReference = firestore
+            .collection(Endpoints.PROJECTS)
+            .document(PrefManager.getcurrentProject())
+            .collection(Endpoints.Project.TASKS)
+        val query = tasksCollection.whereEqualTo("id", taskID)
+        return try {
+            val querySnapshot: QuerySnapshot = query.get().result
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+
 
     fun terminateApp() {
         android.os.Process.killProcess(android.os.Process.myPid());

@@ -13,6 +13,9 @@ import android.widget.EditText
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Domain.Models.CheckList
@@ -31,6 +34,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.AddQuickTaskBottomSheetBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -125,32 +129,61 @@ class AddQuickTaskBottomSheet(private val message: com.ncs.o2.Domain.Models.Mess
                 toast("Enter Task Title")
             }
             else {
-                val task = Task(
-                    title = binding.title.text?.trim().toString(),
-                    description = "",
-                    id = generateTaskID(PrefManager.getcurrentProject()),
-                    difficulty = 1,
-                    priority = 1,
-                    status = 1,
-                    assignee = "None",
-                    assigner = PrefManager.getCurrentUserEmail(),
-                    duration = "Not Set",
-                    time_STAMP = Timestamp.now(),
-                    tags = emptyList(),
-                    project_ID = PrefManager.getcurrentProject(),
-                    segment = binding.segment.text.toString(),
-                    section = binding.section.text.toString(),
-                    type = 1,
-                    moderators = emptyList(),
-                    last_updated = Timestamp.now()
-                )
+                generateUniqueTaskID(PrefManager.getcurrentProject()) { id ->
+                    val task = Task(
+                        title = binding.title.text?.trim().toString(),
+                        description = "",
+                        id = id,
+                        difficulty = 1,
+                        priority = 1,
+                        status = 1,
+                        assignee = "None",
+                        assigner = PrefManager.getCurrentUserEmail(),
+                        duration = "Not Set",
+                        time_STAMP = Timestamp.now(),
+                        tags = emptyList(),
+                        project_ID = PrefManager.getcurrentProject(),
+                        segment = binding.segment.text.toString(),
+                        section = binding.section.text.toString(),
+                        type = 1,
+                        moderators = emptyList(),
+                        last_updated = Timestamp.now()
+                    )
 
-                postTask(task, mutableListOf())
+                    postTask(task, mutableListOf())
+                }
 
             }
         }
 
     }
+    fun generateUniqueTaskID(currentProject: String,result : (String) -> Unit) {
+        var generatedID: String
+        do {
+            generatedID = generateTaskID(currentProject)
+            val taskExists = checkIfTaskExists(generatedID)
+
+        } while (taskExists)
+
+        result(generatedID)
+    }
+
+    fun checkIfTaskExists(taskID: String): Boolean {
+        val firestore = FirebaseFirestore.getInstance()
+        val tasksCollection: CollectionReference = firestore
+            .collection(Endpoints.PROJECTS)
+            .document(PrefManager.getcurrentProject())
+            .collection(Endpoints.Project.TASKS)
+        val query = tasksCollection.whereEqualTo("id", taskID)
+        return try {
+            val querySnapshot: QuerySnapshot = query.get().result
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
 
     private fun postTask(task: Task,checkList: MutableList<CheckList>){
 

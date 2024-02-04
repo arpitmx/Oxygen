@@ -30,5 +30,4 @@ enum class NotificationType(val title: String, val priority : Int) {
     TEAMS_COMMENT_NOTIFICATION("Teams_Comment",1) ,
     TASK_CHECKPOINT_NOTIFICATION("Task_CheckPoint",1) ,
 
-
 }

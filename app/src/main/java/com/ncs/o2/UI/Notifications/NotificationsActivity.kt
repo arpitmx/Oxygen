@@ -5,6 +5,9 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
@@ -14,6 +17,8 @@ import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
@@ -36,6 +41,7 @@ import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Teams.TeamsActivity
+import com.ncs.o2.UI.UIComponents.BottomSheets.FilterNotificationsBottomSheet
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +52,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick,NetworkChangeReceiver.NetworkChangeCallback {
+class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick,NetworkChangeReceiver.NetworkChangeCallback,FilterNotificationsBottomSheet.GetFiltersCallback {
 
     private val binding: ActivityNotificationsBinding by lazy {
         ActivityNotificationsBinding.inflate(layoutInflater)
@@ -56,6 +62,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
     }
 
     private lateinit var shakeDetector: ShakeDetector
+    val list:MutableList<Notification> = mutableListOf()
+    val selectedFilter:MutableList<FilterNotificationsBottomSheet.FilterNotifications> = mutableListOf()
 
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     private val viewModel: NotificationsViewModel by viewModels()
@@ -182,6 +190,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         }
         setUpView()
         viewModel.fetchNotifications()
+        setSelectedButtonColor(binding.all)
     }
 
     private fun initShake(){
@@ -264,13 +273,114 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         backBtn = findViewById(R.id.btnBack_notification)
 
         setUpNotificationRV()
-
+        val filters= listOf(
+            FilterNotificationsBottomSheet.FilterNotifications(
+                index = 0,
+                "All Updates",
+                true
+            ),
+            FilterNotificationsBottomSheet.FilterNotifications(
+                index = 1,
+                "Mention Updates",
+                false
+            ),
+            FilterNotificationsBottomSheet.FilterNotifications(
+                index = 2,
+                "Workspace Updates",
+                false
+            ),
+            FilterNotificationsBottomSheet.FilterNotifications(
+                index = 3,
+                "Assign Updates",
+                false
+            ),
+            FilterNotificationsBottomSheet.FilterNotifications(
+                index = 4,
+                "Checklist Updates",
+                false
+            ),
+        )
         backBtn.setOnClickThrottleBounceListener {
             startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
             overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
             finish()
         }
 
+        binding.includeActionBarNotificatoin.btnFilters.setOnClickThrottleBounceListener {
+            val filterNotificationsBottomSheet=FilterNotificationsBottomSheet(this,filters.toMutableList(), selectedFilter)
+            filterNotificationsBottomSheet.show(supportFragmentManager,"Filter Notificatons")
+        }
+
+        binding.all.setOnClickThrottleBounceListener {
+            setSelectedButtonColor(binding.all)
+            list.clear()
+            setUpNotificationRV()
+        }
+
+        binding.mentions.setOnClickThrottleBounceListener {
+            setSelectedButtonColor(binding.mentions)
+            val newList=list.filter { it.notificationType==NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name || it.notificationType==NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name}
+            setUpRV(newList.toMutableList())
+        }
+
+        binding.workspace.setOnClickThrottleBounceListener {
+            setSelectedButtonColor(binding.workspace)
+            val newList=list.filter { it.notificationType==NotificationType.WORKSPACE_TASK_UPDATE.name}
+            setUpRV(newList.toMutableList())
+        }
+
+        binding.assigned.setOnClickThrottleBounceListener {
+            setSelectedButtonColor(binding.assigned)
+            val newList=list.filter { it.notificationType==NotificationType.TASK_ASSIGNED_NOTIFICATION.name}
+            setUpRV(newList.toMutableList())
+        }
+
+        binding.checklist.setOnClickThrottleBounceListener {
+            setSelectedButtonColor(binding.checklist)
+            val newList=list.filter { it.notificationType==NotificationType.TASK_CHECKLIST_UPDATE.name  }
+            setUpRV(newList.toMutableList())
+        }
+    }
+
+    private fun setSelectedButtonColor(button: AppCompatButton) {
+        val list= listOf(
+            binding.all,binding.mentions,binding.workspace,binding.assigned,binding.checklist
+        ).toMutableList()
+        list.remove(button)
+
+        button.setBackgroundResource(R.drawable.item_bg_curve_selected)
+        val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
+        drawable?.colorFilter = PorterDuffColorFilter(
+            ContextCompat.getColor(this, R.color.secondary_bg),
+            PorterDuff.Mode.SRC_IN
+        )
+        button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+        button.setTextColor(ContextCompat.getColor(this, R.color.secondary_bg))
+        for (element in list){
+            setUnSelectedButtonColor(element)
+        }
+    }
+
+
+    private fun setUnSelectedButtonColor(button: AppCompatButton){
+        button.setBackgroundDrawable(resources.getDrawable(R.drawable.item_bg_curve))
+        val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
+        drawable?.colorFilter = PorterDuffColorFilter(
+            ContextCompat.getColor(this, R.color.better_white),
+            PorterDuff.Mode.SRC_IN
+        )
+        button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+        button.setTextColor(resources.getColor(R.color.better_white))
+    }
+
+
+    private fun setUpRV(list: MutableList<Notification>){
+        notificationRV = binding.notificationRV
+        val layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        notificationRV.layoutManager = layoutManager
+        adapter = NotificationAdapter(this,PrefManager.getProjectTimeStamp(PrefManager.getcurrentProject()),list,this)
+        adapter.notifyDataSetChanged()
+        notificationRV.adapter = adapter
     }
 
     private fun setUpNotificationRV() {
@@ -298,7 +408,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                 is ServerResult.Success -> {
                     binding.progress.gone()
                     Log.d("notificationDB",result.data.toString())
-                    val list=ArrayList<Notification>()
+
                     for (notification in result.data){
                         if (notification.projectID==PrefManager.getcurrentProject()){
                             list.add(notification)
@@ -489,7 +599,41 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         startActivity(intent)
     }
 
+    override fun sendFilter(
+        filter: FilterNotificationsBottomSheet.FilterNotifications,
+        isChecked: Boolean,
+        position: Int
+    ) {
+        if (isChecked){
+            selectedFilter.add(filter)
+            toast("${filter.title}")
+            when(filter.index){
+                0->{
+                    list.clear()
+                    setUpNotificationRV()
+                }
+                1->{
+                    val newList=list.filter { it.notificationType==NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name || it.notificationType==NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name}
+                    setUpRV(newList.toMutableList())
+                }
+                2->{
+                    val newList=list.filter { it.notificationType==NotificationType.WORKSPACE_TASK_UPDATE.name}
+                    setUpRV(newList.toMutableList())
+                }
+                3->{
+                    val newList=list.filter { it.notificationType==NotificationType.TASK_ASSIGNED_NOTIFICATION.name}
+                    setUpRV(newList.toMutableList())
+                }
+                4->{
+                    val newList=list.filter { it.notificationType==NotificationType.TASK_CHECKLIST_UPDATE.name  }
+                    setUpRV(newList.toMutableList())
+                }
 
+            }
 
-
+        }
+        else{
+            selectedFilter.remove(filter)
+        }
+    }
 }

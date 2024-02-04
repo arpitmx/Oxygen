@@ -133,7 +133,6 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 tagList = task.tags
             )
         }
-
         val diffCallback = TaskDiffCallback(taskList, taskItems)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         taskList.clear()

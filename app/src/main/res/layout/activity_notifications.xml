@@ -11,6 +11,96 @@
         android:id="@+id/include_action_bar_notificatoin"
         layout="@layout/action_bar_notifications"
         />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:background="@color/secondary_bg"
+        android:layout_marginBottom="15dp"
+        android:id="@+id/filtersParent"
+        android:scrollbars="none">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/all"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/item_bg_curve"
+                android:drawablePadding="@dimen/_5dp"
+                android:drawableTint="@color/better_white"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="All"
+                android:textAllCaps="false"
+                android:textColor="@color/better_white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/mentions"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/item_bg_curve"
+                android:drawablePadding="@dimen/_5dp"
+                android:drawableTint="@color/better_white"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Mentions"
+                android:textAllCaps="false"
+                android:textColor="@color/better_white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/workspace"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/item_bg_curve"
+                android:drawablePadding="@dimen/_5dp"
+                android:drawableTint="@color/better_white"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Workspace"
+                android:textAllCaps="false"
+                android:textColor="@color/better_white" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/assigned"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/item_bg_curve"
+                android:drawablePadding="@dimen/_5dp"
+                android:drawableTint="@color/better_white"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Assigned"
+                android:textAllCaps="false"
+                android:textColor="@color/better_white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/checklist"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/item_bg_curve"
+                android:drawablePadding="@dimen/_5dp"
+                android:drawableTint="@color/better_white"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginEnd="15dp"
+                android:text="Checklist"
+                android:textAllCaps="false"
+                android:textColor="@color/better_white" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </HorizontalScrollView>
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"

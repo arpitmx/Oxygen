@@ -17,6 +17,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.chip.Chip
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.StorageReference
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -37,6 +40,7 @@ import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.FragmentReportingBinding
 import com.ncs.o2.databinding.FragmentShakePrefrencesBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -405,60 +409,100 @@ class ReportingFragment : Fragment() {
         }
         val words = binding.desc.text?.trim().toString().split(" ")
         val title = if (words.size>=10) words.take(10).joinToString(" ") else binding.desc.text?.trim().toString()
-        val id=generateTaskID("Ncso2v1")
-        val task= Task(
-            title = title,
-            description = desc,
-            id = id,
-            difficulty = 1,
-            priority = 1,
-            status = 1,
-            assignee = "None",
-            assigner = PrefManager.getCurrentUserEmail(),
-            duration = "6 Hours",
-            time_STAMP = Timestamp.now(),
-            tags = emptyList(),
-            project_ID = "Ncso2v1", //Ncso2v1
-            segment = "Issues", //Issues
-            section = "Found 'em", //Found 'em
-            type = if (type[0]== "Bug Found \uD83D\uDC1E") 1 else 2,
-            moderators = emptyList(),
-            last_updated = Timestamp.now()
-        )
-        val list:MutableList<CheckList> = mutableListOf()
-        if (binding.desc.text?.trim().toString().length>=200){
-            list.add(CheckList(id = RandomIDGenerator.generateRandomTaskId(5),
-                title = task.title, desc = binding.desc.text?.trim().toString().substring(0,200), done = false, index = 0))
-        }
-        else{
-            list.add(CheckList(id = RandomIDGenerator.generateRandomTaskId(5),
-                title = task.title, desc = binding.desc.text?.trim().toString(), done = false, index = 0))
-        }
-
-        CoroutineScope(Dispatchers.Main).launch {
-
-            repository.postTask(task, list) { result ->
-
-                when (result) {
-
-                    is ServerResult.Failure -> {
-                        toast("Something went wrong")
-                        startActivity(Intent(requireContext(),MainActivity::class.java))
-                    }
-
-                    ServerResult.Progress -> {
-                    }
-
-                    is ServerResult.Success -> {
-                        binding.layout.visible()
-                        binding.progressbar.gone()
-
-                        toast("Issue Submitted")
-                        startActivity(Intent(requireContext(),MainActivity::class.java))
-                    }
-                }
-
+        generateUniqueTaskID(PrefManager.getcurrentProject()) { id ->
+            val task = Task(
+                title = title,
+                description = desc,
+                id = id,
+                difficulty = 1,
+                priority = 1,
+                status = 1,
+                assignee = "None",
+                assigner = PrefManager.getCurrentUserEmail(),
+                duration = "6 Hours",
+                time_STAMP = Timestamp.now(),
+                tags = emptyList(),
+                project_ID = "Ncso2v1", //Ncso2v1
+                segment = "Issues", //Issues
+                section = "Found 'em", //Found 'em
+                type = if (type[0] == "Bug Found \uD83D\uDC1E") 1 else 2,
+                moderators = emptyList(),
+                last_updated = Timestamp.now()
+            )
+            val list: MutableList<CheckList> = mutableListOf()
+            if (binding.desc.text?.trim().toString().length >= 200) {
+                list.add(
+                    CheckList(
+                        id = RandomIDGenerator.generateRandomTaskId(5),
+                        title = task.title,
+                        desc = binding.desc.text?.trim().toString().substring(0, 200),
+                        done = false,
+                        index = 0
+                    )
+                )
+            } else {
+                list.add(
+                    CheckList(
+                        id = RandomIDGenerator.generateRandomTaskId(5),
+                        title = task.title,
+                        desc = binding.desc.text?.trim().toString(),
+                        done = false,
+                        index = 0
+                    )
+                )
             }
+
+            CoroutineScope(Dispatchers.Main).launch {
+
+                repository.postTask(task, list) { result ->
+
+                    when (result) {
+
+                        is ServerResult.Failure -> {
+                            toast("Something went wrong")
+                            startActivity(Intent(requireContext(), MainActivity::class.java))
+                        }
+
+                        ServerResult.Progress -> {
+                        }
+
+                        is ServerResult.Success -> {
+                            binding.layout.visible()
+                            binding.progressbar.gone()
+
+                            toast("Issue Submitted")
+                            startActivity(Intent(requireContext(), MainActivity::class.java))
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+    fun generateUniqueTaskID(currentProject: String,result : (String) -> Unit) {
+        var generatedID: String
+        do {
+            generatedID = generateTaskID(currentProject)
+            val taskExists = checkIfTaskExists(generatedID)
+
+        } while (taskExists)
+
+        result(generatedID)
+    }
+
+    fun checkIfTaskExists(taskID: String): Boolean {
+        val firestore = FirebaseFirestore.getInstance()
+        val tasksCollection: CollectionReference = firestore
+            .collection(Endpoints.PROJECTS)
+            .document(PrefManager.getcurrentProject())
+            .collection(Endpoints.Project.TASKS)
+        val query = tasksCollection.whereEqualTo("id", taskID)
+        return try {
+            val querySnapshot: QuerySnapshot = query.get().result
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
     fun generateTaskID(projectName: String):String{

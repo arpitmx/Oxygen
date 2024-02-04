@@ -996,12 +996,13 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
 
                                 if (activityBinding.channelName=="General"){
                                     val projectTopic = PrefManager.getcurrentProject().replace("\\s+".toRegex(), "_") + "_TOPIC_GENERAL"
+                                    val notifmsg="${PrefManager.getcurrentUserdetails().USERNAME} : $trimmedMsg"
 
                                     val _notification =  Notification(
                                         notificationID = RandomIDGenerator.generateRandomTaskId(6),
                                         notificationType = NotificationType.TEAMS_COMMENT_NOTIFICATION.name,
                                         taskID = "",
-                                        message = trimmedMsg,
+                                        message = notifmsg,
                                         title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} commented in #${activityBinding.channelName}",
                                         fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                                         toUser = "None",
@@ -1077,13 +1078,14 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
     private fun composeNotification(type: NotificationType, message: String): Notification? {
 
         if (type == NotificationType.TEAMS_COMMENT_NOTIFICATION) {
+            val notifmsg="${PrefManager.getcurrentUserdetails().USERNAME} : $message"
 
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TEAMS_COMMENT_NOTIFICATION.name,
                 taskID = "",
-                message = message,
-                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} commented in #${activityBinding.channelName}",
+                message = notifmsg,
+                title = "${PrefManager.getcurrentProject()} | #${activityBinding.channelName} | New Comment",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,
@@ -1098,12 +1100,14 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                 mentionedUserNames.add("@${user.username!!}")
             }
             val usernames = mentionedUserNames.joinToString(", ")
+            val notifmsg="${PrefManager.getcurrentUserdetails().USERNAME} : $message"
+
             return Notification(
                 notificationID = RandomIDGenerator.generateRandomTaskId(6),
                 notificationType = NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name,
                 taskID = "",
-                message = message,
-                title = "${PrefManager.getcurrentProject()} | @${PrefManager.getcurrentUserdetails().USERNAME} mentioned $usernames in #${activityBinding.channelName}",
+                message = notifmsg,
+                title = "${PrefManager.getcurrentProject()} | #${activityBinding.channelName} | Mentioned $usernames",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,

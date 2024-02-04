@@ -156,7 +156,7 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
                         dismiss()
                         val notification = composeNotification(
                             NotificationType.TASK_CHECKPOINT_NOTIFICATION,
-                            message = checkList.desc
+                            message = "${PrefManager.getcurrentUserdetails().USERNAME} : ${checkList.desc}"
                         )
                         val filteredList = {
                             val list = activityBinding.sharedViewModel.getList()
@@ -213,7 +213,7 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
                 notificationType = NotificationType.TASK_CHECKPOINT_NOTIFICATION.name,
                 taskID = activityBinding.taskId!!,
                 message = message,
-                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} has added a checkpoint in ${activityBinding.taskId}",
+                title = "${PrefManager.getcurrentProject()} | ${activityBinding.taskId} | ${activityBinding.taskTitle} | New Checkpoint",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None",
                 timeStamp = Timestamp.now().seconds,

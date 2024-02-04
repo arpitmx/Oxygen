@@ -287,7 +287,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                                 checkListDialog()
                                 val notification = composeCheckListCompleteNotification(
                                     NotificationType.TASK_CHECKLIST_UPDATE,
-                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} marked #${position+1} checklist as completed in ${activityBinding.taskId}", position = position+1, isComplete = true
+                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} : Marked #${position+1} checklist as completed in ${activityBinding.taskId}", position = position+1, isComplete = true
                                 )
                                 if (activityBinding.moderatorsList.isNotEmpty()){
                                     for (moderator in activityBinding.moderators){
@@ -379,7 +379,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                                 binding.progressbar.gone()
                                 val notification = composeCheckListCompleteNotification(
                                     NotificationType.TASK_CHECKLIST_UPDATE,
-                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} marked #${position+1} checklist as not completed in ${activityBinding.taskId}", position = position+1, isComplete = false
+                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} : Marked #${position+1} checklist as not completed in ${activityBinding.taskId}", position = position+1, isComplete = false
                                 )
                                 if (activityBinding.moderatorsList.isNotEmpty()){
                                     for (moderator in activityBinding.moderators){
@@ -500,7 +500,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                             binding.progressbar.gone()
                             val notification = composeCheckListUpdateNotification(
                                 NotificationType.TASK_CHECKLIST_UPDATE,
-                                message = "${PrefManager.getcurrentUserdetails().USERNAME} updated #${position} checklist in ${activityBinding.taskId}", position = position+1
+                                message = "${PrefManager.getcurrentUserdetails().USERNAME} : Updated #${position} checklist in ${activityBinding.taskId}", position = position+1
                             )
                             if (activityBinding.moderatorsList.isNotEmpty()){
                                 for (moderator in activityBinding.moderators){
@@ -633,7 +633,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 notificationType = NotificationType.TASK_CHECKLIST_UPDATE.name,
                 taskID = activityBinding.taskId!!,
                 message = message,
-                title = "${PrefManager.getcurrentProject()} | Checklist updated in ${activityBinding.taskId}",
+                title = "${PrefManager.getcurrentProject()} | ${activityBinding.taskId} | $${activityBinding.taskTitle}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,
@@ -649,9 +649,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
                 notificationType = NotificationType.TASK_CHECKLIST_UPDATE.name,
                 taskID = activityBinding.taskId!!,
                 message = message,
-                title =
-                if (isComplete) "${PrefManager.getcurrentProject()} | Marked as completed"
-                else "${PrefManager.getcurrentProject()} | Marked as not completed",
+                title ="${PrefManager.getcurrentProject()} | ${activityBinding.taskId} | $${activityBinding.taskTitle}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,

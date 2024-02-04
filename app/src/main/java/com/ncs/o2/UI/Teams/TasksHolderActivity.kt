@@ -35,12 +35,14 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideUpAndVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
@@ -64,6 +66,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -105,6 +108,9 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
     private val selectedTags = mutableListOf<Tag>()
     private  var taskList: MutableList<Task> = mutableListOf()
     private var isFilterVisible=false
+    lateinit var taskadapter:TaskListAdapter
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,7 +118,8 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
 
         _type=intent.getStringExtra("type")
         index=intent.getStringExtra("index")
-        performTaskFetch(_type!!)
+
+
 
         binding.swiperefresh.setOnRefreshListener {
             syncCache(PrefManager.getcurrentProject())
@@ -435,7 +442,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                 )
             }.toMutableList())
             Log.d("tasksFetch",taskItems.toString())
-            val taskadapter = TaskListAdapter(
+            taskadapter = TaskListAdapter(
                 firestoreRepository,
                 this,
                 taskItems.sortedByDescending { it.last_updated }.toMutableList(),
@@ -487,8 +494,6 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                     taskList.clear()
                     taskList.addAll(result.data.toMutableList())
 
-                    setUpOnSuccessRV(taskList)
-
                 }
 
                 is DBResult.Failure -> {
@@ -519,7 +524,6 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                     when (result) {
                         is DBResult.Success -> {
                             taskList.addAll(result.data.toMutableList())
-                            setUpOnSuccessRV(taskList)
 
                         }
 
@@ -596,7 +600,6 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         withContext(Dispatchers.Main) {
                             taskList.clear()
                             taskList.addAll(list.toMutableList())
-                            setUpOnSuccessRV(taskList)
                         }
                     }
 
@@ -631,10 +634,6 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                     taskList.clear()
                     taskList.addAll(result.data.toMutableList())
 
-                    setUpOnSuccessRV(taskList)
-
-
-
                 }
 
                 is DBResult.Failure -> {
@@ -662,7 +661,6 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             when (result) {
                 is DBResult.Success -> {
                     taskList.addAll(listOf(result.data))
-                    setUpOnSuccessRV(taskList)
 
                 }
 
@@ -719,10 +717,12 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                             for (task in tasks) {
                                 db.tasksDao().insert(task)
                             }
+
                         }
                         progressDialog.dismiss()
-                        startActivity(intent)
-                        finish()
+                        performTaskFetch(_type!!)
+                        taskadapter.setTasks(taskList)
+                        taskadapter.notifyDataSetChanged()
                         binding.swiperefresh.isRefreshing=false
 
                     }
@@ -774,10 +774,26 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
 
     override fun onResume() {
         super.onResume()
-//        if (type!=null) {
-//            taskItems.clear()
-//            performTaskFetch(type!!)
-//        }
+        if (_type!=null ){
+            if (this::taskadapter.isInitialized){
+                taskList.clear()
+                performTaskFetch(_type!!)
+                runDelayed(500){
+                    binding.results.text="Matches ${taskList.size} tasks"
+                    taskadapter.setTasks(taskList)
+                    taskadapter.notifyDataSetChanged()
+                }
+
+            }
+            else{
+                taskList.clear()
+                performTaskFetch(_type!!)
+                runDelayed(500){
+                    setUpOnSuccessRV(taskList)
+                }
+            }
+        }
+
         if (PrefManager.getShakePref()){
             initShake()
             shakeDetector.registerListener()
@@ -1038,4 +1054,5 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
 
         }
     }
+
 }
