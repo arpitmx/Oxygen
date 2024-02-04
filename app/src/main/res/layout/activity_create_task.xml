@@ -359,13 +359,13 @@
                     app:hintTextColor="@color/darkTheme_bg">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
                         android:id="@+id/title"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/card_view_white"
                         android:fontFamily="@font/sf_pro_display_medium"
-                        android:maxLines="2"
                         android:maxLength="100"
+                        android:maxLines="2"
                         android:textAlignment="textStart"
                         android:textColor="@color/secondary_bg"
                         android:textSize="17dp" />

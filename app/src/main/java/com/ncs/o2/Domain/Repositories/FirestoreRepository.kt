@@ -2949,7 +2949,7 @@ class FirestoreRepository @Inject constructor(
                     PrefManager.lastaddedproject(projectData[0]!!)
                     PrefManager.setProjectIconUrl(projectData[0]!!,projectData[1]!!)
                     PrefManager.setProjectDeepLink(projectData[0]!!,projectData[2]!!)
-
+                    PrefManager.setProjectAliasCode(projectData[0]!!,projectData[3]!!)
                     Log.d("projectCheck",PrefManager.getProjectIconUrl(projectData[0]!!).toString())
 
                     val updatedUserProjects = getUserProjects(userDocument)
@@ -2983,7 +2983,7 @@ class FirestoreRepository @Inject constructor(
 
         return if (!documents.isEmpty) {
             ServerLogger().addRead(1)
-            listOf(documents.documents.firstOrNull()?.getString("PROJECT_NAME"),documents.documents.firstOrNull()?.getString("ICON_URL"),documents.documents.firstOrNull()?.getString("PROJECT_LINK"))
+            listOf(documents.documents.firstOrNull()?.getString("PROJECT_NAME"),documents.documents.firstOrNull()?.getString("ICON_URL"),documents.documents.firstOrNull()?.getString("PROJECT_LINK"),documents.documents.firstOrNull()?.getString("PROJECT_ALIAS"))
 
         } else {
             null

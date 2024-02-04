@@ -500,7 +500,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                         val projectsList = PrefManager.getProjectsList()
                         CoroutineScope(Dispatchers.IO).launch {
                             for (project in projectsList){
-                                if (PrefManager.getProjectIconUrl(project)=="" || PrefManager.getProjectDeepLink(project)==""){
+                                if (PrefManager.getProjectIconUrl(project)=="" || PrefManager.getProjectDeepLink(project)=="" || PrefManager.getProjectAliasCode(project)==""){
                                     saveProjectIconUrls(projectName = project)
                                 }
                                 Log.d("projectCheck",PrefManager.getProjectIconUrl(project).toString())
@@ -578,6 +578,7 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                 if (documentSnapshot.exists()) {
                     val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
                     val projectLink = documentSnapshot.data?.get("PROJECT_LINK")?.toString()
+                    val projectAlias=documentSnapshot.data?.get("PROJECT_ALIAS")?.toString()
 
                     if (imageUrl != null) {
                         PrefManager.setProjectIconUrl(projectName, imageUrl)
@@ -585,6 +586,8 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                     if (projectLink !=null){
                         PrefManager.setProjectDeepLink(projectName, projectLink)
                     }
+                    PrefManager.setProjectAliasCode(projectName,projectAlias!!)
+
                 }
             }
             .addOnFailureListener { exception ->

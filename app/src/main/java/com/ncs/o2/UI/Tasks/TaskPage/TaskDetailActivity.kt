@@ -11,11 +11,16 @@ import android.os.Looper
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -36,6 +41,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -51,6 +58,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         ActivityTaskDetailBinding.inflate(layoutInflater)
     }
     var taskId:String?= null
+    var taskTitle:String?=null
     lateinit var segmentName:String
     lateinit var sectionName:String
     var type: String? =null
@@ -62,6 +70,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     var moderators: MutableList<User> = mutableListOf()
     var assignee:String=""
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
+    private val viewModel: TaskDetailViewModel by viewModels()
 
     @Inject
     lateinit var db:TasksDatabase
@@ -79,10 +88,16 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
             if (taskId != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     val task = db.tasksDao().getTasksbyId(taskId!!, PrefManager.getcurrentProject())
-                    segmentName = task!!.segment
-                    sectionName = task.section
-                    moderatorsList = task.moderators.toMutableList()
-                    assignee = task.assignee
+                    if (task.isNull){
+                        fetchTask(taskId!!)
+                    }
+                    else{
+                        Log.d("taskFecthing","fetch from db")
+                        segmentName = task!!.segment
+                        sectionName = task.section
+                        moderatorsList = task.moderators.toMutableList()
+                        assignee = task.assignee
+                    }
                 }
             }
 
@@ -139,6 +154,63 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
             }
         }
 
+    }
+
+    private fun fetchTask(taskId:String){
+        Log.d("taskFecthing","fetch from firebase")
+        this.lifecycleScope.launch {
+
+            try {
+
+                val taskResult = withContext(Dispatchers.IO) {
+                    viewModel.getTasksById(taskId, PrefManager.getcurrentProject())
+                }
+
+                Timber.tag(TaskDetailsFragment.TAG).d("Fetched task result : ${taskResult}")
+
+                when (taskResult) {
+
+                    is ServerResult.Failure -> {
+
+                        utils.singleBtnDialog(
+                            "Failure",
+                            "Failure in task fetching : ${taskResult.exception.message}",
+                            "Okay"
+                        ) {
+
+                        }
+
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.progressBar.visible()
+                    }
+
+                    is ServerResult.Success -> {
+                        binding.progressBar.gone()
+                        db.tasksDao().insert(taskResult.data)
+                        segmentName = taskResult.data.segment
+                        sectionName = taskResult.data.section
+                        moderatorsList = taskResult.data.moderators.toMutableList()
+                        assignee = taskResult.data.assignee
+                    }
+                }
+            } catch (e: Exception) {
+
+                Timber.tag(TaskDetailsFragment.TAG).e(e)
+                binding.progressBar.gone()
+
+//                utils.singleBtnDialog(
+//                    "Failure", "Failure in Task exception : ${e.message}", "Okay"
+//                ) {
+//                    requireActivity().finish()
+//                }
+
+            }
+
+        }
     }
 
 

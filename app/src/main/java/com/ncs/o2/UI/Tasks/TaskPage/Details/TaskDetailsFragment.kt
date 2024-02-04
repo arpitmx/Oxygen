@@ -481,8 +481,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
 
     private fun setDefaultViews(task: Task) {
-
-
+        activityBinding.taskTitle=task.title
         binding.sectionNameET.text = task.section
         viewModel.task = task
         val priority = SwitchFunctions.getStringPriorityFromNumPriority(task.priority!!)
@@ -1581,7 +1580,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                     is ServerResult.Success -> {
                         val notification = composeNotification(
                             NotificationType.TASK_ASSIGNED_NOTIFICATION,
-                            message = "You are assigned as an assignee in the task ${activityBinding.taskId} in the project ${PrefManager.getcurrentProject()}",
+                            message = "${PrefManager.getcurrentUserdetails().USERNAME} : You are assigned as an assignee in the task ${activityBinding.taskId} in the project ${PrefManager.getcurrentProject()}",
                             assignee = assignee
                         )
                         if (assignee.firebaseID!="None"){
@@ -1830,7 +1829,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                             is ServerResult.Success -> {
                                 val notification = composeWorkspaceUpdateNotification(
                                     NotificationType.WORKSPACE_TASK_UPDATE,
-                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} updated the state of task ${activityBinding.taskId} to $text",
+                                    message = "${PrefManager.getcurrentUserdetails().USERNAME} : Updated the state of task ${activityBinding.taskId} to $text",
                                     newState = text
                                 )
                                 if (moderators.isNotEmpty()){
@@ -2131,7 +2130,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                 notificationType = NotificationType.TASK_ASSIGNED_NOTIFICATION.name,
                 taskID = activityBinding.taskId!!,
                 message = message,
-                title = "${PrefManager.getcurrentProject()} | You are assigned in the task ${activityBinding.taskId}",
+                title = "${PrefManager.getcurrentProject()} | ${activityBinding.taskId} | ${taskDetails.title}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = assignee.firebaseID!! ,
                 timeStamp = Timestamp.now().seconds,
@@ -2149,7 +2148,7 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
                 notificationType = NotificationType.WORKSPACE_TASK_UPDATE.name,
                 taskID = activityBinding.taskId!!,
                 message = message,
-                title = "${PrefManager.getcurrentProject()} | ${PrefManager.getcurrentUserdetails().USERNAME} changed state of ${activityBinding.taskId} to ${newState}",
+                title = "${PrefManager.getcurrentProject()} | ${activityBinding.taskId} | ${taskDetails.title}",
                 fromUser = PrefManager.getcurrentUserdetails().EMAIL,
                 toUser = "None" ,
                 timeStamp = Timestamp.now().seconds,

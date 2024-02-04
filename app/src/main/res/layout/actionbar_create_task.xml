@@ -121,6 +121,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
+        <ProgressBar
+            android:id="@+id/actionBar_progress"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:layout_marginEnd="52dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:indeterminateTint="@color/primary"/>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
