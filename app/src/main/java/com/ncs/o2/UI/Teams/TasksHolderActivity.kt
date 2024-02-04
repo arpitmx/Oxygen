@@ -776,12 +776,24 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
         super.onResume()
         if (_type!=null ){
             if (this::taskadapter.isInitialized){
-                taskList.clear()
-                performTaskFetch(_type!!)
-                runDelayed(500){
-                    binding.results.text="Matches ${taskList.size} tasks"
-                    taskadapter.setTasks(taskList)
-                    taskadapter.notifyDataSetChanged()
+                if (ifDefault()) {
+                    Log.d("ifDefault","if")
+                    taskList.clear()
+                    performTaskFetch(_type!!)
+                    runDelayed(500) {
+                        binding.results.text = "Matches ${taskList.size} tasks"
+                        taskadapter.setTasks(taskList.sortedByDescending { it.last_updated }.toMutableList())
+                        taskadapter.notifyDataSetChanged()
+                    }
+                }
+                else{
+                    Log.d("ifDefault","else")
+                    taskList.clear()
+                    performTaskFetch(_type!!)
+                    runDelayed(500){
+                        searchQuery(binding.searchBar.text.toString())
+//                        setUpOnSuccessRV(taskList.sortedByDescending { it.last_updated }.toMutableList())
+                    }
                 }
 
             }
@@ -789,7 +801,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                 taskList.clear()
                 performTaskFetch(_type!!)
                 runDelayed(500){
-                    setUpOnSuccessRV(taskList)
+                    setUpOnSuccessRV(taskList.sortedByDescending { it.last_updated }.toMutableList())
                 }
             }
         }
