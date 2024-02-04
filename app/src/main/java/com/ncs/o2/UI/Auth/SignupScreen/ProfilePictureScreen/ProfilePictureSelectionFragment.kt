@@ -368,6 +368,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                                         with(PrefManager){
 
                                             putProjectsList(listOf(Endpoints.defaultProject))
+                                            setProjectAliasCode(Endpoints.defaultProject,Endpoints.defaultAlias)
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 for (project in getProjectsList()){
                                                     saveProjectIconUrls(projectName = project)

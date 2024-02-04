@@ -53,6 +53,7 @@ object PrefManager {
 
     private val projectIconUrlMapKey = "project_icon_url_map"
     private val projectDeeplinkMapKey = "project_deeplink_map"
+    private val projectAliasCodeMapKey = "project_alias_map"
 
 
     private lateinit var projectTimestampMap: MutableMap<String, Long>
@@ -63,6 +64,8 @@ object PrefManager {
     private lateinit var LastChannelTimestampMap: MutableMap<String, Timestamp>
 
     private lateinit var ProjectIconUrlMap: MutableMap<String, String>
+    private lateinit var ProjectAliasCodeMap: MutableMap<String, String>
+
     private lateinit var ProjectDeepLinkMap: MutableMap<String, String>
 
 
@@ -177,6 +180,16 @@ object PrefManager {
         projectIdChannelIdNotiMap = savedLastChannelsNotiTimeStampMapString?.let {
             try {
                 Gson().fromJson(it, object : TypeToken<MutableMap<String, Timestamp>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
+
+        val savedProjectAliasMapString = sharedPreferences.getString(
+            projectAliasCodeMapKey, null)
+        ProjectAliasCodeMap = savedProjectAliasMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, String>>() {}.type)
             } catch (e: JsonSyntaxException) {
                 mutableMapOf()
             }
@@ -844,6 +857,19 @@ object PrefManager {
 
     fun setPopUpVisibility(bool:Boolean) {
         editor.putBoolean("popUp", bool)
+        editor.apply()
+    }
+
+    fun setProjectAliasCode(projectName: String, alias:String) {
+        ProjectAliasCodeMap[projectName] = alias
+        saveProjectAliasCodeHashMapToPreferences()
+    }
+    fun getProjectAliasCode(projectName: String): String {
+        return ProjectAliasCodeMap[projectName] ?: ""
+    }
+    private fun saveProjectAliasCodeHashMapToPreferences() {
+        val hashMapString = Gson().toJson(ProjectAliasCodeMap)
+        editor.putString(projectAliasCodeMapKey, hashMapString)
         editor.apply()
     }
 }

@@ -267,9 +267,10 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                 if (documentSnapshot.exists()) {
                     val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
                     val projectLink = documentSnapshot.data?.get("PROJECT_LINK")?.toString()
-
+                    val projectAlias=documentSnapshot.data?.get("PROJECT_ALIAS")?.toString()
                     PrefManager.setProjectIconUrl(projectName,imageUrl!!)
                     PrefManager.setProjectDeepLink(projectName,projectLink!!)
+                    PrefManager.setProjectAliasCode(projectName,projectAlias!!)
 
                 }
             }

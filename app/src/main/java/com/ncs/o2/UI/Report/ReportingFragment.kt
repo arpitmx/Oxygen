@@ -506,34 +506,7 @@ class ReportingFragment : Fragment() {
         }
     }
     fun generateTaskID(projectName: String):String{
-        return "#${generateProjectNamePrefix(projectName)}-${RandomIDGenerator.generateRandomTaskId(4)}"
+        return "#${PrefManager.getProjectAliasCode(projectName)}-${RandomIDGenerator.generateRandomTaskId(4)}"
     }
-
-    fun generateProjectNamePrefix(projectName: String): String {
-        val words = projectName.split(" ")
-        return when {
-            words.size == 1 -> {
-                if (projectName.length >= 2) {
-                    "${projectName.substring(0, 2)}${projectName.last()}"
-                } else {
-                    projectName
-                }
-            }
-            words.size >= 2 -> {
-                val firstWord = words[0]
-                val secondWord = words[1]
-                if (firstWord.length >= 2) {
-                    "${firstWord.substring(0, 2)}${secondWord.first()}${secondWord.last()}"
-                } else {
-                    projectName
-                }
-            }
-            else -> projectName
-        }.toUpperCase()
-    }
-
-
-
-
 
 }

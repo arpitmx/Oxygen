@@ -42,13 +42,26 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:id="@+id/image"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:id="@+id/_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleY="0.5"
+                        android:scaleX="0.5"
                         android:layout_gravity="center"
                         android:scaleType="centerCrop"
                         android:src="@drawable/add_image" />
                 </androidx.cardview.widget.CardView>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/image"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/secondaryBlue"
+                    app:cardCornerRadius="45dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <EditText
                     android:id="@+id/project_title"
@@ -70,8 +83,47 @@
                     android:textSize="18dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.384"
-                    app:layout_constraintStart_toEndOf="@+id/cardView"
+                    app:layout_constraintStart_toEndOf="@+id/image"
                     app:layout_constraintTop_toTopOf="parent" />
+
+
+                <EditText
+                    android:id="@+id/project_alias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/item_bg_curve"
+                    android:drawablePadding="15dp"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:gravity="start|center_vertical"
+                    android:hint="Project Alias"
+                    android:paddingStart="15dp"
+                    android:paddingBottom="1dp"
+                    android:textAllCaps="false"
+                    android:textColor="#DEE3E3E3"
+                    android:textColorHint="@color/account"
+                    android:textSize="18dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image" />
+
+                <TextView
+                    android:id="@+id/errorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"
+                    android:fontFamily="@font/sf_pro_display_regular"
+                    android:text="Error"
+                    android:textColor="@color/redx"
+                    android:textSize="14dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.507"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/project_alias" />
 
                 <EditText
                     android:id="@+id/project_desc"
@@ -94,7 +146,7 @@
                     android:textSize="18dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardView" />
+                    app:layout_constraintTop_toBottomOf="@+id/errorText" />
 
                 <TextView
                     android:id="@+id/textView"
@@ -122,6 +174,19 @@
                     app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="260dp"
+                    android:fontFamily="@font/sf_pro_display_regular"
+                    android:gravity="center"
+                    android:text="Alias Code will be used as prefix in task id\n Be Careful while creating the alias"
+                    android:textColor="@color/account"
+                    android:textSize="14dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/project_desc" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
