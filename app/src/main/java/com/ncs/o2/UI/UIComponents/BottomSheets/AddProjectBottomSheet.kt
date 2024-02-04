@@ -60,6 +60,7 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                 var _projectData: String? = null
                 var projectData: String? = null
                 var imageUrl:String?=null
+                var aliasCode:String?=null
 
 
                 FirebaseFirestore.getInstance().collection("Projects")
@@ -71,7 +72,7 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                                 val project = document.data
                                 projectData = project.get("PROJECT_NAME").toString()
                                 imageUrl = project.get("ICON_URL").toString()
-
+                                aliasCode=project.get("PROJECT_ALIAS").toString()
                             }
 
                             if (projectData != null) {
@@ -114,6 +115,8 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
                                                             PrefManager.lastaddedproject(projectData!!)
                                                             PrefManager.setProjectIconUrl(projectData!!,imageUrl!!)
                                                             PrefManager.setProjectDeepLink(projectData!!,link.trim())
+                                                            PrefManager.setProjectAliasCode(projectData!!,aliasCode!!)
+
                                                             userProjects?.add(projectData!!.trim())
                                                             sendcallBack(userProjects!!)
                                                             Toast.makeText(

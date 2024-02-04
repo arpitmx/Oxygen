@@ -157,7 +157,6 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             val gravity = if (!drawerLayout.isDrawerOpen(GravityCompat.START)) GravityCompat.START else GravityCompat.END
             drawerLayout.openDrawer(gravity)
         }
-        activityBinding.binding.gioActionbar.line.gone()
         activityBinding.binding.gioActionbar.tabLayout.gone()
         activityBinding.binding.gioActionbar.searchCont.gone()
         activityBinding.binding.gioActionbar.actionbar.visible()

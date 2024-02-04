@@ -740,7 +740,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
                     Timber.tag(TaskDetailsFragment.TAG).e(e)
 
-
                 }
 
             }

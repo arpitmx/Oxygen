@@ -2,6 +2,7 @@ package com.ncs.o2.UI.Teams
 
 import TaskListAdapter
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -81,7 +82,6 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     ): View? {
         binding = FragmentTeamsBinding.inflate(inflater, container, false)
         manageviews()
-        setUpProjectStats()
         return binding.root
     }
 
@@ -97,6 +97,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     override fun onResume() {
         super.onResume()
         manageviews()
+        setUpProjectStats()
         val channels=PrefManager.getProjectChannels(PrefManager.getcurrentProject())
         for (ch in channels){
             getNewMessages(ch.channel_name)
