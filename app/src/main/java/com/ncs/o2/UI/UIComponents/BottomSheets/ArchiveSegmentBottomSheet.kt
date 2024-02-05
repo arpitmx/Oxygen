@@ -46,7 +46,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class ArchiveSegmentBottomSheet(private val type:String,val segmentSelectionListener:SegmentSelectionListener,val sectionSelectionListener:sendSectionsListListner) : BottomSheetDialogFragment(),
+class ArchiveSegmentBottomSheet() : BottomSheetDialogFragment(),
     SegmentListAdapter.OnClickCallback {
     @Inject lateinit var firestoreRepository:FirestoreRepository
     private var segments:List<Segment> = emptyList()
@@ -108,30 +108,7 @@ class ArchiveSegmentBottomSheet(private val type:String,val segmentSelectionList
     }
 
     override fun onClick(segment: SegmentItem, position: Int) {
-        Toast.makeText(requireContext(), segment.segment_NAME, Toast.LENGTH_SHORT).show()
-        val segments=PrefManager.getProjectSegments(PrefManager.getcurrentProject())
-        val sections:MutableList<String> = mutableListOf()
-        for(seg in segments){
-            if (seg.segment_NAME==segment.segment_NAME){
-                sections.addAll(seg.sections.toSet().toMutableList())
-            }
-        }
-        sectionList=sections
-
-        if (type!="Search" && type!="Quick Task" && type!="Create Task"){
-            segmentName=segment.segment_NAME
-        }
-        if (type=="MainActivity" || type=="Create Task" ){
-            PrefManager.setcurrentsegment(segment.segment_NAME)
-            PrefManager.setcurrentsection(sectionList[0])
-            segmentName=segment.segment_NAME
-            sendsectionList(PrefManager.getcurrentProject())
-            PrefManager.putsectionsList(sectionList)
-        }
-        segmentName=segment.segment_NAME
-        segmentSelectionListener.onSegmentSelected(segment.segment_NAME)
-        sectionSelectionListener.sendSectionsList(sectionList)
-        dismiss()
+        toast("Long Press to Unarchive")
     }
 
     override fun onLongClick(segment: SegmentItem, position: Int) {
@@ -171,26 +148,6 @@ class ArchiveSegmentBottomSheet(private val type:String,val segmentSelectionList
                 }, negative = {})
 
         }
-    }
-
-    interface SegmentSelectionListener {
-        fun onSegmentSelected(segmentName: String)
-    }
-    interface sendSectionsListListner{
-        fun sendSectionsList(list:MutableList<String>)
-
-    }
-
-    private fun sendsectionList(projectName: String) {
-        val segments=PrefManager.getProjectSegments(projectName)
-        val newList=segments.distinctBy { it.segment_NAME }
-        for(segment in newList){
-            if (segment.segment_NAME==segmentName){
-                sectionList=segment.sections
-            }
-        }
-        PrefManager.putsectionsList(sectionList)
-        PrefManager.list.value = sectionList
     }
 
 }

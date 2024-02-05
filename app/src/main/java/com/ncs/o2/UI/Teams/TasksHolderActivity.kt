@@ -517,7 +517,9 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
 
 
     private fun setUpOnSuccessRV(list: MutableList<Task>){
-        if (list.isEmpty()){
+        val filteredList = filterTasks(list)
+
+        if (filteredList.isEmpty()){
             binding.layout.gone()
             binding.recyclerView.gone()
             binding.progressbarBlock.gone()
@@ -527,15 +529,15 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             binding.results.text="Matches 0 tasks"
         }
         else{
-            Log.d("lissttt",list.size.toString())
-            Log.d("lissttt",list.toString())
+            Log.d("lissttt",filteredList.size.toString())
+            Log.d("lissttt",filteredList.toString())
             binding.layout.visible()
             binding.recyclerView.visible()
             binding.progressbarBlock.gone()
             binding.progressBar.gone()
             binding.placeholder.gone()
             binding.results.visible()
-            binding.results.text="Matches ${list.size.toString()} tasks"
+            binding.results.text="Matches ${filteredList.size.toString()} tasks"
             if (ifDefault()){
                 binding.clear.gone()
             }
@@ -544,7 +546,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             }
             recyclerView = binding.recyclerView
             taskItems.clear()
-            taskItems.addAll(list.map { task ->
+            taskItems.addAll(filteredList.map { task ->
                 TaskItem(
                     title = task.title!!,
                     id = task.id,
@@ -608,7 +610,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             when (result) {
                 is DBResult.Success -> {
                     taskList.clear()
-                    taskList.addAll(result.data.toMutableList())
+                    taskList.addAll(filterTasks(result.data.toMutableList()))
                     taskList.sortedByDescending { it.last_updated }
 
                 }
@@ -640,7 +642,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                 ) { result ->
                     when (result) {
                         is DBResult.Success -> {
-                            taskList.addAll(result.data.toMutableList())
+                            taskList.addAll(filterTasks(result.data.toMutableList()))
                             taskList.sortedByDescending { it.last_updated }
 
                         }
@@ -672,7 +674,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                 when (result) {
                     is DBResult.Success -> {
                         taskList.clear()
-                        taskList.addAll(result.data.toMutableList())
+                        taskList.addAll(filterTasks(result.data.toMutableList()))
                         taskList.sortedByDescending { it.last_updated }
 
                         setUpOnSuccessRV(taskList)
@@ -719,7 +721,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         }
                         withContext(Dispatchers.Main) {
                             taskList.clear()
-                            taskList.addAll(list.toMutableList())
+                            taskList.addAll(filterTasks(list.toMutableList()))
                             taskList.sortedByDescending { it.last_updated }
 
                         }
@@ -752,7 +754,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             when (result) {
                 is DBResult.Success -> {
                     taskList.clear()
-                    taskList.addAll(result.data.toMutableList())
+                    taskList.addAll(filterTasks(result.data.toMutableList()))
 
                 }
 
@@ -780,7 +782,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
         ) { result ->
             when (result) {
                 is DBResult.Success -> {
-                    taskList.addAll(listOf(result.data))
+                    taskList.addAll(filterTasks(listOf(result.data)))
                     taskList.sortedByDescending { it.last_updated }
 
                 }
@@ -1284,6 +1286,18 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             }
 
         }
+    }
+    fun filterTasks(data: List<Task>): List<Task> {
+        var list = mutableListOf<Task>()
+        list.addAll(data)
+        val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+        list = list.filter { task ->
+            val segmentName = task.segment
+            val segment = segments.find { it.segment_NAME == segmentName }
+            segment?.archived != true
+        }.toMutableList()
+        val sortedList = list.sortedByDescending { it.last_updated }
+        return sortedList
     }
 
 }
