@@ -36,6 +36,7 @@ import com.ncs.o2.Domain.Models.Mail
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.popInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -551,10 +552,10 @@ class ProfilePictureSelectionFragment : Fragment() {
                     val sections=segmentDocument.get("sections") as MutableList<String>
                     val segment_ID= segmentDocument.getString("segment_ID")
                     val creation_DATETIME= segmentDocument.get("creation_DATETIME") as Timestamp
-                    val archived=segmentDocument.getBoolean("archived" ) ?: false
-                    val last_updated= segmentDocument.get("last_updated") as Timestamp ?: Timestamp.now()
+                    val archived= if (segmentDocument.getBoolean("archived" ).isNull) false else segmentDocument.getBoolean("archived" )
+                    val last_updated=  if (segmentDocument.get("last_updated").isNull) Timestamp.now() else segmentDocument.get("last_updated") as Timestamp
 
-                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME, archived = archived,last_updated=last_updated))
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME, archived = archived!!,last_updated=last_updated))
                 }
             }
         } catch (e: java.lang.Exception) {

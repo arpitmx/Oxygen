@@ -340,6 +340,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                             binding.searchPlaceholder.gone()
                             binding.progressBar.gone()
                             val task = result.data
+
                             taskList.clear()
                             for (element in task) {
                                 taskList.add(element)
@@ -390,8 +391,9 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                             binding.searchPlaceholder.gone()
                             binding.progressBar.gone()
                             val task = result.data
+                            val filerList=filterTasks(task)
                             tasks.clear()
-                            for (element in task) {
+                            for (element in filerList) {
                                 if (selectedTags.isNotEmpty()) {
                                     if (element.tags.contains(selectedTags[0].tagID)) {
                                         tasks.add(element)
@@ -630,6 +632,20 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         TagList.clear()
         TagList = tagList
     }
+
+    fun filterTasks(data: List<Task>): List<Task> {
+        var list = mutableListOf<Task>()
+        list.addAll(data)
+        val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+        list = list.filter { task ->
+            val segmentName = task.segment
+            val segment = segments.find { it.segment_NAME == segmentName }
+            segment?.archived != true
+        }.toMutableList()
+        val sortedList = list.sortedByDescending { it.last_updated }
+        return sortedList
+    }
+
 
 }
 

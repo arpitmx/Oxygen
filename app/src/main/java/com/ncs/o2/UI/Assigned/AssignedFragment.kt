@@ -14,25 +14,30 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
+import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.set180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Teams.TasksHolderActivity
@@ -61,12 +66,14 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
         fun newInstance() = AssignedFragment()
     }
     lateinit var binding: FragmentAssignedBinding
-    private lateinit var viewModel: AssignedViewModel
+    private val viewModel: AssignedViewModel by viewModels()
     private lateinit var taskListAdapter: TaskListAdapter
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     private val activityBinding: ActivityMainBinding by lazy {
         (requireActivity() as MainActivity).binding
     }
+    var todays:MutableList<TodayTasks> = mutableListOf()
+
     @Inject
     lateinit var db:TasksDatabase
     var isGridVisible=true
@@ -86,7 +93,6 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AssignedViewModel::class.java)
 
     }
 
@@ -264,32 +270,64 @@ class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
 
             }
         }
-        val todays=PrefManager.getProjectTodayTasks(PrefManager.getcurrentProject())
-
-        if (todays.isNotEmpty()){
-            binding.todaytasksCount.visible()
-            binding.todayProgress.visible()
-            binding.percentageCount.visible()
-
-            val completed=todays.count{ it.isCompleted }
-            val total=todays.size
-            binding.todaytasksCount.text="${completed}/${total}"
-
-            val progressFraction: Float = if (total > 0) {
-                completed.toFloat() / total
-            } else {
-                0f
-            }
-            val progressPercentage: Int = (progressFraction * 100).roundToInt()
-            binding.todayProgress.progress = progressPercentage
-            binding.percentageCount.text="$progressPercentage%"
+        todays.clear()
+        todays=PrefManager.getProjectTodayTasks(PrefManager.getcurrentProject()).toMutableList()
+        for (today in todays) {
+            fetchTasksForID(today.taskID)
         }
-        else{
-            binding.todaytasksCount.gone()
-            binding.todayProgress.gone()
-            binding.percentageCount.gone()
+        runDelayed(500){
+            PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),todays)
+            if (todays.isNotEmpty()){
+                binding.todaytasksCount.visible()
+                binding.todayProgress.visible()
+                binding.percentageCount.visible()
+
+                val completed=todays.count{ it.isCompleted }
+                val total=todays.size
+                binding.todaytasksCount.text="${completed}/${total}"
+
+                val progressFraction: Float = if (total > 0) {
+                    completed.toFloat() / total
+                } else {
+                    0f
+                }
+                val progressPercentage: Int = (progressFraction * 100).roundToInt()
+                binding.todayProgress.progress = progressPercentage
+                binding.percentageCount.text="$progressPercentage%"
+            }
+            else{
+                binding.todaytasksCount.gone()
+                binding.todayProgress.gone()
+                binding.percentageCount.gone()
+            }
         }
     }
 
+    private fun fetchTasksForID(
+        taskID: String,
+    ) {
+        viewModel.getTasksForID(PrefManager.getcurrentProject(), taskID) { result ->
+            when (result) {
+                is DBResult.Success -> {
+                    filterTasks(result.data)
+                }
 
+                is DBResult.Failure -> {
+                }
+
+                is DBResult.Progress -> {
+                }
+            }
+        }
+    }
+
+    fun filterTasks(data: Task) {
+        val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+        for (i in 0 until todays.size) {
+            val task = todays[i]
+            if (segments.any { it.segment_NAME == data.segment && it.archived } && task.taskID == data.id) {
+                todays.removeAt(i)
+            }
+        }
+    }
 }

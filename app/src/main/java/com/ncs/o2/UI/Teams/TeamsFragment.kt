@@ -22,6 +22,7 @@ import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -437,17 +438,12 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
     fun setUpProjectStats() {
         CoroutineScope(Dispatchers.IO).launch {
-            val favs = PrefManager.getProjectFavourites(PrefManager.getcurrentProject())
-            val submittedTasks =
-                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 1)
-            val openTasks =
-                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 2)
-            val ongoingTasks =
-                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 3)
-            val reviewTasks =
-                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 4)
-            val completedTasks =
-                db.tasksDao().getTasksInProjectforState(PrefManager.getcurrentProject(), 5)
+            val currentProject = PrefManager.getcurrentProject()
+            val submittedTasks = getFilteredTasksBySegmentState(currentProject, 1)
+            val openTasks = getFilteredTasksBySegmentState(currentProject, 2)
+            val ongoingTasks = getFilteredTasksBySegmentState(currentProject, 3)
+            val reviewTasks = getFilteredTasksBySegmentState(currentProject, 4)
+            val completedTasks = getFilteredTasksBySegmentState(currentProject, 5)
 
             Log.d("listsizeTeams",submittedTasks.size.toString())
             Log.d("listsizeTeams",openTasks.size.toString())
@@ -475,6 +471,22 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
 
     }
+
+    suspend fun getFilteredTasksBySegmentState(
+        projectName: String,
+        segmentState: Int
+    ): List<Task> = withContext(Dispatchers.IO) {
+        val tasks = db.tasksDao().getTasksInProjectforState(projectName, segmentState)
+        val segments = PrefManager.getProjectSegments(projectName)
+        tasks.filter { task ->
+            val segmentName = task.segment
+            val segment = segments.find { it.segment_NAME == segmentName }
+            segment?.archived != true
+        }
+    }
+
+
+
 
     fun getNewMessages(channelName:String){
 

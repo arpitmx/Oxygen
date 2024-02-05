@@ -7,6 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -26,7 +29,9 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.Adapters.SegmentListAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment.CreateSegmentBottomSheet
@@ -63,12 +68,15 @@ Tasks FUTURE ADDITION :
 */
 @AndroidEntryPoint
 class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFragment(),
-    SegmentListAdapter.OnClickCallback,ArchiveSegmentBottomSheet.SegmentSelectionListener,ArchiveSegmentBottomSheet.sendSectionsListListner {
+    SegmentListAdapter.OnClickCallback {
     @Inject lateinit var firestoreRepository:FirestoreRepository
     private var segments:List<Segment> = emptyList()
     lateinit var binding: SegmetSelectionBottomSheetBinding
     private val recyclerView: RecyclerView by lazy {
         binding.recyclerViewSegments
+    }
+    private val activityBinding: ActivityMainBinding by lazy {
+        (requireActivity() as MainActivity).binding
     }
     var segmentSelectionListener: SegmentSelectionListener? = null
     var sectionSelectionListener:sendSectionsListListner?=null
@@ -78,6 +86,8 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
     private val utils: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(requireActivity())
     }
+    private val viewModel: TaskSectionViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -129,7 +139,7 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
 
         binding.archiveBtn.setOnClickThrottleBounceListener {
             dismiss()
-            val archiveSegmentBottomSheet = ArchiveSegmentBottomSheet(type,this,this)
+            val archiveSegmentBottomSheet = ArchiveSegmentBottomSheet()
             archiveSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
         }
 
@@ -220,7 +230,14 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                     PrefManager.saveProjectSegments(PrefManager.getcurrentProject(),segments)
                     Log.d("segmentsArchive",PrefManager.getProjectSegments(PrefManager.getcurrentProject()).distinctBy { it.segment_ID }.toString())
                     toast("Segment Archived")
+                    if (PrefManager.getcurrentsegment()==segment.segment_NAME){
+                        PrefManager.setcurrentsegment("Select Segment")
+                        findNavController().navigate(R.id.task_item)
+                        viewModel.updateCurrentSegment("Select Segment")
+                        activityBinding.gioActionbar.titleTv.text="Select Segment"
+                    }
                     dismiss()
+
                 }, negative = {})
 
         }
@@ -253,7 +270,7 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                                                 segment_ID = segment.segment_ID,
                                                 creation_DATETIME = segment.creation_DATETIME,
                                                 archived = segment.archived,
-                                                last_updated = segment.last_updated
+                                                last_updated = segment.last_updated!!
 
                                             )
                                         }
@@ -326,7 +343,7 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                                     segment_ID = segment.segment_ID,
                                     creation_DATETIME = segment.creation_DATETIME,
                                     archived =segment.archived,
-                                    last_updated = segment.last_updated
+                                    last_updated = segment.last_updated!!
                                 )
                             }
 
@@ -441,14 +458,5 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
         PrefManager.list.value = sectionList
 
     }
-
-    override fun onSegmentSelected(segmentName: String) {
-        segmentSelectionListener?.onSegmentSelected(segmentName)
-    }
-
-    override fun sendSectionsList(list: MutableList<String>) {
-        sectionSelectionListener?.sendSectionsList(list)
-    }
-
 
 }
