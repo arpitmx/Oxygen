@@ -32,6 +32,19 @@
             android:src="@drawable/baseline_keyboard_arrow_down_24"
             app:tint="@color/dim_primary" />
 
+        <ImageButton
+            android:id="@+id/archive_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:visibility="gone"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/baseline_archive_24"
+            app:tint="@color/dim_primary" />
+
     <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -42,6 +55,7 @@
             android:text="Segments"
             android:textColor="@color/better_white"
             android:textSize="18dp" />
+
 
 
         <ImageButton

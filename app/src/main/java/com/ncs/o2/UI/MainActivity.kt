@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -63,6 +64,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.set180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -85,8 +87,9 @@ import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
 import com.ncs.o2.UI.Teams.TeamsFragment
-import com.ncs.o2.UI.UIComponents.Adapters.ListAdapter
+import com.ncs.o2.UI.UIComponents.Adapters.BottomSheetAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
+import com.ncs.o2.UI.UIComponents.Adapters.RecyclerViewAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddQuickTaskBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
@@ -108,7 +111,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.ProjectAddedListener,NetworkChangeReceiver.NetworkChangeCallback{
-    lateinit var projectListAdapter: ListAdapter
+    lateinit var projectListAdapter: RecyclerViewAdapter
     private var projects: MutableList<String> = mutableListOf()
     lateinit var bottmNav: BottomNavigationView
     private var dynamicLinkHandled = false
@@ -157,6 +160,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
     // Dependency Injection
     @Inject
     lateinit var navigator: Navigator
+
+    var isProjectListVisible=true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -212,9 +217,20 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         val search=intent.getStringExtra("search")
         if (search!=null && search=="GoToSearch") {
             val tagText = intent.getStringExtra("tagText")
-            val bundle = bundleOf("tagID" to tagText)
-            navController.navigate(R.id.bottom_search,bundle)
+            val userName = intent.getStringExtra("userName")
+
+            if (tagText!=null){
+                val bundle = bundleOf("tagID" to tagText)
+                navController.navigate(R.id.bottom_search,bundle)
+            }
+            if (userName!=null){
+                val bundle = bundleOf("userName" to userName)
+                navController.navigate(R.id.bottom_search,bundle)
+            }
+
+
         }
+
 
     }
 
@@ -365,6 +381,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             navigator.startSingleTopActivity(CreateTaskActivity::class.java)
         }
 
+        binding.drawerheaderfile.yourProjects.setOnClickListener {
+            binding.drawerheaderfile.arrow.set180(this)
+            if (isProjectListVisible){
+                isProjectListVisible=false
+                binding.drawerheaderfile.extendedProjectsList.gone()
+            }
+            else{
+                isProjectListVisible=true
+                binding.drawerheaderfile.extendedProjectsList.visible()
+            }
+
+        }
     }
 
     private var receiverRegistered = false
@@ -564,8 +592,12 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         projects=PrefManager.getProjectsList().toMutableList()
         val list=ArrayList<String>()
         list.addAll(projects)
-        projectListAdapter=ListAdapter(this,list)
-        binding.drawerheaderfile.projectlistView.adapter=projectListAdapter
+        val recyclerView=binding.drawerheaderfile.projectRecyclerView
+        val adapter = RecyclerViewAdapter(this,list)
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+        recyclerView.layoutManager = linearLayoutManager
+        recyclerView.adapter = adapter
     }
 
     override fun onClick(projectID: String, position: Int) {
@@ -873,7 +905,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
                                         2000
                                     )
                                 } else {
-                                    val segments=PrefManager.getProjectSegments(project)
+                                    val segments=PrefManager.getUnArchivedProjectSegments(project)
                                     Log.d("segment check",segments.toString())
 
                                     if (segments.isNotEmpty()){
@@ -934,7 +966,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
                                         2000
                                     )
                                 } else {
-                                    val segments=PrefManager.getProjectSegments(project)
+                                    val segments=PrefManager.getUnArchivedProjectSegments(project)
                                     Log.d("segment check",segments.toString())
 
                                     if (segments.isNotEmpty()){
@@ -1128,8 +1160,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
                     val sections=segmentDocument.get("sections") as MutableList<String>
                     val segment_ID= segmentDocument.getString("segment_ID")
                     val creation_DATETIME= segmentDocument.get("creation_DATETIME") as Timestamp
+                    val archived=segmentDocument.getBoolean("archived" ) ?: false
+                    val last_updated= segmentDocument.get("last_updated") as Timestamp ?: Timestamp.now()
 
-                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME!!))
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME!!, archived = archived,last_updated = last_updated))
                 }
             }
         } catch (e: java.lang.Exception) {

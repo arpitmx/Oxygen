@@ -7,5 +7,7 @@ data class SegmentItem (
     var sections: MutableList<String> = mutableListOf(),
     val segment_ID : String="",
     var creation_DATETIME : Timestamp?=null,
+    var archived:Boolean,
+    var last_updated : Timestamp?=null,
 
     )

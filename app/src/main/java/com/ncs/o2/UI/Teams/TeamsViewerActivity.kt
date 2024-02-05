@@ -29,6 +29,7 @@ import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
+import com.ncs.o2.UI.UIComponents.BottomSheets.ProfileBottomSheet
 import com.ncs.o2.databinding.ActivityTasksHolderBinding
 import com.ncs.o2.databinding.ActivityTeamsViewerBinding
 import com.ncs.versa.Constants.Endpoints
@@ -43,7 +44,7 @@ import java.io.IOException
 
 
 @AndroidEntryPoint
-class TeamsViewerActivity : AppCompatActivity() {
+class TeamsViewerActivity : AppCompatActivity(),TeamsAdapter.OnUserClick {
     val binding: ActivityTeamsViewerBinding by lazy {
         ActivityTeamsViewerBinding.inflate(layoutInflater)
     }
@@ -177,7 +178,7 @@ class TeamsViewerActivity : AppCompatActivity() {
         }
         else{
             val recyclerView=binding.recyclerView
-            val adapter = TeamsAdapter(dataList.toMutableList())
+            val adapter = TeamsAdapter(dataList.toMutableList(),this)
             val linearLayoutManager = LinearLayoutManager(this)
             linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
             recyclerView.layoutManager = linearLayoutManager
@@ -254,8 +255,10 @@ class TeamsViewerActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-
-
+    override fun onUserClicked(user: User, position: Int) {
+        val bottomSheet = ProfileBottomSheet(user)
+        bottomSheet.show(supportFragmentManager, "bottomsheet")
+    }
 
 
 }

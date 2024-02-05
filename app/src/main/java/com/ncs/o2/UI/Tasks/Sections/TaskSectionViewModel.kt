@@ -48,6 +48,7 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
     private val _currentSegment = MutableLiveData<String>()
     val currentSegment: LiveData<String> get() = _currentSegment
 
+    var currentSelected="all"
 
     fun getTasksItemsForSegment(
         projectName: String,

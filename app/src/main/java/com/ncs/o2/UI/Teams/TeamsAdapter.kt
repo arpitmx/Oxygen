@@ -22,6 +22,7 @@ import com.ncs.o2.databinding.TeamMemebersRvEachItemBinding
 
 class TeamsAdapter(
     private val dataList: MutableList<User>,
+    private val callback:OnUserClick
 ) : RecyclerView.Adapter<TeamsAdapter.ViewHolder>() {
 
 
@@ -80,6 +81,9 @@ class TeamsAdapter(
         holder.binding.email.text = contributor.firebaseID
         holder.binding.role.text = "Role ${contributor.role.toString()}"
 
+        holder.binding.root.setOnClickThrottleBounceListener {
+            callback.onUserClicked(contributor,position)
+        }
 
 
 
@@ -89,6 +93,9 @@ class TeamsAdapter(
         RecyclerView.ViewHolder(binding.root)
 
 
+    interface OnUserClick{
+        fun onUserClicked(user: User,position: Int)
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +17,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.databinding.ProfileBottomSheetBinding
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -95,5 +98,13 @@ class ProfileBottomSheet (
         val timestamp = user.timestamp?.seconds
         binding.time.text= "Joined ${DateTimeUtils.getTimeAgo(timestamp!!)}"
         binding.totalMembersBs.text=user.designation
+
+        binding.viewIssues.setOnClickThrottleBounceListener{
+            dismiss()
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            intent.putExtra("search", "GoToSearch")
+            intent.putExtra("userName", user.username)
+            startActivity(intent)
+        }
     }
 }
