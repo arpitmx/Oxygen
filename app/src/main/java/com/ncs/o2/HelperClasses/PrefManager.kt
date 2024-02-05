@@ -546,6 +546,15 @@ object PrefManager {
             emptyList()
         }
     }
+    fun getUnArchivedProjectSegments(projectName: String): List<SegmentItem> {
+        val allSegments = getProjectSegments(projectName)
+        return allSegments.filter { !it.archived }
+    }
+
+    fun getArchivedProjectSegments(projectName: String): List<SegmentItem> {
+        val allSegments = getProjectSegments(projectName)
+        return allSegments.filter { it.archived }
+    }
     fun setTaskTimestamp(projectId: String, taskId: String, timestamp: Timestamp) {
         val id = "$projectId$taskId"
         projectIdTaskIdMap[id] = timestamp
@@ -870,6 +879,15 @@ object PrefManager {
     private fun saveProjectAliasCodeHashMapToPreferences() {
         val hashMapString = Gson().toJson(ProjectAliasCodeMap)
         editor.putString(projectAliasCodeMapKey, hashMapString)
+        editor.apply()
+    }
+
+    fun getProjectListVisblity(): Boolean {
+        return sharedPreferences.getBoolean("project_list_visible", true)
+    }
+
+    fun setProjectListVisblity(bool:Boolean) {
+        editor.putBoolean("project_list_visible", bool)
         editor.apply()
     }
 }

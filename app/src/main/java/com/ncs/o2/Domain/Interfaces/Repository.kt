@@ -184,7 +184,7 @@ interface Repository {
     ): ServerResult<Boolean>
     fun getUserInfo(serverResult: (ServerResult<CurrentUser?>) -> Unit)
     fun getUserInfobyId(id: String, serverResult: (ServerResult<User?>) -> Unit)
-
+    fun getUserInfobyUserName(userName: String, serverResult: (ServerResult<User?>) -> Unit)
     fun getUserInfoEditProfile(serverResult: (ServerResult<UserInfo?>) -> Unit)
     fun editUserInfo(userInfo: UserInfo, serverResult: (ServerResult<UserInfo?>) -> Unit)
 

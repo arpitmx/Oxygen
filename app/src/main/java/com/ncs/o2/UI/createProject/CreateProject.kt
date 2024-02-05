@@ -123,14 +123,16 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             if (validateString(alias)==null) {
                 isProjectAliasAvailable(alias) {
                     if (it) {
-                        if (binding.projectTitle.text.toString().isNotEmpty() && !bitmap.isNull) {
+                        val projectTitle=validateProjectTitle(binding.projectTitle.text.toString())
+                        if ( !projectTitle.isNull && !bitmap.isNull) {
                             val project_id =
                                 "${title}${
                                     System.currentTimeMillis().toString().substring(8, 12).trim()
                                 }"
                             val _title = binding.projectTitle.text.toString()
                             val __title = _title.replace(" ", "")
-                            val title = __title.toLowerCase().capitalize()
+                            val title = projectTitle!!
+                            binding.projectTitle.setText(title)
                             val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
                                 .setLink(
                                     Uri.parse(
@@ -197,8 +199,15 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                                                                 "Project with this title already exists",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
+                                                            binding.errorTextTitle.visible()
+                                                            binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                                                            binding.errorTextTitle.text="Project with this title already exists"
                                                             binding.progressBar.gone()
                                                         } else {
+                                                            binding.errorTextTitle.visible()
+                                                            binding.errorTextTitle.setTextColor(resources.getColor(R.color.green))
+                                                            binding.errorTextTitle.text="This Title is Available"
+                                                            binding.progressBar.gone()
                                                             FirebaseFirestore.getInstance()
                                                                 .collection("Projects")
                                                                 .document(title)
@@ -263,22 +272,18 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                                                     "Project Photo cannot be kept empty",
                                                     "Okay",
                                                     {})
-                                            } else {
-                                                Toast.makeText(
-                                                    this,
-                                                    "Project Title can't be empty",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
                                             }
                                         }
                                     } else {
-                                        println("Error creating short link: ${task.exception}")
+                                        toast("Error creating short link")
                                     }
                                 }
 
 
                         } else {
-                            toast("Title and Project Icon are required")
+                            if (bitmap==null){
+                                toast("Project Icon is required")
+                            }
                         }
                     }
                 }
@@ -434,6 +439,62 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     }
     fun hasSpacesinStartin(input: String): Boolean {
         return input.startsWith("  ")
+    }
+
+    fun validateProjectTitle(input: String): String? {
+        val trimmedInput = input.trim()
+
+        if (trimmedInput.isEmpty()){
+            binding.errorTextTitle.visible()
+            binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+            binding.errorTextTitle.text = "Title cannot be empty"
+            return null
+        }
+        else {
+
+            if (containsEmoji(trimmedInput)) {
+                binding.errorTextTitle.visible()
+                binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                binding.errorTextTitle.text = "Emojis are not allowed"
+                return null
+            }
+            if (Character.isDigit(trimmedInput[0])) {
+                binding.errorTextTitle.visible()
+                binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                binding.errorTextTitle.text = "Cannot start with a number"
+                return null
+            }
+            if (trimmedInput.count { it.isLetter() } < 2) {
+                binding.errorTextTitle.visible()
+                binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                binding.errorTextTitle.text = "Should contain at least 2 alphabetical characters"
+                return null
+            }
+            if (hasSpacesinStartin(trimmedInput)) {
+                binding.errorTextTitle.visible()
+                binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                binding.errorTextTitle.text = "Spaces not allowed in starting"
+                return null
+            }
+            if (trimmedInput.length > 16) {
+                binding.errorTextTitle.visible()
+                binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                binding.errorTextTitle.text = "At maximum 16 characters allowed"
+                return null
+            }
+            val words = trimmedInput.split(" ")
+            if (words.size > 2) {
+                binding.errorTextTitle.visible()
+                binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                binding.errorTextTitle.text = "Only two words are allowed"
+                return null
+            }
+            val formattedString = words.joinToString("") {
+                it.toLowerCase().capitalize()
+            }
+
+            return formattedString
+        }
     }
 
 

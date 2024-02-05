@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
 import com.mifmif.common.regex.Main
+import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Domain.Models.Segment
 import com.ncs.o2.Domain.Models.ServerResult
@@ -19,6 +20,7 @@ import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -61,7 +63,7 @@ Tasks FUTURE ADDITION :
 */
 @AndroidEntryPoint
 class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFragment(),
-    SegmentListAdapter.OnClickCallback {
+    SegmentListAdapter.OnClickCallback,ArchiveSegmentBottomSheet.SegmentSelectionListener,ArchiveSegmentBottomSheet.sendSectionsListListner {
     @Inject lateinit var firestoreRepository:FirestoreRepository
     private var segments:List<Segment> = emptyList()
     lateinit var binding: SegmetSelectionBottomSheetBinding
@@ -73,8 +75,9 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
     lateinit var sectionList:MutableList<String>
     private val faker: Faker by lazy { Faker() }
     private lateinit var segmentName:String
-    @Inject
-    lateinit var utils: GlobalUtils.EasyElements
+    private val utils: GlobalUtils.EasyElements by lazy {
+        GlobalUtils.EasyElements(requireActivity())
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -100,6 +103,10 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
         setBottomSheetConfig()
         setActionbar()
 
+        if (PrefManager.getcurrentUserdetails().ROLE>=3){
+            binding.closeBtn.gone()
+            binding.archiveBtn.visible()
+        }
 
     }
 
@@ -119,6 +126,14 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                 toast("Segments creation is not allowed")
             }
         }
+
+        binding.archiveBtn.setOnClickThrottleBounceListener {
+            dismiss()
+            val archiveSegmentBottomSheet = ArchiveSegmentBottomSheet(type,this,this)
+            archiveSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
+        }
+
+
 
 
     }
@@ -171,6 +186,46 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
         sectionSelectionListener?.sendSectionsList(sectionList)
         dismiss()
     }
+
+    override fun onLongClick(segment: SegmentItem, position: Int) {
+        if (PrefManager.getcurrentUserdetails().ROLE>=3){
+            requireContext().performHapticFeedback()
+            utils.twoBtn(title = "Archive Segment",
+                msg = "Do you want to archive this segment ?", positiveBtnText = "Archive", negativeBtnText = "Cancel", positive = {
+                    val segments=PrefManager.getProjectSegments(PrefManager.getcurrentProject()).distinctBy { it.segment_ID }.toMutableList()
+                    Log.d("segmentsArchive",segments.toString())
+                    for (i in 0 until segments.size){
+                        if (segments[i].segment_ID==segment.segment_ID){
+                            segments[i].archived=true
+                            firestoreRepository.updateSegment(PrefManager.getcurrentProject(),segments[i]) { serverResult ->
+                                when (serverResult) {
+                                    is ServerResult.Success -> {
+                                        binding.recyclerViewSegments.gone()
+                                        binding.progressbar.visible()
+                                    }
+                                    is ServerResult.Failure -> {
+                                        val exception = serverResult.exception
+                                        binding.recyclerViewSegments.visible()
+                                        binding.progressbar.gone()
+                                    }
+                                    is ServerResult.Progress -> {
+                                        binding.recyclerViewSegments.gone()
+                                        binding.progressbar.visible()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    PrefManager.setLastSegmentsTimeStamp(PrefManager.getcurrentProject(), Timestamp.now())
+                    PrefManager.saveProjectSegments(PrefManager.getcurrentProject(),segments)
+                    Log.d("segmentsArchive",PrefManager.getProjectSegments(PrefManager.getcurrentProject()).distinctBy { it.segment_ID }.toString())
+                    toast("Segment Archived")
+                    dismiss()
+                }, negative = {})
+
+        }
+    }
+
     interface SegmentSelectionListener {
         fun onSegmentSelected(segmentName: String)
     }
@@ -196,7 +251,10 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                                                 segment_NAME = segment.segment_NAME,
                                                 sections = segment.sections,
                                                 segment_ID = segment.segment_ID,
-                                                creation_DATETIME = segment.creation_DATETIME
+                                                creation_DATETIME = segment.creation_DATETIME,
+                                                archived = segment.archived,
+                                                last_updated = segment.last_updated
+
                                             )
                                         }
                                     val list = PrefManager.getProjectSegments(projectName).toMutableList()
@@ -211,11 +269,11 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                                     if (segments.isNotEmpty()) {
                                         PrefManager.setLastSegmentsTimeStamp(
                                             projectName,
-                                            segments[0].creation_DATETIME!!
+                                            segments[0].last_updated!!
                                         )
 
                                         withContext(Dispatchers.Main) {
-                                            setRecyclerView(PrefManager.getProjectSegments(projectName).distinctBy { it.segment_ID })
+                                            setRecyclerView(PrefManager.getUnArchivedProjectSegments(projectName).distinctBy { it.segment_ID })
                                         }
                                     }
 
@@ -236,14 +294,14 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                 Log.d("segmentsFetchCheck","Fetching segments from cache")
 
                 setRecyclerView(
-                    PrefManager.getProjectSegments(projectName).distinctBy { it.segment_NAME })
+                    PrefManager.getUnArchivedProjectSegments(projectName).distinctBy { it.segment_NAME })
             }
             getNewSegments(projectName)
         }else{
             Log.d("segmentsFetchCheck","Fetching segments from cache")
 
             setRecyclerView(
-                PrefManager.getProjectSegments(projectName).distinctBy { it.segment_NAME })
+                PrefManager.getUnArchivedProjectSegments(projectName).distinctBy { it.segment_NAME })
         }
 
     }
@@ -266,27 +324,36 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
                                     segment_NAME = segment.segment_NAME,
                                     sections = segment.sections,
                                     segment_ID = segment.segment_ID,
-                                    creation_DATETIME = segment.creation_DATETIME
+                                    creation_DATETIME = segment.creation_DATETIME,
+                                    archived =segment.archived,
+                                    last_updated = segment.last_updated
                                 )
                             }
 
-                            val list = PrefManager.getProjectSegments(projectName).toMutableList()
+                            val list = PrefManager.getProjectSegments(projectName).distinctBy { it.segment_ID }.toMutableList()
                             Log.d("segmentsFetchCheck", "old segments : \n ${list.toString()}")
                             segments = segments.distinctBy { it.segment_ID }.sortedByDescending { it.creation_DATETIME }
                             Log.d("segmentsFetchCheck", "new segments : \n ${segments.toString()}")
-                            list.addAll(segments)
+
                             Log.d("segmentsFetchCheck", "after addition : \n ${list.toString()}")
+                            val filteredList = list.filter { listItem ->
+                                segments.none { it.segment_ID == listItem.segment_ID }
+                            }
+                            val combinedList = filteredList + segments
+                            list.clear()
+                            list.addAll(combinedList)
                             PrefManager.saveProjectSegments(projectName, list)
 
+                            Log.d("newwk", "after addition : \n ${list.toString()}")
 
                             if (segments.isNotEmpty()) {
                                 PrefManager.setLastSegmentsTimeStamp(
                                     projectName,
-                                    segments[0].creation_DATETIME!!
+                                    segments[0].last_updated!!
                                 )
 
                                 withContext(Dispatchers.Main) {
-                                    setRecyclerView(PrefManager.getProjectSegments(projectName).distinctBy { it.segment_ID })
+                                    setRecyclerView(PrefManager.getUnArchivedProjectSegments(projectName).distinctBy { it.segment_ID })
                                 }
                             }
 
@@ -302,6 +369,38 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
             }
         }
     }
+
+    fun updateList(list1: List<SegmentItem>, list2: List<SegmentItem>): List<SegmentItem> {
+        val updatedList = mutableListOf<SegmentItem>()
+        val updatedIdsSet = mutableSetOf<String>()
+        val mapList1 = list1.associateBy { it.segment_ID }
+        for (item2 in list2) {
+            val id = item2.segment_ID
+            if (mapList1.containsKey(id)) {
+                val item1 = mapList1[id]!!
+                val updatedItem = item1.copy(
+                    segment_NAME = item2.segment_NAME,
+                    sections = item2.sections,
+                    segment_ID = item2.segment_ID,
+                    creation_DATETIME = item2.creation_DATETIME,
+                    last_updated = item2.last_updated,
+                    archived = item2.archived
+                )
+                updatedList.add(updatedItem)
+                updatedIdsSet.add(id)
+            } else {
+                updatedList.add(item2)
+            }
+        }
+        for (item1 in list1) {
+            if (!updatedIdsSet.contains(item1.segment_ID)) {
+                updatedList.add(item1)
+            }
+        }
+
+        return updatedList
+    }
+
     private fun sendsectionList(projectName: String) {
 //        firestoreRepository.getSegments(projectName) { serverResult ->
 //            when (serverResult) {
@@ -343,6 +442,13 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
 
     }
 
+    override fun onSegmentSelected(segmentName: String) {
+        segmentSelectionListener?.onSegmentSelected(segmentName)
+    }
+
+    override fun sendSectionsList(list: MutableList<String>) {
+        sectionSelectionListener?.sendSectionsList(list)
+    }
 
 
 }

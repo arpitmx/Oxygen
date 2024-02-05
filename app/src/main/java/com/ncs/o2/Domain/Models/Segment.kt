@@ -30,5 +30,7 @@ data class Segment (
     val segment_CREATOR_ID : String="",
     val project_ID: String="",
     var creation_DATETIME : Timestamp?=null,
-    var sections: MutableList<String> = mutableListOf()
+    var sections: MutableList<String> = mutableListOf(),
+    var last_updated:Timestamp?= Timestamp.now(),
+    var archived:Boolean=false
         )

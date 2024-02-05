@@ -87,6 +87,21 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
 
+                <TextView
+                    android:id="@+id/errorTextTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/sf_pro_display_regular"
+                    android:text="Error"
+                    android:textColor="@color/redx"
+                    android:textSize="12dp"
+                    android:layout_marginStart="85dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/project_title" />
+
                 <EditText
                     android:id="@+id/project_alias"
                     android:layout_width="match_parent"

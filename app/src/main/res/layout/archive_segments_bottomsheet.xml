@@ -3,6 +3,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:minHeight="200dp"
     android:background="@color/secondary_bg_black"
     >
 
@@ -31,6 +32,8 @@
             android:src="@drawable/baseline_keyboard_arrow_down_24"
             app:tint="@color/dim_primary" />
 
+
+
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -38,19 +41,20 @@
             android:fontFamily="@font/sf_pro_display_semibold"
             android:gravity="center"
             android:layout_gravity="center"
-            android:text="Filter Notifications"
+            android:text="Archived Segments"
             android:textColor="@color/better_white"
             android:textSize="18dp" />
 
 
+
         <ImageButton
-            android:id="@+id/add_project"
+            android:id="@+id/create_segment_btn"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
             android:visibility="invisible"
+            android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/outline_add_24"
             app:tint="@color/dim_primary" />
@@ -62,19 +66,35 @@
         android:layout_height="2dp"
         android:background="@color/card_bg"
         />
+
+
     <ProgressBar
+        android:id="@+id/progressbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:visibility="gone"
-        android:id="@+id/progress_bar"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="40dp"
-        android:indeterminateTint="@color/primary"/>
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:layout_marginTop="50dp"
+        android:indeterminateTint="@color/primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewSegments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/filters_rv"/>
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="false"
+        android:visibility="gone"
+        android:layoutAnimation="@anim/layout_animation_fadein"
+        android:animationCache="true"
+        />
+
+
 
 
 </LinearLayout>

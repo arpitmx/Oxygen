@@ -41,7 +41,6 @@ import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Teams.TeamsActivity
-import com.ncs.o2.UI.UIComponents.BottomSheets.FilterNotificationsBottomSheet
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +51,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick,NetworkChangeReceiver.NetworkChangeCallback,FilterNotificationsBottomSheet.GetFiltersCallback {
+class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick,NetworkChangeReceiver.NetworkChangeCallback {
 
     private val binding: ActivityNotificationsBinding by lazy {
         ActivityNotificationsBinding.inflate(layoutInflater)
@@ -63,7 +62,6 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
 
     private lateinit var shakeDetector: ShakeDetector
     val list:MutableList<Notification> = mutableListOf()
-    val selectedFilter:MutableList<FilterNotificationsBottomSheet.FilterNotifications> = mutableListOf()
 
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     private val viewModel: NotificationsViewModel by viewModels()
@@ -273,42 +271,11 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         backBtn = findViewById(R.id.btnBack_notification)
 
         setUpNotificationRV()
-        val filters= listOf(
-            FilterNotificationsBottomSheet.FilterNotifications(
-                index = 0,
-                "All Updates",
-                true
-            ),
-            FilterNotificationsBottomSheet.FilterNotifications(
-                index = 1,
-                "Mention Updates",
-                false
-            ),
-            FilterNotificationsBottomSheet.FilterNotifications(
-                index = 2,
-                "Workspace Updates",
-                false
-            ),
-            FilterNotificationsBottomSheet.FilterNotifications(
-                index = 3,
-                "Assign Updates",
-                false
-            ),
-            FilterNotificationsBottomSheet.FilterNotifications(
-                index = 4,
-                "Checklist Updates",
-                false
-            ),
-        )
+
         backBtn.setOnClickThrottleBounceListener {
             startActivity(Intent(this@NotificationsActivity,MainActivity::class.java))
             overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
             finish()
-        }
-
-        binding.includeActionBarNotificatoin.btnFilters.setOnClickThrottleBounceListener {
-            val filterNotificationsBottomSheet=FilterNotificationsBottomSheet(this,filters.toMutableList(), selectedFilter)
-            filterNotificationsBottomSheet.show(supportFragmentManager,"Filter Notificatons")
         }
 
         binding.all.setOnClickThrottleBounceListener {
@@ -599,41 +566,5 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         startActivity(intent)
     }
 
-    override fun sendFilter(
-        filter: FilterNotificationsBottomSheet.FilterNotifications,
-        isChecked: Boolean,
-        position: Int
-    ) {
-        if (isChecked){
-            selectedFilter.add(filter)
-            toast("${filter.title}")
-            when(filter.index){
-                0->{
-                    list.clear()
-                    setUpNotificationRV()
-                }
-                1->{
-                    val newList=list.filter { it.notificationType==NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.name || it.notificationType==NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name}
-                    setUpRV(newList.toMutableList())
-                }
-                2->{
-                    val newList=list.filter { it.notificationType==NotificationType.WORKSPACE_TASK_UPDATE.name}
-                    setUpRV(newList.toMutableList())
-                }
-                3->{
-                    val newList=list.filter { it.notificationType==NotificationType.TASK_ASSIGNED_NOTIFICATION.name}
-                    setUpRV(newList.toMutableList())
-                }
-                4->{
-                    val newList=list.filter { it.notificationType==NotificationType.TASK_CHECKLIST_UPDATE.name  }
-                    setUpRV(newList.toMutableList())
-                }
 
-            }
-
-        }
-        else{
-            selectedFilter.remove(filter)
-        }
-    }
 }
