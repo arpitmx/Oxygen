@@ -44,6 +44,10 @@ class SegmentListAdapter constructor(
         holder.binding.root.setOnClickThrottleBounceListener {
             onClickCallback.onClick(segment, position)
         }
+        holder.binding.root.setOnLongClickListener {
+            onClickCallback.onLongClick(segment,position)
+            true
+        }
     }
 
     override fun getItemCount(): Int {
@@ -55,5 +59,6 @@ class SegmentListAdapter constructor(
 
     interface OnClickCallback {
         fun onClick(segment: SegmentItem, position: Int)
+        fun onLongClick(segment: SegmentItem,position: Int)
     }
 }

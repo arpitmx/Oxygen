@@ -72,6 +72,7 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/scroll"
             android:scrollbars="none">
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -166,6 +167,7 @@
                     android:drawablePadding="@dimen/_5dp"
                     android:drawableTint="@color/better_white"
                     android:paddingStart="20dp"
+                    android:layout_marginEnd="15dp"
                     android:paddingEnd="20dp"
                     android:text="Created by"
                     android:textAllCaps="false"

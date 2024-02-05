@@ -44,6 +44,7 @@ import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Models.UserInfo
 import com.ncs.o2.Domain.Models.WorkspaceTaskItem
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
@@ -1024,12 +1025,45 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+    fun updateSegment(
+        projectName: String, segment: SegmentItem, result: (ServerResult<Boolean>) -> Unit
+    ) {
+        firestore.collection(Endpoints.PROJECTS).document(projectName)
+            .collection(Endpoints.Project.SEGMENT)
+            .whereEqualTo("segment_ID", segment.segment_ID)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
+
+                if (querySnapshot.documents.isNotEmpty()) {
+                    val documentSnapshot = querySnapshot.documents[0]
+                    val segmentRef = documentSnapshot.reference
+                    segmentRef.update(
+                        "archived", segment.archived,
+                        "last_updated", Timestamp.now(),
+                    )
+                        .addOnSuccessListener {
+                            result(ServerResult.Success(true))
+                        }
+                        .addOnFailureListener { exception ->
+                            result(ServerResult.Failure(exception))
+                        }
+                } else {
+                    result(ServerResult.Failure(Exception("Segment not found")))
+                }
+            }
+            .addOnFailureListener { exception ->
+                result(ServerResult.Failure(exception))
+            }
+    }
+
+
     fun getNewSegments(
         projectName: String, result: (ServerResult<List<Segment>>) -> Unit
     ) {
         firestore.collection(Endpoints.PROJECTS).document(projectName)
             .collection(Endpoints.Project.SEGMENT)
-            .whereGreaterThan("creation_DATETIME",PrefManager.getLastSegmentsTimeStamp(projectName))
+            .whereGreaterThan("last_updated",PrefManager.getLastSegmentsTimeStamp(projectName))
             .get(Source.SERVER)
             .addOnSuccessListener { querySnapshot ->
                 ServerLogger().addRead(querySnapshot.size())
@@ -1444,6 +1478,55 @@ class FirestoreRepository @Inject constructor(
             }
     }
 
+
+    override fun getUserInfobyUserName(userName: String, serverResult: (ServerResult<User?>) -> Unit) {
+
+        firestore.collection(Endpoints.USERS)
+            .whereEqualTo("USERNAME", userName)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                ServerLogger().addRead(querySnapshot.size())
+                if (!querySnapshot.isEmpty) {
+
+                    val document = querySnapshot.documents[0]
+                    val firebaseID = document.getString(Endpoints.User.EMAIL) ?: "mohit@mail"
+                    val profileDPUrl = document.getString(Endpoints.User.DP_URL) ?: ""
+                    val name = document.getString(Endpoints.User.USERNAME) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
+                    val fullName = document.getString(Endpoints.User.FULLNAME)
+
+                    var time:Timestamp=Timestamp.now()
+                    if ( document.get(Endpoints.User.TIMESTAMP).isNull){
+                        time=Timestamp.now()
+                    }
+                    else{
+                        time=document.get(Endpoints.User.TIMESTAMP) as Timestamp
+                    }
+                    val role : Int = document.get(Endpoints.User.ROLE)?.toString()?.toInt() ?: 1
+                    val designation = document.getString(Endpoints.User.DESIGNATION) ?: Errors.AccountErrors.ACCOUNT_FIELDS_NULL.code
+                    val fcmToken  = document.getString(Endpoints.User.FCM_TOKEN)
+
+
+
+                    val user = User(
+                        firebaseID = firebaseID,
+                        profileDPUrl = profileDPUrl,
+                        username = name,
+                        timestamp = time,
+                        designation = designation,
+                        role = role,
+                        fcmToken = fcmToken,
+                        fullName = fullName
+                    )
+
+                    serverResult(ServerResult.Success(user))
+                } else {
+                    serverResult(ServerResult.Failure(Exception("Document not found for title: $userName")))
+                }
+            }
+            .addOnFailureListener { exception ->
+                serverResult(ServerResult.Failure(exception))
+            }
+    }
 
 
 

@@ -34,6 +34,7 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -117,6 +118,8 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
 //            }
 //        }
         val tagID = arguments?.getString("tagID")
+        val userName = arguments?.getString("userName")
+
         if (tagID != null) {
             CoroutineScope(Dispatchers.Main).launch {
                 val list = db.tagsDao().getAllTag()
@@ -133,7 +136,71 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
                 }
             }
         }
+        if (userName != null) {
+            fetchAssigneeDetails(userName){
+                selectedAssignee2.add(it)
+                selectedAssignee2[0].isChecked=true
+                binding.created.text=userName
+                setSelectedButtonColor(binding.created)
+                binding.clear.visible()
+                searchQuery("")
+                binding.scroll.post {
+                    binding.scroll.fullScroll(View.FOCUS_RIGHT)
+                }
+            }
+
+        }
         return binding.root
+    }
+
+    private fun fetchAssigneeDetails(assigneeId: String, onUserFetched: (User) -> Unit) {
+        if (assigneeId!="None" && assigneeId!="") {
+            firestoreRepository.getUserInfobyUserName(assigneeId) { result ->
+                when (result) {
+                    is ServerResult.Success -> {
+                        val user = result.data
+                        if (user != null) {
+                            onUserFetched(user)
+                        }
+                        binding.searchPlaceholder.gone()
+                        binding.recyclerView.visible()
+                        binding.placeholder.gone()
+                        binding.progressBar.gone()
+                    }
+
+                    is ServerResult.Failure -> {
+                        binding.searchPlaceholder.gone()
+                        binding.recyclerView.gone()
+                        binding.placeholder.visible()
+                        binding.progressBar.gone()
+
+                    }
+
+                    is ServerResult.Progress -> {
+                        binding.searchPlaceholder.gone()
+                        binding.recyclerView.gone()
+                        binding.placeholder.gone()
+                        binding.progressBar.visible()
+
+                    }
+
+                    else -> {}
+                }
+            }
+        }else{
+            onUserFetched(User(
+                firebaseID = null,
+                profileDPUrl = null,
+                profileIDUrl = null,
+                post = null,
+                username = null,
+                role = null,
+                timestamp = null,
+                designation = null,
+                fcmToken = null,
+                isChecked = false
+            ))
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

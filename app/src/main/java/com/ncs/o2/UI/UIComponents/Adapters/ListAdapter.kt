@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.HelperClasses.PrefManager
@@ -20,7 +21,7 @@ import com.ncs.versa.Constants.Endpoints
 
 /*
 File : ListAdapter.kt -> com.ncs.o2
-Description : Adapter for list  
+Description : Adapter for list
 
 Author : Alok Ranjan (VC uname : apple)
 Link : https://github.com/arpitmx
@@ -29,10 +30,10 @@ From : Bitpolarity x Noshbae (@Project : O2 Android)
 Creation : 3:03 am on 31/05/23
 
 Todo >
-Tasks CLEAN CODE : 
-Tasks BUG FIXES : 
-Tasks FEATURE MUST HAVE : 
-Tasks FUTURE ADDITION : 
+Tasks CLEAN CODE :
+Tasks BUG FIXES :
+Tasks FEATURE MUST HAVE :
+Tasks FUTURE ADDITION :
 
 
 */
@@ -41,109 +42,82 @@ interface ProjectCallback{
     fun onClick(projectID : String,position: Int)
 }
 
+class RecyclerViewAdapter(private val context: Context, private val sList: List<String>) :
+    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
- class ListAdapter(private val context: Context, val sList : List<String>) : BaseAdapter() {
-    private  val mInflator: LayoutInflater
-    private val callback : ProjectCallback by lazy {
+    private val callback: ProjectCallback by lazy {
         context as MainActivity
     }
 
-     private var selectedPosition = -1
+    private var selectedPosition = -1
 
-
-     init {
-        this.mInflator = LayoutInflater.from(context)
-         selectedPosition=PrefManager.getcurrentRadioButton()
+    init {
+        selectedPosition = PrefManager.getcurrentRadioButton()
     }
 
-    override fun getCount(): Int {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(context).inflate(R.layout.project_list_item, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun getItemCount(): Int {
         return sList.size
     }
 
-    override fun getItem(position: Int): Any {
-        return sList[position]
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bindData(sList[position],position)
     }
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val label = itemView.findViewById<TextView>(R.id.project_title)
+        private val radioButton = itemView.findViewById<RadioButton>(R.id.radioButton)
+        private val layout = itemView.findViewById<LinearLayout>(R.id.layout)
+        private val icon = itemView.findViewById<ImageView>(R.id.project_dp)
 
-     // Inside your ListAdapter
-     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-         val view: View?
-         val vh: ListRowHolder
-         if (convertView == null) {
-             view = mInflator.inflate(R.layout.project_list_item, parent, false)
-             vh = ListRowHolder(view)
-             view.tag = vh
-         } else {
-             view = convertView
-             vh = view.tag as ListRowHolder
-         }
+        fun bindData(item: String,position: Int) {
+            label.text = item
 
-         vh.label.text = sList[position]
+            if (PrefManager.getProjectIconUrl(item) == "") {
+                FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(item).get()
+                    .addOnSuccessListener { documentSnapshot ->
+                        if (documentSnapshot.exists()) {
+                            val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
 
-         if (PrefManager.getProjectIconUrl(sList[position])==""){
-             FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS).document(sList[position]).get()
-                 .addOnSuccessListener { documentSnapshot ->
-                     if (documentSnapshot.exists()) {
-                         val imageUrl = documentSnapshot.data?.get("ICON_URL")?.toString()
+                            if (imageUrl != null && (context as? Activity)?.isDestroyed != true) {
+                                PrefManager.setProjectIconUrl(item, imageUrl)
+                                Glide.with(context)
+                                    .load(imageUrl)
+                                    .error(R.drawable.placeholder_image)
+                                    .into(icon)
+                            }
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d("failCheck", exception.toString())
+                    }
+            } else {
+                Glide.with(context)
+                    .load(PrefManager.getProjectIconUrl(item))
+                    .error(R.drawable.placeholder_image)
+                    .into(icon)
+            }
 
-                         if (imageUrl != null && (context as? Activity)?.isDestroyed != true) {
-                             PrefManager.setProjectIconUrl(sList[position], imageUrl)
-                             Glide.with(context)
-                                 .load(imageUrl)
-                                 .error(R.drawable.placeholder_image)
-                                 .into(vh.icon)
-                         }
-                     }
-                 }
-                 .addOnFailureListener { exception ->
-                     Log.d("failCheck", exception.toString())
-                 }
-         }
-         else{
-             Glide.with(context)
-                 .load(PrefManager.getProjectIconUrl(sList[position]))
-                 .error(R.drawable.placeholder_image)
-                 .into(vh.icon)
-         }
-
-
-
-         vh.radioButton.isChecked = position == selectedPosition
-         vh.layout.setOnClickListener {
-             selectedPosition = position
-             notifyDataSetChanged()
-             callback.onClick(sList[position], position)
-         }
-         vh.radioButton.setOnClickListener {
-             selectedPosition = position
-             notifyDataSetChanged()
-             callback.onClick(sList[position], position)
-         }
-
-         vh.label.setOnClickListener {
-             selectedPosition = position
-             notifyDataSetChanged()
-             callback.onClick(sList[position], position)
-         }
-
-         return view
-     }
-
- }
-
-private class ListRowHolder(row: View?) {
-     var label: TextView
-     var radioButton:RadioButton
-     var layout:LinearLayout
-     var icon: ImageView
-
-    init {
-        this.label = row?.findViewById(R.id.project_title) as TextView
-        this.radioButton= row.findViewById(R.id.radioButton) as RadioButton
-        this.layout=row.findViewById(R.id.layout) as LinearLayout
-        this.icon= row.findViewById(R.id.project_dp) as ImageView
+            radioButton.isChecked = position == selectedPosition
+            layout.setOnClickListener {
+                selectedPosition = position
+                notifyDataSetChanged()
+                callback.onClick(item, position)
+            }
+            radioButton.setOnClickListener {
+                selectedPosition = position
+                notifyDataSetChanged()
+                callback.onClick(item, position)
+            }
+            label.setOnClickListener {
+                selectedPosition = position
+                notifyDataSetChanged()
+                callback.onClick(item, position)
+            }
+        }
     }
 }
