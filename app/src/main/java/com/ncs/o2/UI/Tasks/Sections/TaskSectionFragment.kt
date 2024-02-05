@@ -350,9 +350,11 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
             when (result) {
                 is DBResult.Success -> {
 
+                    val filteredList = filterTasks(result.data)
+
                     showLoader(1)
 
-                    val task = result.data
+                    val task = filteredList
                     Log.d("fetch", task.toString())
 
                     tasks.clear()
@@ -361,12 +363,12 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                         tasks.add(element)
                     }
 
-                    if (result.data.isEmpty()) {
+                    if (filteredList.isEmpty()) {
                         showLoader(-1)
                     } else {
 
                         recyclerView = binding.recyclerView
-                        val taskItems: List<TaskItem> = result.data.map { task ->
+                        val taskItems: List<TaskItem> = filteredList.map { task ->
                             TaskItem(
                                 title = task.title!!,
                                 id = task.id,
@@ -466,4 +468,17 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         activityBinding.binding.bottomNav.menu.getItem(0).isChecked = true
         activityBinding.binding.bottomNav.menu.getItem(0).setIcon(R.drawable.baseline_article_24)
     }
+    fun filterTasks(data: List<Task>): List<Task> {
+        var list = mutableListOf<Task>()
+        list.addAll(data)
+        val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+        list = list.filter { task ->
+            val segmentName = task.segment
+            val segment = segments.find { it.segment_NAME == segmentName }
+            segment?.archived != true
+        }.toMutableList()
+        val sortedList = list.sortedByDescending { it.last_updated }
+        return sortedList
+    }
+
 }

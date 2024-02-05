@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.DBResult
 import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Models.UserNote
@@ -22,6 +24,7 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
@@ -93,10 +96,37 @@ class TodayFragment : Fragment(),TodayTasksAdpater.OnClickListener,TodayTasksAdp
             todays.clear()
             todays=PrefManager.getProjectTodayTasks(PrefManager.getcurrentProject()).toMutableList()
             setUpOnSuccessRV(todays)
+
+//            for (today in todays) {
+//                fetchTasksForID(today.taskID)
+//            }
+//            runDelayed(500) {
+//                PrefManager.saveProjectTodayTasks(PrefManager.getcurrentProject(),todays)
+//                setUpOnSuccessRV(todays)
+//            }
+        }
+    }
+    private fun fetchTasksForID(
+        taskID: String,
+    ) {
+        viewModel.getTasksForID(PrefManager.getcurrentProject(), taskID) { result ->
+            when (result) {
+                is DBResult.Success -> {
+                    filterTasks(result.data)
+                }
+
+                is DBResult.Failure -> {
+                }
+
+                is DBResult.Progress -> {
+                }
+            }
         }
     }
 
+
     private fun setUpOnSuccessRV(list: MutableList<TodayTasks>){
+
         Log.d("Todays",list.toString())
         if (list.isEmpty()){
             binding.layout.gone()
@@ -289,4 +319,16 @@ class TodayFragment : Fragment(),TodayTasksAdpater.OnClickListener,TodayTasksAdp
 
     }
 
+    fun filterTasks(data: Task) {
+
+        val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+        for (i in 0 until todays.size) {
+            val task = todays[i]
+            if (segments.any { it.segment_NAME == data.segment && it.archived } && task.taskID == data.id) {
+                todays.removeAt(i)
+            }
+        }
+
+
+    }
 }

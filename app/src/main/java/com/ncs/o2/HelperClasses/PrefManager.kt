@@ -555,6 +555,13 @@ object PrefManager {
         val allSegments = getProjectSegments(projectName)
         return allSegments.filter { it.archived }
     }
+
+    fun isSegmentArchived(projectName: String, segmentName: String): Boolean {
+        val segments = getProjectSegments(projectName)
+        val segment = segments.find { it.segment_NAME == segmentName }
+        return segment?.archived == true
+    }
+
     fun setTaskTimestamp(projectId: String, taskId: String, timestamp: Timestamp) {
         val id = "$projectId$taskId"
         projectIdTaskIdMap[id] = timestamp
