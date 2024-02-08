@@ -71,6 +71,7 @@ Task detail page provides comprehensive details about any task, including issue 
 4. Moderator List
 5. Resource Links (Files, Images, Video)
 
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/2edb6f3f-02bc-4823-a711-2b3352eaffd7" width="200" />
@@ -78,6 +79,7 @@ Task detail page provides comprehensive details about any task, including issue 
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6a5266d7-52fc-4b84-be56-6e2aa60b1136" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6c4e6ed1-00b4-401b-a256-a13f0687d7f0" width="200" />
 </p>
+
 
 
 ---
@@ -90,6 +92,8 @@ Keep your workspace tidy and organized with our clean and segregated interface. 
 - Enhance productivity by providing a clutter-free environment.
 - Segregate tasks with filters for better focus and organization.
 - Streamline workflow by reducing distractions, focus on schedules.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b2182d0f-218a-45a0-a873-5f7ee64ed3ee" width="200" />
@@ -107,6 +111,8 @@ Effortlessly share project updates and communicate with team members through ded
 - Foster transparent communication by sharing updates in dedicated channels.
 - Facilitate collaboration and idea sharing among team members.
 - Ensure important information reaches relevant stakeholders instantly.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b0b3557c-7e48-4578-b4b3-9ac77c56a9ae" width="200" />
@@ -126,6 +132,8 @@ Efficiently plan your day by scheduling tasks for today. Keep track of all the t
 - Stay focused and productive with a clear list of tasks to complete.
 - Easily adjust and update your schedule as priorities change throughout the day.
 
+<br>
+
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5f5d95e3-6292-47c3-9299-be0cc6ad104e" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5e3d6cd8-b4c4-4170-89e1-c1057be61e73" width="200" />
@@ -143,6 +151,8 @@ Harness the power of O2Mate AI to automate the creation of tasks swiftly. Stream
 - Save time and effort by automating the creation of tasks.
 - Improve productivity by eliminating manual task creation processes.
 - Leverage AI-driven insights to optimize task creation and allocation.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/688b44a4-72e3-49f3-8f6b-3e5df89c6465" width="200" />
@@ -162,6 +172,8 @@ Task detail page provides comprehensive details about any task, issues which inc
  4. Moderator list
  5. Resource links -> Files, Images, Video support
 
+<br>
+
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" height="auto" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200"height="auto"/>
@@ -180,17 +192,17 @@ Task detail page provides comprehensive details about any task, issues which inc
  4. Moderator list
  5. Resource links -> Files, Images, Video support
 
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d37dcf7f-4ea5-47fa-b8f8-235e38b15ef8" width="600"/>
+<br>
 
 
 <p float="left">
+   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d37dcf7f-4ea5-47fa-b8f8-235e38b15ef8" width="600"/>
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6b5b22d4-8d4e-4f84-8834-8f51b32173ee" width="200" />
 </p>
 
-
 ---
 
-### 7. Flexible Task Chat system ✦  
+### 8. Flexible Task Chat system ✦  
 
 Utilize our flexible real-time chat system within tasks, enabling seamless communication among team members. Share links, files, and code snippets with support for syntax highlighting.
 
@@ -198,6 +210,8 @@ Utilize our flexible real-time chat system within tasks, enabling seamless commu
 - Enhance collaboration by discussing tasks in real-time within the platform.
 - Share relevant links and files directly within task discussions for easy reference.
 - Collaborate on code snippets with syntax highlighting for improved readability and comprehension.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/8309b23e-2ce5-47a6-9895-efec3373cfb6" width="200" />
@@ -208,7 +222,7 @@ Utilize our flexible real-time chat system within tasks, enabling seamless commu
 
 ---
 
-### 8. Add checks with Checklists ✦  
+### 9. Add checks with Checklists ✦  
 
 Enhance task management by adding checklists to tasks. Break down tasks into actionable steps and track progress more effectively.
 
@@ -216,6 +230,8 @@ Enhance task management by adding checklists to tasks. Break down tasks into act
 - Improve task clarity by breaking them down into smaller, manageable steps.
 - Ensure thoroughness and completeness by checking off items as they are completed.
 - Increase accountability and transparency within the team by monitoring checklist progress.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5114eb11-2351-4bd5-8009-aedb1dd675c9" width="200" />
@@ -227,7 +243,7 @@ Enhance task management by adding checklists to tasks. Break down tasks into act
 ---
 
 
-### 9. Convinient Kanban board ✦  
+### 10. Convinient Kanban board ✦  
 
 Experience the convenience of our Kanban board for visualizing and managing your project workflow. Easily track tasks as they progress through different stages.
 
@@ -235,6 +251,8 @@ Experience the convenience of our Kanban board for visualizing and managing your
 - Streamline project management with a visually intuitive Kanban board interface.
 - Easy task management and reordering.
 - Customize columns and labels to match your team's workflow for maximum convenience.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6f33fa42-4aa2-4974-b968-488d650d6c5f" width="200" />
@@ -246,7 +264,7 @@ Experience the convenience of our Kanban board for visualizing and managing your
 
 ---
 
-### 10. Notification tab keep you updated ✦ 
+### 11. Notification tab keep you updated ✦ 
 
 Stay updated with our notification tab, which keeps you informed of real-time updates, including task assignments, comments, and mentions.
 
@@ -254,6 +272,8 @@ Stay updated with our notification tab, which keeps you informed of real-time up
 - Stay informed of important activities and changes within your projects.
 - Receive notifications for task assignments, comments, and mentions to stay engaged.
 - Customize notification settings to control the type and frequency of updates you receive.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/707665ec-63b7-4357-81b1-63091e04d9aa" width="200" />
@@ -264,7 +284,7 @@ Stay updated with our notification tab, which keeps you informed of real-time up
 
 ---
 
-### 11. Push Notifications ✦  
+### 12. Push Notifications ✦  
 
 Receive push notifications directly to your devices for instant updates on important events and activities within your projects.
 
@@ -273,6 +293,8 @@ Receive push notifications directly to your devices for instant updates on impor
 - Receive instant alerts for task assignments, comments, and mentions.
 - Enable/disable push notifications based on your preferences for optimal productivity.
 
+<br>
+
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/14e4c8fb-8efe-490c-8b70-aad989a9ee73" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b6f4a060-d480-407c-a02d-4fbf869fe57a" width="200" />
@@ -280,7 +302,7 @@ Receive push notifications directly to your devices for instant updates on impor
 
 ---
 
-### 12. Flexible Search System ✦ 
+### 13. Flexible Search System ✦ 
 
 Utilize our flexible search system to find tasks with atomic-level precision. Filter your search queries to narrow down results and locate specific tasks efficiently.
 
@@ -288,6 +310,8 @@ Utilize our flexible search system to find tasks with atomic-level precision. Fi
 - Conduct granular searches to find tasks based on various criteria such as title, description, assignee, due date, and more.
 - Utilize advanced filtering options to refine search results and pinpoint specific tasks.
 - Enhance productivity by quickly locating relevant tasks without sifting through irrelevant information.
+
+<br>
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/693cd8b2-724e-4b95-9aae-63becf47b77d" width="200" />
@@ -298,7 +322,7 @@ Utilize our flexible search system to find tasks with atomic-level precision. Fi
 
 ---
 
-### 13. Team ✦ 
+### 14. Team ✦ 
 
 **Description:**  
 Easily access and view details of team members within the app. Get insights into their roles, responsibilities, contact information, and more.
@@ -308,6 +332,8 @@ Easily access and view details of team members within the app. Get insights into
 - View contact details such as email addresses or phone numbers for seamless communication.
 - Stay informed about team dynamics and roles to facilitate collaboration and coordination.
 
+<br>
+
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fa21fa25-d498-4cf3-9943-146a3bc652c3" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d8263d3f-456a-42d6-b7bd-513c00a3a636" width="200" />
@@ -316,7 +342,7 @@ Easily access and view details of team members within the app. Get insights into
 
 ---
 
-### 14. Offline Mode ✦ 
+### 15. Offline Mode ✦ 
 
 Stay productive even without an internet connection with our offline mode feature. Access and work on your tasks seamlessly, even when offline.
 
@@ -325,6 +351,8 @@ Stay productive even without an internet connection with our offline mode featur
 - Access cached data and synchronize changes once you're back online.
 - Ensure productivity and efficiency, even in remote or low-connectivity environments.
 
+<br>
+
 <p float="left">
    <img src="https://github.com/arpitmx/Oxygen/assets/59350776/80a0fd56-ace7-419a-b911-4b44ac2d9f08" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fc222562-66c9-46f2-befa-a202ca619c12" width="200" />
@@ -332,7 +360,7 @@ Stay productive even without an internet connection with our offline mode featur
 
 ---
 
-### 15. Shake to Report ✦ 
+### 16. Shake to Report ✦ 
 
 Report bugs quickly and conveniently by shaking your device. Provide instant feedback to our development team for swift resolution of issues.
 
@@ -340,7 +368,9 @@ Report bugs quickly and conveniently by shaking your device. Provide instant fee
 - Streamline the bug reporting process with a simple gesture.
 - Encourage user participation in improving app stability and performance.
 - Expedite bug fixes by providing timely and actionable feedback.
-- 
+
+<br>
+
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1261bea1-c176-4cb8-bc4b-4ea33e0e8325" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/f4cd0cb3-06f2-43a2-b15e-719bc0c0f282" width="200" />
@@ -349,12 +379,15 @@ Report bugs quickly and conveniently by shaking your device. Provide instant fee
 
 ---
 
-### 16. Custom Crash Reporting System ✦ 
+### 17. Custom Crash Reporting System ✦ 
 
 Oxygen has its own custom made crash reporting system called `Crashman` which listens for unhandled exception and crashes, wraps them into an Oxygen issue and opens a thread under Issues for faster bug recovery by the Oxygen Team.
 
+<br>
+
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/82c68123-03aa-4567-bb93-b5d353bb34e0" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200"height="auto"/>
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/24ff257d-b03a-47aa-a3b9-7ce30b00e0f0" width="200" />
 </p>
 
