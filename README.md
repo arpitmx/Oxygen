@@ -9,7 +9,7 @@
 
 NCS Oxygen (O2) is a project management Android app designed to streamline and optimize task and project management using modern project management techniques. With support for methodologies like sprints, kanban maps, and more, Oxygen empowers teams to efficiently plan, organize, and track their projects.
 
-<p float="left">
+<p float="left" height="auto">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5de16190-256d-466a-ac96-fcbf06486e32" width="250" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/90caaf73-42fd-4395-9ae3-0639dbcbb821" width="250" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/635bfbbb-6a90-4c96-947c-d4a675eed491" width="250" />
@@ -136,7 +136,7 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 ---
 
-### Create, automate tasks, checklist creation with O2Mate AI : 
+### Swiftly automate tasks creation with O2Mate AI : 
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/688b44a4-72e3-49f3-8f6b-3e5df89c6465" width="200" />
@@ -172,6 +172,27 @@ Task detail page provides comprehensive details about any task, issues which inc
  5. Resource links -> Files, Images, Video support
 
 ---
+
+
+### 2. Add checks with Checklists ✦  
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5114eb11-2351-4bd5-8009-aedb1dd675c9" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d8315154-dc26-4a67-accc-fb820db87ddb" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/7f4ef800-d5cc-48df-b310-4ead34978bd3" width="200" />
+</p>
+
+
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
 
 ### Convinient Kanban board : 
 
