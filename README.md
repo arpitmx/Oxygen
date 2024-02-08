@@ -18,8 +18,16 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 ---
 <br>
 
-### Table of Contents
+# Table of Contents
 * [Technologies](#technologies)
+* [Sections](#sections)
+   * [Project Page](#project)
+   * [Workspace](#work)
+   * [Channels](#channel)
+   * [Today](#today)
+   * [O2 Ai](#o2mate)
+   * [Tasks](#tasks)
+   * [Code Viewer](#code)
 * [Setup](#Installation)
 * [Module/Package structure](#module_structure)
 * [Testing](#testing)
@@ -31,7 +39,7 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 * [License](#license)
 
 
-## Technologies <a name="technologies"></a>
+# Technologies <a name="technologies"></a>
 * Android SDK
 * Kotlin Coroutine for Asynchronous tasks
 * AndroidX Jetpack for navigation
@@ -47,7 +55,7 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 
 
 
-## Key Features
+# Key Features
 
 <img width="400" alt="Frame 1000002619" src="https://github.com/arpitmx/Oxygen/assets/59350776/85e48c6b-56ee-4426-ae8c-22f07886fcaa">
 <br><br>
@@ -58,9 +66,9 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 - **Collaborative workspace** : Foster collaboration within teams by providing a shared platform for communication, file sharing, and discussions.
 - **Reporting and analytics** : Generate insightful reports and analyze project performance to make data-driven decisions.
 
-# Sections 
+# Sections <a name="sections"></a> 
 
-### 1. Project Overview ✦ 
+### 1. Project Overview ✦ <a name="project"></a> 
 
 Task detail page provides comprehensive details about any task, including issue type, priority, duration, difficulty, status, position in kanban, fix in build version, story points, issue title, extensive issue summary with Markdown support, moderator list, and resource links for files, images, and video support.
 
@@ -81,10 +89,9 @@ Task detail page provides comprehensive details about any task, including issue 
 </p>
 
 
-
 ---
 
-### 2. Clean, Segregated Workspace ✦ 
+### 2. Clean, Segregated Workspace ✦ <a name="work"></a> 
 
 Keep your workspace tidy and organized with our clean and segregated interface. Easily navigate between projects, tasks, and files without clutter.
 
@@ -103,7 +110,7 @@ Keep your workspace tidy and organized with our clean and segregated interface. 
 
 ---
 
-### 3. Share updates with Channels ✦  
+### 3. Share updates with Channels ✦  <a name="channel"></a> 
 
 Effortlessly share project updates and communicate with team members through dedicated channel chats. Keep everyone informed and engaged in real-time discussions.
 
@@ -123,7 +130,7 @@ Effortlessly share project updates and communicate with team members through ded
 ---
 
 
-### 4. Schedule tasks for your Today ✦  
+### 4. Schedule tasks for your Today ✦  <a name="today"></a> 
 
 Efficiently plan your day by scheduling tasks for today. Keep track of all the tasks you need to accomplish, ensuring no deadlines are missed.
 
@@ -143,7 +150,7 @@ Efficiently plan your day by scheduling tasks for today. Keep track of all the t
 
 ---
 
-### 5. Swiftly automate tasks creation with O2Mate AI ✦ 
+### 5. Swiftly automate tasks creation with O2Mate AI ✦ <a name="o2mate"></a> 
 
 Harness the power of O2Mate AI to automate the creation of tasks swiftly. Streamline your workflow by leveraging intelligent task generation.
 
@@ -163,7 +170,7 @@ Harness the power of O2Mate AI to automate the creation of tasks swiftly. Stream
 
 ---
 
-### 6. Detailed Tasks ✦  
+### 6. Detailed Tasks ✦  <a name="tasks"></a> 
 
 Task detail page provides comprehensive details about any task, issues which includes : 
  1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
@@ -183,7 +190,7 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 ---
 
-### 7. Syntax highlighting, Code viewer ✦  
+### 7. Syntax highlighting, Code viewer ✦ <a name="code"></a> 
 
 Task detail page provides comprehensive details about any task, issues which includes : 
  1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
