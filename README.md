@@ -212,6 +212,13 @@ Enhance task management by adding checklists to tasks. Break down tasks into act
 
 ### Convinient Kanban board : 
 
+Experience the convenience of our Kanban board for visualizing and managing your project workflow. Easily track tasks as they progress through different stages.
+
+**Highlight:**  
+- Streamline project management with a visually intuitive Kanban board interface.
+- Easy task management and reordering.
+- Customize columns and labels to match your team's workflow for maximum convenience.
+
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6f33fa42-4aa2-4974-b968-488d650d6c5f" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/920af06c-ce49-430c-85fa-c1e9900b44c3" width="200" />
@@ -219,16 +226,17 @@ Enhance task management by adding checklists to tasks. Break down tasks into act
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d491ae85-edbf-4b83-8a9c-926dbf26422b" width="200" />
 </p>
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
 
 ---
 
 ### Notification tab keep you updated: 
+
+Stay updated with our notification tab, which keeps you informed of real-time updates, including task assignments, comments, and mentions.
+
+**Highlight:**  
+- Stay informed of important activities and changes within your projects.
+- Receive notifications for task assignments, comments, and mentions to stay engaged.
+- Customize notification settings to control the type and frequency of updates you receive.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/707665ec-63b7-4357-81b1-63091e04d9aa" width="200" />
@@ -236,36 +244,33 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ae4c765a-f54c-4b09-89a3-682ce110eaeb" width="200" />
 </p>
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
----
 
 ---
 
 ### Push Notifications: 
+
+Receive push notifications directly to your devices for instant updates on important events and activities within your projects.
+
+**Highlight:**  
+- Stay connected and informed even when you're not actively using the app.
+- Receive instant alerts for task assignments, comments, and mentions.
+- Enable/disable push notifications based on your preferences for optimal productivity.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/14e4c8fb-8efe-490c-8b70-aad989a9ee73" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b6f4a060-d480-407c-a02d-4fbf869fe57a" width="200" />
 </p>
 
-
-
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
 ---
 
 ### Flexible Search System : 
+
+Utilize our flexible search system to find tasks with atomic-level precision. Filter your search queries to narrow down results and locate specific tasks efficiently.
+
+**Highlight:**  
+- Conduct granular searches to find tasks based on various criteria such as title, description, assignee, due date, and more.
+- Utilize advanced filtering options to refine search results and pinpoint specific tasks.
+- Enhance productivity by quickly locating relevant tasks without sifting through irrelevant information.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/693cd8b2-724e-4b95-9aae-63becf47b77d" width="200" />
@@ -274,16 +279,17 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ef64ba7d-3490-4f13-802e-36115d5c6ea2" width="200" />
 </p>
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
 ---
 
-### Team : 
+### Team :
+
+**Description:**  
+Easily access and view details of team members within the app. Get insights into their roles, responsibilities, contact information, and more.
+
+**Highlight:**  
+- Access comprehensive profiles of team members to understand their expertise and contributions.
+- View contact details such as email addresses or phone numbers for seamless communication.
+- Stay informed about team dynamics and roles to facilitate collaboration and coordination.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fa21fa25-d498-4cf3-9943-146a3bc652c3" width="200" />
@@ -291,45 +297,38 @@ Task detail page provides comprehensive details about any task, issues which inc
  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d2a42d4e-ccfb-4b4a-a558-8d19a11335fa" width="200" />
 </p>
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
 ---
 
 ### Offline Mode : 
+
+Stay productive even without an internet connection with our offline mode feature. Access and work on your tasks seamlessly, even when offline.
+
+**Highlight:**  
+- Continue working on tasks and projects without interruption, regardless of internet connectivity.
+- Access cached data and synchronize changes once you're back online.
+- Ensure productivity and efficiency, even in remote or low-connectivity environments.
+
 <p float="left">
    <img src="https://github.com/arpitmx/Oxygen/assets/59350776/80a0fd56-ace7-419a-b911-4b44ac2d9f08" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fc222562-66c9-46f2-befa-a202ca619c12" width="200" />
 </p>
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
 ---
 
 ### Shake to Report : 
+
+Report bugs quickly and conveniently by shaking your device. Provide instant feedback to our development team for swift resolution of issues.
+
+**Highlight:**  
+- Streamline the bug reporting process with a simple gesture.
+- Encourage user participation in improving app stability and performance.
+- Expedite bug fixes by providing timely and actionable feedback.
+- 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1261bea1-c176-4cb8-bc4b-4ea33e0e8325" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/f4cd0cb3-06f2-43a2-b15e-719bc0c0f282" width="200" />
 </p>
 
-
-
-
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
 
 ---
 
