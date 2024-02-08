@@ -183,9 +183,9 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" height="auto" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200"height="auto"/>
-   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ff543e7f-50ad-4f89-9da6-9fefcd2fe275" width="200" height="auto"/>
-<img src="https://github.com/arpitmx/Oxygen/assets/59350776/ccab4142-89de-4666-98ae-cc0adb5de466" width="200" height="auto"/>
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200" height="auto"/>
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ff543e7f-50ad-4f89-9da6-9fefcd2fe275" width="200" height="auto"/>
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ccab4142-89de-4666-98ae-cc0adb5de466" width="200" height="auto"/>
 </p>
 
 ---
@@ -203,7 +203,7 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 
 <p float="left">
-   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d37dcf7f-4ea5-47fa-b8f8-235e38b15ef8" width="600"/>
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d37dcf7f-4ea5-47fa-b8f8-235e38b15ef8" width="600"/>
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6b5b22d4-8d4e-4f84-8834-8f51b32173ee" width="200" />
 </p>
 
@@ -344,7 +344,7 @@ Easily access and view details of team members within the app. Get insights into
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fa21fa25-d498-4cf3-9943-146a3bc652c3" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d8263d3f-456a-42d6-b7bd-513c00a3a636" width="200" />
- <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d2a42d4e-ccfb-4b4a-a558-8d19a11335fa" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d2a42d4e-ccfb-4b4a-a558-8d19a11335fa" width="200" />
 </p>
 
 ---
@@ -362,7 +362,7 @@ Stay productive even without an internet connection with our offline mode featur
 
 <p float="left">
    <img src="https://github.com/arpitmx/Oxygen/assets/59350776/80a0fd56-ace7-419a-b911-4b44ac2d9f08" width="200" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fc222562-66c9-46f2-befa-a202ca619c12" width="200" />
+   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fc222562-66c9-46f2-befa-a202ca619c12" width="200" />
 </p>
 
 ---
@@ -394,7 +394,7 @@ Oxygen has its own custom made crash reporting system called `Crashman` which li
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/82c68123-03aa-4567-bb93-b5d353bb34e0" width="200" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200"height="auto"/>
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200"/>
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/24ff257d-b03a-47aa-a3b9-7ce30b00e0f0" width="200" />
 </p>
 
