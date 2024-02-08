@@ -62,7 +62,14 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 
 ### 1. Project Overview ✦ 
 
-Task detail page provides comprehensive details about any task, issues which includes : 
+Task detail page provides comprehensive details about any task, including issue type, priority, duration, difficulty, status, position in kanban, fix in build version, story points, issue title, extensive issue summary with Markdown support, moderator list, and resource links for files, images, and video support.
+
+**Highlights:**
+1. Issue Type, Priority, Duration, Difficulty, Status, Position in Kanban, Fix in Build Version, Story Points
+2. Issue Title
+3. Extensive Issue Summary with Markdown Support
+4. Moderator List
+5. Resource Links (Files, Images, Video)
 
 
 <p float="left">
@@ -72,16 +79,17 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6c4e6ed1-00b4-401b-a256-a13f0687d7f0" width="200" />
 </p>
 
-Highlights : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
 
 ---
 
-### Segregated Workspace : 
+### 2. Clean, Segregated Workspace ✦ 
+
+Keep your workspace tidy and organized with our clean and segregated interface. Easily navigate between projects, tasks, and files without clutter.
+
+**Highlight:**  
+- Enhance productivity by providing a clutter-free environment.
+- Segregate tasks with filters for better focus and organization.
+- Streamline workflow by reducing distractions, focus on schedules.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b2182d0f-218a-45a0-a873-5f7ee64ed3ee" width="200" />
@@ -89,16 +97,18 @@ Highlights :
 </p>
 
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
 ---
 
 ### Share updates with Channels : 
+
+## Feature: Share Updates with Channels Chats
+
+Effortlessly share project updates and communicate with team members through dedicated channel chats. Keep everyone informed and engaged in real-time discussions.
+
+**Highlight:**  
+- Foster transparent communication by sharing updates in dedicated channels.
+- Facilitate collaboration and idea sharing among team members.
+- Ensure important information reaches relevant stakeholders instantly.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b0b3557c-7e48-4578-b4b3-9ac77c56a9ae" width="200" />
@@ -106,18 +116,17 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/da468def-4dc1-48f2-8c7e-5a80abf71052" width="200" />
 </p>
 
-
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
 ---
 
 
 ### Schedule tasks for your Today : 
+
+Efficiently plan your day by scheduling tasks for today. Keep track of all the tasks you need to accomplish, ensuring no deadlines are missed.
+
+**Highlight:**  
+- Organize your daily workflow by prioritizing tasks for today.
+- Stay focused and productive with a clear list of tasks to complete.
+- Easily adjust and update your schedule as priorities change throughout the day.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5f5d95e3-6292-47c3-9299-be0cc6ad104e" width="200" />
@@ -126,17 +135,16 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/99172573-afe2-4fa6-aa87-34f3557adea5" width="200" />
 </p>
 
-
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
-
 ---
 
 ### Swiftly automate tasks creation with O2Mate AI : 
+
+Harness the power of O2Mate AI to automate the creation of tasks swiftly. Streamline your workflow by leveraging intelligent task generation.
+
+**Highlight:**  
+- Save time and effort by automating the creation of tasks.
+- Improve productivity by eliminating manual task creation processes.
+- Leverage AI-driven insights to optimize task creation and allocation.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/688b44a4-72e3-49f3-8f6b-3e5df89c6465" width="200" />
@@ -145,6 +153,9 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b4197375-2524-47b7-a59b-8a7e242e18e5" width="200" />
 </p>
 
+---
+
+### 2. Detailed Tasks ✦  
 
 Task detail page provides comprehensive details about any task, issues which includes : 
  1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
@@ -153,10 +164,6 @@ Task detail page provides comprehensive details about any task, issues which inc
  4. Moderator list
  5. Resource links -> Files, Images, Video support
 
----
-
-
-### 2. Detailed Tasks ✦  
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" height="auto" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200"height="auto"/>
@@ -164,17 +171,34 @@ Task detail page provides comprehensive details about any task, issues which inc
 <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ccab4142-89de-4666-98ae-cc0adb5de466" width="200" height="auto"/>
 </p>
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
+---
+
+### 2. Flexible Task Chat system ✦  
+
+Utilize our flexible real-time chat system within tasks, enabling seamless communication among team members. Share links, files, and code snippets with support for syntax highlighting.
+
+**Highlight:**  
+- Enhance collaboration by discussing tasks in real-time within the platform.
+- Share relevant links and files directly within task discussions for easy reference.
+- Collaborate on code snippets with syntax highlighting for improved readability and comprehension.
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/8309b23e-2ce5-47a6-9895-efec3373cfb6" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/26e3a509-35ea-4122-9288-728e79455ff4" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/dbf9fcb1-74bd-4f8c-8357-cc33ca636b94" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/239ba210-0d0c-4ed5-ad53-b2c6ae06af6c" width="200" />
+</p>
 
 ---
 
-
 ### 2. Add checks with Checklists ✦  
+
+Enhance task management by adding checklists to tasks. Break down tasks into actionable steps and track progress more effectively.
+
+**Highlight:**  
+- Improve task clarity by breaking them down into smaller, manageable steps.
+- Ensure thoroughness and completeness by checking off items as they are completed.
+- Increase accountability and transparency within the team by monitoring checklist progress.
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5114eb11-2351-4bd5-8009-aedb1dd675c9" width="200" />
@@ -182,14 +206,6 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/7f4ef800-d5cc-48df-b310-4ead34978bd3" width="200" />
 </p>
 
-
-
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
 
 ---
 
