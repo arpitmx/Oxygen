@@ -81,6 +81,81 @@ Highlights :
 
 ---
 
+### Segregated Workspace : 
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b2182d0f-218a-45a0-a873-5f7ee64ed3ee" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/25af984c-56b1-4079-8093-6089f4e567be" width="200" />
+</p>
+
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+### Share updates with Channels : 
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b0b3557c-7e48-4578-b4b3-9ac77c56a9ae" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/2893be2c-5ba2-482b-9ca5-4b75f8e38f6d" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/da468def-4dc1-48f2-8c7e-5a80abf71052" width="200" />
+</p>
+
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+
+### Schedule tasks for your Today : 
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5f5d95e3-6292-47c3-9299-be0cc6ad104e" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5e3d6cd8-b4c4-4170-89e1-c1057be61e73" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5e7707f9-e08b-484f-94b4-4b42b2f5a30b" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/99172573-afe2-4fa6-aa87-34f3557adea5" width="200" />
+</p>
+
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+### Create, automate tasks, checklist creation with O2Mate AI : 
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/688b44a4-72e3-49f3-8f6b-3e5df89c6465" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d21a6ca4-3643-420c-bde8-fd01c5ab8f1d" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/58b8ab95-87a7-4ea7-925c-6f8f0d0e6c5a" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b4197375-2524-47b7-a59b-8a7e242e18e5" width="200" />
+</p>
+
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+
 ### 2. Detailed Tasks ✦  
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" height="auto" />
@@ -106,6 +181,43 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/7b7ec28f-234d-4c4b-ab2c-084092ec222f" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d491ae85-edbf-4b83-8a9c-926dbf26422b" width="200" />
 </p>
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+### Notification tab keep you updated: 
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/707665ec-63b7-4357-81b1-63091e04d9aa" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d8599231-1266-4b6b-8914-9d36d630dfa1" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ae4c765a-f54c-4b09-89a3-682ce110eaeb" width="200" />
+</p>
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+---
+
+### Push Notifications: 
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/14e4c8fb-8efe-490c-8b70-aad989a9ee73" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/b6f4a060-d480-407c-a02d-4fbf869fe57a" width="200" />
+</p>
+
+
 
 Task detail page provides comprehensive details about any task, issues which includes : 
  1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
@@ -151,7 +263,6 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 ---
 
-
 ### Offline Mode : 
 <p float="left">
    <img src="https://github.com/arpitmx/Oxygen/assets/59350776/80a0fd56-ace7-419a-b911-4b44ac2d9f08" width="200" />
@@ -166,6 +277,25 @@ Task detail page provides comprehensive details about any task, issues which inc
  5. Resource links -> Files, Images, Video support
 
 ---
+
+### Shake to Report : 
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1261bea1-c176-4cb8-bc4b-4ea33e0e8325" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/f4cd0cb3-06f2-43a2-b15e-719bc0c0f282" width="200" />
+</p>
+
+
+
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
 
 
 ## Module/Package structure <a name="module_structure"></a>
