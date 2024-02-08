@@ -1,7 +1,7 @@
 
 # <img width="60" alt="Frame 1000002619" src="https://github.com/arpitmx/Oxygen/assets/59350776/9a051ee8-1633-4b1f-b61e-1a418d736175"> NCS Oxygen (O2)
  
-
+[![Repository](https://img.shields.io/badge/GitHub-Repository-brightgreen)](https://github.com/arpitmx/Oxygen)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/your-username/ncs-oxygen/blob/main/LICENSE)
 ![Android](https://img.shields.io/badge/Platform-Android-green.svg)
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-orange.svg) 
