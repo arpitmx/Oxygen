@@ -59,10 +59,34 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 - **Reporting and analytics** : Generate insightful reports and analyze project performance to make data-driven decisions.
 
 # Sections 
-### 1. Tasks Details ✦ : 
+
+### 1. Project Overview ✦ 
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+
+
 <p float="left">
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/2edb6f3f-02bc-4823-a711-2b3352eaffd7" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/80a6818e-b744-43b7-93a2-822adba6fd3e" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6a5266d7-52fc-4b84-be56-6e2aa60b1136" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6c4e6ed1-00b4-401b-a256-a13f0687d7f0" width="200" />
+</p>
+
+Highlights : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+### 2. Detailed Tasks ✦  
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" height="auto" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200"height="auto"/>
+   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ff543e7f-50ad-4f89-9da6-9fefcd2fe275" width="200" height="auto"/>
+<img src="https://github.com/arpitmx/Oxygen/assets/59350776/ccab4142-89de-4666-98ae-cc0adb5de466" width="200" height="auto"/>
 </p>
 
 Task detail page provides comprehensive details about any task, issues which includes : 
@@ -72,7 +96,9 @@ Task detail page provides comprehensive details about any task, issues which inc
  4. Moderator list
  5. Resource links -> Files, Images, Video support
 
-### Kanban board : 
+---
+
+### Convinient Kanban board : 
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6f33fa42-4aa2-4974-b968-488d650d6c5f" width="200" />
@@ -81,7 +107,16 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d491ae85-edbf-4b83-8a9c-926dbf26422b" width="200" />
 </p>
 
-### Search system : 
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+### Flexible Search System : 
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/693cd8b2-724e-4b95-9aae-63becf47b77d" width="200" />
@@ -90,6 +125,47 @@ Task detail page provides comprehensive details about any task, issues which inc
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ef64ba7d-3490-4f13-802e-36115d5c6ea2" width="200" />
 </p>
 
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+### Team : 
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fa21fa25-d498-4cf3-9943-146a3bc652c3" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d8263d3f-456a-42d6-b7bd-513c00a3a636" width="200" />
+ <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d2a42d4e-ccfb-4b4a-a558-8d19a11335fa" width="200" />
+</p>
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
+
+
+### Offline Mode : 
+<p float="left">
+   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/80a0fd56-ace7-419a-b911-4b44ac2d9f08" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/fc222562-66c9-46f2-befa-a202ca619c12" width="200" />
+</p>
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+---
 
 
 ## Module/Package structure <a name="module_structure"></a>
