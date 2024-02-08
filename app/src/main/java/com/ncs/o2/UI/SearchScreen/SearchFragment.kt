@@ -71,6 +71,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
     private val selectedTags = mutableListOf<Tag>()
     lateinit var binding: FragmentSearchBinding
     private  var taskList: MutableList<TaskItem> = mutableListOf()
+    private  var recentsTaskList: MutableList<Task> = mutableListOf()
     private val tasks:MutableList<Task> = mutableListOf()
     private lateinit var viewModel: SearchViewModel
     private lateinit var recyclerView: RecyclerView
@@ -150,6 +151,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             }
 
         }
+
         return binding.root
     }
 
@@ -213,7 +215,10 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         defaultButtons()
         filterButtons()
         initViews()
-
+        val recents=PrefManager.getProjectRecents(PrefManager.getcurrentProject())
+        for (recent in recents){
+            fetchTasksforID(recent)
+        }
 
 
     }
@@ -253,6 +258,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         }
     }
     private fun setRecyclerView(){
+        binding.recentsRV.gone()
         binding.results.visible()
         binding.results.text="Matches ${taskList.size.toString()} tasks"
         recyclerView = binding.recyclerView
@@ -284,6 +290,79 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             }
         })
         taskListAdapter.notifyDataSetChanged()
+    }
+
+    private fun setRecentsRecyclerView(){
+        binding.recyclerView.gone()
+        binding.results.visible()
+        binding.results.text="Recent ${recentsTaskList.size.toString()} tasks"
+        binding.placeholder.gone()
+        binding.searchPlaceholder.gone()
+
+        val _recyclerView = binding.recentsRV
+        _recyclerView.visible()
+        val _taskList = recentsTaskList.map { task ->
+            TaskItem(
+                title = task.title!!,
+                id = task.id,
+                assignee_id = task.assignee!!,
+                difficulty = task.difficulty!!,
+                timestamp = task.time_STAMP,
+                completed = SwitchFunctions.getStringStateFromNumState(task.status)=="Completed",
+                tagList = task.tags,
+                last_updated = task.last_updated
+            )
+        }.toMutableList()
+        val _taskListAdapter = TaskListAdapter(firestoreRepository,requireContext(),_taskList.sortedByDescending { it.last_updated }.toMutableList(),db)
+        _taskListAdapter.setOnClickListener(this)
+        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        layoutManager.reverseLayout = false
+        with(_recyclerView) {
+            this.layoutManager = layoutManager
+            adapter = _taskListAdapter
+            edgeEffectFactory = BounceEdgeEffectFactory()
+        }
+        _recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(
+                recyclerView: RecyclerView,
+                newState: Int
+            ) {
+                super.onScrollStateChanged(recyclerView, newState)
+                state[0] = newState
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && (state[0] == 0 || state[0] == 2)) {
+                    hideSearch()
+                } else if (dy < -10) {
+                    showSearch()
+                }
+            }
+        })
+        _taskListAdapter.notifyDataSetChanged()
+    }
+    private fun fetchTasksforID(taskID:String){
+        viewModel.getTasksForID(
+            PrefManager.getcurrentProject(),taskID
+        ) { result ->
+            when (result) {
+                is DBResult.Success -> {
+                    recentsTaskList.add(result.data)
+                    recentsTaskList.sortedByDescending { it.last_updated }
+                    if (recentsTaskList.size==PrefManager.getProjectRecents(PrefManager.getcurrentProject()).size){
+                        setRecentsRecyclerView()
+                    }
+                }
+
+                is DBResult.Failure -> {
+                    val errorMessage = result.exception.message
+                }
+
+                is DBResult.Progress -> {
+                }
+            }
+        }
     }
     private fun searchQuery(text:String){
         binding.searchPlaceholder.gone()

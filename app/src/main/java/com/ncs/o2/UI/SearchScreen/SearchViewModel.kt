@@ -27,6 +27,15 @@ class SearchViewModel  @Inject constructor(private val firestoreRepository: Fire
         firestoreRepository.getSearchedTasks(projectName = projectName, assignee =assignee, type = type, state = state, text = text, creator = creator, result = resultCallback)
     }
 
+    fun getTasksForID(
+        projectName: String,
+        taskID:String,
+        resultCallback: (DBResult<Task>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTaskbyID(projectName, taskID, resultCallback)
+        }
+    }
     suspend fun getSearchTasksFromDB(
         projectName: String,
         assignee:String,

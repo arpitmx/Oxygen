@@ -291,4 +291,16 @@
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recentsRV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:clipToPadding="false"
+        android:elevation="2dp"
+        android:layoutAnimation="@anim/layout_animation_popscale"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
 </androidx.appcompat.widget.LinearLayoutCompat>

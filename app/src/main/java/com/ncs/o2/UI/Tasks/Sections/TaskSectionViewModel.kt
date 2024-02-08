@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.datafaker.providers.base.Bool
 import javax.inject.Inject
 
 /*
@@ -43,6 +44,10 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
 
 
     var sectionName: String? = null
+
+    var isReturning : Boolean = false
+
+    var scrollPosition : Int = 0
 
 
     private val _currentSegment = MutableLiveData<String>()
@@ -145,6 +150,9 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
     fun updateCurrentSegment(newSegment: String) {
         _currentSegment.value = newSegment
     }
+
+
+
 
 
 

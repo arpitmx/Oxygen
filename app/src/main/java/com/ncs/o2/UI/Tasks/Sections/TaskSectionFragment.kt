@@ -9,7 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
@@ -69,8 +71,10 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskListAdapter: TaskListAdapter
     private lateinit var taskList: ArrayList<TaskItem>
+    private var taskItems: MutableList<TaskItem>  = mutableListOf()
+
     private lateinit var tasks: ArrayList<Task>
-    private lateinit var taskList2: ArrayList<Task>
+    private var taskList2: MutableList<Task> = mutableListOf()
     private lateinit var projectName: String
     private lateinit var segmentName: String
     val state = arrayOf(1)
@@ -83,6 +87,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     private val activityBinding: MainActivity by lazy {
         (requireActivity() as MainActivity)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -105,8 +110,8 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-
     }
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -121,6 +126,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         setupViews()
         manageViews()
     }
+
 
     private fun manageViews(){
         activityBinding.binding.gioActionbar.tabLayout.visible()
@@ -368,7 +374,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                     } else {
 
                         recyclerView = binding.recyclerView
-                        val taskItems: List<TaskItem> = filteredList.map { task ->
+                        taskItems= filteredList.map { task ->
                             TaskItem(
                                 title = task.title!!,
                                 id = task.id,
@@ -379,7 +385,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                                 tagList = task.tags,
                                 last_updated = task.last_updated
                             )
-                        }
+                        }.toMutableList()
                         val taskadapter = TaskListAdapter(
                             firestoreRepository,
                             requireContext(),
@@ -445,6 +451,58 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         }
     }
 
+    fun fetchNewTasks() {
+        viewModel.getTasksForSegmentFromDB(
+            projectName,
+            segmentName,
+            viewModel.sectionName!!
+        ) { result ->
+            when (result) {
+                is DBResult.Success -> {
+                    val filteredList = filterTasks(result.data)
+                    val newtaskItems= filteredList.map { task ->
+                        TaskItem(
+                            title = task.title!!,
+                            id = task.id,
+                            assignee_id = task.assignee!!,
+                            difficulty = task.difficulty!!,
+                            timestamp = task.time_STAMP,
+                            completed = if (SwitchFunctions.getStringStateFromNumState(task.status!!) == "Completed") true else false,
+                            tagList = task.tags,
+                            last_updated = task.last_updated
+                        )
+                    }.toMutableList()
+                    val diffResult = calculateDiff(taskItems, newtaskItems)
+                    diffResult.dispatchUpdatesTo(taskListAdapter)
+                }
+
+                is DBResult.Failure -> {
+                    val errorMessage = result.exception.message
+                    // Handle failure if needed
+                }
+
+                is DBResult.Progress -> {
+                    // Handle progress if needed
+                }
+            }
+        }
+    }
+
+    private fun calculateDiff(oldList: List<TaskItem>, newList: List<TaskItem>): DiffUtil.DiffResult {
+        return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = oldList.size
+            override fun getNewListSize(): Int = newList.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldList[oldItemPosition].id == newList[newItemPosition].id
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldList[oldItemPosition] == newList[newItemPosition]
+            }
+        })
+    }
+
     private fun showSearch() {
     }
 
@@ -453,6 +511,8 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
     }
 
     override fun onCLick(position: Int, task: TaskItem) {
+        viewModel.isReturning=true
+        viewModel.scrollPosition=position
         val intent = Intent(requireContext(), TaskDetailActivity::class.java)
         intent.putExtra("task_id", task.id)
         startActivity(intent)
