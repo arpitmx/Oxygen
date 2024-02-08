@@ -59,8 +59,7 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 - **Reporting and analytics** : Generate insightful reports and analyze project performance to make data-driven decisions.
 
 # Sections 
-
-### ✦ Tasks Details  
+### 1. Tasks Details ✦ : 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200" />
@@ -77,16 +76,19 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6f33fa42-4aa2-4974-b968-488d650d6c5f" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/920af06c-ce49-430c-85fa-c1e9900b44c3" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/7b7ec28f-234d-4c4b-ab2c-084092ec222f" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d491ae85-edbf-4b83-8a9c-926dbf26422b" width="200" />
 </p>
 
 ### Search system : 
 
-![Search-tags](https://github.com/arpitmx/Oxygen/assets/59350776/693cd8b2-724e-4b95-9aae-63becf47b77d)
-![Search-Filters](https://github.com/arpitmx/Oxygen/assets/59350776/f4ad5eaf-c0a1-4df5-9799-589b7800bb32)
-![Search-Createdby-Filter-applied](https://github.com/arpitmx/Oxygen/assets/59350776/76bce8e7-176a-4f3b-8563-88b242cd943f)
-![Search-Created-by-filter](https://github.com/arpitmx/Oxygen/assets/59350776/3793ec7e-4a9c-46be-8dc1-d78f4a2a6fef)
-![Search-1](https://github.com/arpitmx/Oxygen/assets/59350776/ef64ba7d-3490-4f13-802e-36115d5c6ea2)
-
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/693cd8b2-724e-4b95-9aae-63becf47b77d" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/f4ad5eaf-c0a1-4df5-9799-589b7800bb32" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/3793ec7e-4a9c-46be-8dc1-d78f4a2a6fef" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ef64ba7d-3490-4f13-802e-36115d5c6ea2" width="200" />
+</p>
 
 
 
