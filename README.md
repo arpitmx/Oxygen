@@ -10,9 +10,9 @@
 NCS Oxygen (O2) is a project management Android app designed to streamline and optimize task and project management using modern project management techniques. With support for methodologies like sprints, kanban maps, and more, Oxygen empowers teams to efficiently plan, organize, and track their projects.
 
 <p float="left">
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5de16190-256d-466a-ac96-fcbf06486e32" width="300" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/90caaf73-42fd-4395-9ae3-0639dbcbb821" width="300" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/635bfbbb-6a90-4c96-947c-d4a675eed491" width="300" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5de16190-256d-466a-ac96-fcbf06486e32" width="250" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/90caaf73-42fd-4395-9ae3-0639dbcbb821" width="250" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/635bfbbb-6a90-4c96-947c-d4a675eed491" width="250" />
 </p>
 
 ---
@@ -58,13 +58,20 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 - **Collaborative workspace** : Foster collaboration within teams by providing a shared platform for communication, file sharing, and discussions.
 - **Reporting and analytics** : Generate insightful reports and analyze project performance to make data-driven decisions.
 
-## Sections 
+# Sections 
 
-### Tasks Details : 
+### ✦ Tasks Details  
 <p float="left">
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/1b639810-8bbf-46a8-81ac-b1fb201e787f" width="200" />
   <img src="https://github.com/arpitmx/Oxygen/assets/59350776/a6981108-39af-4132-9b5c-9fdac6fc4206" width="200" />
 </p>
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
 
 ### Kanban board : 
 
