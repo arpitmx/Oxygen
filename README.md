@@ -101,8 +101,6 @@ Keep your workspace tidy and organized with our clean and segregated interface. 
 
 ### 3. Share updates with Channels ✦  
 
-## Feature: Share Updates with Channels Chats
-
 Effortlessly share project updates and communicate with team members through dedicated channel chats. Keep everyone informed and engaged in real-time discussions.
 
 **Highlight:**  
@@ -170,6 +168,25 @@ Task detail page provides comprehensive details about any task, issues which inc
    <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ff543e7f-50ad-4f89-9da6-9fefcd2fe275" width="200" height="auto"/>
 <img src="https://github.com/arpitmx/Oxygen/assets/59350776/ccab4142-89de-4666-98ae-cc0adb5de466" width="200" height="auto"/>
 </p>
+
+---
+
+### 7. Syntax highlighting, Code viewer ✦  
+
+Task detail page provides comprehensive details about any task, issues which includes : 
+ 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
+ 2. Issue Title
+ 3. Extensive Issue summary with Markdown support
+ 4. Moderator list
+ 5. Resource links -> Files, Images, Video support
+
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/d37dcf7f-4ea5-47fa-b8f8-235e38b15ef8" width="600"/>
+
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/6b5b22d4-8d4e-4f84-8834-8f51b32173ee" width="200" />
+</p>
+
 
 ---
 
@@ -332,6 +349,18 @@ Report bugs quickly and conveniently by shaking your device. Provide instant fee
 
 ---
 
+### 16. Custom Crash Reporting System ✦ 
+
+Oxygen has its own custom made crash reporting system called `Crashman` which listens for unhandled exception and crashes, wraps them into an Oxygen issue and opens a thread under Issues for faster bug recovery by the Oxygen Team.
+
+<p float="left">
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/82c68123-03aa-4567-bb93-b5d353bb34e0" width="200" />
+  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/24ff257d-b03a-47aa-a3b9-7ce30b00e0f0" width="200" />
+</p>
+
+---
+
+ 
 
 
 ## Module/Package structure <a name="module_structure"></a>
