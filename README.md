@@ -99,7 +99,7 @@ Keep your workspace tidy and organized with our clean and segregated interface. 
 
 ---
 
-### Share updates with Channels : 
+### 3. Share updates with Channels ✦  
 
 ## Feature: Share Updates with Channels Chats
 
@@ -119,7 +119,7 @@ Effortlessly share project updates and communicate with team members through ded
 ---
 
 
-### Schedule tasks for your Today : 
+### 4. Schedule tasks for your Today ✦  
 
 Efficiently plan your day by scheduling tasks for today. Keep track of all the tasks you need to accomplish, ensuring no deadlines are missed.
 
@@ -137,7 +137,7 @@ Efficiently plan your day by scheduling tasks for today. Keep track of all the t
 
 ---
 
-### Swiftly automate tasks creation with O2Mate AI : 
+### 5. Swiftly automate tasks creation with O2Mate AI ✦ 
 
 Harness the power of O2Mate AI to automate the creation of tasks swiftly. Streamline your workflow by leveraging intelligent task generation.
 
@@ -155,7 +155,7 @@ Harness the power of O2Mate AI to automate the creation of tasks swiftly. Stream
 
 ---
 
-### 2. Detailed Tasks ✦  
+### 6. Detailed Tasks ✦  
 
 Task detail page provides comprehensive details about any task, issues which includes : 
  1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
@@ -173,7 +173,7 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 ---
 
-### 2. Flexible Task Chat system ✦  
+### 7. Flexible Task Chat system ✦  
 
 Utilize our flexible real-time chat system within tasks, enabling seamless communication among team members. Share links, files, and code snippets with support for syntax highlighting.
 
@@ -191,7 +191,7 @@ Utilize our flexible real-time chat system within tasks, enabling seamless commu
 
 ---
 
-### 2. Add checks with Checklists ✦  
+### 8. Add checks with Checklists ✦  
 
 Enhance task management by adding checklists to tasks. Break down tasks into actionable steps and track progress more effectively.
 
@@ -210,7 +210,7 @@ Enhance task management by adding checklists to tasks. Break down tasks into act
 ---
 
 
-### Convinient Kanban board : 
+### 9. Convinient Kanban board ✦  
 
 Experience the convenience of our Kanban board for visualizing and managing your project workflow. Easily track tasks as they progress through different stages.
 
@@ -229,7 +229,7 @@ Experience the convenience of our Kanban board for visualizing and managing your
 
 ---
 
-### Notification tab keep you updated: 
+### 10. Notification tab keep you updated ✦ 
 
 Stay updated with our notification tab, which keeps you informed of real-time updates, including task assignments, comments, and mentions.
 
@@ -247,7 +247,7 @@ Stay updated with our notification tab, which keeps you informed of real-time up
 
 ---
 
-### Push Notifications: 
+### 11. Push Notifications ✦  
 
 Receive push notifications directly to your devices for instant updates on important events and activities within your projects.
 
@@ -263,7 +263,7 @@ Receive push notifications directly to your devices for instant updates on impor
 
 ---
 
-### Flexible Search System : 
+### 12. Flexible Search System ✦ 
 
 Utilize our flexible search system to find tasks with atomic-level precision. Filter your search queries to narrow down results and locate specific tasks efficiently.
 
@@ -281,7 +281,7 @@ Utilize our flexible search system to find tasks with atomic-level precision. Fi
 
 ---
 
-### Team :
+### 13. Team ✦ 
 
 **Description:**  
 Easily access and view details of team members within the app. Get insights into their roles, responsibilities, contact information, and more.
@@ -299,7 +299,7 @@ Easily access and view details of team members within the app. Get insights into
 
 ---
 
-### Offline Mode : 
+### 14. Offline Mode ✦ 
 
 Stay productive even without an internet connection with our offline mode feature. Access and work on your tasks seamlessly, even when offline.
 
@@ -315,7 +315,7 @@ Stay productive even without an internet connection with our offline mode featur
 
 ---
 
-### Shake to Report : 
+### 15. Shake to Report ✦ 
 
 Report bugs quickly and conveniently by shaking your device. Provide instant feedback to our development team for swift resolution of issues.
 
