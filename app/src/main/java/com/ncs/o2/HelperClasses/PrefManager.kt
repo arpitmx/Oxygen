@@ -54,6 +54,7 @@ object PrefManager {
     private val projectIconUrlMapKey = "project_icon_url_map"
     private val projectDeeplinkMapKey = "project_deeplink_map"
     private val projectAliasCodeMapKey = "project_alias_map"
+    private val projectRecentsMapKey = "project_recents_map"
 
 
     private lateinit var projectTimestampMap: MutableMap<String, Long>
@@ -65,6 +66,8 @@ object PrefManager {
 
     private lateinit var ProjectIconUrlMap: MutableMap<String, String>
     private lateinit var ProjectAliasCodeMap: MutableMap<String, String>
+    private lateinit var ProjectRecentsMap: MutableMap<String, String>
+
 
     private lateinit var ProjectDeepLinkMap: MutableMap<String, String>
 
@@ -195,6 +198,15 @@ object PrefManager {
             }
         } ?: mutableMapOf()
 
+        val savedProjectRecentsMapString = sharedPreferences.getString(
+            projectRecentsMapKey, null)
+        ProjectRecentsMap = savedProjectRecentsMapString?.let {
+            try {
+                Gson().fromJson(it, object : TypeToken<MutableMap<String, String>>() {}.type)
+            } catch (e: JsonSyntaxException) {
+                mutableMapOf()
+            }
+        } ?: mutableMapOf()
     }
 
 
@@ -889,12 +901,22 @@ object PrefManager {
         editor.apply()
     }
 
-    fun getProjectListVisblity(): Boolean {
-        return sharedPreferences.getBoolean("project_list_visible", true)
-    }
-
-    fun setProjectListVisblity(bool:Boolean) {
-        editor.putBoolean("project_list_visible", bool)
+    fun saveProjectRecents(projectName: String, recents: List<String>) {
+        val gson = Gson()
+        val channelsJson = gson.toJson(recents)
+        editor.putString("project_recents_$projectName", channelsJson)
         editor.apply()
     }
+
+    fun getProjectRecents(projectName: String): List<String> {
+        val favsJson = sharedPreferences.getString("project_recents_$projectName", null)
+        val gson = Gson()
+        val type = object : TypeToken<List<String>>() {}.type
+        return if (favsJson != null) {
+            gson.fromJson(favsJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
 }
