@@ -49,7 +49,7 @@
             android:name=".UI.Teams.TasksHolderActivity"
             android:exported="false" />
         <activity
-            android:name=".UI.Teams.TeamsActivity"
+            android:name=".UI.Teams.ChannelHolderActivity"
             android:exported="false" />
         <activity
             android:name=".UI.Logs.LogsActivity"

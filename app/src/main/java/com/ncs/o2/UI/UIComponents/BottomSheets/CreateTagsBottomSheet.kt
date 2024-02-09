@@ -34,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.datafaker.Faker
+//import net.datafaker.Faker
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,7 +49,7 @@ class CreateTagsBottomSheet (private var selectedTagsList: MutableList<Tag>,priv
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
 
 
-    private val faker: Faker by lazy { Faker() }
+//    private val faker: Faker by lazy { Faker() }
 
     override fun onCreateView(
         inflater: LayoutInflater,

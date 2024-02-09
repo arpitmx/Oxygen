@@ -27,7 +27,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.datafaker.Faker
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -118,7 +117,7 @@ constructor(val notificationApiService: NotificationApiService,
         payload.addProperty("to", token)
         val data = JsonObject()
         data.addProperty("title", "Work request")
-        data.addProperty("body", Faker().bigBangTheory().quote().toString())
+        //data.addProperty("body", Faker().bigBangTheory().quote().toString())
         payload.add("data", data)
         return payload
     }

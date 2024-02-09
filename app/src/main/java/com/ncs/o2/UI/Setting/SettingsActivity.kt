@@ -26,7 +26,6 @@ import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Logs.LogsActivity
 import com.ncs.o2.UI.NewChanges
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
-import com.ncs.o2.UI.Teams.TeamsActivity
 import com.ncs.o2.databinding.ActivitySettingsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint

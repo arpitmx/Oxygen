@@ -83,7 +83,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import net.datafaker.Faker
 import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -553,15 +552,15 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
 
     private fun sendRequestNotification() {
 
-        val requestNotification: Notification = createRequestNotification()
+        val requestNotification: Notification? = createRequestNotification()
         val receiverFCMToken: String = getReceiverFCMToken()
 
-        CoroutineScope(Dispatchers.Main).launch {
-            viewModel.sendNotificationToReceiverFirebase(
-                requestNotification,
-                receiverFCMToken
-            )
-        }
+//        CoroutineScope(Dispatchers.Main).launch {
+//            viewModel.sendNotificationToReceiverFirebase(
+//                requestNotification,
+//                receiverFCMToken
+//            )
+//        }
     }
 
     private fun manageState(task: Task) {
@@ -646,19 +645,20 @@ class TaskDetailsFragment : androidx.fragment.app.Fragment(), ContributorAdapter
         return test_fcmtokenEmulator
     }
 
-    private fun createRequestNotification(): Notification {
-        return Notification(
-            notificationID = RandomIDGenerator.generateRandomId(),
-            notificationType = NotificationType.TASK_REQUEST_RECIEVED_NOTIFICATION.toString(),
-            taskID = Faker().number().randomDigit().toString(),
-            title = "Armax wants to work on 12345",
-            message = Faker().backToTheFuture().quote().toString(),
-            timeStamp = Timestamp.now().seconds,
-            fromUser = Faker().funnyName().name().toString(),
-            toUser = "userid1",
-            lastUpdated = Timestamp.now().seconds,
-            projectID = PrefManager.getcurrentProject()
-        )
+    private fun createRequestNotification(): Notification? {
+//        return Notification(
+//            notificationID = RandomIDGenerator.generateRandomId(),
+//            notificationType = NotificationType.TASK_REQUEST_RECIEVED_NOTIFICATION.toString(),
+//            taskID = Faker().number().randomDigit().toString(),
+//            title = "Armax wants to work on 12345",
+//            message = Faker().backToTheFuture().quote().toString(),
+//            timeStamp = Timestamp.now().seconds,
+//            fromUser = Faker().funnyName().name().toString(),
+//            toUser = "userid1",
+//            lastUpdated = Timestamp.now().seconds,
+//            projectID = PrefManager.getcurrentProject()
+//        )
+        return null
     }
 
     private fun setContributors(list: MutableList<User>) {

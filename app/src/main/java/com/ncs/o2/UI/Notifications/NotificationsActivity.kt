@@ -1,7 +1,6 @@
 package com.ncs.o2.UI.Notifications
 
 import android.app.Activity
-import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
@@ -40,7 +39,7 @@ import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Notifications.Adapter.NotificationAdapter
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
-import com.ncs.o2.UI.Teams.TeamsActivity
+import com.ncs.o2.UI.Teams.ChannelHolderActivity
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,7 +47,6 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotificationClick,NetworkChangeReceiver.NetworkChangeCallback {
@@ -129,7 +127,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                 NotificationType.TEAMS_COMMENT_NOTIFICATION.name->{
                     finish()
                     updateProjectCache(projectID)
-                    val intent = Intent(this, TeamsActivity::class.java)
+                    val intent = Intent(this, ChannelHolderActivity::class.java)
                     Log.d("teamsChannelID",channelID.toString())
                     intent.putExtra("channel_name", channelID)
                     intent.putExtra("type", "channel")
@@ -140,7 +138,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
                 NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name->{
                     finish()
                     updateProjectCache(projectID)
-                    val intent = Intent(this, TeamsActivity::class.java)
+                    val intent = Intent(this, ChannelHolderActivity::class.java)
                     Log.d("teamsChannelID",channelID.toString())
                     intent.putExtra("channel_name", channelID)
                     intent.putExtra("type", "channel")
@@ -453,7 +451,7 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
             }
             NotificationType.TEAMS_COMMENT_MENTION_NOTIFICATION.name->{
                 finish()
-                val intent = Intent(this, TeamsActivity::class.java)
+                val intent = Intent(this, ChannelHolderActivity::class.java)
                 Log.d("channele name",notification.channelID)
                 intent.putExtra("channel_name", notification.channelID)
                 intent.putExtra("type", "channel")

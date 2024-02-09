@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -169,6 +170,19 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         binding.viewPager2.adapter = adapter
         binding.viewPager2.offscreenPageLimit = 4
         setUpTabsLayout(list)
+
+        binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                Timber.tag("Viewpager").i("position : ${position}, positionOffset : ${positionOffset}, positionOffsetPX : ${positionOffsetPixels}")
+                val dragDistance = positionOffset * binding.viewPager2.width
+
+
+            }
+        })
     }
 
     private fun setUpTabsLayout(list: MutableList<String>) {
@@ -196,7 +210,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
                 }
             })
             if (position < list.size && position !in processedPositions) {
-                Log.d("sectionslist", "current position is $position")
+                Timber.tag("sectionslist").d("current position is %s", position)
 
                 CoroutineScope(Dispatchers.IO).launch {
                     lock.withLock {
@@ -207,7 +221,8 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
                                 list[currentPosition]
                             )
 
-                            Log.d("sectionslist", "position while updating is $currentPosition")
+                            Timber.tag("sectionslist")
+                                .d("position while updating is %s", currentPosition)
 
                             withContext(Dispatchers.Main) {
                                 if (tasks.isEmpty()) {
@@ -317,6 +332,11 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
     }
 
     override fun smoothScrollby(dx: Float, dy: Float) {
+
+        with(binding.viewPager2){
+
+        }
+
 
     }
 

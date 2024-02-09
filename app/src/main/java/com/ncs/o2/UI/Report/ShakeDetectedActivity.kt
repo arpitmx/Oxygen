@@ -1,27 +1,13 @@
 package com.ncs.o2.UI.Report
 
-import android.app.Activity
-import android.content.Intent
-import android.graphics.Bitmap
-import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
-import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
-import com.ncs.o2.UI.Teams.Chat.TeamsChatFragment
-import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.ActivityShakeDetectedBinding
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.Date
 
 
 @AndroidEntryPoint

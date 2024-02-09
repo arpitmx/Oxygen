@@ -1,8 +1,6 @@
 package com.ncs.o2.UI.Teams
 
-import TaskListAdapter
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,24 +8,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
-import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
 import com.ncs.o2.Domain.Models.Channel
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
-import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.set180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -38,22 +31,14 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.MainActivity
-import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
-import com.ncs.o2.UI.UIComponents.Adapters.BottomSheetAdapter
-import com.ncs.o2.UI.UIComponents.BottomSheets.AddTagsBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.CreateNewChannelBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.TeamsPagemoreOptions
 import com.ncs.o2.databinding.FragmentTeamsBinding
-import com.ncs.o2.databinding.FragmentTeamsChatBinding
-import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import me.shouheng.utils.app.ActivityUtils.overridePendingTransition
 import javax.inject.Inject
 
 
@@ -300,7 +285,6 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
         }
     }
-
 
 
     fun fetchNewChannels() {
@@ -563,7 +547,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
 
     override fun onChannelClick(channel: Channel) {
-        val intent = Intent(requireContext(), TeamsActivity::class.java)
+        val intent = Intent(requireContext(), ChannelHolderActivity::class.java)
         intent.putExtra("channel_name", channel.channel_name)
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)

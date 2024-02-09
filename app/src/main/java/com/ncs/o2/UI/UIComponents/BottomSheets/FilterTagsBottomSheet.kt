@@ -36,7 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.datafaker.Faker
+//import net.datafaker.Faker
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -45,7 +45,7 @@ class FilterTagsBottomSheet (private var TagsList: MutableList<Tag>, private val
     private var TagListfromFireStore: MutableList<Tag> = mutableListOf()
     private val viewmodel: TaskSectionViewModel by viewModels()
     lateinit var binding: FilterTagBottomSheetBinding
-    private val faker: Faker by lazy { Faker() }
+//    private val faker: Faker by lazy { Faker() }
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository

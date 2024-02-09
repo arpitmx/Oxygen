@@ -26,7 +26,7 @@ android {
         minSdk 26
         targetSdkVersion 34
         versionCode 12
-        versionName "24.1.15"
+        versionName "24.2.10"
         multiDexEnabled true
 
 
@@ -56,7 +56,7 @@ android {
             //Gemini, FCM
             buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")
             buildConfigField("String", "FCM_SERVER_KEY", "\"AAAAmReJ314:APA91bGdEcp1FOt43szF1N7xbG-Pdjuct_0gZzhuDP5GvpSt_ECeXV3mQhKq3Gqq1Rgqa6FGcUwTlCyJYqbo0f89Flb5Y6X44nNMVkqW5Q1XsXZZXwE-77N3bORGbEdQ1TbM24Cb90Dw\"")
-            buildConfigField("String","GEMINI_API_KEY","\"AIzaSyDVca4I2Jk5heUGS_0Jry1721VC8M32ATg\"")
+            buildConfigField("String","GEMINI_API_KEY","\"AIzaSyDvQi6ElnqLNPIXEsCTY0Q_KepvmlwKwrE\"")
         }
 
         release {
@@ -87,6 +87,8 @@ android {
 }
 
 dependencies {
+
+
 
     //Easy Permission
     implementation 'pub.devrel:easypermissions:3.0.0'
@@ -121,8 +123,8 @@ dependencies {
     implementation"io.noties.markwon:ext-strikethrough:$markwon_version"
 
     //Prism 4j
-//    implementation "io.noties:prism4j:2.0.0"
-//    kapt 'io.noties:prism4j-bundler:2.0.0'
+    implementation "io.noties:prism4j:2.0.0"
+    kapt 'io.noties:prism4j-bundler:2.0.0'
 
 
     //Cloudnary
@@ -251,7 +253,7 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
 
-    //Faker data TODO "Remove in production"
+//    //Faker data TODO "Remove in production"
     implementation 'net.datafaker:datafaker:1.9.0'
 
     //color picker
