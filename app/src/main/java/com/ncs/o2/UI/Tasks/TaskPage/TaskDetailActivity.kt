@@ -106,6 +106,17 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
                         }
                     }
                 }
+                val oldRecents=PrefManager.getProjectRecents(PrefManager.getcurrentProject()).distinct().toMutableList()
+                if (!oldRecents.contains(taskId)){
+                    if (oldRecents.size>=10){
+                        oldRecents.removeAt(oldRecents.size-1)
+                        oldRecents.add(taskId!!)
+                    }
+                    else{
+                        oldRecents.add(taskId!!)
+                    }
+                }
+                PrefManager.saveProjectRecents(PrefManager.getcurrentProject(),oldRecents.distinct())
             }
 
             if (_type!=null){

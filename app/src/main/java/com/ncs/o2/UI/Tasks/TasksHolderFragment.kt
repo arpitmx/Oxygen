@@ -151,6 +151,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
             activityBinding.gioActionbar.tabLayout.visible()
         }
 
+
     }
 
     private fun setUpBackPress() {
