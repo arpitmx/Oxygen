@@ -539,10 +539,6 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
             drawerLayout.openDrawer(gravity)
         }
 
-        activityBinding.binding.gioActionbar.refresh.setOnClickThrottleBounceListener {
-            startActivity(Intent(requireContext(),CreateTaskActivity::class.java))
-        }
-
         activityBinding.binding.gioActionbar.tabLayout.gone()
         activityBinding.binding.gioActionbar.line.visible()
         activityBinding.binding.gioActionbar.refresh.visible()

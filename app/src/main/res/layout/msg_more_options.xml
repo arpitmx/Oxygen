@@ -80,6 +80,9 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:visibility="visible"
+        android:foreground="@drawable/ripplecustom"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_height="wrap_content"
         android:id="@+id/addtoCheckList">
         <LinearLayout
@@ -131,6 +134,9 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:visibility="visible"
+        android:foreground="@drawable/ripplecustom"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_height="wrap_content"
         android:id="@+id/createTask">
         <LinearLayout
@@ -179,6 +185,9 @@
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:visibility="visible"
+            android:foreground="@drawable/ripplecustom"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_height="wrap_content"
             android:id="@+id/reply">
             <LinearLayout
@@ -227,6 +236,9 @@
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:visibility="visible"
+            android:foreground="@drawable/ripplecustom"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_height="wrap_content"
             android:id="@+id/copy">
             <LinearLayout

@@ -252,6 +252,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="15dp"
             android:fontFamily="@font/sf_pro_display_medium"
             android:text="Crafted with ❤️ By NCS"
             android:textColor="#686666"

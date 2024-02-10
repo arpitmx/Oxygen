@@ -4,6 +4,9 @@
     android:layout_height="50dp"
     android:background="@color/secondary_bg_black"
     android:orientation="vertical"
+    android:foreground="@drawable/ripplecustom"
+    android:clickable="true"
+    android:focusable="true"
     android:weightSum="10"
     >
 

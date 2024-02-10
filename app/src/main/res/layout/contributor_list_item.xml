@@ -4,6 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="8dp"
+    android:foreground="@drawable/ripplecustom"
+    android:clickable="true"
+    android:focusable="true"
     android:background="@color/primary_bg">
 
     <androidx.constraintlayout.widget.ConstraintLayout

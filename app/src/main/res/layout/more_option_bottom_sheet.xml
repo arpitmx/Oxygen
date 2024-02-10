@@ -81,6 +81,9 @@
         android:orientation="vertical"
         android:paddingTop="24dp"
         android:id="@+id/share_button"
+        android:foreground="@drawable/ripplecustom"
+        android:clickable="true"
+        android:focusable="true"
         android:background="@color/secondary_bg_black"
         android:layout_height="wrap_content">
         <LinearLayout
@@ -125,6 +128,9 @@
             android:orientation="vertical"
             android:paddingTop="24dp"
             android:id="@+id/today"
+            android:foreground="@drawable/ripplecustom"
+            android:clickable="true"
+            android:focusable="true"
             android:background="@color/secondary_bg_black"
             android:layout_height="wrap_content">
             <LinearLayout

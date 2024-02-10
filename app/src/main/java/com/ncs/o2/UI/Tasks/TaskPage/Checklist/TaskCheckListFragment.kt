@@ -156,6 +156,14 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
     private fun setCheckListRecyclerView(_list: List<CheckList>) {
         val  list = _list.sortedBy { it.index }.toMutableList()
+        if (list.isEmpty()){
+            binding.noCheckList.visible()
+            checkList_rv.gone()
+        }
+        else{
+            binding.noCheckList.gone()
+            checkList_rv.visible()
+        }
         if (isAssignee && !isModerator){
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,true, )
         }
@@ -178,7 +186,7 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
             checkListAdapter = CheckListAdapter(list = list,markwon= markwon,this,false,false,false)
         }
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        checkList_rv.visible()
+//        checkList_rv.visible()
         with(checkList_rv) {
             this.layoutManager = layoutManager
             adapter = checkListAdapter

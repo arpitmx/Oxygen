@@ -669,6 +669,9 @@ object PrefManager {
     }
 
     fun setAppMode(mode:String) {
+        if (mode==Endpoints.OFFLINE_MODE){
+            PrefManager.setShakePref(false)
+        }
         editor.putString("appMode", mode)
         editor.apply()
     }

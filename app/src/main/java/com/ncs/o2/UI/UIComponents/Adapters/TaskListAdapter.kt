@@ -37,9 +37,7 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
     private val selectedTags = mutableListOf<Tag>()
     private var onClickListener: OnClickListener? = null
 
-    init {
-        taskList.sortedByDescending { it.last_updated }
-    }
+
     inner class TaskItemViewHolder(private val binding: TaskItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 

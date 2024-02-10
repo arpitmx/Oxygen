@@ -230,6 +230,14 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
 
         }
+        binding.gioActionbar.refresh.setOnClickThrottleBounceListener {
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                startActivity(Intent(this,CreateTaskActivity::class.java))
+            }
+            else{
+                easyElements.showSnackbar(binding.root,"Task Creation is not available in offline mode",3000)
+            }
+        }
 
 
     }
@@ -451,9 +459,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
         }
 
         binding.gioActionbar.btnQuickTask.setOnClickThrottleBounceListener {
-            val quickTaskBottomSheet =
-                AddQuickTaskBottomSheet(Message(messageId = "", messageType = MessageType.NORMAL_MSG, timestamp = Timestamp.now(), senderId = "", additionalData = emptyMap(), content = ""))
-            quickTaskBottomSheet.show(supportFragmentManager, "quickTask")
+            if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                val quickTaskBottomSheet =
+                    AddQuickTaskBottomSheet(Message(messageId = "", messageType = MessageType.NORMAL_MSG, timestamp = Timestamp.now(), senderId = "", additionalData = emptyMap(), content = ""))
+                quickTaskBottomSheet.show(supportFragmentManager, "quickTask")
+            }else {
+
+                easyElements.showSnackbar(
+                    binding.root,
+                    "Task Creation is not available in offline mode",
+                    3000
+                )
+            }
         }
 
 
