@@ -466,7 +466,7 @@ object PrefManager {
             val type = object : TypeToken<List<String>>() {}.type
             return gson.fromJson(sectionsJson, type)
         }else{
-            return listOf("Must Read", "Features", "Working", "Instructions")
+            return Endpoints.defaultSections
         }
     }
     fun putProjectsList(projects:List<String>){

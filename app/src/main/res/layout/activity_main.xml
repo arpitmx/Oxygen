@@ -27,6 +27,7 @@
                     android:layout_height="wrap_content"
                     android:visibility="visible" />
 
+
             <FrameLayout
                 android:id="@+id/container"
                 android:layout_width="match_parent"
@@ -55,6 +56,20 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textSize="30dp"
+                    android:textColor="@color/edit_text_hint"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAlignment="center"
+                    android:padding="10dp"
+                    android:visibility="gone"
+                    android:id="@+id/project_placeholder"
+                    android:text="Join a project to continue"
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textSize="20dp"
                     android:textColor="@color/edit_text_hint"/>
 
             </FrameLayout>

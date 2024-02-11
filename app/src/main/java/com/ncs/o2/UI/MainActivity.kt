@@ -239,7 +239,30 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             }
         }
 
+        manageNoProject()
 
+    }
+
+    private fun manageNoProject(){
+        if (PrefManager.getcurrentProject()=="None"){
+            binding.projectPlaceholder.visible()
+            binding.navHostFragmentActivityMain.gone()
+            binding.bottomNavParent.gone()
+            binding.gioActionbar.teamsSearch.gone()
+            binding.gioActionbar.notifications.gone()
+            binding.gioActionbar.btnMoreTeams.gone()
+            binding.gioActionbar.searchCont.gone()
+            PrefManager.setRadioButton(-1)
+        }
+        else{
+            binding.navHostFragmentActivityMain.visible()
+            binding.bottomNavParent.visible()
+            binding.gioActionbar.teamsSearch.visible()
+            binding.gioActionbar.notifications.visible()
+            binding.gioActionbar.btnMoreTeams.visible()
+            binding.projectPlaceholder.gone()
+
+        }
     }
 
     private fun initShake(){
@@ -305,10 +328,10 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
         // Set up various views and components
         setUpProjects()
-        setUpActionBar()
         setUpViewsOnClicks()
         setupProjectsList()
         setBottomNavBar()
+        setUpActionBar()
 
     }
 
@@ -421,6 +444,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
     override fun onResume() {
         super.onResume()
+        manageNoProject()
         if (PrefManager.getShakePref()){
             initShake()
             shakeDetector.registerListener()
@@ -602,19 +626,31 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
     }
     private fun setupProjectsList(){
 
-
+        manageNoProject()
         //Version tag setup
         binding.drawerheaderfile.versionCode.text = "Oxygen v${getVersionName(this)}"
 
         projects=PrefManager.getProjectsList().toMutableList()
         val list=ArrayList<String>()
         list.addAll(projects)
+        if (list.contains("None")){
+            list.remove("None")
+        }
         val recyclerView=binding.drawerheaderfile.projectRecyclerView
-        projectListAdapter = RecyclerViewAdapter(this,list)
-        val linearLayoutManager = LinearLayoutManager(this)
-        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView.layoutManager = linearLayoutManager
-        recyclerView.adapter = projectListAdapter
+        if (list.isEmpty()){
+            recyclerView.gone()
+            binding.drawerheaderfile.projectPlaceholder.visible()
+        }
+        else{
+            recyclerView.visible()
+            binding.drawerheaderfile.projectPlaceholder.gone()
+            projectListAdapter = RecyclerViewAdapter(this,list)
+            val linearLayoutManager = LinearLayoutManager(this)
+            linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView.layoutManager = linearLayoutManager
+            recyclerView.adapter = projectListAdapter
+        }
+
     }
 
     override fun onClick(projectID: String, position: Int) {
@@ -642,6 +678,8 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             setUpTags(projectName = projectID)
 
         }
+        manageNoProject()
+
     }
 
 
@@ -846,11 +884,18 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
     }
 
     override fun onProjectAdded(userProjects: ArrayList<String>) {
+        manageNoProject()
         Log.d("projectCheck",PrefManager.getProjectsList().toString())
         PrefManager.putProjectsList(userProjects)
         Log.d("projectCheck",PrefManager.getProjectsList().toString())
         setupProjectsList()
-        projectListAdapter.notifyDataSetChanged()
+        if (this::projectListAdapter.isInitialized) {
+            projectListAdapter.notifyDataSetChanged()
+        }
+        else{
+            projectListAdapter = RecyclerViewAdapter(this,PrefManager.getProjectsList())
+            projectListAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -944,10 +989,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
                                         }
                                     }
                                     Log.d("position",position.toString())
-                                    PrefManager.setcurrentProject(project)
-                                    PrefManager.setRadioButton(position)
-                                    PrefManager.selectedPosition.value = position
-                                    projectListAdapter.notifyDataSetChanged()
+
+                                    if (this@MainActivity::projectListAdapter.isInitialized) {
+                                        PrefManager.setcurrentProject(project)
+                                        PrefManager.setRadioButton(position)
+                                        PrefManager.selectedPosition.value = position
+                                        projectListAdapter.notifyDataSetChanged()
+                                    }
+                                    else{
+                                        projectListAdapter = RecyclerViewAdapter(this@MainActivity,PrefManager.getProjectsList())
+                                        projectListAdapter.notifyDataSetChanged()
+                                    }
                                     setupProjectsList()
                                     val intent =
                                         Intent(this@MainActivity, TaskDetailActivity::class.java)
@@ -1004,10 +1056,17 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
                                         }
                                     }
                                     Log.d("position",position.toString())
-                                    PrefManager.setcurrentProject(project)
-                                    PrefManager.setRadioButton(position)
-                                    PrefManager.selectedPosition.value = position
-                                    projectListAdapter.notifyDataSetChanged()
+
+                                    if (this@MainActivity::projectListAdapter.isInitialized) {
+                                        PrefManager.setcurrentProject(project)
+                                        PrefManager.setRadioButton(position)
+                                        PrefManager.selectedPosition.value = position
+                                        projectListAdapter.notifyDataSetChanged()
+                                    }
+                                    else{
+                                        projectListAdapter = RecyclerViewAdapter(this@MainActivity,PrefManager.getProjectsList())
+                                        projectListAdapter.notifyDataSetChanged()
+                                    }
                                     setupProjectsList()
                                     val intent =
                                         Intent(this@MainActivity, TaskDetailActivity::class.java)
@@ -1081,7 +1140,13 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
                     projects.addAll(result.data)
                     Timber.tag("result").d(result.data.toString())
                     PrefManager.putProjectsList(result.data)
-                    projectListAdapter.notifyDataSetChanged()
+                    if (this@MainActivity::projectListAdapter.isInitialized) {
+                        projectListAdapter.notifyDataSetChanged()
+                    }
+                    else{
+                        projectListAdapter = RecyclerViewAdapter(this@MainActivity,PrefManager.getProjectsList())
+                        projectListAdapter.notifyDataSetChanged()
+                    }
                     setupProjectsList()
                     CoroutineScope(Dispatchers.IO).launch {
                         val list = getProjectSegments(PrefManager.getlastaddedproject())
