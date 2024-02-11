@@ -20,7 +20,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.core.updateTransition
 import androidx.core.content.ContextCompat
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.Timestamp
@@ -31,18 +30,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Constants.Errors
-import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Constants.TestingConfig
-import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Interfaces.Repository
-import com.ncs.o2.Domain.Models.CurrentUser
 import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Domain.Models.Task
+import com.ncs.o2.Domain.Models.Update
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.blink
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.blinkinfi
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.deleteDownloadedFile
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.getVersionName
@@ -50,7 +45,6 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isGreaterThanVersion
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.popInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotateInfinity
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -60,7 +54,6 @@ import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
-import com.ncs.o2.Services.Updater.UpdateDownloaderService
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.Auth.SignupScreen.SignUpScreenFragment
 import com.ncs.o2.UI.MainActivity
@@ -73,11 +66,9 @@ import com.ncs.o2.UI.UpdateScreen.UpdaterActivity
 import com.ncs.o2.databinding.ActivitySplashScreenBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.internal.util.HalfSerializer.onComplete
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -126,7 +117,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
         PrefManager.setOfflineDialogShown(false)
         PrefManager.setAppMode(Endpoints.ONLINE_MODE)
         binding.fragLogoContainer.blinkinfi(this)
-
         binding.fragLogoContainer.visible()
 
         if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
@@ -138,6 +128,8 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
     }
 
+
+
     private fun initialise() {
 
         binding.fragContainer.gone()
@@ -145,31 +137,40 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
         //Check for updates
         viewModel.getUpdateDocumentLiveData().observe(this) { update ->
             val currentVersion = getVersionName(this)
-
             currentVersion?.let {
+
+                //New Update
                 if (update.VERSION_CODE.isGreaterThanVersion(currentVersion)) {
-                    util.singleBtnDialog(
-                        getString(R.string.new_update),
-                        getString(R.string.a_new_version_of_o2_has_been_released_proceed_to_install),
-                        "Proceed"
-                    ) {
-                        val intent = Intent(this, UpdaterActivity::class.java)
-                        intent.putExtra("UPDATE", update)
-                        startActivity(intent)
-                        finishAffinity()
-                    }
+                    startUpdateProcess(update)
                     return@let
-
-                } else {
-
-                    binding.fragContainer.clearAnimation()
-
-                    removeRedundantUpdatePackages()
-                    askNotificationPermission()
+                }
+                //Current is latest
+                else {
+                    startScreenProcess()
                 }
             }
         }
     }
+
+
+    private fun startUpdateProcess(update: Update){
+        util.singleBtnDialog(
+            getString(R.string.new_update),
+            getString(R.string.a_new_version_of_o2_has_been_released_proceed_to_install),
+            "Proceed"
+        ) {
+            val intent = Intent(this, UpdaterActivity::class.java)
+            intent.putExtra("UPDATE", update)
+            startActivity(intent)
+            finishAffinity()
+        }
+    }
+    private fun startScreenProcess(){
+        binding.fragContainer.clearAnimation()
+        removeRedundantUpdatePackages()
+        setUpViews()
+    }
+
 
     private fun removeRedundantUpdatePackages() {
         if (PrefManager.getDownloadID()!= -1L){
@@ -203,8 +204,10 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
         }
     }
 
-    private fun askNotificationPermission() {
+    private fun setUpViews() {
 
+
+        //Check for Notification permission for android 12
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -231,8 +234,10 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         } else {
+
             setBallAnimator()
             setUpViews(TestingConfig.isTesting)
+
         }
     }
 
@@ -325,14 +330,17 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
             viewModel.checkMaintenanceThroughRepository().observe(this) {
 
-                if (Codes.STRINGS.isMaintaining != null) {
+                if (Codes.STRINGS.isMaintaining != "") {
                     if (Codes.STRINGS.isMaintaining == "true") {
-                        Log.d("maintainenceCheck", "maintaining")
-                        val intent = Intent(this, MaintainingScreen::class.java)
+
+                        Timber.tag("maintainenceCheck").d("maintaining")
+                        val intent = Intent(this, MaintainanceScreen::class.java)
                         startActivity(intent)
                         finishAffinity()
+
                     } else {
                         if (PrefManager.getPopUpVisibility()){
+
                             val intent = Intent(this, NewChanges::class.java)
                             intent.putExtra("type","popup")
                             startActivity(intent)
@@ -447,8 +455,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
             }
         }
-
-
     }
 
     private fun setUpProcesses() {
@@ -468,7 +474,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                 }
 
                 val document = task.result
-
                 if (!document.exists()) {
                     showBallError(Errors.AccountErrors.ACCOUNT_FIELDS_NULL, task.exception!!)
                     return@addOnCompleteListener
@@ -547,8 +552,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
                         finishAffinity()
 
                     }
-
-
 
                 }
                 else{
@@ -862,8 +865,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
 
     }
 
-
-
     private fun setUpFCMTokenIfRequired(document: DocumentSnapshot) {
 
         val fcmToken = document.getString(Endpoints.User.FCM_TOKEN) ?: ""
@@ -961,7 +962,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
     }
 
     private var receiverRegistered = false
-
     private val intentFilter by lazy{
         IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
     }
@@ -1008,7 +1008,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
             }
         }
     }
-
     fun takeScreenshot(activity: Activity) {
         Log.e("takeScreenshot", activity.localClassName)
         val rootView = activity.window.decorView.rootView
@@ -1036,7 +1035,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
         intent.putExtra("type","report")
         startActivity(intent)
     }
-
     fun moveToShakeSettings() {
         val intent = Intent(this, ShakeDetectedActivity::class.java)
         intent.putExtra("type","settings")

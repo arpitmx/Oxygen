@@ -79,7 +79,7 @@
             android:name=".UI.UIComponents.BottomSheets.sectionDisplayBottomSheet"
             android:exported="false" />
         <activity
-            android:name=".UI.StartScreen.MaintainingScreen"
+            android:name=".UI.StartScreen.MaintainanceScreen"
             android:exported="false" />
         <activity
             android:name=".UI.EditProfile.EditProfileActivity"

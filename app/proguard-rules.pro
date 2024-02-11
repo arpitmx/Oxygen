@@ -20,6 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.ncs.o2.Domain.Models.* {
-        *;
-}
+-dontobfuscate

@@ -8,7 +8,7 @@ import com.ncs.o2.Domain.Utility.Codes
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.databinding.ActivityMaintainingScreenBinding
 
-class MaintainingScreen : AppCompatActivity() {
+class MaintainanceScreen : AppCompatActivity() {
 
     private lateinit var binding: ActivityMaintainingScreenBinding
     override fun onCreate(savedInstanceState: Bundle?) {
