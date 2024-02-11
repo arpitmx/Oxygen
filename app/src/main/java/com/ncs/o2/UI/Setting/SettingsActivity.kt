@@ -69,15 +69,15 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             settingOption("Edit Profile", R.drawable.round_edit_24, ""),
 
             settingTitle("what's new"),
-            settingOption("What's New", R.drawable.baseline_info_24, "Version 24.1.24"),
+            settingOption("What's New", R.drawable.baseline_info_24, "Version 24.2.10"),
 
             settingTitle("Report & Feedback"),
             settingOption("Feedback", R.drawable.baseline_feedback_24, ""),
             settingOption("Shake to Report", R.drawable.baseline_screen_rotation_24, ""),
 
 
-            settingTitle("Logs"),
-            settingOption("Logs", R.drawable.baseline_assistant_24, ""),
+//            settingTitle("Logs"),
+//            settingOption("Logs", R.drawable.baseline_assistant_24, ""),
 
             settingTitle("Account"),
             settingOption("Log Out", R.drawable.logout, "") ,
@@ -162,10 +162,16 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
         else if(Codes.STRINGS.clickedSetting == "Feedback"){
-            val intent = Intent(this, ShakeDetectedActivity::class.java)
-            intent.putExtra("type", "report")
-            startActivity(intent)
-            this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+                val intent = Intent(this, ShakeDetectedActivity::class.java)
+                intent.putExtra("type", "report")
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            else{
+                util.showSnackbar(binding.root,"Feedback can't be given in offline mode",2000)
+            }
+
         }
     }
 

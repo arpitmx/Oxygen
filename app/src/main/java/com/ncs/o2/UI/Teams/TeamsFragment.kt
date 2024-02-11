@@ -67,7 +67,9 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentTeamsBinding.inflate(inflater, container, false)
+
         manageviews()
+
         return binding.root
     }
 
@@ -82,6 +84,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
 
     override fun onResume() {
         super.onResume()
+
         manageviews()
         setUpProjectStats()
         val channels=PrefManager.getProjectChannels(PrefManager.getcurrentProject())
@@ -381,39 +384,44 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     }
 
     private fun postDefaultChannel() {
-        val channel = Channel(
-            channel_name = "General",
-            channel_desc = "General Description",
-            channel_id = "General${RandomIDGenerator.generateRandomTaskId(4)}",
-            timestamp = Timestamp.now(),
-            creator = PrefManager.getCurrentUserEmail()
-        )
+        if (PrefManager.getcurrentProject()!="None") {
+            val channel = Channel(
+                channel_name = "General",
+                channel_desc = "General Description",
+                channel_id = "General${RandomIDGenerator.generateRandomTaskId(4)}",
+                timestamp = Timestamp.now(),
+                creator = PrefManager.getCurrentUserEmail()
+            )
 
-        CoroutineScope(Dispatchers.Main).launch {
-            repository.postChannel(channel, PrefManager.getcurrentProject()) { result ->
+            CoroutineScope(Dispatchers.Main).launch {
+                repository.postChannel(channel, PrefManager.getcurrentProject()) { result ->
 
-                when (result) {
+                    when (result) {
 
-                    is ServerResult.Failure -> {
-                        binding.progressBar.gone()
-                    }
+                        is ServerResult.Failure -> {
+                            binding.progressBar.gone()
+                        }
 
-                    ServerResult.Progress -> {
-                        binding.progressBar.visible()
-                    }
+                        ServerResult.Progress -> {
+                            binding.progressBar.visible()
+                        }
 
-                    is ServerResult.Success -> {
-                        binding.progressBar.gone()
-                        val oldList =
-                            PrefManager.getProjectChannels(PrefManager.getcurrentProject())
-                        val newList =
-                            (oldList.toMutableList() + channel).sortedByDescending { it.timestamp }
-                        PrefManager.saveProjectChannels(PrefManager.getcurrentProject(), newList)
-                        PrefManager.setLastChannelTimeStamp(
-                            PrefManager.getcurrentProject(),
-                            channel.timestamp!!
-                        )
-                        setRecyclerView(newList.distinctBy { it.channel_id })
+                        is ServerResult.Success -> {
+                            binding.progressBar.gone()
+                            val oldList =
+                                PrefManager.getProjectChannels(PrefManager.getcurrentProject())
+                            val newList =
+                                (oldList.toMutableList() + channel).sortedByDescending { it.timestamp }
+                            PrefManager.saveProjectChannels(
+                                PrefManager.getcurrentProject(),
+                                newList
+                            )
+                            PrefManager.setLastChannelTimeStamp(
+                                PrefManager.getcurrentProject(),
+                                channel.timestamp!!
+                            )
+                            setRecyclerView(newList.distinctBy { it.channel_id })
+                        }
                     }
                 }
             }
@@ -523,10 +531,6 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
             drawerLayout.openDrawer(gravity)
         }
 
-        activityBinding.binding.gioActionbar.refresh.setOnClickThrottleBounceListener {
-            startActivity(Intent(requireContext(),CreateTaskActivity::class.java))
-        }
-
         activityBinding.binding.gioActionbar.tabLayout.gone()
         activityBinding.binding.gioActionbar.line.visible()
         activityBinding.binding.gioActionbar.refresh.visible()
@@ -543,6 +547,14 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
                 PrefManager.getcurrentProject()
             ), resources.getDrawable(R.drawable.placeholder_image)
         )
+        if (PrefManager.getcurrentProject()=="None"){
+            activityBinding.binding.gioActionbar.btnMoreTeams.gone()
+            activityBinding.binding.gioActionbar.searchCont.gone()
+        }
+        else{
+            activityBinding.binding.gioActionbar.btnMoreTeams.visible()
+            activityBinding.binding.gioActionbar.searchCont.visible()
+        }
     }
 
 

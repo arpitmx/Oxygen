@@ -167,14 +167,14 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         }
                         "pending"->{
                             setSelectedColor(binding.pending)
-                            taskList=taskList.filter { it.status==1 || it.status==2 }.sortedByDescending { it.last_updated }.toMutableList()
+                            taskList=taskList.filter { it.status==1 || it.status==2 }.sortedByDescending { it.time_STAMP }.toMutableList()
                             runDelayed(800) {
                                 searchQuery(binding.searchBar.text.toString())
                             }
                         }
                         "working"->{
                             setSelectedColor(binding.working)
-                            taskList=taskList.filter { it.status==3 }.sortedByDescending { it.last_updated }.toMutableList()
+                            taskList=taskList.filter { it.status==3 }.sortedByDescending { it.time_STAMP }.toMutableList()
                             runDelayed(800) {
                                 searchQuery(binding.searchBar.text.toString())
                             }
@@ -182,14 +182,14 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         "review"->{
                             setSelectedColor(binding.review)
 
-                            taskList=taskList.filter { it.status==4 }.sortedByDescending { it.last_updated }.toMutableList()
+                            taskList=taskList.filter { it.status==4 }.sortedByDescending { it.time_STAMP }.toMutableList()
                             runDelayed(800) {
                                 searchQuery(binding.searchBar.text.toString())
                             }
                         }
                         "completed"->{
                             setSelectedColor(binding.completed)
-                            taskList=taskList.filter { it.status==5 }.sortedByDescending { it.last_updated }.toMutableList()
+                            taskList=taskList.filter { it.status==5 }.sortedByDescending { it.time_STAMP }.toMutableList()
                             runDelayed(800) {
                                 searchQuery(binding.searchBar.text.toString())
                             }
@@ -214,13 +214,14 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             setSelectedColor(binding.all)
             list.clear()
             FetchTasksforModerators()
+            setUpOnSuccessRV(taskList)
         }
 
         binding.pending.setOnClickThrottleBounceListener {
             viewModel.currentSelected="pending"
             setSelectedColor(binding.pending)
             val filter = taskList.filter { (it.status == 1 || it.status==2)}.toMutableList()
-            setUpOnSuccessRV(filter.sortedByDescending { it.last_updated }.toMutableList())
+            setUpOnSuccessRV(filter.sortedByDescending { it.time_STAMP }.toMutableList())
 
         }
 
@@ -228,21 +229,21 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             viewModel.currentSelected="working"
             setSelectedColor(binding.working)
             val filter = taskList.filter { it.status==3}.toMutableList()
-            setUpOnSuccessRV(filter.sortedByDescending { it.last_updated }.toMutableList())
+            setUpOnSuccessRV(filter.sortedByDescending { it.time_STAMP }.toMutableList())
         }
 
         binding.review.setOnClickThrottleBounceListener {
             viewModel.currentSelected="review"
             setSelectedColor(binding.review)
             val filter = taskList.filter { it.status==4}.toMutableList()
-            setUpOnSuccessRV(filter.sortedByDescending { it.last_updated }.toMutableList())
+            setUpOnSuccessRV(filter.sortedByDescending { it.time_STAMP }.toMutableList())
         }
 
         binding.completed.setOnClickThrottleBounceListener {
             viewModel.currentSelected="completed"
             setSelectedColor(binding.completed)
             val filter = taskList.filter { it.status==5}.toMutableList()
-            setUpOnSuccessRV(filter.sortedByDescending { it.last_updated }.toMutableList())
+            setUpOnSuccessRV(filter.sortedByDescending { it.time_STAMP }.toMutableList())
         }
 
 
@@ -347,7 +348,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
 
         Log.d("filterActivity", finalFilter.toString())
 
-        setUpOnSuccessRV(finalFilter.sortedByDescending { it.last_updated }.toMutableList())
+        setUpOnSuccessRV(finalFilter.sortedByDescending { it.time_STAMP }.toMutableList())
 
 
 
@@ -563,7 +564,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             taskadapter = TaskListAdapter(
                 firestoreRepository,
                 this,
-                taskItems.sortedByDescending { it.last_updated }.toMutableList(),
+                taskItems.sortedByDescending { it.timestamp }.toMutableList(),
                 db
             )
             taskadapter.setOnClickListener(this)
@@ -611,7 +612,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                 is DBResult.Success -> {
                     taskList.clear()
                     taskList.addAll(filterTasks(result.data.toMutableList()))
-                    taskList.sortedByDescending { it.last_updated }
+                    taskList.sortedByDescending { it.time_STAMP }
 
                 }
 
@@ -643,7 +644,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                     when (result) {
                         is DBResult.Success -> {
                             taskList.addAll(filterTasks(result.data.toMutableList()))
-                            taskList.sortedByDescending { it.last_updated }
+                            taskList.sortedByDescending { it.time_STAMP }
 
                         }
 
@@ -675,7 +676,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                     is DBResult.Success -> {
                         taskList.clear()
                         taskList.addAll(filterTasks(result.data.toMutableList()))
-                        taskList.sortedByDescending { it.last_updated }
+                        taskList.sortedByDescending { it.time_STAMP }
 
                         setUpOnSuccessRV(taskList)
 
@@ -722,7 +723,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         withContext(Dispatchers.Main) {
                             taskList.clear()
                             taskList.addAll(filterTasks(list.toMutableList()))
-                            taskList.sortedByDescending { it.last_updated }
+                            taskList.sortedByDescending { it.time_STAMP }
 
                         }
                     }
@@ -783,7 +784,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             when (result) {
                 is DBResult.Success -> {
                     taskList.addAll(filterTasks(listOf(result.data)))
-                    taskList.sortedByDescending { it.last_updated }
+                    taskList.sortedByDescending { it.time_STAMP }
 
                 }
 
@@ -906,7 +907,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         performTaskFetch(_type!!)
                         runDelayed(800) {
                             binding.results.text = "Matches ${taskList.size} tasks"
-                            taskadapter.setTasks(taskList.sortedByDescending { it.last_updated }
+                            taskadapter.setTasks(taskList.sortedByDescending { it.time_STAMP }
                                 .toMutableList())
                             taskadapter.notifyDataSetChanged()
                         }
@@ -924,14 +925,14 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                                 "pending"->{
                                     setSelectedColor(binding.pending)
 
-                                    taskList=taskList.filter { it.status==1 || it.status==2 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==1 || it.status==2 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
                                 }
                                 "working"->{
                                     setSelectedColor(binding.working)
-                                    taskList=taskList.filter { it.status==3 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==3 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
@@ -939,14 +940,14 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                                 "review"->{
                                     setSelectedColor(binding.review)
 
-                                    taskList=taskList.filter { it.status==4 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==4 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
                                 }
                                 "completed"->{
                                     setSelectedColor(binding.completed)
-                                    taskList=taskList.filter { it.status==5 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==5 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
@@ -978,7 +979,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                                 "pending"->{
                                     setSelectedColor(binding.pending)
 
-                                    taskList=taskList.filter { it.status==1 || it.status==2 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==1 || it.status==2 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
@@ -986,21 +987,21 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                                 "working"->{
                                     setSelectedColor(binding.working)
 
-                                    taskList=taskList.filter { it.status==3 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==3 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
                                 }
                                 "review"->{
                                     setSelectedColor(binding.review)
-                                    taskList=taskList.filter { it.status==4 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==4 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
                                 }
                                 "completed"->{
                                     setSelectedColor(binding.completed)
-                                    taskList=taskList.filter { it.status==5 }.sortedByDescending { it.last_updated }.toMutableList()
+                                    taskList=taskList.filter { it.status==5 }.sortedByDescending { it.time_STAMP }.toMutableList()
                                     runDelayed(800) {
                                         searchQuery(binding.searchBar.text.toString())
                                     }
@@ -1022,7 +1023,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                 taskList.clear()
                 performTaskFetch(_type!!)
                 runDelayed(800){
-                    setUpOnSuccessRV(taskList.sortedByDescending { it.last_updated }.toMutableList())
+                    setUpOnSuccessRV(taskList.sortedByDescending { it.time_STAMP }.toMutableList())
                 }
             }
         }
@@ -1296,7 +1297,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             val segment = segments.find { it.segment_NAME == segmentName }
             segment?.archived != true
         }.toMutableList()
-        val sortedList = list.sortedByDescending { it.last_updated }
+        val sortedList = list.sortedByDescending { it.time_STAMP }
         return sortedList
     }
 

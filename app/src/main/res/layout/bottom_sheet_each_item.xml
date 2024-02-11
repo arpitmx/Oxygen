@@ -5,6 +5,9 @@
     android:orientation="vertical"
     android:paddingTop="24dp"
     android:id="@+id/layout"
+    android:foreground="@drawable/ripplecustom"
+    android:clickable="true"
+    android:focusable="true"
     android:background="@color/secondary_bg_black"
     android:layout_height="wrap_content">
     <LinearLayout

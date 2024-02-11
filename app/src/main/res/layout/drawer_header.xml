@@ -162,6 +162,21 @@
                 android:visibility="visible"
                 tools:listitem="@layout/project_list_item"
                  />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:padding="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                android:id="@+id/project_placeholder"
+                android:text="You have not joined any projects"
+                android:fontFamily="@font/sf_pro_display_semibold"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="14dp"
+                android:textColor="@color/edit_text_hint"/>
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -252,6 +267,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="15dp"
             android:fontFamily="@font/sf_pro_display_medium"
             android:text="Crafted with ❤️ By NCS"
             android:textColor="#686666"

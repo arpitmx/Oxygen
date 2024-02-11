@@ -9,9 +9,10 @@ object Endpoints {
     const val APP_CONFIG = "AppConfig"
     const val USERID = "userid1"
     const val new_changes_des = "Certainly! In order to provide you with a more personalized description, could you please specify what kind of description you are looking for? Are you interested in a description of a person, a place, an event, or something else? Additionally, if you have any specific details or preferences in mind, feel free to share them, so I can tailor the description to your needs.```xml    <application>        <meta-data          android:name=\"firebase_performance_logcat_enabled\"          android:value=\"true\" />    </application>```"
-    const val defaultProject="Oxidizer"
-    const val defaultAlias="OXR"
-    const val defaultSegment="Getting started"
+    const val defaultProject="None"                //Oxidizer
+    const val defaultAlias="None"                  //OXR
+    const val defaultSegment="Select Segment"      //Getting started
+    val defaultSections=listOf("Must Read", "Features", "Working", "Instructions")
     const val defaultLightSensi=.1F
     const val defaultMediumSensi=1.5F
     const val defaultHeavySensi=2.5F

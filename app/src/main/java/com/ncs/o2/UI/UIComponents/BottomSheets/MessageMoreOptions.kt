@@ -4,6 +4,7 @@ package com.ncs.o2.UI.UIComponents.BottomSheets
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,9 +25,12 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.R
+import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.MsgMoreOptionsBinding
+import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -88,19 +92,31 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
         }
 
         binding.addtoCheckList.setOnClickThrottleBounceListener {
-            val checkList=CheckList(
-                id=RandomIDGenerator.generateRandomTaskId(5),
-                title = "CheckPoint",
-                desc = message.content,
-                done = false,
-                index = -100)
-            addCheckList(checkList)
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+                val checkList=CheckList(
+                    id=RandomIDGenerator.generateRandomTaskId(5),
+                    title = "CheckPoint",
+                    desc = message.content,
+                    done = false,
+                    index = -100)
+                addCheckList(checkList)
+            }
+            else{
+                toast("CheckList can't be created while offline")
+            }
+
         }
 
         binding.createTask.setOnClickThrottleBounceListener {
-            dismiss()
-            val addQuickTaskBottomSheet = AddQuickTaskBottomSheet(message,segmentName,sectionName)
-            addQuickTaskBottomSheet.show(requireFragmentManager(), "Quick Task")
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+                dismiss()
+                val addQuickTaskBottomSheet = AddQuickTaskBottomSheet(message,segmentName,sectionName)
+                addQuickTaskBottomSheet.show(requireFragmentManager(), "Quick Task")
+            }
+            else{
+                toast("Task can't be created while offline")
+            }
+
         }
 
         binding.copy.setOnClickThrottleBounceListener {

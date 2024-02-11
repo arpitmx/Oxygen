@@ -81,6 +81,9 @@
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:paddingTop="24dp"
+            android:foreground="@drawable/ripplecustom"
+            android:clickable="true"
+            android:focusable="true"
             android:id="@+id/share_button"
             android:background="@color/secondary_bg_black"
             android:layout_height="wrap_content">
@@ -127,6 +130,9 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:visibility="visible"
+        android:foreground="@drawable/ripplecustom"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_height="wrap_content"
         android:id="@+id/moderating">
         <LinearLayout
@@ -174,6 +180,9 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:orientation="vertical"
+        android:foreground="@drawable/ripplecustom"
+        android:clickable="true"
+        android:focusable="true"
         android:visibility="visible"
         android:layout_height="wrap_content"
         android:id="@+id/opened">

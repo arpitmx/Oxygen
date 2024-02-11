@@ -322,7 +322,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
 
                         val tasks = taskResult.data
                         if (tasks.isNotEmpty()){
-                            val newList=taskResult.data.toMutableList().sortedByDescending { it.last_updated }
+                            val newList=taskResult.data.toMutableList().sortedByDescending { it.time_STAMP }
                             PrefManager.setLastTaskTimeStamp(projectName,newList[0].last_updated!!)
                             for (task in tasks) {
                                 db.tasksDao().insert(task)
@@ -389,7 +389,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                         val taskadapter = TaskListAdapter(
                             firestoreRepository,
                             requireContext(),
-                            taskItems.sortedByDescending { it.last_updated }.toMutableList(),
+                            taskItems.sortedByDescending { it.timestamp }.toMutableList(),
                             db
                         )
                         taskadapter.setOnClickListener(this)
@@ -537,7 +537,7 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
             val segment = segments.find { it.segment_NAME == segmentName }
             segment?.archived != true
         }.toMutableList()
-        val sortedList = list.sortedByDescending { it.last_updated }
+        val sortedList = list.sortedByDescending { it.time_STAMP }
         return sortedList
     }
 

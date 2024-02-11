@@ -76,6 +76,9 @@
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:paddingTop="24dp"
+            android:foreground="@drawable/ripplecustom"
+            android:clickable="true"
+            android:focusable="true"
             android:id="@+id/share_button"
             android:background="@color/secondary_bg_black"
             android:layout_height="wrap_content">
