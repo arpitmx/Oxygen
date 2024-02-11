@@ -2,14 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout"
     android:background="@color/primary_bg"
     android:orientation="horizontal"
     android:weightSum="10"
-
-
-
-
     >
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -21,7 +18,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:gravity="center"
-        android:src="@drawable/sampleprojectdp"
+        android:src="@drawable/placeholder_image"
         android:scaleType="centerCrop"
          />
 
@@ -32,7 +29,7 @@
         android:fontFamily="@font/sf_pro_display_regular"
         android:gravity="center_vertical"
         android:paddingStart="10dp"
-        android:text="Versa"
+        android:text="Project"
         android:textColor="@color/better_white"
         android:layout_weight="8.5"
         android:textSize="16dp" />

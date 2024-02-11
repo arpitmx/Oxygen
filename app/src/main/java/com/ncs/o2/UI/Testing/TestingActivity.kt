@@ -36,7 +36,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.datafaker.Faker
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.random.Random
@@ -1203,7 +1202,7 @@ See [`LICENSE`](LICENSE) for full of the license text.
         for (i in 1..quantity) {
 
             val task = Task(
-                title = Faker().howIMetYourMother().quote().toString(),
+                title = "Add faker",
                 description = desc7,
                 id = "#T${RandomIDGenerator.generateRandomTaskId(5)}",
                 difficulty = Random(System.currentTimeMillis()).nextInt(1, 4),
@@ -1259,11 +1258,11 @@ See [`LICENSE`](LICENSE) for full of the license text.
             val notification = Notification(
                 notificationID = RandomIDGenerator.generateRandomId(),
                 notificationType = NotificationType.TASK_COMMENT_MENTION_NOTIFICATION.toString(),
-                taskID = Faker().number().randomDigit().toString(),
+                taskID = "123re",
                 title = "Mention",
-                message = Faker().backToTheFuture().quote().toString(),
+                message = "Add faker before testing",
                 timeStamp = Timestamp.now().seconds,
-                fromUser = Faker().funnyName().name().toString(),
+                fromUser = "",
                 toUser = PrefManager.getCurrentUserEmail()
             )
 

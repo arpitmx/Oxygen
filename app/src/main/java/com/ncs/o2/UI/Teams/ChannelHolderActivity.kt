@@ -17,8 +17,7 @@ import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
-import com.ncs.o2.UI.Teams.Chat.TeamsChatFragment
-import com.ncs.o2.databinding.ActivityMainBinding
+import com.ncs.o2.UI.Teams.Chat.ChannelChatFragment
 import com.ncs.o2.databinding.ActivityTeamsBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +26,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 @AndroidEntryPoint
-class TeamsActivity : AppCompatActivity() {
+class ChannelHolderActivity : AppCompatActivity() {
 
     val binding: ActivityTeamsBinding by lazy {
         ActivityTeamsBinding.inflate(layoutInflater)
@@ -67,7 +66,7 @@ class TeamsActivity : AppCompatActivity() {
 
         super.onBackPressed()
         if (type=="channel" ){
-            startActivity(Intent(this@TeamsActivity, MainActivity::class.java))
+            startActivity(Intent(this@ChannelHolderActivity, MainActivity::class.java))
             overridePendingTransition(R.anim.slide_in_right, me.shouheng.utils.R.anim.slide_out_right)
         }
         else{
@@ -80,7 +79,7 @@ class TeamsActivity : AppCompatActivity() {
 
     private fun attachFragment(){
         val transaction = supportFragmentManager.beginTransaction()
-        val fragment = TeamsChatFragment()
+        val fragment = ChannelChatFragment()
         transaction.replace(R.id.teams_chat_fragment_container, fragment)
         transaction.commit()
     }

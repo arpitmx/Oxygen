@@ -1,7 +1,6 @@
 package com.ncs.o2.UI.Teams.Chat
 
 import android.Manifest
-import android.adservices.topics.Topic
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
@@ -30,7 +29,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.GravityCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,7 +54,6 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursorMiddleCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
@@ -69,13 +66,12 @@ import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
-import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.ChatViewModel
-//import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
+import com.ncs.o2.UI.Tasks.TaskPage.Chat.ExampleGrammarLocator
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
-import com.ncs.o2.UI.Teams.TeamsActivity
+import com.ncs.o2.UI.Teams.ChannelHolderActivity
 import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.MessageMoreOptions
 import com.ncs.o2.databinding.FragmentTeamsChatBinding
@@ -110,12 +106,12 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
-    TeamsChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,TeamsChatAdapter.OnMessageLongPress,MessageMoreOptions.OnReplyClick {
+class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickListner,
+    ChannelChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,ChannelChatAdapter.OnMessageLongPress,MessageMoreOptions.OnReplyClick {
 
     lateinit var binding: FragmentTeamsChatBinding
-    private val activityBinding: TeamsActivity by lazy {
-        (requireActivity() as TeamsActivity)
+    private val activityBinding: ChannelHolderActivity by lazy {
+        (requireActivity() as ChannelHolderActivity)
     }
     @Inject
     @FirebaseRepository
@@ -131,7 +127,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
     private val viewModel: TaskDetailViewModel by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
     private lateinit var mdEditor: MarkwonEditor
-    lateinit var chatAdapter: TeamsChatAdapter
+    lateinit var chatAdapter: ChannelChatAdapter
     lateinit var mentionAdapter: MentionUsersAdapter
     lateinit var recyclerView: RecyclerView
     lateinit var mentionUserRv: RecyclerView
@@ -709,7 +705,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
     }
 
     private fun setMessages() {
-        chatAdapter = TeamsChatAdapter(
+        chatAdapter = ChannelChatAdapter(
             activitybinding = activityBinding,
             repository = firestoreRepository,
             msgList = mutableListOf(),
@@ -1265,16 +1261,13 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
                 }
             }
         }
-
-
     }
 
-// TODO : Use prism js in production
     private val markwon: Markwon by lazy {
 
         // *NOTE @O2 team : If ExampleGrammarLocator class is not found after pull, // just hit run, this class is built at compile time*
 
-//        val prism4j = Prism4j(ExampleGrammarLocator())
+        val prism4j = Prism4j(ExampleGrammarLocator())
 
         // *NOTE*
 
@@ -1284,7 +1277,7 @@ class TeamsChatFragment : Fragment(), TeamsChatAdapter.onChatDoubleClickListner,
             .usePlugin(GlideImagesPlugin.create(activity)).usePlugin(TablePlugin.create(activity))
             .usePlugin(TaskListPlugin.create(activity)).usePlugin(HtmlPlugin.create())
             .usePlugin(StrikethroughPlugin.create())
-//            .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
+            .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
 
             .usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configure(registry: MarkwonPlugin.Registry) {

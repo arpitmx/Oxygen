@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
-import com.mifmif.common.regex.Main
+//import com.mifmif.common.regex.Main
 import com.ncs.o2.Constants.Pref
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Domain.Models.Segment
@@ -41,7 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import net.datafaker.Faker
+//import net.datafaker.Faker
 import javax.inject.Inject
 
 
@@ -56,7 +56,7 @@ class ArchiveSegmentBottomSheet() : BottomSheetDialogFragment(),
     }
 
     lateinit var sectionList:MutableList<String>
-    private val faker: Faker by lazy { Faker() }
+//    private val faker: Faker by lazy { Faker() }
     private lateinit var segmentName:String
     private val utils: GlobalUtils.EasyElements by lazy {
         GlobalUtils.EasyElements(requireActivity())

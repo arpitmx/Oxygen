@@ -30,10 +30,12 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setBackgroundDrawable
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
+import com.ncs.o2.UI.Tasks.Sections.DragHelper
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.TaskSectionViewPagerAdapter
@@ -49,10 +51,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner,SegmentSelectionBottomSheet.SegmentSelectionListener {
+class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner,SegmentSelectionBottomSheet.SegmentSelectionListener, DragHelper.TabChangeListener {
 
 
     lateinit var binding: FragmentTasksHolderBinding
@@ -168,6 +171,19 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
         binding.viewPager2.adapter = adapter
         binding.viewPager2.offscreenPageLimit = 4
         setUpTabsLayout(list)
+
+        binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                Timber.tag("Viewpager").i("position : ${position}, positionOffset : ${positionOffset}, positionOffsetPX : ${positionOffsetPixels}")
+                val dragDistance = positionOffset * binding.viewPager2.width
+
+
+            }
+        })
     }
 
     private fun setUpTabsLayout(list: MutableList<String>) {
@@ -195,7 +211,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
                 }
             })
             if (position < list.size && position !in processedPositions) {
-                Log.d("sectionslist", "current position is $position")
+                Timber.tag("sectionslist").d("current position is %s", position)
 
                 CoroutineScope(Dispatchers.IO).launch {
                     lock.withLock {
@@ -206,7 +222,8 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
                                 list[currentPosition]
                             )
 
-                            Log.d("sectionslist", "position while updating is $currentPosition")
+                            Timber.tag("sectionslist")
+                                .d("position while updating is %s", currentPosition)
 
                             withContext(Dispatchers.Main) {
                                 if (tasks.isEmpty()) {
@@ -288,6 +305,39 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
             Log.d("sectionsafter",PrefManager.getsectionsList().toString())
             setUpViewPager(PrefManager.getsectionsList().toMutableList())
         }
+
+    }
+
+    override fun switchToNextTab() {
+        with(binding.viewPager2){
+            val nextItem = currentItem + 1
+            if (nextItem < (adapter?.itemCount ?: 0)) {
+                setCurrentItem(nextItem,true)
+            } else {
+                toast("No more boards..")
+            }
+        }
+    }
+
+    override fun switchToPreviousTab() {
+
+        with(binding.viewPager2){
+            val previousItem = currentItem - 1
+            if (previousItem >= 0) {
+                setCurrentItem(previousItem,true)
+            } else {
+                toast("No more boards..")
+            }
+        }
+
+    }
+
+    override fun smoothScrollby(dx: Float, dy: Float) {
+
+        with(binding.viewPager2){
+
+        }
+
 
     }
 

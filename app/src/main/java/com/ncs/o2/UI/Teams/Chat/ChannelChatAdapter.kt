@@ -28,10 +28,8 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.R
-import com.ncs.o2.UI.MainActivity
-import com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters.ChatAdapter
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
-import com.ncs.o2.UI.Teams.TeamsActivity
+import com.ncs.o2.UI.Teams.ChannelHolderActivity
 import com.ncs.o2.databinding.ChatImageItemBinding
 import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.ChatMessageReplyItemBinding
@@ -42,8 +40,8 @@ import java.util.Date
 import java.util.regex.Pattern
 
 
-class TeamsChatAdapter(
-    val activitybinding:TeamsActivity,
+class ChannelChatAdapter(
+    val activitybinding:ChannelHolderActivity,
     val repository: FirestoreRepository,
     var msgList: MutableList<Message>,
     val context: Context,
