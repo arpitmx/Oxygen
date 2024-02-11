@@ -50,7 +50,7 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 * Firebase Firestore, MongoDB as Cloud Databases
 * Firebase storage, dynamic links
 * Firebase cloud functions
-* Django database for Mailing system, webhooks
+* Django rest for Mailing system, webhooks
 * Paging 3 for pagination
 
 
