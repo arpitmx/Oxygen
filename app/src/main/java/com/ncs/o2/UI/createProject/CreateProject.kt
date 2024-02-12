@@ -451,7 +451,12 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             return null
         }
         else {
-
+            if (trimmedInput.lowercase()=="none") {
+                binding.errorTextTitle.visible()
+                binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
+                binding.errorTextTitle.text = "This title is not allowed"
+                return null
+            }
             if (containsEmoji(trimmedInput)) {
                 binding.errorTextTitle.visible()
                 binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))

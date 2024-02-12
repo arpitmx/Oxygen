@@ -33,4 +33,8 @@ object ServerExceptions : Exception(){
         val exceptionDescription: String = "Segment created successfully"
         val exceptionCode : Int = 1400
     }
+    object keywordDetectedException : Exception(){
+        val exceptionDescription: String = "Choose another segment name"
+        val exceptionCode : Int = 1600
+    }
 }

@@ -107,6 +107,9 @@ class CreateSectionsBottomSheet : BottomSheetDialogFragment(){
                 ServerExceptions.projectDoesNotExists.exceptionDescription -> {
                     binding.validationsTxt.text = getString(R.string.this_project_doesn_t_exist)
                 }
+                ServerExceptions.keywordDetectedException.exceptionDescription -> {
+                    binding.validationsTxt.text = "Choose another segment name"
+                }
                 Errors.Status.VALID_INPUT -> {
                     binding.validationsTxt.text = getString(R.string.creating_your_segment)
                 }
