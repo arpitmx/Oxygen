@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="10dp"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/primary_bg"
     android:orientation="vertical"
     >
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/primary"
+        android:background="@color/dim_primary"
         />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -42,7 +42,7 @@
             android:layout_weight="9"
             android:fontFamily="@font/sfbold"
             android:gravity="center"
-            app:tint="@color/dim_primary"
+            app:tint="@color/better_white"
             android:layout_gravity="center"
             android:src="@drawable/baseline_account_tree_24"
             android:textColor="@color/better_white"
@@ -67,7 +67,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/card_bg"
+        android:background="@color/border_bg"
         />
 
 
@@ -82,7 +82,7 @@
         android:gravity="center"
         android:layout_marginTop="15dp"
         android:text="@string/create_a_segment"
-        android:textColor="@color/dim_primary"
+        android:textColor="@color/better_white"
         android:textSize="20dp"
         />
 
@@ -128,7 +128,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="15dp"
-            app:boxBackgroundColor="@color/better_white"
+            app:boxBackgroundColor="@color/edit_text_bg"
             app:counterEnabled="true"
             app:counterMaxLength="15"
             app:counterTextColor="@color/white"
@@ -145,7 +145,7 @@
                 android:lines="1"
                 android:fontFamily="@font/sf_pro_display_regular"
                 android:singleLine="true"
-                android:textColorHint="@color/darkbg_main_a80"
+                android:textColorHint="@color/edit_text_hint"
 
                 />
 
@@ -197,7 +197,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="5dp"
-            app:boxBackgroundColor="@color/better_white"
+            app:boxBackgroundColor="@color/edit_text_bg"
             app:counterEnabled="true"
             app:counterMaxLength="100"
             app:endIconMode="clear_text"
@@ -213,7 +213,7 @@
                 android:minHeight="60dp"
                 android:fontFamily="@font/sf_pro_display_regular"
                 android:inputType="textMultiLine"
-                android:textColorHint="@color/darkbg_main_a80"
+                android:textColorHint="@color/edit_text_hint"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -256,7 +256,7 @@
             android:layout_marginTop="10dp"
             android:text="Next"
             android:gravity="center"
-            android:textColor="@color/primary_bg"
+            android:textColor="@color/secondary_bg"
             android:textAllCaps="false"
             android:fontFamily="@font/sf_pro_display_medium"
             android:textSize="18dp"

@@ -53,6 +53,9 @@ android {
             //Mail Server
             buildConfigField("String", "MAIL_SERVER_URL", "\"https://o2gitman.vercel.app/\"")
 
+            //Dynamic Link
+            buildConfigField("String", "DYNAMIC_LINK_HOST", "\"https://oxy2.page.link\"")
+
             //Gemini, FCM
             buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")
             buildConfigField("String", "FCM_SERVER_KEY", "\"AAAAmReJ314:APA91bGdEcp1FOt43szF1N7xbG-Pdjuct_0gZzhuDP5GvpSt_ECeXV3mQhKq3Gqq1Rgqa6FGcUwTlCyJYqbo0f89Flb5Y6X44nNMVkqW5Q1XsXZZXwE-77N3bORGbEdQ1TbM24Cb90Dw\"")
@@ -63,6 +66,9 @@ android {
 
             //Mail Server
             buildConfigField("String", "MAIL_SERVER_URL", "\"https://o2gitman.vercel.app/\"")
+
+            //Dynamic Link
+            buildConfigField("String", "DYNAMIC_LINK_HOST", "\"https://oxgn.page.link\"")
 
             //Gemini, FCM
             buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")

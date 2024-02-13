@@ -13,7 +13,7 @@
         android:visibility="visible"
         android:layout_height="wrap_content"
         android:elevation="5dp"
-        android:background="@color/secondary_bg"
+        android:background="@color/primary_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -71,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
-                android:background="@color/secondary_bg"
+                android:background="@color/primary_bg"
                 android:layout_marginBottom="15dp"
                 android:id="@+id/moderatorFilter"
                 android:scrollbars="none">
@@ -94,7 +94,7 @@
                         android:paddingEnd="20dp"
                         android:text="All"
                         android:textAllCaps="false"
-                        android:textColor="@color/secondary_bg" />
+                        android:textColor="@color/primary_bg" />
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/pending"
@@ -162,7 +162,7 @@
                 android:id="@+id/line"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="@color/border_grey" />
+                android:background="@color/border_bg" />
 
 
 
@@ -308,14 +308,14 @@
         android:id="@+id/searchParent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/secondary_bg"
+        android:background="@color/primary_bg"
         android:elevation="5dp"
         android:orientation="vertical">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/border_grey" />
+            android:background="@color/border_bg" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/resultsParent"

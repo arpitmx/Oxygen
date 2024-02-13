@@ -44,7 +44,7 @@
                 android:id="@+id/logs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/secondary_bg_black"
+                android:background="@color/secondary_bg_lighter"
                 android:minHeight="400dp"
                 android:padding="10dp"
                 android:paddingBottom="20dp"

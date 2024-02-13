@@ -30,7 +30,7 @@
         android:fontFamily="@font/sf_pro_display_medium"
         android:layout_gravity="center"
         android:gravity="center"
-        android:background="@color/primary_bg"
+        android:background="@color/secondary_bg"
         android:textSize="22dp"
         android:textColor="@color/edit_text_hint"/>
     <ProgressBar

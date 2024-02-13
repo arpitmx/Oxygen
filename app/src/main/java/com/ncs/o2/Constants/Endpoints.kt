@@ -28,6 +28,11 @@ object Endpoints {
 
     }
 
+    object DynamicLink {
+        const val OxgnHost = "https://oxgn.page.link"
+
+    }
+
     object Storage {
         const val DP_PATH = "/DP/dp"
         const val IMAGE_PATH = "/icon/img"

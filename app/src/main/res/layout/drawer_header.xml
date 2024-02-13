@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_bg"
+    android:background="@color/secondary_bg"
     android:orientation="vertical">
 
     <LinearLayout
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:elevation="5dp"
-        android:background="@color/secondary_bg"
+        android:background="@color/primary_bg"
         android:orientation="horizontal"
         android:weightSum="10">
 
@@ -43,8 +43,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/sf_pro_display_semibold"
-                android:text="Alok Ranjan"
-                android:textColor="#D8D8D8"
+                android:text="User"
+                android:textColor="@color/primary_txt"
                 android:textSize="20dp" />
 
             <TextView
@@ -53,8 +53,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="@font/sf_pro_display_regular"
-                android:text="Android Developer"
-                android:textColor="@color/green"
+                android:text="Developer"
+                android:textColor="@color/dim_primary"
                 android:textSize="14dp" />
 
             <TextView
@@ -62,8 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/sf_pro_display_regular"
-                android:text="sudoarmax@gmail.com"
-                android:textColor="#97CDCDCD"
+                android:text="geek@gmail.com"
+                android:textColor="@color/primary_txt"
                 android:textSize="14dp" />
 
 
@@ -113,6 +113,7 @@
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:weightSum="10"
+                android:gravity="center_vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -129,6 +130,21 @@
                     android:textColor="@color/better_white"
                     android:textSize="18dp" />
 
+                <TextView
+                    android:id="@+id/project_count_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:text="0"
+                    android:textColor="@color/primary"
+                    android:background="@drawable/card_view_project_element_bg"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:paddingTop="4dp"
+                    android:textSize="12dp" />
 
             </LinearLayout>
 
@@ -152,12 +168,14 @@
             android:id="@+id/extended_projectsList"
             android:visibility="visible"
             android:orientation="vertical">
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/projectRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
                 android:paddingTop="6dp"
+                android:paddingBottom="5dp"
                 android:nestedScrollingEnabled="false"
                 android:visibility="visible"
                 tools:listitem="@layout/project_list_item"
@@ -184,19 +202,18 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="5dp"
             android:background="@null"
             android:drawableStart="@drawable/outline_add_24"
             android:drawablePadding="10dp"
-            android:drawableTint="#C5C5C5"
+            android:drawableTint="@color/primary"
             android:fontFamily="@font/sf_pro_display_regular"
             android:gravity="start|center_vertical"
             android:paddingStart="10dp"
-            android:text="Add a project"
+            android:text="@string/add_a_project"
             android:textAllCaps="false"
-            android:textColor="#C5C5C5"
+            android:textColor="@color/primary_txt"
             android:textSize="15dp" />
 
         <View
@@ -220,13 +237,13 @@
             android:background="@null"
             android:drawableStart="@drawable/baseline_settings_24"
             android:drawablePadding="10dp"
-            android:drawableTint="@color/green"
+            android:drawableTint="@color/primary"
             android:fontFamily="@font/sf_pro_display_regular"
             android:gravity="start|center_vertical"
             android:paddingStart="10dp"
             android:text="Settings"
             android:textAllCaps="false"
-            android:textColor="#C5C5C5"
+            android:textColor="@color/primary_txt"
             android:textSize="15dp" />
 
         <View

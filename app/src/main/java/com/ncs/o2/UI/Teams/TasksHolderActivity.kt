@@ -16,12 +16,10 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.SwitchFunctions
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
@@ -31,11 +29,8 @@ import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.TaskItem
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
-import com.ncs.o2.Domain.Utility.ExtensionsUtil
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
@@ -43,12 +38,9 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideUpAndVisible
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
-import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
-import com.ncs.o2.UI.MainActivity
-import com.ncs.o2.UI.Notifications.NotificationsViewModel
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.SearchScreen.SearchViewModel
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
@@ -59,15 +51,12 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.FilterTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserListBottomSheet
 import com.ncs.o2.databinding.ActivityTasksHolderBinding
-import com.ncs.o2.databinding.ActivityTeamsBinding
-import com.ncs.o2.databinding.FragmentSearchBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -363,11 +352,11 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
         button.setBackgroundResource(R.drawable.item_bg_curve_selected)
         val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
         drawable?.colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(this, R.color.secondary_bg),
+            ContextCompat.getColor(this, R.color.primary_bg),
             PorterDuff.Mode.SRC_IN
         )
         button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
-        button.setTextColor(ContextCompat.getColor(this, R.color.secondary_bg))
+        button.setTextColor(ContextCompat.getColor(this, R.color.primary_bg))
         for (element in list){
             setUnSelectedColor(element)
         }
@@ -1221,11 +1210,11 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
         button.setBackgroundResource(R.drawable.item_bg_curve_selected)
         val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
         drawable?.colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(this, R.color.secondary_bg),
+            ContextCompat.getColor(this, R.color.primary_bg),
             PorterDuff.Mode.SRC_IN
         )
         button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
-        button.setTextColor(ContextCompat.getColor(this, R.color.secondary_bg))
+        button.setTextColor(ContextCompat.getColor(this, R.color.primary_bg))
     }
 
 

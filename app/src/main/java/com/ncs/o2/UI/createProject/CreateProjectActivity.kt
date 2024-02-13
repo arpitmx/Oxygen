@@ -13,21 +13,15 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.ui.text.toUpperCase
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexWrap
-import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Source
 import com.google.firebase.storage.StorageReference
-import com.ncs.o2.Domain.Models.CurrentUser
+import com.ncs.o2.BuildConfig
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
@@ -43,7 +37,6 @@ import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
-import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.UIComponents.Adapters.ContributorAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.Userlist.UserlistBottomSheet
 import com.ncs.o2.databinding.ActivityCreateProjectBinding
@@ -57,21 +50,16 @@ import java.io.InputStream
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback,
+class CreateProjectActivity : AppCompatActivity(), ContributorAdapter.OnProfileClickCallback,
     UserlistBottomSheet.getContributorsCallback , NetworkChangeReceiver.NetworkChangeCallback{
 
     @Inject
     lateinit var util: GlobalUtils.EasyElements
-
-    private var OList: MutableList<User> = mutableListOf()
-
     private var bitmap: Bitmap? = null
     private lateinit var viewModel: createProjectViewModel
 
     lateinit var moderatorAdapter: ContributorAdapter
-//    private val moderatorsrecycler: RecyclerView by lazy {
-//        binding.moderatorsRecyclerView
-//    }
+
     val binding: ActivityCreateProjectBinding by lazy {
         ActivityCreateProjectBinding.inflate(layoutInflater)
     }
@@ -85,6 +73,8 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
 
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_PICK = 2
+
+    private val TAG = "CreateProject"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,20 +92,6 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         binding.gioActionbar.btnBack.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
         }
-        OList = mutableListOf(
-//            User("https://yt3.googleusercontent.com/xIPexCvioEFPIq_nuEOOsv129614S3K-AblTK2P1L9GvVIZ6wmhz7VyCT-aENMZfCzXU-qUpaA=s900-c-k-c0x00ffffff-no-rj","armax","android","url1"),
-//            User("https://hips.hearstapps.com/hmg-prod/images/apple-ceo-steve-jobs-speaks-during-an-apple-special-event-news-photo-1683661736.jpg?crop=0.800xw:0.563xh;0.0657xw,0.0147xh&resize=1200:*"
-//                ,"abhishek","android","url2" ),
-//            User("https://picsum.photos/200","vivek","design","url3"),
-//            User("https://picsum.photos/300","lalit","web","url4"),
-//            User("https://picsum.photos/350","yogita","design","url5"),
-//            User("https://picsum.photos/450","aditi","design","url6"),
-        )
-
-//        binding.addModeratorsBtn.setOnClickThrottleBounceListener {
-//            val userListBottomSheet = UserlistBottomSheet(this)
-//            userListBottomSheet.show(supportFragmentManager, "OList")
-//        }
 
         binding.gioActionbar.btnNext.setOnClickThrottleBounceListener {
             val alias=binding.projectAlias.text.toString().trim().trimStart().toUpperCase()
@@ -125,23 +101,19 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                     if (it) {
                         val projectTitle=validateProjectTitle(binding.projectTitle.text.toString())
                         if ( !projectTitle.isNull && !bitmap.isNull) {
-                            val project_id =
-                                "${title}${
-                                    System.currentTimeMillis().toString().substring(8, 12).trim()
-                                }"
+
                             val _title = binding.projectTitle.text.toString()
-                            val __title = _title.replace(" ", "")
                             val title = projectTitle!!
                             binding.projectTitle.setText(title)
                             val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
                                 .setLink(
                                     Uri.parse(
-                                        "https://oxy2.page.link/join/${
+                                        "${BuildConfig.DYNAMIC_LINK_HOST}/${
                                             title.toLowerCase().trim()
                                         }"
                                     )
                                 )
-                                .setDomainUriPrefix("https://oxy2.page.link")
+                                .setDomainUriPrefix(BuildConfig.DYNAMIC_LINK_HOST)
                                 .setAndroidParameters(
                                     DynamicLink.AndroidParameters.Builder("com.ncs.o2")
                                         .setMinimumVersion(1)
@@ -163,7 +135,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                                                     .trim()
                                             }",
                                             "PROJECT_LINK" to shortLink,
-                                            "PROJECT_DEEPLINK" to "https://oxy2.page.link/join/${
+                                            "PROJECT_DEEPLINK" to "${BuildConfig.DYNAMIC_LINK_HOST}/${
                                                 title.toLowerCase().trim()
                                             }",
                                             "PROJECT_DESC" to desc.toString().trim(),
@@ -171,10 +143,8 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                                             "contributors" to listOf(PrefManager.getCurrentUserEmail()),
                                             "PROJECT_ALIAS" to alias
                                         )
-                                        Log.d(
-                                            "checking image size",
-                                            bitmap!!.byteCount.toLong().toString()
-                                        )
+                                        Timber.tag("checking image size")
+                                            .d(bitmap!!.byteCount.toLong().toString())
 
                                         if (title.isNotEmpty()) {
 
@@ -291,7 +261,6 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             else{
                 binding.errorText.text=validateString(binding.projectAlias.text.toString())
             }
-            // setUpViews()
         }
 
     }
@@ -379,14 +348,14 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
                 if (!querySnapshot.isEmpty) {
                     aliasResult(false)
                     binding.progressBar.gone()
-                    binding.errorText.text="This Alias is already in use"
+                    binding.errorText.text= getString(R.string.this_alias_is_already_in_use)
                     binding.errorText.visible()
                     binding.errorText.setTextColor(resources.getColor(R.color.redx))
 
                 } else {
                     aliasResult(true)
                     binding.progressBar.gone()
-                    binding.errorText.text="This Alias is available"
+                    binding.errorText.text= getString(R.string.this_alias_is_available)
                     binding.errorText.visible()
                     binding.errorText.setTextColor(resources.getColor(R.color.green))
 
@@ -403,33 +372,33 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             binding.errorText.visible()
             binding.errorText.setTextColor(resources.getColor(R.color.redx))
 
-            return "Should be 2 to 4 characters long"
+            return getString(R.string.should_be_2_to_4_characters_long)
         }
         if (!trimmedInput.matches(Regex("[a-zA-Z0-9]+"))) {
             binding.errorText.visible()
             binding.errorText.setTextColor(resources.getColor(R.color.redx))
-            return "Only Alphanumeric characters allowed"
+            return getString(R.string.only_alphanumeric_characters_allowed)
         }
         if (containsEmoji(trimmedInput)) {
             binding.errorText.visible()
             binding.errorText.setTextColor(resources.getColor(R.color.redx))
 
-            return "Emojis are not allowed"
+            return getString(R.string.emojis_are_not_allowed)
         }
         if (Character.isDigit(trimmedInput[0])) {
             binding.errorText.visible()
             binding.errorText.setTextColor(resources.getColor(R.color.redx))
-            return "Cannot start with a number"
+            return getString(R.string.cannot_start_with_a_number)
         }
         if (trimmedInput.count { it.isLetter() } < 2) {
             binding.errorText.visible()
             binding.errorText.setTextColor(resources.getColor(R.color.redx))
-            return "Should contain at least 2 alphabetical characters"
+            return getString(R.string.should_contain_at_least_2_alphabetical_characters)
         }
         if (hasSpacesinStartin(trimmedInput)) {
             binding.errorText.visible()
             binding.errorText.setTextColor(resources.getColor(R.color.redx))
-            return "Spaces not allowed in starting"
+            return getString(R.string.spaces_not_allowed_in_starting)
         }
         return null
     }
@@ -447,7 +416,7 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
         if (trimmedInput.isEmpty()){
             binding.errorTextTitle.visible()
             binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
-            binding.errorTextTitle.text = "Title cannot be empty"
+            binding.errorTextTitle.text = getString(R.string.title_cannot_be_empty)
             return null
         }
         else {
@@ -460,13 +429,13 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
             if (containsEmoji(trimmedInput)) {
                 binding.errorTextTitle.visible()
                 binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
-                binding.errorTextTitle.text = "Emojis are not allowed"
+                binding.errorTextTitle.text = getString(R.string.emojis_are_not_allowed)
                 return null
             }
             if (Character.isDigit(trimmedInput[0])) {
                 binding.errorTextTitle.visible()
                 binding.errorTextTitle.setTextColor(resources.getColor(R.color.redx))
-                binding.errorTextTitle.text = "Cannot start with a number"
+                binding.errorTextTitle.text = getString(R.string.cannot_start_with_a_number)
                 return null
             }
             if (trimmedInput.count { it.isLetter() } < 2) {
@@ -560,10 +529,9 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     }
 
     override fun removeClick(user: User, position: Int) {
-        moderatorAdapter.removeUser(user)
-        val pos = OList.indexOf(user)
-        OList[pos].isChecked = false
+        TODO("Not yet implemented")
     }
+
 
     override fun onSelectedContributors(contributor: User, isChecked: Boolean) {
         if (isChecked) {
@@ -576,9 +544,9 @@ class CreateProject : AppCompatActivity(), ContributorAdapter.OnProfileClickCall
     }
 
     override fun onTListUpdated(TList: MutableList<User>) {
-        OList.clear()
-        OList = TList
+        TODO("Not yet implemented")
     }
+
 
     override fun onStart() {
         super.onStart()

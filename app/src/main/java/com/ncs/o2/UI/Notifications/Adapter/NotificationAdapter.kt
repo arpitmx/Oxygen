@@ -173,7 +173,7 @@ class NotificationAdapter(
         fun bind(notification: Notification) {
             binding.difficulty.setBackgroundResource(R.drawable.label_cardview_green)
             binding.difficulty.text="@Assigned"
-            binding.difficulty.setTextColor(context.resources.getColor(R.color.secondary_bg))
+            binding.difficulty.setTextColor(context.resources.getColor(R.color.primary_bg))
             binding.taskId.text = notification.taskID
             binding.durationTv.text = DateTimeUtils.getTimeAgo(notification.timeStamp)
             binding.msgTv.text = notification.message
@@ -198,7 +198,7 @@ class NotificationAdapter(
         fun bind(notification: Notification) {
             binding.difficulty.setBackgroundResource(R.drawable.label_cardview_yellow)
             binding.difficulty.text="Workspace"
-            binding.difficulty.setTextColor(context.resources.getColor(R.color.secondary_bg))
+            binding.difficulty.setTextColor(context.resources.getColor(R.color.primary_bg))
             binding.taskId.text = notification.taskID
             binding.durationTv.text = DateTimeUtils.getTimeAgo(notification.timeStamp)
             binding.msgTv.text = notification.message

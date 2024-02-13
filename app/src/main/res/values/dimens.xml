@@ -35,5 +35,8 @@
     <dimen name="button_size_workspace">15dp</dimen>
     <dimen name="bottom_sheet_holder_height">3dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="radius_imgview">12dp</dimen>
+    <dimen name="elements_corners">8dp</dimen>
+    <dimen name="h1">18dp</dimen>
 
 </resources>

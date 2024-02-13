@@ -5,7 +5,8 @@
     android:id="@+id/actionbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/secondary_bg"
+    android:background="@color/primary_bg"
+    android:elevation="@dimen/_5dp"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,26 +27,10 @@
             android:orientation="horizontal"
             android:paddingTop="@dimen/padding_bottom_offset"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/create_task_button"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/btnHam"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
-
-
-            <!--            <de.hdodenhof.circleimageview.CircleImageView-->
-            <!--                android:id="@+id/asignee_dp"-->
-            <!--                android:layout_width="40dp"-->
-            <!--                android:scaleY="0.8"-->
-            <!--                android:layout_marginStart="2dp"-->
-            <!--                android:scaleX="0.8"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:layout_alignParentTop="true"-->
-            <!--                android:layout_alignParentEnd="true"-->
-            <!--                android:layout_alignParentBottom="false"-->
-            <!--                android:src="@drawable/apphd"-->
-            <!--                app:layout_constraintEnd_toStartOf="@+id/create_task_button"-->
-            <!--                app:layout_constraintTop_toTopOf="parent" />-->
 
 
             <TextView
@@ -57,7 +42,7 @@
                 android:gravity="center"
                 android:paddingBottom="@dimen/padding_bottom_offset"
                 android:text="Development"
-                android:textColor="@color/primary"
+                android:textColor="@color/better_white"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/btnHam"
@@ -71,7 +56,7 @@
                 android:background="@null"
 
                 app:srcCompat="@android:drawable/arrow_down_float"
-                app:tint="@color/primary" />
+                app:tint="@color/better_white" />
 
         </LinearLayout>
 
@@ -174,8 +159,8 @@
                 android:fontFamily="@font/sf_pro_display_semibold"
                 android:gravity="center"
                 android:paddingBottom="@dimen/padding_bottom_offset"
-                android:text="Workspace"
-                android:textColor="@color/primary"
+                android:text="@string/workspace"
+                android:textColor="@color/better_white"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/btnHam"
@@ -249,21 +234,6 @@
             app:layout_constraintVertical_bias="0.0">
 
 
-            <!--            <de.hdodenhof.circleimageview.CircleImageView-->
-            <!--                android:id="@+id/asignee_dp"-->
-            <!--                android:layout_width="40dp"-->
-            <!--                android:scaleY="0.8"-->
-            <!--                android:layout_marginStart="2dp"-->
-            <!--                android:scaleX="0.8"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:layout_alignParentTop="true"-->
-            <!--                android:layout_alignParentEnd="true"-->
-            <!--                android:layout_alignParentBottom="false"-->
-            <!--                android:src="@drawable/apphd"-->
-            <!--                app:layout_constraintEnd_toStartOf="@+id/create_task_button"-->
-            <!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-
             <TextView
                 android:id="@+id/search"
                 android:layout_width="wrap_content"
@@ -272,8 +242,8 @@
                 android:fontFamily="@font/sf_pro_display_semibold"
                 android:gravity="center"
                 android:paddingBottom="@dimen/padding_bottom_offset"
-                android:text="Search"
-                android:textColor="@color/primary"
+                android:text="@string/search"
+                android:textColor="@color/better_white"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/btnHam"
@@ -320,34 +290,44 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
-            <androidx.cardview.widget.CardView
+
+            <FrameLayout
                 android:layout_width="35dp"
                 android:layout_height="35dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/square_rounded_img_view_bg"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/label_cardview_green"
-                app:cardCornerRadius="10dp">
+                >
 
-                <ImageView
-                    android:id="@+id/projectIcon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/placeholder_image" />
+                <androidx.cardview.widget.CardView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:cardCornerRadius="10dp"
+                    android:layout_gravity="center"
+                   >
 
-            </androidx.cardview.widget.CardView>
+                    <ImageView
+                        android:id="@+id/projectIcon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/placeholder_image" />
 
+                </androidx.cardview.widget.CardView>
+
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/projectName"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 android:fontFamily="@font/sf_pro_display_semibold"
                 android:gravity="center"
                 android:paddingBottom="@dimen/padding_bottom_offset"
                 android:text="Project_Name"
-                android:textColor="@color/primary"
+                android:textColor="@color/better_white"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/btnHam"
@@ -435,7 +415,6 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnMore"
             app:layout_constraintStart_toEndOf="@+id/create_task_button"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -495,7 +474,7 @@
         style="@style/CustomTabLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/secondary_bg"
+        android:background="@color/primary_bg"
         android:layoutAnimation="@anim/layout_animation_fadein"
         android:visibility="gone"
         app:tabGravity="fill"
@@ -511,7 +490,7 @@
     <LinearLayout
         android:id="@+id/search_cont"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="65dp"
         android:orientation="horizontal"
         android:visibility="visible">
 
@@ -519,12 +498,12 @@
             android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="7dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:layout_weight="9"
-            android:background="@drawable/dark_bg_rounded_corner_lighter"
+            android:background="@drawable/item_bg_curve_dark"
             android:drawableStart="@drawable/ic_searchico"
             android:drawablePadding="15dp"
             android:drawableTint="#DEE3E3E3"
@@ -555,11 +534,11 @@
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="10dp"
             android:layout_weight="1.2"
-            android:scaleX="0.8"
-            android:visibility="visible"
             android:background="@drawable/dark_bg_rounded_corner_lighter"
+            android:scaleX="0.8"
             android:scaleY="0.8"
             android:src="@drawable/outline_add_24"
+            android:visibility="visible"
             app:tint="@color/primary" />
 
 
@@ -569,7 +548,8 @@
         android:id="@+id/line"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/border_grey"
+        android:background="@color/border_bg"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
 

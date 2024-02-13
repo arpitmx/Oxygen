@@ -10,7 +10,7 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/primary_bg"
+        android:background="@color/secondary_bg"
         android:orientation="vertical"
         android:paddingBottom="40dp"
         tools:context=".UI.Assigned.WorkspaceFragment">
@@ -20,7 +20,7 @@
             android:id="@+id/layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/secondary_bg"
+            android:background="@color/primary_bg"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -55,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="@color/secondary_bg"
+            android:background="@color/primary_bg"
             android:gravity="center"
             android:orientation="vertical"
             android:translationY="-25dp"

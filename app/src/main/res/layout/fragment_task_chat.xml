@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/primary_bg"
+    android:background="@color/secondary_bg"
     android:orientation="vertical"
     android:weightSum="10">
 
@@ -141,7 +141,7 @@
             android:id="@+id/chatbox_option_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/secondary_bg"
+            android:background="@color/primary_bg"
             android:paddingTop="5dp"
             android:scrollbars="none">
 

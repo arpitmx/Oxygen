@@ -38,7 +38,7 @@
             android:id="@+id/constraintLayoutTeams"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/secondary_bg"
+            android:background="@color/primary_bg"
             android:elevation="5dp"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
@@ -98,7 +98,7 @@
                     android:id="@+id/line"
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:background="@color/border_grey" />
+                    android:background="@color/border_bg" />
 
             </LinearLayout>
 

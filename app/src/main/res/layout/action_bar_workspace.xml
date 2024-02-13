@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:background="@color/secondary_bg"
+    android:background="@color/primary_bg"
     android:id="@+id/actionbar_workspace"
     android:visibility="gone"
     android:layout_height="wrap_content">
@@ -38,7 +38,7 @@
                 android:gravity="center"
                 android:paddingBottom="@dimen/padding_bottom_offset"
                 android:text="Workspace"
-                android:textColor="@color/primary"
+                android:textColor="@color/better_white"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/btnHam"
@@ -70,6 +70,6 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:id="@+id/line"
-        android:background="@color/border_grey"
+        android:background="@color/border_bg"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 </androidx.appcompat.widget.LinearLayoutCompat>

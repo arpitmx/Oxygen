@@ -1,3 +1,4 @@
+
 package com.ncs.o2.UI.UIComponents.BottomSheets.CreateSegment
 
 import android.os.Bundle
@@ -60,9 +61,15 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
     override fun onViewCreated( view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val current_project=PrefManager.getcurrentProject()
+
+
+        binding.closeBottmSheet.setOnClickThrottleBounceListener {
+            this.dismiss()
+        }
 
         binding.doneButton.setOnClickThrottleBounceListener{
+
+            val currentProject=PrefManager.getcurrentProject()
             binding.validationsTxt.gone()
             setUpViews()
 
@@ -73,7 +80,7 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
                     segment_NAME = title.toLowerCase().capitalize(),
                     description = desc,
                     segment_ID = "${title.toLowerCase()}_${System.currentTimeMillis().toString().substring(8,12)}",
-                    project_ID = current_project,
+                    project_ID = currentProject,
                     creation_DATETIME = Timestamp.now(),
                     segment_CREATOR = PrefManager.getcurrentUserdetails().USERNAME,
                     segment_CREATOR_ID = FirebaseAuth.getInstance().currentUser?.uid!!
@@ -88,7 +95,7 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
                 PrefManager.setSegmentdetails(segment!!)
 
             }else {
-                binding.segmetTitleTv.error = "Invalid Input"
+                binding.segmetTitleTv.error = getString(R.string.invalid_input)
             }
         }
 
@@ -98,10 +105,6 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
 
 
         binding.segmetTitleTv.requestFocus()
-
-        binding.closeBottmSheet.setOnClickThrottleBounceListener {
-            this.dismiss()
-        }
 
         viewModel.showprogressLD.observe(this){
             if (it){

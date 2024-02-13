@@ -116,7 +116,7 @@
             android:name=".UI.CreateTask.CreateTaskActivity"
             android:exported="false" />
         <activity
-            android:name=".UI.createProject.CreateProject"
+            android:name=".UI.createProject.CreateProjectActivity"
             android:exported="false" />
         <activity
             android:name=".UI.Notifications.Requests.RequestActivity"
@@ -136,9 +136,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="oxy2.page.link"
-                    android:scheme="https" />
+                <data android:scheme="https"/>
+                <data android:host="oxgn.page.link"/>
+
+                <data android:scheme="https"/>
+                <data android:host="oxy2.page.link"/>
+
             </intent-filter>
         </activity>
 

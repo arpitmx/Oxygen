@@ -34,7 +34,6 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -46,7 +45,6 @@ import com.ncs.o2.UI.UIComponents.BottomSheets.FilterBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.FilterTagsBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.UserListBottomSheet
-import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentSearchBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -607,11 +605,11 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         button.setBackgroundResource(R.drawable.item_bg_curve_selected)
         val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
         drawable?.colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.secondary_bg),
+            ContextCompat.getColor(requireContext(), R.color.primary_bg),
             PorterDuff.Mode.SRC_IN
         )
         button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
-        button.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondary_bg))
+        button.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_bg))
     }
 
 

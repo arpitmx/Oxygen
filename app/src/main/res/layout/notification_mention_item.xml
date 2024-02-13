@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="2dp"
     android:paddingTop="5dp"
+    android:foreground="@drawable/ripplecustom"
     android:background="@color/darkbg_main_a80"
     android:orientation="vertical"
     android:weightSum="10">
@@ -51,7 +52,7 @@
             android:text="Mentioned"
             android:padding="5dp"
             android:layout_alignParentTop="true"
-            android:textColor="@color/better_white"
+            android:textColor="@color/pureblack"
             android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -130,7 +131,7 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="10dp"
-        android:background="@color/border_grey"
+        android:background="@color/border_bg"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="10dp"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/primary_bg"
     android:orientation="vertical"
     >
 
@@ -67,11 +67,6 @@
         android:layout_height="2dp"
         android:background="@color/card_bg"
         />
-
-
-
-
-
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/number_of_sections_cont"
@@ -153,7 +148,7 @@
                 android:layout_marginBottom="7dp"
                 android:layout_marginEnd="15dp"
                 android:gravity="center"
-                android:drawableTint="@color/white"
+                android:drawableTint="@color/primary_bg"
                 android:orientation="vertical"
                 android:textAllCaps="false"
                 android:drawableStart="@drawable/baseline_check_24"
@@ -217,6 +212,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"/>
     </LinearLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:id="@+id/btn_cont"
@@ -237,7 +233,7 @@
             android:orientation="vertical"
             android:text="Done"
             android:textAllCaps="false"
-            android:textColor="@color/better_white"
+            android:textColor="@color/primary_bg"
             android:textSize="18dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -257,7 +253,7 @@
             android:layout_marginEnd="15dp"
             android:fontFamily="@font/sf_pro_display_medium"
             android:gravity="center"
-            android:drawableTint="@color/purple"
+            android:drawableTint="@color/primary_bg"
             android:orientation="vertical"
             android:textAllCaps="false"
             android:drawableStart="@drawable/reset"

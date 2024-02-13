@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_bg"
+    android:background="@color/secondary_bg"
     tools:context=".UI.CreateTask.CreateTaskActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -367,7 +367,7 @@
                         android:maxLength="100"
                         android:maxLines="2"
                         android:textAlignment="textStart"
-                        android:textColor="@color/secondary_bg"
+                        android:textColor="@color/primary_bg"
                         android:textSize="17dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>

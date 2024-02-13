@@ -7,7 +7,7 @@
     android:foreground="@drawable/ripplecustom"
     android:clickable="true"
     android:focusable="true"
-    android:background="@color/primary_bg">
+    android:background="@color/secondary_bg">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"

@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:padding="7dp"
     android:id="@+id/parent"
-    android:background="@color/primary_bg"
+    android:background="@color/secondary_bg"
     android:foreground="@drawable/ripplecustom"
     android:clickable="true"
     android:focusable="true"

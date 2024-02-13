@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="5dp"
-    android:background="@color/primary_bg"
+    android:background="@color/secondary_bg"
     android:foreground="@drawable/ripplecustom"
     android:orientation="vertical"
     android:clickable="true"
@@ -132,7 +132,7 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="10dp"
-        android:background="@color/border_grey"
+        android:background="@color/border_bg"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
 

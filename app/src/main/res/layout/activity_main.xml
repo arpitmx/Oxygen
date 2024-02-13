@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer"
-    android:background="@color/secondary_bg"
+    android:background="@color/primary_bg"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -40,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:defaultNavHost="true"
-                    android:background="@color/primary_bg"
+                    android:background="@color/secondary_bg"
                     android:visibility="visible"
                     app:navGraph="@navigation/nav_graph" />
 
@@ -90,7 +90,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="@color/border_zero_alpha"
+                android:background="#1D7D7D7D"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
 
@@ -98,7 +98,7 @@
                 android:id="@+id/bottom_nav"
                 android:layout_width="match_parent"
                 android:layout_height="53dp"
-                android:background="@color/secondary_bg"
+                android:background="@color/primary_bg"
                 android:elevation="8dp"
                 app:labelVisibilityMode="unlabeled"
                 android:padding="5dp"
@@ -129,7 +129,7 @@
         android:layout_width="340dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/secondary_bg_black"
+        android:background="@color/secondary_bg_lighter"
         app:headerLayout="@layout/drawer_header">
 
         <LinearLayout

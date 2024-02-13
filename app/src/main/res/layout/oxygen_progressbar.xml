@@ -10,7 +10,7 @@
         android:id="@+id/toast"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/secondary_bg_black"
+        android:background="@color/secondary_bg_lighter"
         android:textColor="@color/primary"
         android:text="Welcome back Alok , your content is loaded!"
         android:gravity="center"

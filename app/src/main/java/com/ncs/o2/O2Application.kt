@@ -109,8 +109,6 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
         for (project in projectsList){
             initializeListner(project)
             initializeTagListner(project)
-
-
         }
 
         if (userID.isNotEmpty()){
@@ -219,11 +217,6 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
 
             }
         })
-
-
-
-
-
 
     }
 

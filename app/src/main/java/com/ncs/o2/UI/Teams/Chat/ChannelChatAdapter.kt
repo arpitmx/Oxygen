@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
@@ -297,11 +298,13 @@ class ChannelChatAdapter(
     }
 
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
+
         setMessageView(msgList[position], binding)
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.tvName.text = user.USERNAME
         setNormalMsgDPHeader(position, binding, user)
+
     }
 
     fun setChatReplyItem(user: UserInMessage, binding: ChatMessageReplyItemBinding, position: Int) {
@@ -449,7 +452,7 @@ class ChannelChatAdapter(
         }
     }
 
-    private fun processSpan(message: String) : SpannableStringBuilder {
+    private fun processSpan(message: Spanned) : SpannableStringBuilder {
         val spannable = SpannableStringBuilder(message)
         val mentionedUsers: MutableList<String> = mutableListOf()
 
@@ -482,14 +485,19 @@ class ChannelChatAdapter(
 
 
     private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
-        markwon.setParsedMarkdown(binding.descriptionTv, processSpan(message.content))
+        val spannedMessage = processSpan(markwon.render(markwon.parse(message.content)))
+        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+
         binding.descriptionTv.visible()
         binding.modTag.gone()
         binding.assigneeTag.gone()
     }
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
-        markwon.setParsedMarkdown(binding.descriptionTv, processSpan(message.content))
+
+        val spannedMessage = processSpan(markwon.render(markwon.parse(message.content)))
+        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+
         binding.descriptionTv.visible()
         binding.modTag.gone()
         binding.assigneeTag.gone()

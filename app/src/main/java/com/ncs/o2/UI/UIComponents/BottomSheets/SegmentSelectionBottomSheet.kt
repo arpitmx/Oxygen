@@ -102,7 +102,6 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sectionList = mutableListOf()
-
         setViews()
 
     }
@@ -127,13 +126,19 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
 
         binding.createSegmentBtn.setOnClickThrottleBounceListener {
             if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
-                dismiss()
-                val createSegmentBottomSheet = CreateSegmentBottomSheet()
-                createSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
+
+                if (PrefManager.getcurrentUserdetails().ROLE>=2){
+                    dismiss()
+                    val createSegmentBottomSheet = CreateSegmentBottomSheet()
+                    createSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
+
+                }else{
+                    toast(getString(R.string.insufficient_permission_for_your_role_to_create_segment))
+                }
 
             }
             else{
-                toast("Segments creation is not allowed")
+                toast(getString(R.string.segments_creation_is_not_allowed_in_offline_mode))
             }
         }
 
@@ -142,9 +147,6 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
             val archiveSegmentBottomSheet = ArchiveSegmentBottomSheet()
             archiveSegmentBottomSheet.show(requireActivity().supportFragmentManager,"this")
         }
-
-
-
 
     }
 
@@ -161,7 +163,6 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
         recyclerView.adapter = adapter
         recyclerView.visible()
         binding.progressbar.gone()
-
 
     }
 

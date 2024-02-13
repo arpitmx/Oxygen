@@ -1,47 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout"
-    android:background="@color/primary_bg"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/secondary_bg"
     android:orientation="horizontal"
-    android:weightSum="10"
-    >
+    android:weightSum="10">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/project_dp"
+    <androidx.cardview.widget.CardView
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:gravity="center"
-        android:src="@drawable/placeholder_image"
-        android:scaleType="centerCrop"
-         />
+        app:cardCornerRadius="@dimen/radius_imgview">
+
+        <ImageView
+            android:id="@+id/project_dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_image" />
+
+    </androidx.cardview.widget.CardView>
+
 
     <TextView
         android:id="@+id/project_title"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:fontFamily="@font/sf_pro_display_regular"
+        android:layout_weight="8.5"
+        android:fontFamily="@font/sf_pro_display_medium"
         android:gravity="center_vertical"
         android:paddingStart="10dp"
         android:text="Project"
-        android:textColor="@color/better_white"
-        android:layout_weight="8.5"
+        android:textColor="@color/primary_txt"
         android:textSize="16dp" />
 
     <RadioButton
         android:id="@+id/radioButton"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:layout_weight="1.5"
-        android:buttonTint="@color/green"
-         />
+        android:buttonTint="@color/primary"
+        android:gravity="center" />
 
 
 </LinearLayout>

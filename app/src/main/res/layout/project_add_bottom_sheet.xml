@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:minHeight="200dp"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/secondary_bg_lighter"
     android:paddingBottom="30dp"
     >
 
@@ -114,7 +114,7 @@
         android:paddingEnd="20dp"
         android:text="@string/submit"
         android:textAllCaps="false"
-        android:textColor="@color/primary_bg"
+        android:textColor="@color/secondary_bg"
         android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
