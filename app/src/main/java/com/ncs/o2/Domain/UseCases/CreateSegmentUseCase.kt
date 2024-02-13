@@ -31,40 +31,44 @@ class CreateSegmentUseCase @Inject constructor(
 ) {
 
     fun doCheckAndCreateSegment(segment: Segment, callback: (ServerResult<Int>) -> Unit) {
+        if (segment.segment_NAME.trim().trimStart()=="Select Segment"){
+            callback(ServerResult.Failure(ServerExceptions.keywordDetectedException))
+        }
+        else {
+            repository.checkIfSegmentNameExists(
+                fieldName = segment.segment_NAME, projectID = segment.project_ID
+            ) { result ->
 
-        repository.checkIfSegmentNameExists(
-            fieldName = segment.segment_NAME, projectID = segment.project_ID
-        ) { result ->
 
-            when (result) {
-                is ServerResult.Success -> {
+                when (result) {
+                    is ServerResult.Success -> {
 
-                    if (result.data) {
-                        //True : Same segment name found
-                        callback(ServerResult.Failure(ServerExceptions.duplicateNameException))
-                    } else {
-                        //False : Not a duplicate, safe to create new segment
-                        callback(ServerResult.Success(Errors.Status.RESULT_OK))
+                        if (result.data) {
+                            //True : Same segment name found
+                            callback(ServerResult.Failure(ServerExceptions.duplicateNameException))
+                        } else {
+                            //False : Not a duplicate, safe to create new segment
+                            callback(ServerResult.Success(Errors.Status.RESULT_OK))
+                        }
+
+                    }
+
+                    is ServerResult.Failure -> {
+
+                        if (result.exception == ServerExceptions.projectDoesNotExists) {
+                            callback(ServerResult.Failure(ServerExceptions.projectDoesNotExists))
+                            return@checkIfSegmentNameExists
+                        } else {
+                            callback(ServerResult.Failure(result.exception))
+                        }
+                    }
+
+                    is ServerResult.Progress -> {
+                        callback(ServerResult.Progress)
                     }
 
                 }
-
-                is ServerResult.Failure -> {
-
-                    if (result.exception == ServerExceptions.projectDoesNotExists) {
-                        callback(ServerResult.Failure(ServerExceptions.projectDoesNotExists))
-                        return@checkIfSegmentNameExists
-                    } else {
-                        callback(ServerResult.Failure(result.exception))
-                    }
-                }
-
-                is ServerResult.Progress -> {
-                    callback(ServerResult.Progress)
-                }
-
             }
-
         }
 
     }

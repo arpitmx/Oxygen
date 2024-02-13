@@ -68,6 +68,9 @@ class CreateSegmentViewModel @Inject constructor(
                                 ServerExceptions.duplicateNameException -> {
                                     _segmentValidityLiveData.postValue(ServerExceptions.duplicateNameException.exceptionDescription)
                                 }
+                                ServerExceptions.keywordDetectedException->{
+                                    _segmentValidityLiveData.postValue(ServerExceptions.keywordDetectedException.exceptionDescription)
+                                }
                                 else -> {
                                     _segmentValidityLiveData.postValue(callback.exception.message.toString())
                                 }
