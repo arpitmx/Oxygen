@@ -24,19 +24,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,40 +56,32 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.set180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.GlobalUtils
+import com.ncs.o2.Domain.Utility.Issue
 import com.ncs.o2.HelperClasses.Navigator
 import com.ncs.o2.HelperClasses.NetworkChangeReceiver
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.HelperClasses.ShakeDetector
 import com.ncs.o2.R
-import com.ncs.o2.UI.Assigned.AssignedFragment
 import com.ncs.o2.UI.Auth.AuthScreenActivity
 import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.EditProfile.EditProfileActivity
 import com.ncs.o2.UI.Notifications.NotificationsActivity
 import com.ncs.o2.UI.Report.ShakeDetectedActivity
-import com.ncs.o2.UI.SearchScreen.SearchFragment
 import com.ncs.o2.UI.Setting.SettingsActivity
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.SharedViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
-import com.ncs.o2.UI.Tasks.TasksHolderFragment
-import com.ncs.o2.UI.Teams.TeamsFragment
-import com.ncs.o2.UI.UIComponents.Adapters.BottomSheetAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.ProjectCallback
 import com.ncs.o2.UI.UIComponents.Adapters.RecyclerViewAdapter
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddProjectBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.AddQuickTaskBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.versa.Constants.Endpoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -530,9 +518,7 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             }else{
                 easyElements.showSnackbar(binding.root,"Projects can't be added in offline mode",2000)
             }
-
         }
-
 
 
         //Setting button click listener
@@ -624,35 +610,49 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
             null
         }
     }
+
+
+    @Issue("Project name can be None, make sure projects cannot be created with these keywords")
     private fun setupProjectsList(){
 
         manageNoProject()
+
         //Version tag setup
         binding.drawerheaderfile.versionCode.text = "Oxygen v${getVersionName(this)}"
 
         projects=PrefManager.getProjectsList().toMutableList()
-        val list=ArrayList<String>()
-        list.addAll(projects)
-        if (list.contains("None")){
-            list.remove("None")
+        val project_list=ArrayList<String>()
+        project_list.addAll(projects)
+
+        if (project_list.contains("None")){
+            project_list.remove("None")
         }
+
         val recyclerView=binding.drawerheaderfile.projectRecyclerView
-        if (list.isEmpty()){
+        if (project_list.isEmpty()){
             recyclerView.gone()
+            binding.drawerheaderfile.projectCountTv.text = "0"
             binding.drawerheaderfile.projectPlaceholder.visible()
         }
+
         else{
+
             recyclerView.visible()
             binding.drawerheaderfile.projectPlaceholder.gone()
-            projectListAdapter = RecyclerViewAdapter(this,list)
+            projectListAdapter = RecyclerViewAdapter(this,project_list)
             val linearLayoutManager = LinearLayoutManager(this)
             linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
             recyclerView.layoutManager = linearLayoutManager
             recyclerView.adapter = projectListAdapter
+
+            binding.drawerheaderfile.projectCountTv.text = project_list.size.toString()
+
         }
 
     }
 
+
+    @Issue("Project name can be None, make sure projects cannot be created with these keywords")
     override fun onClick(projectID: String, position: Int) {
 
         // Handle click on a project in the list
@@ -679,7 +679,6 @@ class MainActivity : AppCompatActivity(), ProjectCallback,AddProjectBottomSheet.
 
         }
         manageNoProject()
-
     }
 
 

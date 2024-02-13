@@ -316,11 +316,11 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         button.setBackgroundResource(R.drawable.item_bg_curve_selected)
         val drawable: Drawable? = button.compoundDrawables[2]?.mutate()
         drawable?.colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(this, R.color.secondary_bg),
+            ContextCompat.getColor(this, R.color.primary_bg),
             PorterDuff.Mode.SRC_IN
         )
         button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
-        button.setTextColor(ContextCompat.getColor(this, R.color.secondary_bg))
+        button.setTextColor(ContextCompat.getColor(this, R.color.primary_bg))
         for (element in list){
             setUnSelectedButtonColor(element)
         }

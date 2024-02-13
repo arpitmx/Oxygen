@@ -54,7 +54,7 @@
             android:maxLines="2"
             android:maxLength="100"
             android:textAlignment="textStart"
-            android:textColor="@color/secondary_bg"
+            android:textColor="@color/primary_bg"
             android:textSize="18dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -80,7 +80,7 @@
             android:background="@drawable/card_view_white"
             android:fontFamily="@font/sf_pro_display_regular"
             android:gravity="top|start"
-            android:textColor="@color/secondary_bg"
+            android:textColor="@color/primary_bg"
             android:textSize="18dp" />
 
     </com.google.android.material.textfield.TextInputLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/secondary_bg_lighter"
     android:orientation="vertical"
     android:weightSum="10"
     tools:context=".UI.Tasks.TaskPage.TaskDetailActivity">
@@ -22,7 +22,7 @@
         style="@style/CustomTabLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/secondary_bg"
+        android:background="@color/primary_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:visibility="gone"
-        android:background="@color/border_grey"
+        android:background="@color/border_bg"
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
@@ -104,7 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:visibility="gone"
-        android:background="@color/border_grey"
+        android:background="@color/border_bg"
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

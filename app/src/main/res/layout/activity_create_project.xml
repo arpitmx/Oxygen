@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.createProject.CreateProject">
+    tools:context=".UI.createProject.CreateProjectActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,6 +20,7 @@
             android:layout_height="53dp"
             android:visibility="visible"
             />
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

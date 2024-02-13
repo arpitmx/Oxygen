@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swiperefresh"
-    android:background="@color/primary_bg"
+    android:background="@color/secondary_bg"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -208,7 +208,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:visibility="invisible"
-                        android:background="@color/border_grey" />
+                        android:background="@color/border_bg" />
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
@@ -316,7 +316,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:visibility="invisible"
-                        android:background="@color/border_grey" />
+                        android:background="@color/border_bg" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -390,7 +390,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:visibility="invisible"
-                        android:background="@color/border_grey" />
+                        android:background="@color/border_bg" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -461,7 +461,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:visibility="invisible"
-                        android:background="@color/border_grey" />
+                        android:background="@color/border_bg" />
                 </LinearLayout>
 
             </LinearLayout>

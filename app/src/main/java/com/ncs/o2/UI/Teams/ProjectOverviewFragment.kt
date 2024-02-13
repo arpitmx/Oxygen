@@ -29,7 +29,6 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
-import com.ncs.o2.UI.CreateTask.CreateTaskActivity
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.UIComponents.BottomSheets.TeamsPagemoreOptions
 import com.ncs.o2.databinding.FragmentTeamsBinding
@@ -39,11 +38,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
+import timber.log.Timber
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.OnChannelAdded {
+class ProjectOverviewFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.OnChannelAdded {
 
     @Inject
     @FirebaseRepository
@@ -59,7 +59,7 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
     lateinit var msgDB:MessageDatabase
     private var isVisible = true
     private var isStatsVisible = true
-    private var isTeamsVisible = false
+    private var isTeamsVisible = true
 
 
     override fun onCreateView(
@@ -158,16 +158,19 @@ class TeamsFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemoreOptions.
                 if (PrefManager.getLastChannelTimeStamp(PrefManager.getcurrentProject()).seconds.toInt() == 0) {
                     fetchChannels()
                 } else {
-                    Log.d("channelFetch", "fetch from cache")
+                    Timber.tag("channelFetch").d("fetch from cache")
                     val oldList = PrefManager.getProjectChannels(PrefManager.getcurrentProject())
                     val newList = oldList.toMutableList().sortedByDescending { it.timestamp }
-                    Log.d("channelFetch", "fetch from cache new list: \n ${newList.toString()}")
+                    Timber.tag("channelFetch").d("fetch from cache new list: " + "\n" + " " + newList.toString())
+
                     if (newList.isNotEmpty()) {
                         binding.placeholder.gone()
                         binding.channelsRv.visible()
                         setRecyclerView(newList.distinctBy { it.channel_id })
                     }
+
                 }
+
                 fetchNewChannels()
 
             } else {

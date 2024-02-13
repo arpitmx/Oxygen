@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/secondary_bg_lighter"
     android:minHeight="200dp"
     >
 
@@ -16,7 +16,7 @@
         />
 
     <RelativeLayout
-        android:background="@color/secondary_bg_black"
+        android:background="@color/secondary_bg_lighter"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         >
@@ -52,7 +52,7 @@
             android:layout_alignParentEnd="true"
             android:background="@null"
             android:layout_marginEnd="10dp"
-            app:tint="@color/green"
+            app:tint="@color/primary"
             app:srcCompat ="@drawable/baseline_done_24"
             />
 
@@ -116,7 +116,7 @@
         android:padding="20dp"
         android:visibility="gone"
         android:id="@+id/unassign_layout"
-        android:background="@color/primarybg">
+        android:background="@color/primary_lighter_bg">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"

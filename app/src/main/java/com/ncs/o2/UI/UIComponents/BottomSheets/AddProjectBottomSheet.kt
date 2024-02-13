@@ -1,6 +1,5 @@
 package com.ncs.o2.UI.UIComponents.BottomSheets
 
-import android.R
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -18,9 +17,10 @@ import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.UI.createProject.CreateProject
+import com.ncs.o2.UI.createProject.CreateProjectActivity
 import com.ncs.o2.databinding.ProjectAddBottomSheetBinding
 import com.ncs.versa.Constants.Endpoints
 import kotlinx.coroutines.CoroutineScope
@@ -48,6 +48,8 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setViews()
+
+
         binding.submitLink.setOnClickThrottleBounceListener {
             binding.progressBar.visible()
             val link = binding.projectLink.text.toString()
@@ -182,10 +184,14 @@ class AddProjectBottomSheet(private val projectAddedListener:ProjectAddedListene
         }
 
         binding.addProject.setOnClickThrottleBounceListener {
-            startActivity(Intent(requireContext(), CreateProject::class.java))
-            dismiss()
-        }
 
+            if (PrefManager.getcurrentUserdetails().ROLE>2){
+                startActivity(Intent(requireContext(), CreateProjectActivity::class.java))
+                dismiss()
+            }else{
+                toast("Insufficient role access to create project")
+            }
+        }
 
     }
 

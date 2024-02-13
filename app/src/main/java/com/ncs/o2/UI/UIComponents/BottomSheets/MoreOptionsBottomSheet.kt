@@ -15,6 +15,7 @@ import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ncs.o2.BuildConfig
 import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -104,8 +105,8 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
     private fun createTaskLink(taskId: String){
         if (taskId[0]=='#' && taskId[1]=='T' && taskId.split(" ").size==1 && !taskId.contains('-')) {
             val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                .setLink(Uri.parse("https://oxy2.page.link/share/${taskId.substring(2)}/${PrefManager.getcurrentProject()}"))
-                .setDomainUriPrefix("https://oxy2.page.link")
+                .setLink(Uri.parse("${BuildConfig.DYNAMIC_LINK_HOST}/share/${taskId.substring(2)}/${PrefManager.getcurrentProject()}"))
+                .setDomainUriPrefix(BuildConfig.DYNAMIC_LINK_HOST)
                 .setAndroidParameters(
                     DynamicLink.AndroidParameters.Builder("com.ncs.o2")
                         .setMinimumVersion(1)
@@ -131,8 +132,8 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
         }
         else{
             val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                .setLink(Uri.parse("https://oxy2.page.link/share/${taskId.substringAfter('-', taskId)}/${PrefManager.getcurrentProject()}/${taskId.substringBefore('-').substring(1)}"))
-                .setDomainUriPrefix("https://oxy2.page.link")
+                .setLink(Uri.parse("${BuildConfig.DYNAMIC_LINK_HOST}/${taskId.substringAfter('-', taskId)}/${PrefManager.getcurrentProject()}/${taskId.substringBefore('-').substring(1)}"))
+                .setDomainUriPrefix(BuildConfig.DYNAMIC_LINK_HOST)
                 .setAndroidParameters(
                     DynamicLink.AndroidParameters.Builder("com.ncs.o2")
                         .setMinimumVersion(1)

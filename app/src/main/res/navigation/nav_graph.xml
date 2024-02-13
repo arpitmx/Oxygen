@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/teams_page"
-        android:name="com.ncs.o2.UI.Teams.TeamsFragment"
+        android:name="com.ncs.o2.UI.Teams.ProjectOverviewFragment"
         android:label="teams_page"
         tools:layout="@layout/fragment_teams" >
         <action

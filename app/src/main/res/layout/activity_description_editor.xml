@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/secondary_bg"
+    android:background="@color/primary_bg"
     tools:context=".UI.CreateTask.DescriptionEditorActivity">
 
     <include
@@ -74,7 +74,7 @@
                     android:padding="10dp"
                     android:scrollbarThumbVertical="@color/primary"
                     android:scrollbars="vertical"
-                    android:textColor="@color/secondary_bg"
+                    android:textColor="@color/primary_bg"
                     android:textColorHint="@color/account"
                     android:textSize="16dp" />
 
@@ -105,7 +105,7 @@
         android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/secondarybg"
+        android:textColor="@color/secondary_darker_bg"
         android:background="@drawable/card_view_white"
         android:text="Preview"
         android:layout_marginBottom="5dp"

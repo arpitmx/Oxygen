@@ -12,7 +12,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/primary_bg"
+    android:background="@color/secondary_bg"
     tools:context=".UI.Tasks.TasksHolderFragment"
     >
 
@@ -112,7 +112,7 @@
         android:layout_gravity="center"
         android:visibility="gone"
         android:translationY="-25dp"
-        android:background="@color/secondary_bg"
+        android:background="@color/primary_bg"
         android:gravity="center"
         android:paddingBottom="@dimen/progress_offset"
         >

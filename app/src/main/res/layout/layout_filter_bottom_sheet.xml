@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:minHeight="200dp"
-    android:background="@color/secondary_bg_black"
+    android:background="@color/secondary_bg_lighter"
     >
 
 

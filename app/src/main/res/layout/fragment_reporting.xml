@@ -229,7 +229,7 @@
                 android:background="@drawable/card_view_white"
                 android:fontFamily="@font/sf_pro_display_regular"
                 android:gravity="top|start"
-                android:textColor="@color/secondary_bg"
+                android:textColor="@color/primary_bg"
                 android:textSize="18dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -262,7 +262,7 @@
             android:paddingEnd="20dp"
             android:text="@string/submit"
             android:textAllCaps="false"
-            android:textColor="@color/primary_bg"
+            android:textColor="@color/secondary_bg"
             android:textSize="18dp" />
     </LinearLayout>
 

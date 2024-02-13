@@ -143,7 +143,7 @@
         android:drawableEnd="@drawable/rounded_download_24"
         android:fontFamily="@font/sf_pro_display_semibold"
         android:backgroundTint="@color/better_white"
-        android:textColor="@color/secondary_bg"
+        android:textColor="@color/primary_bg"
         android:textAllCaps="false"
         android:layout_marginTop="8dp"
         />
@@ -165,7 +165,7 @@
         android:drawableEnd="@drawable/baseline_install_mobile_24"
         android:fontFamily="@font/sf_pro_display_semibold"
         android:backgroundTint="@color/primary"
-        android:textColor="@color/secondary_bg"
+        android:textColor="@color/primary_bg"
         android:textAllCaps="false"
         android:layout_marginTop="8dp"
         />

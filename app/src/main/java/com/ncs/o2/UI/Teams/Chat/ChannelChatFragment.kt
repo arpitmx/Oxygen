@@ -1264,18 +1264,14 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
     }
 
     private val markwon: Markwon by lazy {
-
-        // *NOTE @O2 team : If ExampleGrammarLocator class is not found after pull, // just hit run, this class is built at compile time*
-
         val prism4j = Prism4j(ExampleGrammarLocator())
-
-        // *NOTE*
-
         val activity = requireActivity()
-
-        Markwon.builder(activity).usePlugin(ImagesPlugin.create())
-            .usePlugin(GlideImagesPlugin.create(activity)).usePlugin(TablePlugin.create(activity))
-            .usePlugin(TaskListPlugin.create(activity)).usePlugin(HtmlPlugin.create())
+        Markwon.builder(activity)
+            .usePlugin(ImagesPlugin.create())
+            .usePlugin(GlideImagesPlugin.create(activity))
+            .usePlugin(TablePlugin.create(activity))
+            .usePlugin(TaskListPlugin.create(activity))
+            .usePlugin(HtmlPlugin.create())
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(SyntaxHighlightPlugin.create(prism4j, Prism4jThemeDarkula.create()))
 
@@ -1285,10 +1281,13 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
                         imagesPlugin.addSchemeHandler(DataUriSchemeHandler.create())
                     }
                 }
-            }).usePlugin(object : AbstractMarkwonPlugin() {
+            })
+            .usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configureTheme(builder: MarkwonTheme.Builder) {
-                    builder.blockQuoteColor(requireContext().getColor(R.color.primary))
-                        .linkColor(requireContext().getColor(R.color.primary)).codeBlockTextSize(30)
+                    builder
+                        .blockQuoteColor(resources.getColor(R.color.primary))
+                        .linkColor(resources.getColor(R.color.primary))
+                        .codeBlockTextSize(30)
                 }
             })
 

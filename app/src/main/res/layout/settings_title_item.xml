@@ -10,7 +10,7 @@
         android:id="@+id/setting_line"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/border_grey"
+        android:background="@color/border_bg"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

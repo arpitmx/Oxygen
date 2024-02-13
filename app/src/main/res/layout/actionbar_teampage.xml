@@ -3,7 +3,7 @@
     android:visibility="visible"
     android:layout_height="wrap_content"
     android:elevation="5dp"
-    android:background="@color/secondary_bg"
+    android:background="@color/primary_bg"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +50,7 @@
                 android:gravity="center"
                 android:paddingBottom="@dimen/padding_bottom_offset"
                 android:text="# random"
-                android:textColor="@color/primary"
+                android:textColor="@color/better_white"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/btnHam"
@@ -63,7 +63,7 @@
             android:id="@+id/line"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/border_grey" />
+            android:background="@color/border_bg" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,13 +5,13 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.ui.graphics.Color
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
@@ -19,7 +19,6 @@ import com.ncs.o2.Data.Room.MessageRepository.UsersDao
 import com.ncs.o2.Domain.Models.Enums.MessageType
 import com.ncs.o2.Domain.Models.Message
 import com.ncs.o2.Domain.Models.ServerResult
-import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
@@ -37,7 +36,6 @@ import com.ncs.o2.databinding.ChatMessageItemBinding
 import com.ncs.o2.databinding.ChatMessageReplyItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonVisitor
 import timber.log.Timber
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -321,7 +319,6 @@ class ChatAdapter(
     }
 
     fun setChatItem(user: UserInMessage, binding: ChatMessageItemBinding, position: Int) {
-//        setMessageView(msgList[position], binding)
         setMessageView(msgList[position].content,binding)
         val time = msgList[position].timestamp!!
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
@@ -563,7 +560,7 @@ class ChatAdapter(
         }
     }
 
-    private fun processSpan(message: String) : SpannableStringBuilder{
+    private fun processSpan(message: Spanned) : SpannableStringBuilder{
         val spannable = SpannableStringBuilder(message)
         val mentionedUsers: MutableList<String> = mutableListOf()
 
@@ -575,7 +572,6 @@ class ChatAdapter(
             mentionedUsers.add(user)
             val startIndex = mentionMatcher.start()
             val endIndex = message.indexOf(" ", startIndex).takeIf { it != -1 } ?: mentionMatcher.end()
-
 
             spannable.setSpan(
                 StyleSpan(Typeface.BOLD),
@@ -595,9 +591,8 @@ class ChatAdapter(
     }
 
     private fun setMessageView(message: String, binding: ChatMessageItemBinding) {
-
-
-        markwon.setParsedMarkdown(binding.descriptionTv, processSpan(message))
+        val spannedMessage = processSpan(markwon.render(markwon.parse(message)))
+        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
         binding.descriptionTv.visible()
     }
 
@@ -605,7 +600,8 @@ class ChatAdapter(
 
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
-        markwon.setParsedMarkdown(binding.descriptionTv, processSpan(message.content))
+        val spannedMessage = processSpan(markwon.render(markwon.parse(message.content)))
+        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
         binding.descriptionTv.visible()
 
     }
