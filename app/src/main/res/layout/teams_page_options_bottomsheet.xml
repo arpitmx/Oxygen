@@ -1,11 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="150dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_marginTop="5dp"
-    android:background="@color/secondary_bg_lighter"
+    android:background="@color/secondary_bg"
     >
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -13,6 +12,7 @@
         android:orientation="vertical"
         android:visibility="visible"
         android:layout_height="wrap_content"
+        android:background="@color/primary_bg"
         android:id="@+id/buttons">
 
         <View
@@ -80,8 +80,9 @@
             android:clickable="true"
             android:focusable="true"
             android:id="@+id/share_button"
-            android:background="@color/secondary_bg_lighter"
+            android:background="@color/secondary_bg"
             android:layout_height="wrap_content">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
@@ -98,7 +99,7 @@
                     android:layout_marginEnd="10dp"
                     android:background="@null"
                     android:src="@drawable/baseline_share_24"
-                    app:tint="@color/better_white" />
+                    app:tint="@color/dim_primary" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -106,14 +107,14 @@
                     android:layout_marginStart="16dp"
                     android:fontFamily="@font/sf_pro_display_semibold"
                     android:text="Share Project"
-                    android:textColor="@color/better_white"
+                    android:textColor="@color/subheading"
                     android:textSize="18dp" />
             </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="15dp"
-                android:background="@color/card_bg"
+                android:background="@color/seperator_light"
                 />
         </LinearLayout>
 
@@ -124,14 +125,16 @@
         android:orientation="vertical"
         android:visibility="gone"
         android:layout_height="wrap_content"
+        android:background="@color/secondary_bg"
         android:id="@+id/addChannels"
         >
+
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:paddingTop="24dp"
-            android:background="@color/secondary_bg_lighter"
             android:layout_height="wrap_content">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
@@ -147,7 +150,7 @@
                     android:layout_marginEnd="10dp"
                     android:background="@null"
                     android:src="@drawable/outline_add_24"
-                    app:tint="@color/better_white" />
+                    app:tint="@color/dim_primary" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -156,18 +159,20 @@
                     android:id="@+id/text_full"
                     android:fontFamily="@font/sf_pro_display_semibold"
                     android:text="Add Channel"
-                    android:textColor="@color/better_white"
+                    android:textColor="@color/subheading"
                     android:textSize="18dp" />
+
             </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="15dp"
-                android:background="@color/card_bg"
+                android:background="@color/seperator_light"
                 />
         </LinearLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
         <ProgressBar
         android:layout_width="match_parent"
         android:layout_height="50dp"

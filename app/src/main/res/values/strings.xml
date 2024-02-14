@@ -82,7 +82,7 @@
     <string name="choose_designation">Choose Designation</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="submit">Submit</string>
-    <string name="paste_project_link_here">Paste project link here</string>
+    <string name="paste_project_link_here">*Paste project link here</string>
     <string name="add_project">Add Project</string>
     <string name="sections">Sections</string>
     <string name="total_sections">Total Sections</string>

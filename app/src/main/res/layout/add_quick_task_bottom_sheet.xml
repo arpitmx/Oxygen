@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:weightSum="10"
+        android:background="@color/primary_bg"
         >
 
         <ImageButton
@@ -75,6 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/body"
+        android:background="@color/secondary_bg"
         android:orientation="vertical">
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -164,7 +166,7 @@
             android:layout_height="wrap_content"
             android:text="Moderators can edit this task later"
             android:textColor="@color/account"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:fontFamily="@font/sf_pro_display_medium"/>
 
         <androidx.appcompat.widget.AppCompatButton

@@ -11,6 +11,7 @@
         android:layout_width="40dp"
         android:layout_height="3dp"
         android:layout_marginTop="5dp"
+        android:layout_marginEnd="3dp"
         android:background="@drawable/card_view_bottomsheet_background"
         android:layout_gravity="center_horizontal"
         />
@@ -69,10 +70,10 @@
 
     <androidx.appcompat.widget.AppCompatEditText
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:id="@+id/searchBox"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/item_bg_curve"
@@ -164,6 +165,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:nestedScrollingEnabled="false"
         android:visibility="gone"
         android:layoutAnimation="@anim/layout_animation_fadein"

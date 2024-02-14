@@ -131,8 +131,9 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
                 }
         }
         else{
+
             val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                .setLink(Uri.parse("${BuildConfig.DYNAMIC_LINK_HOST}/${taskId.substringAfter('-', taskId)}/${PrefManager.getcurrentProject()}/${taskId.substringBefore('-').substring(1)}"))
+                .setLink(Uri.parse("${BuildConfig.DYNAMIC_LINK_HOST}/share/${taskId.substringAfter('-', taskId)}/${PrefManager.getcurrentProject()}/${taskId.substringBefore('-').substring(1)}"))
                 .setDomainUriPrefix(BuildConfig.DYNAMIC_LINK_HOST)
                 .setAndroidParameters(
                     DynamicLink.AndroidParameters.Builder("com.ncs.o2")
@@ -140,6 +141,7 @@ class MoreOptionsBottomSheet : BottomSheetDialogFragment(){
                         .build()
                 )
                 .buildDynamicLink()
+
             FirebaseDynamicLinks.getInstance().createDynamicLink()
                 .setLongLink(dynamicLink.uri)
                 .buildShortDynamicLink()

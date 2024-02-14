@@ -11,40 +11,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
+        android:nestedScrollingEnabled="true"
         android:paddingBottom="100dp"
         android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="30dp"
+            android:paddingBottom="50dp"
+            android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:background="@drawable/secondary_layer_top"
+                android:layout_margin="10dp"
+                android:paddingBottom="15dp"
+                android:paddingTop="15dp"
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/stats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     >
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
                         android:weightSum="10"
-
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +61,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_semibold"
-                                android:text="@string/bottom_nav_project"
+                                android:text="Overview"
                                 android:textColor="@color/better_white"
                                 android:textSize="18dp" />
 
@@ -92,22 +93,13 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-                <!--                <View-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="2dp"-->
-                <!--                    android:background="@color/border_grey"-->
-                <!--                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />-->
-
-
                 <HorizontalScrollView
                     android:id="@+id/extended_stats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="15dp"
                     android:clipToPadding="false"
                     android:nestedScrollingEnabled="true"
                     android:scrollbars="none"
@@ -137,169 +129,17 @@
 
 
                 </HorizontalScrollView>
+
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <LinearLayout
-                android:id="@+id/teamMembers"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/teams"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="start"
-                        android:orientation="horizontal"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="10dp"
-                        android:weightSum="10"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:fontFamily="@font/sf_pro_display_semibold"
-                            android:text="Team"
-                            android:textColor="@color/better_white"
-                            android:textSize="@dimen/h1" />
-
-                        <ImageView
-                            android:id="@+id/teamsIc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginTop="1dp"
-                            android:src="@drawable/baseline_groups_24"
-                            app:tint="@color/better_white" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/arrow_team"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="22dp"
-                        android:background="@drawable/card_view_chatbox_options"
-                        android:src="@drawable/baseline_keyboard_arrow_up_24"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/better_white" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="#00656668"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
-
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/extended_team"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/card_view_project_element_bg"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:orientation="vertical"
-                    android:paddingStart="10dp"
-                    android:paddingTop="15dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="7dp"
-                    android:visibility="visible"
-                    android:weightSum="10">
-
-                    <LinearLayout
-                        android:id="@+id/viewTeamMember"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="@drawable/ripplecustom"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="15dp"
-                            android:background="@drawable/channel_button_border"
-                            android:src="@drawable/baseline_subdirectory_arrow_right_24"
-                            app:tint="@color/dim_primary" />
-
-                        <TextView
-                            android:id="@+id/channel_name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="8"
-                            android:fontFamily="@font/sf_pro_display_medium"
-                            android:text="View Team Members"
-                            android:textColor="@color/edit_text_txt"
-                            android:textSize="18dp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/addTeamMembers"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="@drawable/ripplecustom"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="15dp"
-                            android:background="@drawable/channel_button_border"
-                            android:src="@drawable/outline_add_24"
-                            app:tint="@color/primary" />
-
-                        <TextView
-                            android:id="@+id/AddTeamMemebers"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="8"
-                            android:fontFamily="@font/sf_pro_display_medium"
-                            android:text="Add Members"
-                            android:textColor="@color/edit_text_txt"
-                            android:textSize="18dp" />
-                    </LinearLayout>
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-            </LinearLayout>
-
-
-<!--            <View-->
-<!--                android:id="@+id/line3"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="1dp"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:layout_marginEnd="10dp"-->
-<!--                android:background="@color/secondary_bg_black" />-->
-
 
             <LinearLayout
                 android:id="@+id/channels"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/secondary_layer_top"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -346,7 +186,7 @@
                         android:id="@+id/arrow"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="22dp"
+                        android:layout_marginEnd="20dp"
                         android:background="@drawable/card_view_chatbox_options"
                         android:src="@drawable/baseline_keyboard_arrow_up_24"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -388,14 +228,15 @@
                         android:id="@+id/channels_rv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="10dp"
                         android:layoutAnimation="@anim/layout_animation_fadein"
                         android:visibility="visible"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
+                        android:nestedScrollingEnabled="false"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
-                        android:background="@drawable/card_view_project_element_bg"
+                        android:background="@drawable/primary_layer_top"
                         tools:listitem="@layout/channels_each_item" />
 
 
@@ -408,6 +249,161 @@
                     android:background="#00656668" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/teamMembers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/secondary_layer_top"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/teams"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:orientation="horizontal"
+                        android:weightSum="10"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:fontFamily="@font/sf_pro_display_semibold"
+                            android:text="Team"
+                            android:textColor="@color/better_white"
+                            android:textSize="@dimen/h1" />
+
+                        <ImageView
+                            android:id="@+id/teamsIc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="1dp"
+                            android:src="@drawable/baseline_groups_24"
+                            app:tint="@color/better_white" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/arrow_team"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="20dp"
+                        android:background="@drawable/card_view_chatbox_options"
+                        android:src="@drawable/baseline_keyboard_arrow_up_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/better_white" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#00656668"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/extended_team"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/primary_layer_top"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:paddingTop="15dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="7dp"
+                    android:visibility="visible"
+                    android:weightSum="10">
+
+                    <LinearLayout
+                        android:id="@+id/viewTeamMember"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="@drawable/ripplecustom"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:background="@drawable/channel_button_border"
+                            android:src="@drawable/baseline_subdirectory_arrow_right_24"
+                            app:tint="@color/dim_primary" />
+
+                        <TextView
+                            android:id="@+id/channel_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="8"
+                            android:fontFamily="@font/sf_pro_display_regular"
+                            android:text="View Team Members"
+                            android:textColor="@color/subheading"
+                            android:textSize="@dimen/h2" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/addTeamMembers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="@drawable/ripplecustom"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:background="@drawable/channel_button_border"
+                            android:src="@drawable/outline_add_24"
+                            app:tint="@color/primary" />
+
+                        <TextView
+                            android:id="@+id/AddTeamMemebers"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="8"
+                            android:fontFamily="@font/sf_pro_display_regular"
+                            android:text="Add Members"
+                            android:textColor="@color/subheading"
+                            android:textSize="@dimen/h2" />
+                    </LinearLayout>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </LinearLayout>
+
 
         </LinearLayout>
 

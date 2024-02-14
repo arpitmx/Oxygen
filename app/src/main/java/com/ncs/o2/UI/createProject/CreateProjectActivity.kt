@@ -108,7 +108,7 @@ class CreateProjectActivity : AppCompatActivity(), ContributorAdapter.OnProfileC
                             val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
                                 .setLink(
                                     Uri.parse(
-                                        "${BuildConfig.DYNAMIC_LINK_HOST}/${
+                                        "${BuildConfig.DYNAMIC_LINK_HOST}/join/${
                                             title.toLowerCase().trim()
                                         }"
                                     )
@@ -512,16 +512,6 @@ class CreateProjectActivity : AppCompatActivity(), ContributorAdapter.OnProfileC
         return bitmap
     }
 
-//    private fun setupSelectedMembersRecyclerView() {
-//        val layoutManager = FlexboxLayoutManager(this)
-//        layoutManager.flexDirection = FlexDirection.ROW
-//        layoutManager.flexWrap = FlexWrap.WRAP
-//        moderatorsrecycler.layoutManager = layoutManager
-//        moderatorAdapter = ContributorAdapter(mutableListOf(), this)
-//        moderatorsrecycler.adapter = moderatorAdapter
-//        moderatorsrecycler.visible()
-//
-//    }
 
 
     override fun onProfileClick(user: User, position: Int) {

@@ -2,10 +2,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:minHeight="200dp"
-    android:background="@color/primary_bg"
-    >
+    android:background="@color/secondary_bg">
 
     <View
         android:layout_width="match_parent"
@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:weightSum="10"
+        android:background="@color/primary_bg"
         >
 
         <ImageButton
@@ -100,9 +101,9 @@
         android:clipToPadding="false"
         android:nestedScrollingEnabled="false"
         android:visibility="gone"
-        android:paddingTop="5dp"
         android:layoutAnimation="@anim/layout_animation_fadein"
         android:animationCache="true"
+        tools:listitem="@layout/segmet_selection_item"
         />
 
 

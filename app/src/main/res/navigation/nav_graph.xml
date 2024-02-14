@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/assigned_item"
-        android:name="com.ncs.o2.UI.Assigned.AssignedFragment"
+        android:name="com.ncs.o2.UI.Assigned.WorkFragment"
         android:label="fragment_assigned"
         tools:layout="@layout/fragment_assigned" >
     </fragment>

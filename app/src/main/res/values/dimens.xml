@@ -38,5 +38,6 @@
     <dimen name="radius_imgview">12dp</dimen>
     <dimen name="elements_corners">8dp</dimen>
     <dimen name="h1">18dp</dimen>
+    <dimen name="h2">17dp</dimen>
 
 </resources>

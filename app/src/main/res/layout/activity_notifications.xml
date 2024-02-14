@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/secondary_bg_lighter"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
@@ -17,7 +16,7 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         android:background="@color/primary_bg"
-        android:layout_marginBottom="15dp"
+        android:paddingBottom="10dp"
         android:id="@+id/filtersParent"
         android:scrollbars="none">
 
@@ -101,13 +100,7 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
     </HorizontalScrollView>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/secondaryBlue"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
 
 
     <LinearLayout
@@ -117,6 +110,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
+        android:background="@color/secondary_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
