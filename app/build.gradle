@@ -12,6 +12,17 @@ plugins {
 
 }
 
+def getProps(String propName) {
+    def propsFile = rootProject.file('local.properties')
+    if (propsFile.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        return props[propName]
+    } else {
+        return NullPointerException;
+    }
+}
+
 
 configurations {
     cleanedAnnotations
@@ -51,29 +62,34 @@ android {
         debug{
 
             //Mail Server
-            buildConfigField("String", "MAIL_SERVER_URL", "\"https://o2gitman.vercel.app/\"")
+            buildConfigField("String", "MAIL_SERVER_URL", "\"${getProps("DEBUG_MAIL_SERVER_URL")}\"")
 
             //Dynamic Link
-            buildConfigField("String", "DYNAMIC_LINK_HOST", "\"https://oxy2.page.link\"")
+            buildConfigField("String", "DYNAMIC_LINK_HOST", "\"${getProps("DEBUG_DYNAMIC_LINK_HOST")}\"")
 
-            //Gemini, FCM
-            buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")
-            buildConfigField("String", "FCM_SERVER_KEY", "\"AAAAmReJ314:APA91bGdEcp1FOt43szF1N7xbG-Pdjuct_0gZzhuDP5GvpSt_ECeXV3mQhKq3Gqq1Rgqa6FGcUwTlCyJYqbo0f89Flb5Y6X44nNMVkqW5Q1XsXZZXwE-77N3bORGbEdQ1TbM24Cb90Dw\"")
-            buildConfigField("String","GEMINI_API_KEY","\"AIzaSyCx0JV3MwiYZJQbkYbod4-kabJ76jnauio\"")
+            //FCM
+            buildConfigField("String", "FCM_BASE_URL", "\"${getProps("DEBUG_FCM_BASE_URL")}\"")
+            buildConfigField("String", "FCM_SERVER_KEY", "\"${getProps("DEBUG_FCM_SERVER_KEY")}\"")
+
+            //Gemini
+            buildConfigField("String","GEMINI_API_KEY","\"${getProps("DEBUG_GEMINI_API_KEY")}\"")
+
         }
 
         release {
 
             //Mail Server
-            buildConfigField("String", "MAIL_SERVER_URL", "\"https://o2gitman.vercel.app/\"")
+            buildConfigField("String", "MAIL_SERVER_URL", "\"${getProps("RELEASE_MAIL_SERVER_URL")}\"")
 
             //Dynamic Link
-            buildConfigField("String", "DYNAMIC_LINK_HOST", "\"https://oxgn.page.link\"")
+            buildConfigField("String", "DYNAMIC_LINK_HOST", "\"${getProps("RELEASE_DYNAMIC_LINK_HOST")}\"")
 
-            //Gemini, FCM
-            buildConfigField("String", "FCM_BASE_URL", "\"https://fcm.googleapis.com/\"")
-            buildConfigField("String", "FCM_SERVER_KEY", "\"AAAAV820VG8:APA91bGra5lkHPV2T6DQ8IoEY9-IxeynpIbTP7aR2vFAx0JsvDYYSSZRclQWHqYnSRYkxjXnfxolE7EkaBUDFOLKXMuJ2biziHnnpUAhbRHJnXn8R4cUPbTErrkqUgNfspvVR_ue55lO\"")
-            buildConfigField("String","GEMINI_API_KEY","\"AIzaSyCx0JV3MwiYZJQbkYbod4-kabJ76jnauio\"")
+            //FCM
+            buildConfigField("String", "FCM_BASE_URL", "\"${getProps("RELEASE_FCM_BASE_URL")}\"")
+            buildConfigField("String", "FCM_SERVER_KEY", "\"${getProps("RELEASE_FCM_SERVER_KEY")}\"")
+
+            //Gemini
+            buildConfigField("String","GEMINI_API_KEY","\"${getProps("RELEASE_GEMINI_API_KEY")}\"")
 
             minifyEnabled false
             shrinkResources false
@@ -245,6 +261,8 @@ dependencies {
     //Firebase Dynamic links
     implementation 'com.google.firebase:firebase-dynamic-links'
     //Firebase Crashylitics
+    implementation 'com.google.firebase:firebase-crashlytics'
+
 
 
 

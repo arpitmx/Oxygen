@@ -7,6 +7,7 @@
     android:background="@color/secondary_bg">
 
     <ScrollView
+        android:id="@+id/parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
@@ -15,10 +16,11 @@
         android:scrollbars="none">
 
         <LinearLayout
-            android:id="@+id/parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingBottom="50dp"
+            android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">

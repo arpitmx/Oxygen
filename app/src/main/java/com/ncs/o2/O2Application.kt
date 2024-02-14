@@ -93,7 +93,7 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
         NotificationsUtils.initialize(this@O2Application)
 
         //CrashMan
-        setUpCrashMan()
+//        setUpCrashMan()
 
 
 
