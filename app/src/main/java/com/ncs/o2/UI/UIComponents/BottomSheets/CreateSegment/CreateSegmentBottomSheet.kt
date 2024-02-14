@@ -85,8 +85,13 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
                     segment_CREATOR = PrefManager.getcurrentUserdetails().USERNAME,
                     segment_CREATOR_ID = FirebaseAuth.getInstance().currentUser?.uid!!
                 )
-
-                viewModel.createSegment(segment = segment!!)
+                if (title.trim().trimStart().lowercase()=="select segment"){
+                    binding.validationsTxt.visible()
+                    binding.validationsTxt.text = "Choose another segment name"
+                }
+                else{
+                    viewModel.createSegment(segment = segment!!)
+                }
                 PrefManager.setSegmentdetails(segment!!)
 
             }else {
@@ -131,14 +136,15 @@ class CreateSegmentBottomSheet :BottomSheetDialogFragment() {
                 ServerExceptions.projectDoesNotExists.exceptionDescription -> {
                     binding.validationsTxt.text = getString(R.string.this_project_doesn_t_exist)
                 }
+                ServerExceptions.keywordDetectedException.exceptionDescription -> {
+                    binding.validationsTxt.text = "Choose another segment name"
+                }
                 Errors.Status.VALID_INPUT -> {
                     binding.validationsTxt.text = getString(R.string.creating_your_segment)
                     this.dismiss()
-
                     val createSectionsBottomSheet = CreateSectionsBottomSheet()
-                    createSectionsBottomSheet.show(requireActivity().supportFragmentManager,"this")
+                    createSectionsBottomSheet.show(requireFragmentManager(),"this")
                 }
-
                 else -> {
                     binding.validationsTxt.text = "*"+state
                 }
