@@ -307,6 +307,9 @@ dependencies {
     //swipe to refresh
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 
+    //link preview
+    implementation 'org.jsoup:jsoup:1.17.2'
+
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'

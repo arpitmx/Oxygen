@@ -598,15 +598,17 @@ class ChatAdapter(
     }
 
     fun convertLinksToHtml(text: String): String {
-        val pattern = Regex("""\b(?:https?|ftp):\/\/\S+""")
+        val pattern = Regex("""\b(?:https?|www)\:\/\/\S+|\b\S+\.\S+""")
         val replacedText = pattern.replace(text) { matchResult ->
             val url = matchResult.value
-            """<a href="$url" target="_blank">$url</a>"""
+            if (url.startsWith("www.") || url.startsWith("http")) {
+                """<a href="$url" target="_blank">$url</a>"""
+            } else {
+                """<a href="http://$url" target="_blank">$url</a>"""
+            }
         }
         return replacedText
     }
-
-
 
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {

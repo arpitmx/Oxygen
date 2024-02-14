@@ -16,19 +16,17 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.util.Patterns
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.text.capitalize
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -59,6 +57,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursorMiddleCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
@@ -102,11 +101,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.Executors
-import java.util.regex.Matcher
 import javax.inject.Inject
 
 
@@ -144,6 +144,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private val CAMERA_PERMISSION_CODE = 101
     private var currentPhotoPath: String? = null
     private var replyingTo: String? = null
+    private val data: Metadata?= null
 
 
     var contributors: MutableList<String> = mutableListOf()
@@ -213,6 +214,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
             override fun afterTextChanged(s: Editable?) {
                 val input = s.toString()
+
+//                val links = extractLinks(input)
+//                processLinks(links)
+//                if (links.isEmpty() || links=="") {
+//                    processLinks("")
+//                }
 
                 val lastAtSymbolIndex = input.lastIndexOf('@')
 
@@ -320,22 +327,116 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 "` `", type = 2
             )
         }
-    }
 
-
-    private fun extractLinks(text: String): List<String> {
-        val links = mutableListOf<String>()
-        val pattern = Patterns.WEB_URL
-        val matcher: Matcher = pattern.matcher(text)
-        while (matcher.find()) {
-            val url = matcher.group()
-            links.add(url)
+        binding.inputBox.closeLinkPreview.setOnClickThrottleBounceListener {
+            binding.inputBox.linkPreviewSender.gone()
         }
-        return links
+    }
+    private fun extractLinks(input: String) : String{
+        val urlPattern = "(https?|ftp)://[^\\s/$.?#].[^\\s]*".toRegex()
+        val matches = urlPattern.findAll(input)
+        val firstMatch = matches.firstOrNull()
+        if (firstMatch != null) {
+            val link = firstMatch.value
+            return link
+        } else {
+            return ""
+        }
+    }
+    private fun processLinks(link: String) {
+        if (link.isNotEmpty() || link!="") {
+            binding.inputBox.linkPreviewSender.visible()
+            CoroutineScope(Dispatchers.IO).launch {
+
+//                "Title" to title,
+//                "Description" to description,
+//                "Open Graph Title" to ogTitle,
+//                "Open Graph Description" to ogDescription,
+//                "Open Graph Image" to ogImage
+
+                val metadata = fetchMetadata(link)
+                withContext(Dispatchers.Main) {
+                    if (metadata.isNull) {
+                        binding.inputBox.linkPreviewSender.gone()
+                    } else {
+                        if (metadata?.getValue("Type")=="normal") {
+                            binding.inputBox.linkPreviewTitle.text = metadata?.getValue("Title")
+
+                            binding.inputBox.linkPreviewDesc.text = if (metadata?.getValue("Open Graph Description").isNullOrEmpty()) link else metadata.getValue("Open Graph Description")
+
+                        }
+                        else{
+                            binding.inputBox.linkPreviewTitle.text = metadata?.getValue("Title")
+                            binding.inputBox.linkPreviewDesc.text = link
+                        }
+                    }
+                }
+            }
+
+        } else {
+            binding.inputBox.linkPreviewSender.gone()
+        }
     }
 
-    private fun processLink(link: String) {
+    suspend fun fetchMetadata(url: String): Map<String, String>? {
+        return try {
+            val document = Jsoup.connect(url).get()
 
+            val title = document.title()
+            val description = document.select("meta[name=description]").attr("content")
+            val ogTitle = document.select("meta[property=og:title]").attr("content")
+            val ogDescription = document.select("meta[property=og:description]").attr("content")
+            val ogImage = document.select("meta[property=og:image]").attr("content")
+
+            mapOf(
+                "Title" to title,
+                "Description" to description,
+                "Open Graph Title" to ogTitle,
+                "Open Graph Description" to ogDescription,
+                "Open Graph Image" to ogImage,
+                "Type" to "normal"
+            )
+        } catch (e: IOException) {
+            Log.d("metadatafetch",e.message.toString())
+            val list=extractPartsFromUrl(e.message!!)
+            if (list.isNullOrEmpty()) {
+                util.showSnackbar(binding.root, "Unable to fetch the link details", 2000)
+                null
+            }
+            else{
+                if (list.size==4){
+                    mapOf(
+                        "Title" to "${list[0].capitalize()}  #${list[3].dropLast(1)}-${list[1]}",
+                        "Description" to "",
+                        "Open Graph Title" to "",
+                        "Open Graph Description" to "",
+                        "Open Graph Image" to "",
+                        "Type" to "o2"
+                    )
+                }
+                else {
+                    mapOf(
+                        "Title" to "${list[0].capitalize()} - ${list[1].capitalize().dropLast(1)}",
+                        "Description" to "",
+                        "Open Graph Title" to "",
+                        "Open Graph Description" to "",
+                        "Open Graph Image" to "",
+                        "Type" to "o2"
+                    )
+                }
+            }
+        }
+    }
+    fun extractPartsFromUrl(inputString: String): List<String> {
+        val urlPattern = Regex("https://oxgn\\.page\\.link/([^/]+)/([^/]+)(?:/([^/]+)(?:/([^/\\]]+))?)?")
+        val matchResult = urlPattern.find(inputString)
+        return matchResult?.let {
+            val (part1, part2, part3, part4) = matchResult.destructured
+            when {
+                part3.isEmpty() -> listOf(part1, part2)
+                else -> listOf(part1, part2, part3, part4).filter { it.isNotEmpty() }
+            }
+        } ?: emptyList()
     }
 
     private fun pasteFromClipboard() {
