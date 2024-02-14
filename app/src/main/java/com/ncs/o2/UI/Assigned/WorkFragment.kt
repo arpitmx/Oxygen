@@ -1,24 +1,15 @@
 package com.ncs.o2.UI.Assigned
 
 import TaskListAdapter
-import android.animation.AnimatorInflater
-import android.animation.AnimatorSet
 import android.app.ProgressDialog
 import android.content.Intent
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.view.animation.LinearInterpolator
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
 import com.ncs.o2.Domain.Models.DBResult
@@ -29,7 +20,6 @@ import com.ncs.o2.Domain.Models.TodayTasks
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.rotate180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.set180
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -37,17 +27,11 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
-import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Teams.TasksHolderActivity
-import com.ncs.o2.UI.UIComponents.Adapters.TaskSectionViewPagerAdapter
-import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsWorkspaceBottomSheet
-import com.ncs.o2.UI.UIComponents.BottomSheets.MoreProjectOptionsBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentAssignedBinding
-import com.ncs.o2.databinding.FragmentTasksHolderBinding
-import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,10 +44,10 @@ import kotlin.math.roundToInt
 
 
 @AndroidEntryPoint
-class AssignedFragment : Fragment() , TaskListAdapter.OnClickListener {
+class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
 
     companion object {
-        fun newInstance() = AssignedFragment()
+        fun newInstance() = WorkFragment()
     }
     lateinit var binding: FragmentAssignedBinding
     private val viewModel: AssignedViewModel by viewModels()

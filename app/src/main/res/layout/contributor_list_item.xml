@@ -3,15 +3,17 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:padding="8dp"
+    android:padding="10dp"
     android:foreground="@drawable/ripplecustom"
     android:clickable="true"
     android:focusable="true"
-    android:background="@color/secondary_bg">
+   >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginStart="5dp"
+        >
 
     <ProgressBar
         android:id="@+id/progressbar"

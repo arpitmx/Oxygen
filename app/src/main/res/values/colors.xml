@@ -16,24 +16,20 @@
     <color name="darkbg_main_a80">#131313</color>
     <color name="chat_bg">#1E1E1E</color>
 
-
     <color name="secondaryPink">#ff89b3</color>
     <color name="primary_lighter_bg">#303030</color>
     <color name="secondary_darker_bg">#0d0c0b</color>
-
-
 
     <color name="green">@color/primary</color>
     <color name="yello">@color/s3bg</color>
     <color name="red">@color/secondaryPink</color>
     <color name="redx">#FF5252</color>
 
-
     <color name="s1bg">#A7FFA5</color>
     <color name="s2bg">#F19FFF</color>
     <color name="s3bg">#FFE871</color>
 
-    <color name="secondary_bg_lighter">#202020</color>
+    <color name="secondary_bg_lighter">#242424</color>
     <color name="item_bg_glow">#1D2930</color>
     <color name="better_white">#E3E1E1</color>
     <color name="card_bg">#3F4041</color>
@@ -77,7 +73,8 @@
     <color name="darkbgmain_darker">#232323</color>
     <color name="project_element_bg">#A61A1A1A</color>
     <color name="mention_list_rv_child_bg">#232323</color>
-
+    <color name="subheading">#C5C5C5</color>
+    <color name="seperator_light">#8B1E1E1E</color>
 
 
 </resources>

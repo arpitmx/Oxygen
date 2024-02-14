@@ -62,9 +62,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/sf_pro_display_regular"
-                android:text="geek@gmail.com"
+                android:text="user@mail.com"
+                android:paddingEnd="2dp"
+                android:layout_marginBottom="2dp"
                 android:textColor="@color/primary_txt"
-                android:textSize="14dp" />
+                android:textSize="13dp" />
 
 
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -139,7 +141,7 @@
                     android:fontFamily="@font/sf_pro_display_semibold"
                     android:text="0"
                     android:textColor="@color/primary"
-                    android:background="@drawable/card_view_project_element_bg"
+                    android:background="@drawable/primary_layer_top"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"

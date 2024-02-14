@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="105dp"
     android:id="@+id/stat_parent"
-    android:background="@drawable/card_view_project_element_bg"
+    android:background="@drawable/primary_layer_top"
     android:orientation="vertical"
     android:layout_marginStart="5dp"
     android:paddingStart="8dp"

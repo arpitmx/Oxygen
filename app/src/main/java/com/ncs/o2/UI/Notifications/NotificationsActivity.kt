@@ -42,6 +42,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Teams.ChannelHolderActivity
 import com.ncs.o2.databinding.ActivityNotificationsBinding
 import com.ncs.versa.Constants.Endpoints
+import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
@@ -343,6 +344,8 @@ class NotificationsActivity : AppCompatActivity(),NotificationAdapter.OnNotifica
         notificationRV = binding.notificationRV
         val layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         notificationRV.layoutManager = layoutManager
+        notificationRV.edgeEffectFactory = BounceEdgeEffectFactory()
+
         adapter = NotificationAdapter(this,PrefManager.getProjectTimeStamp(PrefManager.getcurrentProject()),list,this)
         adapter.notifyDataSetChanged()
         notificationRV.adapter = adapter

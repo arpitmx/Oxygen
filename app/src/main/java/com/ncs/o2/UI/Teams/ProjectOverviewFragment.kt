@@ -96,7 +96,7 @@ class ProjectOverviewFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemo
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
 
-        OverScrollDecoratorHelper.setUpOverScroll(binding.parent)
+        OverScrollDecoratorHelper.setUpStaticOverScroll(binding.parent, 0)
         OverScrollDecoratorHelper.setUpOverScroll(binding.extendedStats)
 
         binding.parent.gone()

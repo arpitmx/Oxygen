@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/primary_bg"
-        android:elevation="5dp"
+        android:elevation="10dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -29,7 +29,7 @@
                 android:id="@+id/search_bar"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_marginStart="15dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="7dp"
@@ -39,15 +39,15 @@
                 android:drawableTint="#DEE3E3E3"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:fontFamily="@font/sf_pro_display_regular"
+                android:fontFamily="@font/sf_pro_display_semibold"
                 android:gravity="start|center_vertical"
-                android:hint="Search tasks, tags, etc."
+                android:hint="Search"
                 android:inputType="textAutoCorrect"
                 android:paddingStart="15dp"
                 android:paddingBottom="1dp"
                 android:textAllCaps="false"
                 android:textColor="#DEE3E3E3"
-                android:textColorHint="@color/account"
+                android:textColorHint="@color/better_white"
                 android:textSize="18dp"
                 android:transitionName="searchActivityTransition"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -85,7 +85,7 @@
                     android:id="@+id/tags"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="10dp"
                     android:background="@drawable/item_bg_curve"
                     android:drawableRight="@drawable/baseline_keyboard_arrow_down_24"
                     android:drawablePadding="@dimen/_5dp"
@@ -190,9 +190,9 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/sf_pro_display_semibold"
                 android:text="Matches 20 issues"
-                android:textColor="@color/better_white"
+                android:textColor="@color/subheading"
                 android:textSize="14dp"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -219,7 +219,8 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:id="@+id/line"
-            android:background="@color/border_bg"
+            android:visibility="gone"
+            android:background="@color/seperator_light"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
 
@@ -287,6 +288,7 @@
         android:layout_marginBottom="50dp"
         android:clipToPadding="false"
         android:elevation="2dp"
+        android:paddingTop="5dp"
         android:layoutAnimation="@anim/layout_animation_popscale"
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
@@ -295,6 +297,7 @@
         android:id="@+id/recentsRV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="5dp"
         android:layout_marginBottom="50dp"
         android:clipToPadding="false"
         android:elevation="2dp"

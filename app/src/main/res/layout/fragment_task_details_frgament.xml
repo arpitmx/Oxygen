@@ -536,6 +536,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_margin="10dp"
                                 android:layout_marginTop="10dp"
+                                android:layout_marginBottom="8dp"
                                 android:fontFamily="@font/sf_pro_display_regular"
                                 android:gravity="start"
                                 android:paddingStart="@dimen/_5dp"
@@ -556,6 +557,7 @@
                                 android:clipToPadding="false"
                                 android:layoutAnimation="@anim/layout_animation_popscale"
                                 android:nestedScrollingEnabled="false" />
+
                         </RelativeLayout>
 
                         <LinearLayout
@@ -671,7 +673,7 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:text="View comments and other activity"
-                    android:textColor="@color/secondaryBlue"
+                    android:textColor="@color/dim_primary"
                     android:textSize="16dp" />
 
 

@@ -229,7 +229,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         }
         activityBinding.binding.gioActionbar.tabLayout.gone()
         activityBinding.binding.gioActionbar.searchCont.gone()
-        activityBinding.binding.gioActionbar.actionbar.visible()
+        activityBinding.binding.gioActionbar.actionbar.gone()
         activityBinding.binding.gioActionbar.constraintLayout2.gone()
         activityBinding.binding.gioActionbar.constraintLayoutsearch.visible()
         activityBinding.binding.gioActionbar.constraintLayoutworkspace.gone()
@@ -255,6 +255,14 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             searchQuery(binding.searchBar.text?.toString()!!)
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        activityBinding.binding.gioActionbar.actionbar.gone()
+
+    }
+
     private fun setRecyclerView(){
         binding.recentsRV.gone()
         binding.results.visible()
