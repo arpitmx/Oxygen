@@ -485,7 +485,8 @@ class ChannelChatAdapter(
 
 
     private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
-        val spannedMessage = processSpan(markwon.render(markwon.parse(message.content)))
+        val links=convertLinksToHtml(message.content)
+        val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
         markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
 
         binding.descriptionTv.visible()
@@ -494,13 +495,22 @@ class ChannelChatAdapter(
     }
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
-
-        val spannedMessage = processSpan(markwon.render(markwon.parse(message.content)))
+        val links=convertLinksToHtml(message.content)
+        val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
         markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
 
         binding.descriptionTv.visible()
         binding.modTag.gone()
         binding.assigneeTag.gone()
+    }
+
+    fun convertLinksToHtml(text: String): String {
+        val pattern = Regex("""\b(?:https?|ftp):\/\/\S+""")
+        val replacedText = pattern.replace(text) { matchResult ->
+            val url = matchResult.value
+            """<a href="$url" target="_blank">$url</a>"""
+        }
+        return replacedText
     }
 
 

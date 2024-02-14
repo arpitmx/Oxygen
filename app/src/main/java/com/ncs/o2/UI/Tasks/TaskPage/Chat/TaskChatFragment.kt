@@ -21,6 +21,7 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.util.Patterns
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -105,6 +106,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.Executors
+import java.util.regex.Matcher
 import javax.inject.Inject
 
 
@@ -238,8 +240,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 for (cont in contributorsData) {
                                     if (cont.username.equals(mention.trim(), ignoreCase = true)) {
                                         mentionedUsers.add(cont)
-                                        val list = mentionedUsers.distinctBy { it.firebaseID }
-                                            .toMutableList()
+                                        val list = mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
                                         Timber.tag("listcheck").d(list.toString())
                                     }
                                 }
@@ -253,7 +254,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 }
             }
         })
-
         binding.inputBox.btnSend.setOnClickThrottleBounceListener {
 
             if (binding.inputBox.editboxMessage.text.toString().trim().isNotEmpty()) {
@@ -320,6 +320,22 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 "` `", type = 2
             )
         }
+    }
+
+
+    private fun extractLinks(text: String): List<String> {
+        val links = mutableListOf<String>()
+        val pattern = Patterns.WEB_URL
+        val matcher: Matcher = pattern.matcher(text)
+        while (matcher.find()) {
+            val url = matcher.group()
+            links.add(url)
+        }
+        return links
+    }
+
+    private fun processLink(link: String) {
+
     }
 
     private fun pasteFromClipboard() {
@@ -1325,7 +1341,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }).usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configureTheme(builder: MarkwonTheme.Builder) {
                     builder.blockQuoteColor(requireContext().getColor(R.color.primary))
-                        .linkColor(requireContext().getColor(R.color.primary)).codeBlockTextSize(30)
+                        .linkColor(requireContext().getColor(R.color.light_blue_A200)).codeBlockTextSize(30)
                 }
             })
 

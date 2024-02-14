@@ -1286,7 +1286,7 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
                 override fun configureTheme(builder: MarkwonTheme.Builder) {
                     builder
                         .blockQuoteColor(resources.getColor(R.color.primary))
-                        .linkColor(resources.getColor(R.color.primary))
+                        .linkColor(resources.getColor(R.color.light_blue_A200))
                         .codeBlockTextSize(30)
                 }
             })

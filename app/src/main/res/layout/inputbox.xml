@@ -8,6 +8,13 @@
     android:background="@color/primary_bg"
     android:orientation="vertical">
 
+    <include
+        android:id="@+id/linkPreviewSender"
+        android:visibility="gone"
+        layout="@layout/link_preview_layout_sender"
+        />
+
+
     <LinearLayout
         android:id="@+id/reply_view_parent"
         android:layout_width="match_parent"
