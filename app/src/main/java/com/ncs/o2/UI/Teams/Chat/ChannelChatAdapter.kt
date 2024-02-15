@@ -486,7 +486,8 @@ class ChannelChatAdapter(
         }
 
         // All the other items
-
+        binding.modTag.gone()
+        binding.assigneeTag.gone()
         binding.msgSeperator.visible()
         binding.imgDp.visible()
         binding.tvName.visible()
@@ -528,7 +529,8 @@ class ChannelChatAdapter(
         binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
         binding.msgSeperator.alpha = 1f
         binding.imgDp.loadProfileImg(user.DP_URL.toString())
-
+        binding.modTag.gone()
+        binding.assigneeTag.gone()
     }
 
     private fun setReplyDPHeader(position: Int, binding: ChatMessageReplyItemBinding, user: UserInMessage) {
@@ -551,7 +553,8 @@ class ChannelChatAdapter(
         binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
         binding.msgSeperator.alpha = 1f
         binding.imgDp.loadProfileImg(user.DP_URL.toString())
-
+        binding.modTag.gone()
+        binding.assigneeTag.gone()
 
     }
 
@@ -695,7 +698,8 @@ class ChannelChatAdapter(
         binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
         binding.msgSeperator.alpha = 1f
         binding.imgDp.loadProfileImg(user.DP_URL.toString())
-
+        binding.modTag.gone()
+        binding.assigneeTag.gone()
     }
 
     fun convertLinksToHtml(text: String): String {
