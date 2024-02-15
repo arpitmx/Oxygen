@@ -874,7 +874,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private fun setMentionUsersRv(list: MutableList<User>) {
         val uniqueList = list.toSet().toMutableList()
         Log.d("rvList", list.toString())
-        mentionAdapter = MentionUsersAdapter(list, this)
+        mentionAdapter = MentionUsersAdapter(list.toSet().toMutableList(), this)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         mentionUserRv.layoutManager = linearLayoutManager

@@ -855,7 +855,7 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
 
     private fun setMentionUsersRv(list: MutableList<User>) {
         Log.d("rvList", list.toString())
-        mentionAdapter = MentionUsersAdapter(list, this)
+        mentionAdapter = MentionUsersAdapter(list.toSet().toMutableList(), this)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         mentionUserRv.layoutManager = linearLayoutManager
