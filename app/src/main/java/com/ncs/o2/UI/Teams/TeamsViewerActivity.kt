@@ -178,7 +178,7 @@ class TeamsViewerActivity : AppCompatActivity(),TeamsAdapter.OnUserClick {
         }
         else{
             val recyclerView=binding.recyclerView
-            val adapter = TeamsAdapter(dataList.toMutableList(),this)
+            val adapter = TeamsAdapter(dataList.toMutableList().sortedBy { it.username }.toMutableList(),this)
             val linearLayoutManager = LinearLayoutManager(this)
             linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
             recyclerView.layoutManager = linearLayoutManager
