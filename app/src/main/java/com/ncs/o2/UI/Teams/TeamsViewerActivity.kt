@@ -172,13 +172,15 @@ class TeamsViewerActivity : AppCompatActivity(),TeamsAdapter.OnUserClick {
         }
     }
     fun setRecyclerView(dataList: List<User>){
+        binding.userCountTv.visible()
+        binding.userCountTv.text=dataList.size.toString()
         if (dataList.isEmpty()){
             binding.recyclerView.gone()
             binding.placeholder.visible()
         }
         else{
             val recyclerView=binding.recyclerView
-            val adapter = TeamsAdapter(dataList.toMutableList(),this)
+            val adapter = TeamsAdapter(dataList.toMutableList().sortedWith(compareByDescending<User> { it.role }.thenBy { it.username }).toMutableList(),this)
             val linearLayoutManager = LinearLayoutManager(this)
             linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
             recyclerView.layoutManager = linearLayoutManager
