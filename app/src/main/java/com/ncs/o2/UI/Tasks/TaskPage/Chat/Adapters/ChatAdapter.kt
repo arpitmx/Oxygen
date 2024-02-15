@@ -817,7 +817,7 @@ class ChatAdapter(
     }
 
     fun convertLinksToHtml(text: String): String {
-        val pattern = Regex("""\b(?:https?|www)\:\/\/\S+|\b\S+\.\S+""")
+        val pattern = "([\\w+]+\\:\\/\\/)?([\\w\\d-]+\\.)*[\\w-]+[\\.\\:]\\w+([\\/\\?\\=\\&\\#\\.]?[\\w-]+)*\\/?".toRegex()
         val replacedText = pattern.replace(text) { matchResult ->
             val url = matchResult.value
             if (url.startsWith("www.") || url.startsWith("http")) {

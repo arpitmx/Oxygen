@@ -814,16 +814,20 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             viewModel.getUserbyId(contributor) { result ->
                                 when (result) {
                                     is ServerResult.Success -> {
-                                        binding.mentionProgressbar.gone()
-                                        binding.mentionUserRv.visible()
-
                                         val user = result.data
                                         user?.email = contributor
                                         contributorsData.add(user!!)
+                                        Log.d("contributorsdata", contributorsData.size.toString())
+                                        Log.d("contributorsdata", contributorList.size.toString())
+
                                         if (contributorsData.size == contributorList.size) {
-                                            setMentionUsersRv(contributorsData)
+                                            Log.d("contributorsdata", contributorsData.toString())
+                                            binding.mentionProgressbar.gone()
+                                            setMentionUsersRv(contributorsData.distinctBy { it.firebaseID }.toMutableList())
+                                            binding.mentionUserRv.visible()
                                         }
                                         Log.d("contributorsdata", contributorsData.toString())
+
                                     }
 
                                     is ServerResult.Failure -> {
@@ -870,7 +874,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private fun setMentionUsersRv(list: MutableList<User>) {
         val uniqueList = list.toSet().toMutableList()
         Log.d("rvList", list.toString())
-        mentionAdapter = MentionUsersAdapter(list, this)
+        mentionAdapter = MentionUsersAdapter(list.toSet().toMutableList(), this)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         mentionUserRv.layoutManager = linearLayoutManager
