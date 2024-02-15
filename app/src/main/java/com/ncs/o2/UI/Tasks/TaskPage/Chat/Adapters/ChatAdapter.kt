@@ -3,6 +3,7 @@ package com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
+import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -12,6 +13,7 @@ import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
@@ -23,6 +25,7 @@ import com.ncs.o2.Domain.Models.UserInMessage
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.DateTimeUtils
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
@@ -33,6 +36,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.ChatImageItemBinding
 import com.ncs.o2.databinding.ChatMessageItemBinding
+import com.ncs.o2.databinding.ChatMessageLinkItemBinding
 import com.ncs.o2.databinding.ChatMessageReplyItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
@@ -93,7 +97,8 @@ class ChatAdapter(
         const val NORMAL_MSG = 0
         const val IMAGE_MSG = 1
         const val REPLY_MSG = 2
-        const val FILE_MSG = 3
+        const val LINK_MSG=3
+        const val FILE_MSG = 4
     }
 
     private inner class UserMessage_ViewHolder(val binding: ChatMessageItemBinding) :
@@ -273,6 +278,135 @@ class ChatAdapter(
         }
     }
 
+    private inner class UserMessage_Link_ViewHolder(val binding: ChatMessageLinkItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+
+        fun bind(position: Int) {
+
+            val senderId = msgList[position].senderId
+            val localUser = users.find { it.EMAIL == senderId }
+
+            if (localUser != null) {
+                setChatLinkItem(localUser, binding, position)
+                Timber.tag("DB").d("fetching from local")
+
+            } else {
+                fetchUser(senderId) { newUser ->
+                    users.add(newUser)
+                    Timber.tag("DB").d("fetching from db")
+                    setChatLinkItem(newUser, binding, position)
+                }
+            }
+
+            val title=msgList[position].additionalData?.getValue("Title")
+            val desc=msgList[position].additionalData?.getValue("Open Graph Description")
+            val image=msgList[position].additionalData?.getValue("Open Graph Image")
+            val url=msgList[position].additionalData?.getValue("Url")
+            val type=msgList[position].additionalData?.getValue("Type")
+
+
+            if (!title.isNull){
+                binding.linkPreviewTitle.text=title.toString()
+            }
+            if (!type.isNull){
+                if (type=="normal") {
+                    if (!desc.isNull){
+                        binding.linkPreviewDesc.text=desc.toString()
+                    }
+                }
+                else{
+                    binding.linkPreviewDesc.text=if (!url.isNull) url.toString() else ""
+                }
+            }
+
+            if (!type.isNull){
+                if (type=="normal") {
+                    if (!image.isNull) {
+                        binding.linkPreviewImage.load(
+                            url = image.toString(),
+                            placeholder = context.resources.getDrawable(R.drawable.placeholder_image)
+                        )
+                    }
+                }
+                else{
+                    binding.linkPreviewImage.setImageDrawable(context.resources.getDrawable(R.drawable.apphd))
+                }
+            }
+            if (!url.isNull) {
+                binding.linkPreview.setOnClickThrottleBounceListener {
+                    openInBrowser(url.toString())
+                }
+            }
+
+            binding.parentMessageItem.setOnLongClickListener {
+                if (localUser != null) {
+                    onMessageLongPress.onLongPress(msgList[position],localUser.USERNAME!!)
+                    true
+
+                } else {
+                    fetchUser(senderId) {
+                        onMessageLongPress.onLongPress(msgList[position],it.USERNAME!!)
+                    }
+                    true
+                }
+
+            }
+
+            binding.descriptionTv.setOnLongClickListener {
+                if (localUser != null) {
+                    onMessageLongPress.onLongPress(msgList[position],localUser.USERNAME!!)
+                    true
+
+                } else {
+                    fetchUser(senderId) {
+                        onMessageLongPress.onLongPress(msgList[position],it.USERNAME!!)
+                    }
+                    true
+                }
+
+            }
+
+            binding.parentMessageItem.setOnDoubleClickListener {
+
+                if (localUser != null) {
+                    onchatDoubleClickListner.onDoubleClickListner(
+                        msgList[position],
+                        localUser.USERNAME!!
+                    )
+                } else {
+                    fetchUser(senderId) {
+                        onchatDoubleClickListner.onDoubleClickListner(
+                            msgList[position],
+                            it.USERNAME!!
+                        )
+                    }
+                }
+            }
+
+            binding.descriptionTv.setOnDoubleClickListener {
+
+                if (localUser != null) {
+                    onchatDoubleClickListner.onDoubleClickListner(
+                        msgList[position],
+                        localUser.USERNAME!!
+                    )
+                } else {
+                    fetchUser(senderId) {
+                        onchatDoubleClickListner.onDoubleClickListner(
+                            msgList[position],
+                            it.USERNAME!!
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun openInBrowser(url: String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(browserIntent)
+    }
 
     private inner class ImageMessage_ViewHolder(val binding: ChatImageItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -332,6 +466,14 @@ class ChatAdapter(
         binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
         binding.tvName.text = user.USERNAME
         setReplyDPHeader(position, binding, user)
+    }
+
+    fun setChatLinkItem(user: UserInMessage, binding: ChatMessageLinkItemBinding, position: Int) {
+        setMessageLinkView(msgList[position], binding)
+        val time = msgList[position].timestamp!!
+        binding.tvTimestamp.text = DateTimeUtils.getTimeAgo(time.seconds)
+        binding.tvName.text = user.USERNAME
+        setLinkDPHeader(position, binding, user)
     }
 
     private fun setImgMsgDPHeader(position: Int, binding: ChatImageItemBinding, user: UserInMessage) {
@@ -520,6 +662,72 @@ class ChatAdapter(
         }
     }
 
+    private fun setLinkDPHeader(position: Int, binding: ChatMessageLinkItemBinding, user: UserInMessage) {
+
+        if (position == 0) {
+            binding.msgSeperator.gone()
+            binding.imgDp.visible()
+            binding.tvName.visible()
+            binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
+            binding.imgDp.loadProfileImg(user.DP_URL.toString())
+
+            if (moderatorList.contains(user.EMAIL)){
+                binding.modTag.visible()
+                binding.tvName.setTextColor(context.resources.getColor(R.color.light_blue_A200))
+
+            }else {
+                binding.modTag.gone()
+                binding.tvName.setTextColor(context.resources.getColor(R.color.primary))
+            }
+
+            if (assignee == user.EMAIL){
+                binding.assigneeTag.visible()
+            }else{
+                binding.assigneeTag.gone()
+            }
+
+            return
+        }
+
+        // Removing dp and changing some layout if the previous message is sent from same user
+        val timestamp1 = msgList[position].timestamp?.toDate()?.time
+        val timestamp2 = msgList[position - 1].timestamp?.toDate()?.time
+        val timeDifferenceMillis = timestamp1?.minus(timestamp2!!)
+        val timeDifferenceMinutes = timeDifferenceMillis?.let { TimeUnit.MILLISECONDS.toMinutes(it) }
+        if (msgList[position - 1].senderId == msgList[position].senderId && timeDifferenceMinutes!! < 10) {
+            binding.imgDp.loadProfileImg(R.drawable.baseline_subdirectory_arrow_right_24)
+            binding.tvName.gone()
+            binding.tvTimestamp.gravity = Gravity.START or Gravity.CENTER
+            binding.msgSeperator.gone()
+            binding.modTag.gone()
+            binding.assigneeTag.gone()
+            return
+        }
+
+        // All the other items
+        binding.msgSeperator.visible()
+        binding.imgDp.visible()
+        binding.tvName.visible()
+        binding.tvTimestamp.gravity = Gravity.END or Gravity.CENTER
+        binding.msgSeperator.alpha = 1f
+        binding.imgDp.loadProfileImg(user.DP_URL.toString())
+
+        if (moderatorList.contains(user.EMAIL)){
+            binding.modTag.visible()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.light_blue_A200))
+        }else {
+            binding.modTag.gone()
+            binding.tvName.setTextColor(context.resources.getColor(R.color.primary))
+
+        }
+
+        if (assignee == user.EMAIL){
+            binding.assigneeTag.visible()
+        }else{
+            binding.assigneeTag.gone()
+        }
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -543,6 +751,17 @@ class ChatAdapter(
                     )
                 )
             }
+
+            LINK_MSG-> {
+                UserMessage_Link_ViewHolder(
+                    ChatMessageLinkItemBinding.inflate(
+                        LayoutInflater.from(context),
+                        parent,
+                        false
+                    )
+                )
+            }
+
 
             IMAGE_MSG -> {
                 ImageMessage_ViewHolder(
@@ -619,6 +838,14 @@ class ChatAdapter(
 
     }
 
+    private fun setMessageLinkView(message: Message, binding: ChatMessageLinkItemBinding) {
+        val links=convertLinksToHtml(message.content)
+        val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
+        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        binding.descriptionTv.visible()
+
+    }
+
 
     override fun getItemCount(): Int {
         return msgList.size
@@ -630,6 +857,9 @@ class ChatAdapter(
         }
         else if (msgList[position].messageType == MessageType.REPLY_MSG){
             (holder as UserMessage_Reply_ViewHolder).bind(position)
+        }
+        else if (msgList[position].messageType == MessageType.LINK_MSG){
+            (holder as UserMessage_Link_ViewHolder).bind(position)
         }
         else if (msgList[position].messageType == MessageType.IMAGE_MSG) {
             (holder as ImageMessage_ViewHolder).bind(position)

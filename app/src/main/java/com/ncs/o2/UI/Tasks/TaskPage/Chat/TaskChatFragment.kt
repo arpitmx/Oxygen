@@ -59,6 +59,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideUpAndVisible
@@ -144,7 +145,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private val CAMERA_PERMISSION_CODE = 101
     private var currentPhotoPath: String? = null
     private var replyingTo: String? = null
-    private val data: Metadata?= null
+    private var linkPreviewMetaData:Map<String,String> = emptyMap()
 
 
     var contributors: MutableList<String> = mutableListOf()
@@ -215,11 +216,22 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             override fun afterTextChanged(s: Editable?) {
                 val input = s.toString()
 
-//                val links = extractLinks(input)
-//                processLinks(links)
-//                if (links.isEmpty() || links=="") {
-//                    processLinks("")
-//                }
+                val links = extractLinks(input)
+                if (links.isEmpty() || links=="") {
+                    processLinks("")
+                }
+                else{
+                    processLinks(links)
+                }
+                if (' ' in input) {
+                    val links = extractLinks(input)
+                    Log.d("linksaterext",links)
+                    if (links.isEmpty() || links == "") {
+                        processLinks("")
+                    } else {
+                        processLinks(links)
+                    }
+                }
 
                 val lastAtSymbolIndex = input.lastIndexOf('@')
 
@@ -330,22 +342,29 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
         binding.inputBox.closeLinkPreview.setOnClickThrottleBounceListener {
             binding.inputBox.linkPreviewSender.gone()
+            binding.inputBox.linkPreviewTitle.text="Getting link info..."
+            binding.inputBox.linkPreviewDesc.text="Please wait..."
         }
     }
-    private fun extractLinks(input: String) : String{
-        val urlPattern = "(https?|ftp)://[^\\s/$.?#].[^\\s]*".toRegex()
+    private fun extractLinks(input: String): String {
+        val urlPattern = "([\\w+]+\\:\\/\\/)?([\\w\\d-]+\\.)*[\\w-]+[\\.\\:]\\w+([\\/\\?\\=\\&\\#\\.]?[\\w-]+)*\\/?".toRegex()
         val matches = urlPattern.findAll(input)
         val firstMatch = matches.firstOrNull()
-        if (firstMatch != null) {
-            val link = firstMatch.value
-            return link
-        } else {
-            return ""
-        }
+
+        return firstMatch?.let {
+            val link = it.value
+            Log.d("linkkk",link.toString())
+            if (!link.startsWith("http://") && !link.startsWith("https://")) {
+                "https://$link"
+            } else {
+                link
+            }
+        } ?: ""
     }
+
+
     private fun processLinks(link: String) {
         if (link.isNotEmpty() || link!="") {
-            binding.inputBox.linkPreviewSender.visible()
             CoroutineScope(Dispatchers.IO).launch {
 
 //                "Title" to title,
@@ -354,20 +373,42 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 //                "Open Graph Description" to ogDescription,
 //                "Open Graph Image" to ogImage
 
-                val metadata = fetchMetadata(link)
+                var metadata = fetchMetadata(link)
+
                 withContext(Dispatchers.Main) {
-                    if (metadata.isNull) {
+                    if (binding.inputBox.editboxMessage.text.isNullOrEmpty()){
                         binding.inputBox.linkPreviewSender.gone()
-                    } else {
-                        if (metadata?.getValue("Type")=="normal") {
-                            binding.inputBox.linkPreviewTitle.text = metadata?.getValue("Title")
+                        binding.inputBox.linkPreviewTitle.text="Getting link info..."
+                        binding.inputBox.linkPreviewDesc.text="Please wait..."
+                    }
+                    else {
+                        if (metadata.isNull) {
+                            binding.inputBox.linkPreviewSender.gone()
+                            binding.inputBox.linkPreviewTitle.text = "Getting link info..."
+                            binding.inputBox.linkPreviewDesc.text = "Please wait..."
+                        } else {
+                            linkPreviewMetaData = metadata!!
+                            binding.inputBox.linkPreviewSender.visible()
 
-                            binding.inputBox.linkPreviewDesc.text = if (metadata?.getValue("Open Graph Description").isNullOrEmpty()) link else metadata.getValue("Open Graph Description")
+                            runDelayed(2000) {
+                                if (metadata?.getValue("Type") == "normal") {
+                                    binding.inputBox.linkPreviewTitle.text =
+                                        metadata?.getValue("Title")
 
-                        }
-                        else{
-                            binding.inputBox.linkPreviewTitle.text = metadata?.getValue("Title")
-                            binding.inputBox.linkPreviewDesc.text = link
+                                    binding.inputBox.linkPreviewDesc.text =
+                                        if (metadata?.getValue("Open Graph Description")
+                                                .isNullOrEmpty()
+                                        ) link else metadata.getValue("Open Graph Description")
+
+                                } else {
+                                    binding.inputBox.linkPreviewTitle.text =
+                                        metadata?.getValue("Title")
+                                    binding.inputBox.linkPreviewDesc.text = link
+                                }
+                                binding.inputBox.linkPreviewSender.setOnClickThrottleBounceListener {
+                                    openInBrowser(link)
+                                }
+                            }
                         }
                     }
                 }
@@ -375,6 +416,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
         } else {
             binding.inputBox.linkPreviewSender.gone()
+            binding.inputBox.linkPreviewTitle.text="Getting link info..."
+            binding.inputBox.linkPreviewDesc.text="Please wait..."
         }
     }
 
@@ -394,13 +437,13 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 "Open Graph Title" to ogTitle,
                 "Open Graph Description" to ogDescription,
                 "Open Graph Image" to ogImage,
-                "Type" to "normal"
+                "Type" to "normal",
+                "Url" to url
             )
         } catch (e: IOException) {
             Log.d("metadatafetch",e.message.toString())
             val list=extractPartsFromUrl(e.message!!)
             if (list.isNullOrEmpty()) {
-                util.showSnackbar(binding.root, "Unable to fetch the link details", 2000)
                 null
             }
             else{
@@ -411,7 +454,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         "Open Graph Title" to "",
                         "Open Graph Description" to "",
                         "Open Graph Image" to "",
-                        "Type" to "o2"
+                        "Type" to "o2",
+                        "Url" to url
+
                     )
                 }
                 else {
@@ -421,7 +466,9 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         "Open Graph Title" to "",
                         "Open Graph Description" to "",
                         "Open Graph Image" to "",
-                        "Type" to "o2"
+                        "Type" to "o2",
+                        "Url" to url
+
                     )
                 }
             }
@@ -437,6 +484,11 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 else -> listOf(part1, part2, part3, part4).filter { it.isNotEmpty() }
             }
         } ?: emptyList()
+    }
+
+    private fun openInBrowser(url: String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(browserIntent)
     }
 
     private fun pasteFromClipboard() {
@@ -462,7 +514,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun sendMessageProcess() {
 
-        if (replyingTo == null) {
+        if (replyingTo == null && linkPreviewMetaData.isEmpty()) {
             val message = Message(
                 messageId = RandomIDGenerator.generateRandomId(),
                 senderId = PrefManager.getcurrentUserdetails().EMAIL,
@@ -471,8 +523,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 timestamp = Timestamp.now(),
             )
             postMessage(message)
-        } else {
-
+        }
+        else if (replyingTo!=null) {
             val additionalData: HashMap<String, String> = hashMapOf(
                 "replyingTo" to replyingTo!!,
             )
@@ -484,6 +536,18 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 messageType = MessageType.REPLY_MSG,
                 timestamp = Timestamp.now(),
                 additionalData = additionalData,
+
+                )
+            postMessage(message)
+        }
+        else{
+            val message = Message(
+                messageId = RandomIDGenerator.generateRandomId(),
+                senderId = PrefManager.getcurrentUserdetails().EMAIL,
+                content = binding.inputBox.editboxMessage.text?.trim().toString(),
+                messageType = MessageType.LINK_MSG,
+                timestamp = Timestamp.now(),
+                additionalData = linkPreviewMetaData,
 
                 )
             postMessage(message)
@@ -1076,6 +1140,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             ViewGroup.LayoutParams.WRAP_CONTENT
 
                         clearReplying()
+                        binding.inputBox.linkPreviewSender.gone()
+                        binding.inputBox.linkPreviewTitle.text="Getting link info..."
+                        binding.inputBox.linkPreviewDesc.text="Please wait..."
+                        linkPreviewMetaData= emptyMap()
 
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDatabase.messagesDao().insert(message)
@@ -1096,7 +1164,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             }
                         }
 
-                        if (message.messageType == MessageType.NORMAL_MSG || message.messageType == MessageType.REPLY_MSG) {
+                        if (message.messageType == MessageType.NORMAL_MSG || message.messageType == MessageType.REPLY_MSG || message.messageType==MessageType.LINK_MSG) {
 
                             Log.d("listcheck", mentionedUsers.toString())
                             val list = mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
