@@ -75,6 +75,23 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
 
+                <TextView
+                    android:id="@+id/user_count_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="@font/sf_pro_display_semibold"
+                    android:text="10"
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    android:textColor="@color/primary"
+                    android:background="@drawable/primary_layer_top"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:paddingTop="4dp"
+                    android:textSize="14dp" />
+
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <ImageView
