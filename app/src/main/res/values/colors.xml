@@ -42,7 +42,7 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
-
+    <color name="real_blue">#00008B</color>
     <color name="edge_bg">#00FFFFFF</color>
 
     <color name="bot_bubble_bg">#FFF8E1</color>

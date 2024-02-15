@@ -135,7 +135,7 @@ class CreateProjectActivity : AppCompatActivity(), ContributorAdapter.OnProfileC
                                                     .trim()
                                             }",
                                             "PROJECT_LINK" to shortLink,
-                                            "PROJECT_DEEPLINK" to "${BuildConfig.DYNAMIC_LINK_HOST}/${
+                                            "PROJECT_DEEPLINK" to "${BuildConfig.DYNAMIC_LINK_HOST}/join/${
                                                 title.toLowerCase().trim()
                                             }",
                                             "PROJECT_DESC" to desc.toString().trim(),

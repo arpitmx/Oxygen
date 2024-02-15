@@ -16,18 +16,17 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.text.capitalize
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -58,7 +57,9 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursorMiddleCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideDownAndGone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.slideUpAndVisible
@@ -101,8 +102,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -142,6 +145,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private val CAMERA_PERMISSION_CODE = 101
     private var currentPhotoPath: String? = null
     private var replyingTo: String? = null
+    private var linkPreviewMetaData:Map<String,String> = emptyMap()
 
 
     var contributors: MutableList<String> = mutableListOf()
@@ -212,6 +216,23 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             override fun afterTextChanged(s: Editable?) {
                 val input = s.toString()
 
+                val links = extractLinks(input)
+                if (links.isEmpty() || links=="") {
+                    processLinks("")
+                }
+                else{
+                    processLinks(links)
+                }
+                if (' ' in input) {
+                    val links = extractLinks(input)
+                    Log.d("linksaterext",links)
+                    if (links.isEmpty() || links == "") {
+                        processLinks("")
+                    } else {
+                        processLinks(links)
+                    }
+                }
+
                 val lastAtSymbolIndex = input.lastIndexOf('@')
 
                 if (lastAtSymbolIndex != -1 && lastAtSymbolIndex == input.length - 1) {
@@ -238,8 +259,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                                 for (cont in contributorsData) {
                                     if (cont.username.equals(mention.trim(), ignoreCase = true)) {
                                         mentionedUsers.add(cont)
-                                        val list = mentionedUsers.distinctBy { it.firebaseID }
-                                            .toMutableList()
+                                        val list = mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
                                         Timber.tag("listcheck").d(list.toString())
                                     }
                                 }
@@ -253,7 +273,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 }
             }
         })
-
         binding.inputBox.btnSend.setOnClickThrottleBounceListener {
 
             if (binding.inputBox.editboxMessage.text.toString().trim().isNotEmpty()) {
@@ -320,6 +339,156 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 "` `", type = 2
             )
         }
+
+        binding.inputBox.closeLinkPreview.setOnClickThrottleBounceListener {
+            binding.inputBox.linkPreviewSender.gone()
+            binding.inputBox.linkPreviewTitle.text="Getting link info..."
+            binding.inputBox.linkPreviewDesc.text="Please wait..."
+        }
+    }
+    private fun extractLinks(input: String): String {
+        val urlPattern = "([\\w+]+\\:\\/\\/)?([\\w\\d-]+\\.)*[\\w-]+[\\.\\:]\\w+([\\/\\?\\=\\&\\#\\.]?[\\w-]+)*\\/?".toRegex()
+        val matches = urlPattern.findAll(input)
+        val firstMatch = matches.firstOrNull()
+
+        return firstMatch?.let {
+            val link = it.value
+            Log.d("linkkk",link.toString())
+            if (!link.startsWith("http://") && !link.startsWith("https://")) {
+                "https://$link"
+            } else {
+                link
+            }
+        } ?: ""
+    }
+
+
+    private fun processLinks(link: String) {
+        if (link.isNotEmpty() || link!="") {
+            CoroutineScope(Dispatchers.IO).launch {
+
+//                "Title" to title,
+//                "Description" to description,
+//                "Open Graph Title" to ogTitle,
+//                "Open Graph Description" to ogDescription,
+//                "Open Graph Image" to ogImage
+
+                var metadata = fetchMetadata(link)
+
+                withContext(Dispatchers.Main) {
+                    if (binding.inputBox.editboxMessage.text.isNullOrEmpty()){
+                        binding.inputBox.linkPreviewSender.gone()
+                        binding.inputBox.linkPreviewTitle.text="Getting link info..."
+                        binding.inputBox.linkPreviewDesc.text="Please wait..."
+                    }
+                    else {
+                        if (metadata.isNull) {
+                            binding.inputBox.linkPreviewSender.gone()
+                            binding.inputBox.linkPreviewTitle.text = "Getting link info..."
+                            binding.inputBox.linkPreviewDesc.text = "Please wait..."
+                        } else {
+                            linkPreviewMetaData = metadata!!
+                            binding.inputBox.linkPreviewSender.visible()
+
+                            runDelayed(2000) {
+                                if (metadata?.getValue("Type") == "normal") {
+                                    binding.inputBox.linkPreviewTitle.text =
+                                        metadata?.getValue("Title")
+
+                                    binding.inputBox.linkPreviewDesc.text =
+                                        if (metadata?.getValue("Open Graph Description")
+                                                .isNullOrEmpty()
+                                        ) link else metadata.getValue("Open Graph Description")
+
+                                } else {
+                                    binding.inputBox.linkPreviewTitle.text =
+                                        metadata?.getValue("Title")
+                                    binding.inputBox.linkPreviewDesc.text = link
+                                }
+                                binding.inputBox.linkPreviewSender.setOnClickThrottleBounceListener {
+                                    openInBrowser(link)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } else {
+            binding.inputBox.linkPreviewSender.gone()
+            binding.inputBox.linkPreviewTitle.text="Getting link info..."
+            binding.inputBox.linkPreviewDesc.text="Please wait..."
+        }
+    }
+
+    suspend fun fetchMetadata(url: String): Map<String, String>? {
+        return try {
+            val document = Jsoup.connect(url).get()
+
+            val title = document.title()
+            val description = document.select("meta[name=description]").attr("content")
+            val ogTitle = document.select("meta[property=og:title]").attr("content")
+            val ogDescription = document.select("meta[property=og:description]").attr("content")
+            val ogImage = document.select("meta[property=og:image]").attr("content")
+
+            mapOf(
+                "Title" to title,
+                "Description" to description,
+                "Open Graph Title" to ogTitle,
+                "Open Graph Description" to ogDescription,
+                "Open Graph Image" to ogImage,
+                "Type" to "normal",
+                "Url" to url
+            )
+        } catch (e: IOException) {
+            Log.d("metadatafetch",e.message.toString())
+            val list=extractPartsFromUrl(e.message!!)
+            if (list.isNullOrEmpty()) {
+                null
+            }
+            else{
+                if (list.size==4){
+                    mapOf(
+                        "Title" to "${list[0].capitalize()}  #${list[3].dropLast(1)}-${list[1]}",
+                        "Description" to "",
+                        "Open Graph Title" to "",
+                        "Open Graph Description" to "",
+                        "Open Graph Image" to "",
+                        "Type" to "o2",
+                        "Url" to url
+
+                    )
+                }
+                else {
+                    mapOf(
+                        "Title" to "${list[0].capitalize()} - ${list[1].capitalize().dropLast(1)}",
+                        "Description" to "",
+                        "Open Graph Title" to "",
+                        "Open Graph Description" to "",
+                        "Open Graph Image" to "",
+                        "Type" to "o2",
+                        "Url" to url
+
+                    )
+                }
+            }
+        }
+    }
+    fun extractPartsFromUrl(inputString: String): List<String> {
+        val urlPattern = Regex("https://oxgn\\.page\\.link/([^/]+)/([^/]+)(?:/([^/]+)(?:/([^/\\]]+))?)?")
+        val matchResult = urlPattern.find(inputString)
+        return matchResult?.let {
+            val (part1, part2, part3, part4) = matchResult.destructured
+            when {
+                part3.isEmpty() -> listOf(part1, part2)
+                else -> listOf(part1, part2, part3, part4).filter { it.isNotEmpty() }
+            }
+        } ?: emptyList()
+    }
+
+    private fun openInBrowser(url: String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(browserIntent)
     }
 
     private fun pasteFromClipboard() {
@@ -345,7 +514,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun sendMessageProcess() {
 
-        if (replyingTo == null) {
+        if (replyingTo == null && linkPreviewMetaData.isEmpty()) {
             val message = Message(
                 messageId = RandomIDGenerator.generateRandomId(),
                 senderId = PrefManager.getcurrentUserdetails().EMAIL,
@@ -354,8 +523,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 timestamp = Timestamp.now(),
             )
             postMessage(message)
-        } else {
-
+        }
+        else if (replyingTo!=null) {
             val additionalData: HashMap<String, String> = hashMapOf(
                 "replyingTo" to replyingTo!!,
             )
@@ -367,6 +536,18 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 messageType = MessageType.REPLY_MSG,
                 timestamp = Timestamp.now(),
                 additionalData = additionalData,
+
+                )
+            postMessage(message)
+        }
+        else{
+            val message = Message(
+                messageId = RandomIDGenerator.generateRandomId(),
+                senderId = PrefManager.getcurrentUserdetails().EMAIL,
+                content = binding.inputBox.editboxMessage.text?.trim().toString(),
+                messageType = MessageType.LINK_MSG,
+                timestamp = Timestamp.now(),
+                additionalData = linkPreviewMetaData,
 
                 )
             postMessage(message)
@@ -959,6 +1140,10 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             ViewGroup.LayoutParams.WRAP_CONTENT
 
                         clearReplying()
+                        binding.inputBox.linkPreviewSender.gone()
+                        binding.inputBox.linkPreviewTitle.text="Getting link info..."
+                        binding.inputBox.linkPreviewDesc.text="Please wait..."
+                        linkPreviewMetaData= emptyMap()
 
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDatabase.messagesDao().insert(message)
@@ -979,7 +1164,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             }
                         }
 
-                        if (message.messageType == MessageType.NORMAL_MSG || message.messageType == MessageType.REPLY_MSG) {
+                        if (message.messageType == MessageType.NORMAL_MSG || message.messageType == MessageType.REPLY_MSG || message.messageType==MessageType.LINK_MSG) {
 
                             Log.d("listcheck", mentionedUsers.toString())
                             val list = mentionedUsers.distinctBy { it.firebaseID }.toMutableList()
@@ -1325,7 +1510,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             }).usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configureTheme(builder: MarkwonTheme.Builder) {
                     builder.blockQuoteColor(requireContext().getColor(R.color.primary))
-                        .linkColor(requireContext().getColor(R.color.primary)).codeBlockTextSize(30)
+                        .linkColor(requireContext().getColor(R.color.light_blue_A200)).codeBlockTextSize(30)
                 }
             })
 

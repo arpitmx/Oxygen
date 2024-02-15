@@ -1,6 +1,7 @@
 package com.ncs.o2.UI.CreateTask
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.Bitmap
@@ -78,7 +79,7 @@ class DescriptionEditorActivity : AppCompatActivity(),ImageAdapter.ImagesListner
         GlobalUtils.EasyElements(this)
     }
     lateinit var draft: Task
-
+    lateinit var progressDialog:ProgressDialog
     private val viewModel: CreateTaskViewModel by viewModels()
 
     private val REQUEST_IMAGE_CAPTURE = 1
@@ -530,7 +531,10 @@ send.sendImages(imgArray);
         return bitmap
     }
     private fun uploadImageToFirebaseStorage(bitmap: Bitmap, taskID:String) {
-
+        progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("Uploading Image...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
         viewModel.uploadImagethroughRepository(bitmap, taskID).observe(this) { result ->
 
             when(result){
@@ -566,6 +570,8 @@ send.sendImages(imgArray);
                     ) {
                         imageRef.delete()
                     }
+                    progressDialog.dismiss()
+
                 }
                 ServerResult.Progress -> {
                     binding.progressBar.visible()
@@ -577,6 +583,7 @@ send.sendImages(imgArray);
                         binding.summaryEt.selectionStart,
                         "\n ![image!](${result.data}) \n "
                     )
+                    progressDialog.dismiss()
                 }
             }
         }
