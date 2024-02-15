@@ -314,6 +314,9 @@ class ChatAdapter(
                     if (!desc.isNull){
                         binding.linkPreviewDesc.text=desc.toString()
                     }
+                    else{
+                        binding.linkPreviewDesc.text=if (!url.isNull) url.toString() else ""
+                    }
                 }
                 else{
                     binding.linkPreviewDesc.text=if (!url.isNull) url.toString() else ""
@@ -817,7 +820,7 @@ class ChatAdapter(
     }
 
     fun convertLinksToHtml(text: String): String {
-        val pattern = "([\\w+]+\\:\\/\\/)?([\\w\\d-]+\\.)*[\\w-]+[\\.\\:]\\w+([\\/\\?\\=\\&\\#\\.]?[\\w-]+)*\\/?".toRegex()
+        val pattern = Regex("""\b(?:https?|www)\:\/\/\S+|\b\S+\.\S+(?:\.\S+)*(?<!\.)""")
         val replacedText = pattern.replace(text) { matchResult ->
             val url = matchResult.value
             if (url.startsWith("www.") || url.startsWith("http")) {
