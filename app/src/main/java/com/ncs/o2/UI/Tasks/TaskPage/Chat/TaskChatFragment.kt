@@ -1516,8 +1516,6 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 }
             }
         }
-
-
     }
 
 
@@ -1685,8 +1683,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 PrefManager.setcurrentProject(projectId)
                 PrefManager.setRadioButton(position)
                 PrefManager.selectedPosition.value = position
-                val intent =
-                    Intent(requireActivity(), TaskDetailActivity::class.java)
+                val intent = Intent(requireActivity(), TaskDetailActivity::class.java)
                 intent.putExtra("task_id", taskId)
                 intent.putExtra("type", "shareTask")
                 startActivity(intent)
