@@ -2,7 +2,6 @@ package com.ncs.o2.Api
 
 import com.google.gson.JsonObject
 import com.ncs.o2.BuildConfig
-import retrofit2.Call
 import retrofit2.Response
 
 import retrofit2.http.Body

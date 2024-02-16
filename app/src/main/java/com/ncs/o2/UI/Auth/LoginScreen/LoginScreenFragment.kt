@@ -55,7 +55,10 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
     companion object {
         fun newInstance() = LoginScreenFragment()
+        val TAG = "LoginScreenFragment"
     }
+
+
 
     @Inject
     lateinit var util : GlobalUtils.EasyElements
@@ -75,6 +78,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setUpViews()
         setUpValidation()
 
@@ -82,62 +86,63 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
 
     private fun setUpValidation() {
-        authResource = viewModel.loginLiveData
-        CoroutineScope(Dispatchers.Main).launch {
-            viewModel.validationEvents.collect { event ->
-                when (event) {
-                    LoginScreenViewModel.ValidationEvent.Success -> {
-                        //requireActivity().startActivity(Intent(requireContext(),MainActivity::class.java))
-                        authResource.let { liveData ->
-                            liveData.observe(viewLifecycleOwner) { result ->
-                                handleLoginResult(result)
-                            }
-                        }
-                    }
 
-                }
-            }
+        viewModel.loginLiveData.observe(viewLifecycleOwner){ result->
+            handleLoginResult(result)
         }
+
     }
 
     private fun handleLoginResult(result: ServerResult<FirebaseUser>?) {
+
+        Timber.tag(TAG)
+            .d("Received result : ${result.toString()}")
+
         when (result) {
             is ServerResult.Failure -> {
+
+                Timber.tag(TAG)
+                    .d("Failure ran: ${result.exception.message}")
+
                 binding.progressbar.gone()
                 binding.btnLogin.isEnabled = true
                 binding.btnLogin.isClickable = true
                 binding.btnLogin.text = getString(R.string.login)
+
                 Toast.makeText(
                     activity,
                     "Registration Failed : ${result.exception.message}",
                     Toast.LENGTH_SHORT
                 ).show()
 
-                Timber.tag(SignUpScreenFragment.TAG)
+                Timber.tag(TAG)
                     .d("Registration Failed : ${result.exception.message}")
 
             }
 
-            ServerResult.Progress -> {
-
+            is ServerResult.Progress -> {
 
                 binding.progressbar.visible()
                 binding.btnLogin.isEnabled = false
                 binding.btnLogin.isClickable = false
                 binding.btnLogin.text = getString(R.string.hold_on)
-
+                Timber.tag(TAG)
+                    .d("Progress Ran " )
 
             }
 
             is ServerResult.Success -> {
+
+                binding.progressbar.gone()
+
+                Timber.tag(TAG)
+                    .d("Success Ran ${FirebaseAuth.getInstance().currentUser?.email}" )
 
                 FirebaseFirestore.getInstance().collection("Users")
                     .document(FirebaseAuth.getInstance().currentUser?.email!!)
                     .get(Source.SERVER)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-
-
 
                             val document = task.result
                             if (document != null && document.exists()) {
@@ -177,6 +182,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
                                                 }
                                             }
                                             val notification_timestamp=document.getLong("NOTIFICATION_LAST_SEEN")
+
                                             if (fcmToken == null) {
                                                 fcmToken { token->
                                                     fcmToken = token
@@ -186,7 +192,7 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
                                                 initialize(requireContext())
                                                 setLastSeenTimeStamp(notification_timestamp!!)
-                                                setProjectTimeStamp(PrefManager.getcurrentProject(),notification_timestamp)
+                                                setProjectTimeStamp(getcurrentProject(),notification_timestamp)
                                                 setLatestNotificationTimeStamp(0)
                                                 setNotificationCount(0)
 
@@ -399,21 +405,22 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
 
         setUpVisibilities()
 
+        viewModel.emailError.observe(requireActivity()) { error ->
+            binding.etEmail.error = error
+        }
+
+        viewModel.passwordError.observe(requireActivity()) { error ->
+            binding.etPass.error = error
+        }
+
+
         binding.forgotPassword.setOnClickThrottleBounceListener {
             findNavController().navigate(R.id.action_loginScreenFragment_to_resetPasswordFragment)
         }
 
         binding.signUp.setOnClickListener {
+
             findNavController().navigate(R.id.action_loginScreenFragment_to_signUpScreenFragment)
-
-            viewModel.emailError.observe(requireActivity()) { error ->
-                binding.etEmail.error = error
-            }
-
-            viewModel.passwordError.observe(requireActivity()) { error ->
-                binding.etPass.error = error
-            }
-
         }
 
 
@@ -422,8 +429,10 @@ class LoginScreenFragment @Inject constructor() : Fragment() {
         }
 
         binding.btnLogin.setOnClickThrottleBounceListener {
+
             val email = binding.etEmail.text.toString()
             val pass = binding.etPass.text.toString()
+
             viewModel.validateInput(
                 email = email,
                 password = pass
