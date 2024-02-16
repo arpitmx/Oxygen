@@ -34,6 +34,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.load
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -891,62 +892,92 @@ class ChannelChatAdapter(
             val endIndex = inputText.indexOf(' ', startIndex)
             val endPosition = if (endIndex != -1) endIndex else inputText.length
             val _url = inputText.substring(startIndex, endPosition)
-            if (!deepLinkMap.containsKey(_url)){
+            Log.d("styleLinkNotContains", _url!!)
+            if (!deepLinkMap.containsKey(_url)) {
                 val uri = getFullUri(_url)
-                val url = extractUrl(uri)
-                deepLinkMap[_url] = url!!
-                Log.d("styleLinkNotContains", url!!)
+                if (!uri.isNull) {
+                    Log.d("styleLinkNotContainsUri", uri!!)
+                    val url = extractUrl(uri)
+                    if (!url.isNull) {
+                        Log.d("styleLinkNotContainsUrl", url!!)
+                        deepLinkMap[_url] = url!!
+                        Log.d("styleLinkNotContains", url!!)
 
-                val list = extractPathAfterLink(url)
-                Log.d("styleLinkNotContains", list.toString()!!)
+                        val list = extractPathAfterLink(url)
+                        Log.d("styleLinkNotContains", list.toString()!!)
 
-                if (list.size == 4) {
-                    val clickableText = "  Task #${list[3]}-${list[1]}  "
-                    val clickableSpan = object : ClickableSpan() {
-                        override fun onClick(widget: View) {
-                            val projectId=list[2]
-                            val taskId="#${list[3]}-${list[1]}"
-                            onTaskLinkPreviewClick.onTaskClick(projectId = projectId, taskId = taskId)
+                        if (list.size == 4) {
+                            val clickableText = "  Task #${list[3]}-${list[1]}  "
+                            val clickableSpan = object : ClickableSpan() {
+                                override fun onClick(widget: View) {
+                                    val projectId = list[2]
+                                    val taskId = "#${list[3]}-${list[1]}"
+                                    onTaskLinkPreviewClick.onTaskClick(
+                                        projectId = projectId,
+                                        taskId = taskId
+                                    )
+                                }
+
+                                override fun updateDrawState(ds: TextPaint) {
+                                    ds.color = Color.RED
+                                    ds.isUnderlineText = false
+                                }
+                            }
+
+                            val roundedBackgroundSpan = RoundedBackgroundSpan(
+                                ContextCompat.getColor(context, R.color.primary),
+                                ContextCompat.getColor(context, R.color.pureblack),
+                                10F
+                            )
+                            inputText.replace(startIndex, endPosition, clickableText)
+                            inputText.setSpan(
+                                clickableSpan,
+                                startIndex,
+                                startIndex + clickableText.length,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
+                            inputText.setSpan(
+                                roundedBackgroundSpan,
+                                startIndex,
+                                startIndex + clickableText.length,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
                         }
+                        if (list.size == 2) {
+                            val clickableText = "  Join Project - ${list[1].capitalize()}  "
+                            val clickableSpan = object : ClickableSpan() {
+                                override fun onClick(widget: View) {
+                                    onTaskLinkPreviewClick.onProjectClick(list[1])
 
-                        override fun updateDrawState(ds: TextPaint) {
-                            ds.color = Color.RED
-                            ds.isUnderlineText = false
+                                }
+
+                                override fun updateDrawState(ds: TextPaint) {
+                                    ds.color = Color.RED
+                                    ds.isUnderlineText = false
+                                }
+                            }
+
+                            val roundedBackgroundSpan = RoundedBackgroundSpan(
+                                ContextCompat.getColor(context, R.color.primary),
+                                ContextCompat.getColor(context, R.color.pureblack),
+                                10F
+                            )
+
+                            inputText.replace(startIndex, endPosition, clickableText)
+                            inputText.setSpan(
+                                clickableSpan,
+                                startIndex,
+                                startIndex + clickableText.length,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
+                            inputText.setSpan(
+                                roundedBackgroundSpan,
+                                startIndex,
+                                startIndex + clickableText.length,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
                         }
                     }
-
-                    val roundedBackgroundSpan = RoundedBackgroundSpan(
-                        ContextCompat.getColor(context, R.color.primary),
-                        ContextCompat.getColor(context, R.color.pureblack),
-                        10F
-                    )
-                    inputText.replace(startIndex,endPosition,clickableText)
-                    inputText.setSpan(clickableSpan, startIndex,startIndex+clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    inputText.setSpan(roundedBackgroundSpan, startIndex,startIndex+clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                }
-                if (list.size==2){
-                    val clickableText = "  Join Project - ${list[1].capitalize()}  "
-                    val clickableSpan = object : ClickableSpan() {
-                        override fun onClick(widget: View) {
-                            onTaskLinkPreviewClick.onProjectClick(list[1])
-
-                        }
-
-                        override fun updateDrawState(ds: TextPaint) {
-                            ds.color = Color.RED
-                            ds.isUnderlineText = false
-                        }
-                    }
-
-                    val roundedBackgroundSpan = RoundedBackgroundSpan(
-                        ContextCompat.getColor(context, R.color.primary),
-                        ContextCompat.getColor(context, R.color.pureblack),
-                        10F
-                    )
-
-                    inputText.replace(startIndex,endPosition,clickableText)
-                    inputText.setSpan(clickableSpan, startIndex,startIndex+clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    inputText.setSpan(roundedBackgroundSpan, startIndex,startIndex+clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
             }
             else{
