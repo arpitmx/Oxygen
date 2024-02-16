@@ -107,6 +107,18 @@ class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,p
 
         }
 
+        binding.sendEmail.setOnClickThrottleBounceListener {
+            if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
+                dismiss()
+                val sendCopyToMailBottomSheet = SendCopyToMailBottomSheet(message)
+                sendCopyToMailBottomSheet.show(requireFragmentManager(), "Send Copy")
+            }
+            else{
+                toast("Can't send email in offline mode")
+            }
+
+        }
+
         binding.createTask.setOnClickThrottleBounceListener {
             if (PrefManager.getAppMode()== Endpoints.ONLINE_MODE) {
                 dismiss()
