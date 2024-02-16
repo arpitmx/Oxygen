@@ -4,12 +4,10 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
-import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -26,17 +24,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.NotificationsUtils
-import com.ncs.o2.Domain.Workers.FCMWorker
+import com.ncs.o2.Domain.Workers.NotificationsFCMWorker
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Api.NotificationApiService
-import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
-import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.CrashReporting.CrashMan
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -297,7 +292,7 @@ class O2Application : Application(), Configuration.Provider, LifecycleEventObser
             workerClassName: String,
             workerParameters: WorkerParameters
         ): ListenableWorker
-        = FCMWorker(
+        = NotificationsFCMWorker(
             appContext,
             workerParameters,
             notificationApiService)

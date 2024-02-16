@@ -103,7 +103,7 @@
             android:gravity="start|center"
             android:text="2 days ago"
             android:textColor="@color/account"
-            android:textSize="@dimen/chat_msg_text_size"
+            android:textSize="@dimen/font_size_timestamp"
 
             />
 

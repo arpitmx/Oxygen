@@ -7,11 +7,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.work.ListenableWorker
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ncs.o2.Api.MailApiService
-import com.ncs.o2.Api.NotificationApiService
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Constants.TestingConfig
 import com.ncs.o2.Domain.Interfaces.Repository
@@ -28,10 +26,8 @@ import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.Data.Room.NotificationRepository.NotificationDatabase
 import com.ncs.o2.Domain.Models.Mail
-import com.ncs.o2.Domain.Workers.FCMWorker
 import com.ncs.o2.databinding.ActivityTestingBinding
 import com.ncs.versa.Constants.Endpoints
-import dagger.assisted.Assisted
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
