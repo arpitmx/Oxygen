@@ -933,18 +933,18 @@ class ChatAdapter(
     }
 
     private fun makeClickableSpannable(text: SpannableStringBuilder): SpannableStringBuilder {
-        val spannableString = SpannableString(text)
+        val spannableString = SpannableStringBuilder(text)
 
         val dynamicLinkHost = BuildConfig.DYNAMIC_LINK_HOST
-        var startIndex = text.indexOf(dynamicLinkHost)
+        var startIndex = spannableString.indexOf(dynamicLinkHost)
 
         while (startIndex != -1) {
-            val endIndex = text.indexOf(' ', startIndex)
-            val endPosition = if (endIndex != -1) endIndex else text.length
+            val endIndex = spannableString.indexOf(' ', startIndex)
+            val endPosition = if (endIndex != -1) endIndex else spannableString.length
 
             val clickableSpan = object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    handleLinkClick(text.substring(startIndex, endPosition))
+                    handleLinkClick(spannableString.substring(startIndex, endPosition))
                 }
             }
 
@@ -962,11 +962,12 @@ class ChatAdapter(
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
-            startIndex = text.indexOf(dynamicLinkHost, endPosition)
+            startIndex = spannableString.indexOf(dynamicLinkHost, endPosition)
         }
 
         return SpannableStringBuilder(spannableString)
     }
+
 
 
 

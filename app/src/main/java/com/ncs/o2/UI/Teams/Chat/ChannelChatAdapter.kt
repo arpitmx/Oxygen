@@ -743,7 +743,7 @@ class ChannelChatAdapter(
     }
 
     private fun makeClickableSpannable(text: SpannableStringBuilder): SpannableStringBuilder {
-        val spannableString = SpannableString(text)
+        val spannableString = SpannableStringBuilder(text)
 
         val dynamicLinkHost = BuildConfig.DYNAMIC_LINK_HOST
         var startIndex = text.indexOf(dynamicLinkHost)
@@ -754,7 +754,7 @@ class ChannelChatAdapter(
 
             val clickableSpan = object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    handleLinkClick(text.substring(startIndex, endPosition))
+                    handleLinkClick(spannableString.substring(startIndex, endPosition))
                 }
             }
 
@@ -777,6 +777,7 @@ class ChannelChatAdapter(
 
         return SpannableStringBuilder(spannableString)
     }
+
 
 
 
