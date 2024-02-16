@@ -22,7 +22,7 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Repositories.TaskRepository
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Api.NotificationApiService
-import com.ncs.o2.Domain.Workers.FCMWorker
+import com.ncs.o2.Domain.Workers.NotificationsFCMWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -94,14 +94,14 @@ constructor(val notificationApiService: NotificationApiService,
         val payloadJsonObject = buildNotificationPayload(fcmToken)
 
         val payloadInputData = Data.Builder()
-            .putString(FCMWorker.PAYLOAD_DATA,payloadJsonObject.toString())
+            .putString(NotificationsFCMWorker.PAYLOAD_DATA,payloadJsonObject.toString())
             .build()
 
         val contraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<FCMWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<NotificationsFCMWorker>()
              .setConstraints(contraints)
             .setBackoffCriteria(BackoffPolicy.LINEAR,500L,TimeUnit.MICROSECONDS)
             .setInputData(payloadInputData)

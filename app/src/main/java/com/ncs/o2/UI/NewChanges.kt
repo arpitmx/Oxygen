@@ -36,8 +36,8 @@ class NewChanges : AppCompatActivity() {
 
 
         setViews()
-        val desc="## Release Notes [24.2.10] - [10/02/2024]\n" +
-                "\n" +
+        val desc="## Release Notes [24.2.15] - [15/02/2024]\n" +
+                "\n ![img](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTFodDNscnE5b3E5Mm4yZDQ2cWh0bTdrNjZkamt0NHFiNXV4NGRodCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lKrfxjj5soCIw/giphy.gif) \n" +
                 "### New Features\n" +
                 " - Created project stats: Now you can easily track and analyze project statistics within the app.\n" +
                 " \n" +
@@ -67,7 +67,7 @@ class NewChanges : AppCompatActivity() {
                 "- Made general improvements in UX\n" +
                 "\n" +
                 "### How to Update\n" +
-                "- Latest Version of O2 is 24.2.10, it can be downloaded from the release page, find version 24.2.10 at [Release Page](https://github.com/arpitmx/Oxygen/releases)\n" +
+                "- Latest Version of O2 is 24.2.15, it can be downloaded from the release page, find version 24.2.15 at [Release Page](https://github.com/arpitmx/Oxygen/releases)\n" +
                 "\n" +
                 "### Feedback\n" +
                 "- Feedback is the key to enhancing user experience, it is our appeal to the users for providing any constructive feedback about any issues faced by them.\n" +

@@ -183,7 +183,6 @@ class StartScreen @Inject constructor() : AppCompatActivity(), NetworkChangeRece
         }
     }
 
-
     lateinit var scaleAnimation: ScaleAnimation
 
     private val requestPermissionLauncher = registerForActivityResult(

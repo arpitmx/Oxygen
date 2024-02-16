@@ -40,7 +40,7 @@ Tasks FUTURE ADDITION :
 */
 
 @HiltWorker
-class FCMWorker @AssistedInject constructor(
+class NotificationsFCMWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParameters: WorkerParameters,
     @Assisted val notificationApiService: NotificationApiService,

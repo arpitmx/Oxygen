@@ -4,7 +4,6 @@ package com.ncs.o2.UI.UIComponents.BottomSheets
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,8 +24,6 @@ import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
 import com.ncs.o2.HelperClasses.PrefManager
-import com.ncs.o2.R
-import com.ncs.o2.UI.Report.ShakeDetectedActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.MsgMoreOptionsBinding
@@ -40,8 +37,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MessageMoreOptions(private val message: com.ncs.o2.Domain.Models.Message,private val openBy:String,private val onReplyClick: OnReplyClick,private val senderName:String,
-                         val segmentName: String?=null,val sectionName: String?=null) : BottomSheetDialogFragment(){
+class ChatMoreOptions(private val message: com.ncs.o2.Domain.Models.Message, private val openBy:String, private val onReplyClick: OnReplyClick, private val senderName:String,
+                      val segmentName: String?=null, val sectionName: String?=null) : BottomSheetDialogFragment(){
     @Inject
     lateinit var utils : GlobalUtils.EasyElements
     lateinit var binding:MsgMoreOptionsBinding

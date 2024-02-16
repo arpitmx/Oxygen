@@ -83,7 +83,7 @@ import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailViewModel
 import com.ncs.o2.UI.Teams.ChannelHolderActivity
 import com.ncs.o2.UI.UIComponents.Adapters.MentionUsersAdapter
 import com.ncs.o2.UI.UIComponents.Adapters.RecyclerViewAdapter
-import com.ncs.o2.UI.UIComponents.BottomSheets.MessageMoreOptions
+import com.ncs.o2.UI.UIComponents.BottomSheets.ChatMoreOptions
 import com.ncs.o2.databinding.FragmentTeamsChatBinding
 import com.ncs.versa.Constants.Endpoints
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -121,7 +121,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickListner,
-    ChannelChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,ChannelChatAdapter.OnMessageLongPress,MessageMoreOptions.OnReplyClick,ChannelChatAdapter.OnLinkPreviewClick{
+    ChannelChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick,ChannelChatAdapter.OnMessageLongPress,ChatMoreOptions.OnReplyClick,ChannelChatAdapter.OnLinkPreviewClick{
 
     lateinit var binding: FragmentTeamsChatBinding
     private val activityBinding: ChannelHolderActivity by lazy {
@@ -1584,7 +1584,7 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
     override fun onLongPress(message: Message,senderName: String) {
         requireContext().performHapticFeedback()
         val moreOptionBottomSheet =
-            MessageMoreOptions(message,"Channel Chat",this, senderName)
+            ChatMoreOptions(message,"Channel Chat",this, senderName)
         moreOptionBottomSheet.show(requireFragmentManager(), "Options")
     }
     override fun onReplyClicked(message: Message,senderName: String) {

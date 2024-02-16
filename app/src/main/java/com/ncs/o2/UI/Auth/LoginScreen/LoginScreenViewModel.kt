@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -36,8 +37,8 @@ class LoginScreenViewModel @Inject constructor(
     private val _passwordError = MutableLiveData<String?>(null)
     val passwordError: LiveData<String?> get() = _passwordError
 
-    private val validationEventChannel = Channel<ValidationEvent>()
-    val validationEvents = validationEventChannel.receiveAsFlow()
+//    private val validationEventChannel = Channel<ValidationEvent>()
+//    val validationEvents = validationEventChannel.receiveAsFlow()
 
     private val _loginLiveData = MutableLiveData<ServerResult<FirebaseUser>?>(null)
     val loginLiveData: LiveData<ServerResult<FirebaseUser>?> = _loginLiveData
@@ -45,6 +46,7 @@ class LoginScreenViewModel @Inject constructor(
 
     @Issue("Running multiple times on wrong input...")
     fun validateInput(email: String, password: String) {
+
         val isEmailValid = emailValidator.execute(email)
         val isPasswordValid = passwordValidator.execute(password)
 
@@ -69,33 +71,21 @@ class LoginScreenViewModel @Inject constructor(
         if (hasError) return
 
         viewModelScope.launch {
-            validationEventChannel.send(ValidationEvent.Success)
             loginUser(email, password = password)
         }
     }
 
     suspend fun loginUser(email: String, password: String) {
+
         _loginLiveData.postValue(ServerResult.Progress)
         val result = authRepository.login(email, password)
         _loginLiveData.postValue(result)
-
-    }
-    fun fetchUserInfo() {
-        repository.getUserInfo { result ->
-            when (result) {
-                is ServerResult.Success -> {
-                    _user.value = result.data
-                }
-                else -> {
-                }
-            }
-        }
     }
 
 
 
-    sealed class ValidationEvent {
-        object Success: ValidationEvent ()
-    }
+//    sealed class ValidationEvent {
+//        object Success: ValidationEvent ()
+//    }
 
 }
