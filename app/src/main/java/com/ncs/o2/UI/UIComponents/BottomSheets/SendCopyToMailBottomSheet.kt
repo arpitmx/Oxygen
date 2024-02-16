@@ -88,6 +88,14 @@ class SendCopyToMailBottomSheet(private val message: com.ncs.o2.Domain.Models.Me
 
         binding.userEmail.text="This copy will be sent to ${PrefManager.getCurrentUserEmail()}"
 
+        binding.submit.setOnClickThrottleBounceListener {
+            if (binding.message.text.isNullOrEmpty()){
+                toast("Message can't be empty")
+            }
+            else{
+
+            }
+        }
 
 
     }
