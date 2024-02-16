@@ -306,21 +306,24 @@ class ChatAdapter(
             val type=msgList[position].additionalData?.getValue("Type")
 
 
-            if (!title.isNull){
+            if (title!=""){
                 binding.linkPreviewTitle.text=title.toString()
             }
-            if (!type.isNull){
+            if (type!=""){
                 if (type=="normal") {
-                    if (!desc.isNull){
+                    if (desc!=""){
                         binding.linkPreviewDesc.text=desc.toString()
+                    }
+                    else{
+                        binding.linkPreviewDesc.text=if (url!="") url.toString() else ""
                     }
                 }
                 else{
-                    binding.linkPreviewDesc.text=if (!url.isNull) url.toString() else ""
+                    binding.linkPreviewDesc.text=if (url!="") url.toString() else ""
                 }
             }
 
-            if (!type.isNull){
+            if (type!=""){
                 if (type=="normal") {
                     if (!image.isNull) {
                         binding.linkPreviewImage.load(
@@ -333,7 +336,7 @@ class ChatAdapter(
                     binding.linkPreviewImage.setImageDrawable(context.resources.getDrawable(R.drawable.apphd))
                 }
             }
-            if (!url.isNull) {
+            if (url!="") {
                 binding.linkPreview.setOnClickThrottleBounceListener {
                     openInBrowser(url.toString())
                 }
@@ -817,7 +820,7 @@ class ChatAdapter(
     }
 
     fun convertLinksToHtml(text: String): String {
-        val pattern = "([\\w+]+\\:\\/\\/)?([\\w\\d-]+\\.)*[\\w-]+[\\.\\:]\\w+([\\/\\?\\=\\&\\#\\.]?[\\w-]+)*\\/?".toRegex()
+        val pattern = Regex("""\b(?:https?|www)\:\/\/\S+|\b\S+\.\S+(?:\.\S+)*(?<!\.)""")
         val replacedText = pattern.replace(text) { matchResult ->
             val url = matchResult.value
             if (url.startsWith("www.") || url.startsWith("http")) {
