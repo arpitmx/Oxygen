@@ -5,16 +5,24 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Spannable
+import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData
+import com.ncs.o2.BuildConfig
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.MessageRepository.UsersDao
 import com.ncs.o2.Domain.Models.Enums.MessageType
@@ -40,7 +48,13 @@ import com.ncs.o2.databinding.ChatMessageLinkItemBinding
 import com.ncs.o2.databinding.ChatMessageReplyItemBinding
 import com.ncs.versa.Constants.Endpoints
 import io.noties.markwon.Markwon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
@@ -53,7 +67,8 @@ class ChannelChatAdapter(
     val context: Context,
     private val onchatDoubleClickListner: onChatDoubleClickListner,
     private val markwon: Markwon,
-    private val onMessageLongPress: OnMessageLongPress
+    private val onMessageLongPress: OnMessageLongPress,
+    private val onTaskLinkPreviewClick: OnLinkPreviewClick
 
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -284,6 +299,9 @@ class ChannelChatAdapter(
             val image=msgList[position].additionalData?.getValue("Open Graph Image")
             val url=msgList[position].additionalData?.getValue("Url")
             val type=msgList[position].additionalData?.getValue("Type")
+            val subtype= if (msgList[position].additionalData?.containsKey("SubType")!!) msgList[position].additionalData?.getValue("SubType") else ""
+            val taskID= if (msgList[position].additionalData?.containsKey("TaskID")!!) msgList[position].additionalData?.getValue("TaskID") else ""
+            val projectID= if (msgList[position].additionalData?.containsKey("ProjectID")!!) msgList[position].additionalData?.getValue("ProjectID") else ""
 
 
             if (title!=""){
@@ -316,9 +334,25 @@ class ChannelChatAdapter(
                     binding.linkPreviewImage.setImageDrawable(context.resources.getDrawable(R.drawable.apphd))
                 }
             }
-            if (url!="") {
-                binding.linkPreview.setOnClickThrottleBounceListener {
-                    openInBrowser(url.toString())
+            binding.linkPreview.setOnClickThrottleBounceListener {
+                if (type != "") {
+                    if (type == "normal") {
+                        if (url != "") {
+                            openInBrowser(url.toString())
+                        }
+                    } else {
+                        if (subtype != "") {
+                            if (subtype == "share") {
+                                if (taskID != "" && projectID != "") {
+                                    Log.d("sharecheck", "$taskID - $projectID")
+                                    onTaskLinkPreviewClick.onTaskClick(projectId = projectID.toString(), taskId = taskID.toString())
+                                }
+                            } else {
+                                onTaskLinkPreviewClick.onProjectClick(projectId = projectID.toString())
+//                                openInBrowser(url.toString())
+                            }
+                        }
+                    }
                 }
             }
 
@@ -643,32 +677,142 @@ class ChannelChatAdapter(
 
 
     private fun setMessageView(message: Message, binding: ChatMessageItemBinding) {
-        val links=convertLinksToHtml(message.content)
-        val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
-        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
-
+        if (message.content.contains("${BuildConfig.DYNAMIC_LINK_HOST}")){
+            val links = convertLinksToHtml(message.content)
+            val newLinks=makeClickableSpannable(links)
+            val spannedMessage = processSpan(newLinks)
+            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        }
+        else {
+            val links = convertLinksToHtml(message.content)
+            val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
+            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        }
         binding.descriptionTv.visible()
         binding.modTag.gone()
         binding.assigneeTag.gone()
     }
 
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
-        val links=convertLinksToHtml(message.content)
-        val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
-        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
-
+        if (message.content.contains("${BuildConfig.DYNAMIC_LINK_HOST}")){
+            val links = convertLinksToHtml(message.content)
+            val newLinks=makeClickableSpannable(links)
+            val spannedMessage = processSpan(newLinks)
+            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        }
+        else {
+            val links = convertLinksToHtml(message.content)
+            val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
+            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        }
         binding.descriptionTv.visible()
         binding.modTag.gone()
         binding.assigneeTag.gone()
     }
 
     private fun setMessageLinkView(message: Message, binding: ChatMessageLinkItemBinding) {
-        val links=convertLinksToHtml(message.content)
-        val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
-        markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        if (message.content.contains("${BuildConfig.DYNAMIC_LINK_HOST}")){
+            val links = convertLinksToHtml(message.content)
+            val newLinks=makeClickableSpannable(links)
+            val spannedMessage = processSpan(newLinks)
+            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        }
+        else {
+            val links = convertLinksToHtml(message.content)
+            val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
+            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+        }
+        binding.modTag.gone()
+        binding.assigneeTag.gone()
         binding.descriptionTv.visible()
 
     }
+
+    private fun makeClickableSpannable(text: String): Spannable {
+        val spannableString = SpannableString(text)
+
+        val startIndex = text.indexOf("${BuildConfig.DYNAMIC_LINK_HOST}")
+
+        if (startIndex != -1) {
+            val endIndex = text.indexOf(' ', startIndex)
+            val endPosition = if (endIndex != -1) endIndex else text.length
+
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    handleLinkClick(text.substring(startIndex, endPosition))
+                }
+            }
+
+            spannableString.setSpan(
+                clickableSpan,
+                startIndex,
+                endPosition,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            spannableString.setSpan(
+                ForegroundColorSpan(context.resources.getColor(R.color.light_blue_A200)),
+                startIndex,
+                endPosition,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        return spannableString
+    }
+
+
+    private fun handleLinkClick(url: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val uri = getFullUri(url)
+            val url=extractUrl(uri)
+            withContext(Dispatchers.Main) {
+                Log.d("shortlink", url!!)
+                val list=extractPathAfterLink(url)
+                Log.d("shortlink", list.toString()!!)
+                if (list.size==2){
+                    onTaskLinkPreviewClick.onProjectClick(list[1])
+                }
+                if (list.size==4){
+                    val projectId=list[2]
+                    val taskId="#${list[3]}-${list[1]}"
+                    onTaskLinkPreviewClick.onTaskClick(projectId = projectId, taskId = taskId)
+                }
+
+            }
+        }
+    }
+    fun extractPathAfterLink(inputLink: String): List<String> {
+        val linkStartIndex = inputLink.indexOf(".link/")
+        return if (linkStartIndex != -1) {
+            val path = inputLink.substring(linkStartIndex + 6)
+            path.split("/")
+        } else {
+            emptyList()
+        }
+    }
+    fun getFullUri(shortLink: String): String {
+
+        val connection = URL(shortLink).openConnection() as HttpURLConnection
+        connection.instanceFollowRedirects = false
+        connection.connect()
+
+        val locationHeader = connection.getHeaderField("Location")
+        connection.disconnect()
+
+        return locationHeader ?: shortLink
+    }
+    fun extractUrl(link: String): String? {
+        val urlStartIndex = link.indexOf("url=")
+        val urlEndIndex = link.indexOf("&", startIndex = urlStartIndex)
+
+        return if (urlStartIndex != -1 && urlEndIndex != -1) {
+            link.substring(urlStartIndex + 4, urlEndIndex)
+        } else {
+            null
+        }
+    }
+
     private fun setLinkDPHeader(position: Int, binding: ChatMessageLinkItemBinding, user: UserInMessage) {
 
 
@@ -709,13 +853,22 @@ class ChannelChatAdapter(
         val pattern = Regex("""\b(?:https?|www)\:\/\/\S+|\b\S+\.\S+(?:\.\S+)*(?<!\.)""")
         val replacedText = pattern.replace(text) { matchResult ->
             val url = matchResult.value
-            if (url.startsWith("www.") || url.startsWith("http")) {
-                """<a href="$url" target="_blank">$url</a>"""
+            if (shouldExcludeLink(url)) {
+                url
             } else {
-                """<a href="http://$url" target="_blank">$url</a>"""
+                if (url.startsWith("www.") || url.startsWith("http")) {
+                    """<a href="$url" target="_blank">$url</a>"""
+                } else {
+                    """<a href="http://$url" target="_blank">$url</a>"""
+                }
             }
         }
         return replacedText
+    }
+
+    fun shouldExcludeLink(url: String): Boolean {
+        val excludedDomains = listOf("${BuildConfig.DYNAMIC_LINK_HOST}")
+        return excludedDomains.any { url.startsWith(it) }
     }
 
 
@@ -790,6 +943,11 @@ class ChannelChatAdapter(
     }
     interface OnMessageLongPress{
         fun onLongPress(message: Message,senderName: String)
+    }
+    interface OnLinkPreviewClick{
+        fun onTaskClick(projectId:String,taskId:String)
+        fun onProjectClick(projectId:String)
+
     }
     fun onImageClick(position: Int, imageUrls: List<String>) {
         val imageViewerIntent = Intent(context, ImageViewerActivity::class.java)
