@@ -24,8 +24,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.compose.ui.text.capitalize
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -35,9 +38,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.StorageReference
+import com.ncs.o2.BuildConfig
 import com.ncs.o2.Constants.NotificationType
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
 import com.ncs.o2.Data.Room.MessageRepository.MessageProjectTaskAssociation
@@ -51,7 +57,9 @@ import com.ncs.o2.Domain.Models.Notification
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.Task
 import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Models.state.SegmentItem
 import com.ncs.o2.Domain.Repositories.FirestoreRepository
+import com.ncs.o2.Domain.Utility.ExtensionsUtil
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursor
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.appendTextAtCursorMiddleCursor
@@ -101,6 +109,7 @@ import io.noties.prism4j.Prism4j
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import timber.log.Timber
@@ -108,13 +117,14 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.Executors
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     ChatAdapter.onImageClicked, MentionUsersAdapter.onUserClick, ChatAdapter.OnMessageLongPress,
-    MessageMoreOptions.OnReplyClick {
+    MessageMoreOptions.OnReplyClick,ChatAdapter.OnLinkPreviewClick {
     @Inject
     @FirebaseRepository
     lateinit var repository: Repository
@@ -382,6 +392,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                         binding.inputBox.linkPreviewDesc.text="Please wait..."
                     }
                     else {
+                        Log.d("metadatacheck",metadata.toString())
                         if (metadata.isNull) {
                             binding.inputBox.linkPreviewSender.gone()
                             binding.inputBox.linkPreviewTitle.text = "Getting link info..."
@@ -390,7 +401,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                             linkPreviewMetaData = metadata!!
                             binding.inputBox.linkPreviewSender.visible()
 
-                            runDelayed(2000) {
+                            ExtensionsUtil.runDelayed(2000) {
                                 if (metadata?.getValue("Type") == "normal") {
                                     binding.inputBox.linkPreviewTitle.text =
                                         metadata?.getValue("Title")
@@ -442,50 +453,70 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             )
         } catch (e: IOException) {
             Log.d("metadatafetch",e.message.toString())
-            val list=extractPartsFromUrl(e.message!!)
-            if (list.isNullOrEmpty()) {
+            val list=extractValues(e.message!!)
+            Log.d("metadatafetch",list.toString())
+            if (list.isEmpty()) {
+                Log.d("metadatafetch",list.size.toString())
                 null
             }
             else{
                 if (list.size==4){
+                    val taskID="#${list[3]}-${list[1]}"
+                    val projectId=list[2]
+                    val task=tasksDB.tasksDao().getTasksbyId(tasksId = taskID, projectId = projectId)
+
                     mapOf(
-                        "Title" to "${list[0].capitalize()}  #${list[3].dropLast(1)}-${list[1]}",
+                        "Title" to "${list[0].capitalize()} | ${list[2]} | #${list[3]}-${list[1]}",
                         "Description" to "",
                         "Open Graph Title" to "",
                         "Open Graph Description" to "",
                         "Open Graph Image" to "",
                         "Type" to "o2",
-                        "Url" to url
+                        "SubType" to "share",
+                        "Url" to task!!.title,
+                        "TaskID" to taskID,
+                        "ProjectID" to projectId
 
                     )
                 }
                 else {
                     mapOf(
-                        "Title" to "${list[0].capitalize()} - ${list[1].capitalize().dropLast(1)}",
+                        "Title" to "${list[0].capitalize()} - ${list[1].capitalize()}",
                         "Description" to "",
                         "Open Graph Title" to "",
                         "Open Graph Description" to "",
                         "Open Graph Image" to "",
                         "Type" to "o2",
-                        "Url" to url
+                        "SubType" to "join",
+                        "Url" to url,
+                        "ProjectID" to list[1]
 
                     )
                 }
             }
         }
     }
-    fun extractPartsFromUrl(inputString: String): List<String> {
-        val urlPattern = Regex("https://oxgn\\.page\\.link/([^/]+)/([^/]+)(?:/([^/]+)(?:/([^/\\]]+))?)?")
-        val matchResult = urlPattern.find(inputString)
-        return matchResult?.let {
-            val (part1, part2, part3, part4) = matchResult.destructured
-            when {
-                part3.isEmpty() -> listOf(part1, part2)
-                else -> listOf(part1, part2, part3, part4).filter { it.isNotEmpty() }
-            }
-        } ?: emptyList()
-    }
+    fun extractValues(errorMessage: String): List<String> {
+        val sharePattern = Pattern.compile("/share/(\\d+)/(\\w+)/(\\w+)")
+        val joinPattern = Pattern.compile("/join/(\\w+)")
 
+        val shareMatcher = sharePattern.matcher(errorMessage)
+        val joinMatcher = joinPattern.matcher(errorMessage)
+
+        val values = mutableListOf<String>()
+
+        if (shareMatcher.find()) {
+            values.add("Task")
+            values.add(shareMatcher.group(1))
+            values.add(shareMatcher.group(2))
+            values.add(shareMatcher.group(3))
+        } else if (joinMatcher.find()) {
+            values.add("Join")
+            values.add(joinMatcher.group(1))
+        }
+
+        return values
+    }
     private fun openInBrowser(url: String) {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         startActivity(browserIntent)
@@ -907,7 +938,8 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             markwon = markwon,
             moderatorList = moderatorList,
             assignee = activityBinding.assignee,
-            onMessageLongPress = this
+            onMessageLongPress = this,
+            onTaskLinkPreviewClick = this
         )
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -1619,5 +1651,173 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         requireActivity().performHapticFeedback()
         replyingTo = message.messageId
     }
+
+    override fun onTaskClick(projectId: String, taskId: String) {
+        if (PrefManager.getProjectsList().contains(projectId)){
+            if (PrefManager.getcurrentProject()==projectId){
+                val intent = Intent(requireContext(), TaskDetailActivity::class.java)
+                intent.putExtra("task_id", taskId)
+                startActivity(intent)
+                requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+            }
+            else{
+                val segments=PrefManager.getUnArchivedProjectSegments(projectId)
+                Log.d("segment check",segments.toString())
+
+                if (segments.isNotEmpty()){
+                    PrefManager.setcurrentsegment(segments[0].segment_NAME)
+                    PrefManager.putsectionsList(segments[0].sections.distinct())
+//                    viewModel.updateCurrentSegment(segments[0].segment_NAME)
+                }
+                else{
+                    PrefManager.setcurrentsegment("Select Segment")
+//                    viewModel.updateCurrentSegment("Select Segment")
+                }
+//                binding.gioActionbar.titleTv.text = PrefManager.getcurrentsegment()
+                val list = PrefManager.getProjectsList()
+                var position:Int=0
+                for (i in 0 until list.size){
+                    if (list[i]==projectId){
+                        position=i
+                    }
+                }
+                Log.d("position",position.toString())
+                PrefManager.setcurrentProject(projectId)
+                PrefManager.setRadioButton(position)
+                PrefManager.selectedPosition.value = position
+                val intent =
+                    Intent(requireActivity(), TaskDetailActivity::class.java)
+                intent.putExtra("task_id", taskId)
+                intent.putExtra("type", "shareTask")
+                startActivity(intent)
+                requireActivity().finish()
+                requireActivity().overridePendingTransition(
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_left
+                )
+                toast("Project has been changed to $projectId")
+
+            }
+        }
+        else{
+            util.showSnackbar(binding.root, "You haven't joined this project so you cant view this task", 500)
+        }
+    }
+
+    override fun onProjectClick(projectId: String) {
+        val uri="${BuildConfig.DYNAMIC_LINK_HOST}/join/$projectId"
+        if (PrefManager.getProjectsList().any { it.equals(projectId, ignoreCase = true) }) {
+            util.showSnackbar(binding.root,"You have already joined this project",2000)
+        }else{
+            lifecycleScope.launch {
+                val isValidLink = isValidProjectLink(uri.toString())
+                if (isValidLink) {
+                    showBottomSheetForJoinConfirmation(uri.toString(),projectId)
+                } else {
+                    util.showSnackbar(binding.root,"Invalid project link",2000)
+                }
+            }
+        }
+    }
+    private suspend fun isValidProjectLink(projectLink: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val querySnapshot = FirebaseFirestore.getInstance().collection("Projects")
+                    .whereEqualTo("PROJECT_DEEPLINK", projectLink.toLowerCase())
+                    .limit(1)
+                    .get()
+                    .await()
+
+                return@withContext querySnapshot.documents.isNotEmpty()
+            } catch (e: Exception) {
+                return@withContext false
+            }
+        }
+    }
+    private fun showBottomSheetForJoinConfirmation(projectLink: String,id:String) {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.deeplink_project_add_sheet, null)
+
+        view.findViewById<Button>(R.id.btnYes).setOnClickThrottleBounceListener {
+            addProjectToUser(projectLink)
+            bottomSheetDialog.dismiss()
+        }
+
+        view.findViewById<TextView>(R.id.projectName).text=id
+        view.findViewById<Button>(R.id.btnNo).setOnClickThrottleBounceListener {
+            bottomSheetDialog.dismiss()
+        }
+        view.findViewById<AppCompatImageButton>(R.id.close_btn).setOnClickThrottleBounceListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.setContentView(view)
+        bottomSheetDialog.show()
+    }
+
+    private fun addProjectToUser(projectLink: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            when (val result = firestoreRepository.addProjectToUser(projectLink)) {
+                is ServerResult.Success -> {
+                    PrefManager.putProjectsList(result.data)
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val list = getProjectSegments(PrefManager.getlastaddedproject())
+                        val projectTopic = PrefManager.getlastaddedproject().replace("\\s+".toRegex(), "_") + "_TOPIC_GENERAL"
+
+                        FirebaseMessaging.getInstance().subscribeToTopic(projectTopic)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d("FCM", "Subscribed to topic successfully")
+                                } else {
+                                    Log.d("FCM", "Failed to subscribe to topic")
+                                }
+                            }
+                        val newList=list.toMutableList().sortedByDescending { it.creation_DATETIME }
+                        PrefManager.saveProjectSegments(PrefManager.getlastaddedproject(), list)
+                        withContext(Dispatchers.Main){
+                            util.showSnackbar(binding.root,"Successfully joined this project",2000)
+                        }
+                        if (newList.isNotEmpty()){
+                            PrefManager.setLastSegmentsTimeStamp(PrefManager.getlastaddedproject(),newList[0].creation_DATETIME!!)
+                        }
+
+                    }
+                }
+                is ServerResult.Failure -> {
+                    Toast.makeText(requireContext(), "Failed to add project: ${result.exception.message}", Toast.LENGTH_SHORT).show()
+                }
+                else -> {}
+            }
+        }
+    }
+    suspend fun getProjectSegments(project: String): List<SegmentItem> {
+        val projectsCollection =  FirebaseFirestore.getInstance().collection(Endpoints.PROJECTS)
+        val list = mutableListOf<SegmentItem>()
+
+        try {
+            val projectsSnapshot = projectsCollection.get().await()
+            for (projectDocument in projectsSnapshot.documents) {
+                val projectName = projectDocument.id
+                val segmentsCollection = projectsCollection.document(project).collection(Endpoints.Project.SEGMENT)
+                val segmentsSnapshot = segmentsCollection.get().await()
+                for (segmentDocument in segmentsSnapshot.documents) {
+                    val segmentName = segmentDocument.id
+                    val sections=segmentDocument.get("sections") as MutableList<String>
+                    val segment_ID= segmentDocument.getString("segment_ID")
+                    val creation_DATETIME= segmentDocument.get("creation_DATETIME") as Timestamp
+                    val archived= if (segmentDocument.getBoolean("archived" ).isNull) false else segmentDocument.getBoolean("archived" )
+                    val last_updated=  if (segmentDocument.get("last_updated").isNull) Timestamp.now() else segmentDocument.get("last_updated") as Timestamp
+
+                    list.add(SegmentItem(segment_NAME = segmentName, sections = sections, segment_ID = segment_ID!!, creation_DATETIME = creation_DATETIME!!, archived = archived!!,last_updated = last_updated))
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        return list
+    }
+
 
 }
