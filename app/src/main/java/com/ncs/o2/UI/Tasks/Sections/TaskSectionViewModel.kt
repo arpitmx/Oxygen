@@ -76,6 +76,15 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
         }
     }
 
+    fun getTasksinProject(
+        projectName: String,
+        resultCallback: (DBResult<List<Task>>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskRepository.getTasksInProject(projectName, resultCallback)
+        }
+    }
+
     fun getTasksForID(
         projectName: String,
         taskID:String,
@@ -149,6 +158,10 @@ class TaskSectionViewModel @Inject constructor(private val firestoreRepository: 
 
     fun updateCurrentSegment(newSegment: String) {
         _currentSegment.value = newSegment
+    }
+
+    suspend fun updateArchive(taskID:String,archive:Boolean,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updateArchive(id = taskID, archive = archive, projectName = projectName)
     }
 
 

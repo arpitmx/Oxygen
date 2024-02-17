@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/secondary_bg_lighter"
+    android:background="@color/primary_bg"
     >
 
 
@@ -17,9 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:weightSum="10"
+        android:background="@color/primary_bg"
         >
-
-
 
         <ImageButton
             android:id="@+id/close_btn"
@@ -64,6 +63,7 @@
         android:layout_height="2dp"
         android:background="@color/card_bg"
         />
+
     <ProgressBar
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -72,21 +72,23 @@
         android:layout_marginTop="40dp"
         android:layout_marginBottom="40dp"
         android:indeterminateTint="@color/primary"/>
+
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:visibility="visible"
+        android:background="@color/secondary_bg"
         android:layout_height="wrap_content"
-        android:foreground="@drawable/ripplecustom"
-        android:clickable="true"
-        android:focusable="true"
         android:id="@+id/buttons">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:paddingTop="24dp"
-            android:id="@+id/share_button"
-            android:background="@color/secondary_bg_lighter"
+            android:id="@+id/btn_archiveTask"
+            android:foreground="@drawable/ripplecustom"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_height="wrap_content">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -96,50 +98,7 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/share_ic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@null"
-                    android:src="@drawable/baseline_share_24"
-                    app:tint="@color/better_white" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:id="@+id/text_full"
-                    android:fontFamily="@font/sf_pro_display_semibold"
-                    android:text="Share Project"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp" />
-            </LinearLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="15dp"
-                android:background="@color/card_bg"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:paddingTop="24dp"
-            android:id="@+id/arhivedTasks"
-            android:background="@color/secondary_bg_lighter"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:orientation="horizontal">
-
-                <ImageButton
+                    android:id="@+id/archive_ic"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentStart="true"
@@ -147,22 +106,25 @@
                     android:layout_marginEnd="10dp"
                     android:background="@null"
                     android:src="@drawable/baseline_archive_24"
-                    app:tint="@color/better_white" />
+                    app:tint="@color/dim_primary" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="16dp"
-                    android:fontFamily="@font/sf_pro_display_semibold"
-                    android:text="View Archived Tasks"
-                    android:textColor="@color/better_white"
-                    android:textSize="18dp" />
+                    android:id="@+id/text_full"
+                    android:gravity="center_vertical"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:text="Archive Task"
+                    android:textColor="@color/subheading"
+                    android:textSize="@dimen/h2" />
             </LinearLayout>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="15dp"
-                android:background="@color/card_bg"
+                android:background="@color/seperator_light"
                 />
 
         </LinearLayout>

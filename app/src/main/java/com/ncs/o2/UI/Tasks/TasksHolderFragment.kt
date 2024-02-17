@@ -39,6 +39,7 @@ import com.ncs.o2.UI.Tasks.Sections.DragHelper
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionFragment
 import com.ncs.o2.UI.Tasks.Sections.TaskSectionViewModel
 import com.ncs.o2.UI.UIComponents.Adapters.TaskSectionViewPagerAdapter
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsTasksBottomSheet
 import com.ncs.o2.UI.UIComponents.BottomSheets.SegmentSelectionBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTasksHolderBinding
@@ -55,7 +56,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner,SegmentSelectionBottomSheet.SegmentSelectionListener, DragHelper.TabChangeListener {
+class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsListListner,SegmentSelectionBottomSheet.SegmentSelectionListener, DragHelper.TabChangeListener{
 
 
     lateinit var binding: FragmentTasksHolderBinding
@@ -220,7 +221,7 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
                                 PrefManager.getcurrentProject(),
                                 PrefManager.getcurrentsegment(),
                                 list[currentPosition]
-                            )
+                            ).filter { !it.archived }
 
                             Timber.tag("sectionslist")
                                 .d("position while updating is %s", currentPosition)
@@ -340,5 +341,6 @@ class TasksHolderFragment : Fragment(),SegmentSelectionBottomSheet.sendSectionsL
 
 
     }
+
 
 }

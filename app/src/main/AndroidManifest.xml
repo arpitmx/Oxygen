@@ -32,6 +32,9 @@
         android:theme="@style/O2SplashTheme"
         tools:targetApi="31">
         <activity
+            android:name=".UI.Tasks.TaskPage.ArchivedTasksActivity"
+            android:exported="false" />
+        <activity
             android:name=".UI.Assigned.TodayActivity"
             android:exported="false" />
         <activity
@@ -136,12 +139,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="https"/>
-                <data android:host="oxgn.page.link"/>
-
-                <data android:scheme="https"/>
-                <data android:host="oxy2.page.link"/>
-
+                <data android:scheme="https" />
+                <data android:host="oxgn.page.link" />
+                <data android:scheme="https" />
+                <data android:host="oxy2.page.link" />
             </intent-filter>
         </activity>
 
