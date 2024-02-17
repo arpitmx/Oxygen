@@ -744,35 +744,38 @@ class ChannelChatAdapter(
 
     private fun makeClickableSpannable(text: SpannableStringBuilder): SpannableStringBuilder {
         val spannableString = SpannableStringBuilder(text)
-
         val dynamicLinkHost = BuildConfig.DYNAMIC_LINK_HOST
-        var startIndex = text.indexOf(dynamicLinkHost)
+        val pattern = Pattern.compile(Pattern.quote(dynamicLinkHost) + "[^\\s]+")
+        val matcher = pattern.matcher(text)
 
-        while (startIndex != -1) {
-            val endIndex = text.indexOf(' ', startIndex)
-            val endPosition = if (endIndex != -1) endIndex else text.length
+        var offset = 0
+
+        while (matcher.find()) {
+            val startIndex = matcher.start() + offset
+            val endIndex = matcher.end() + offset
 
             val clickableSpan = object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    handleLinkClick(spannableString.substring(startIndex, endPosition))
+                    handleLinkClick(spannableString.substring(startIndex, endIndex))
                 }
             }
 
             spannableString.setSpan(
                 clickableSpan,
                 startIndex,
-                endPosition,
+                endIndex,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
             spannableString.setSpan(
                 ForegroundColorSpan(context.resources.getColor(R.color.light_blue_A200)),
                 startIndex,
-                endPosition,
+                endIndex,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
-            startIndex = text.indexOf(dynamicLinkHost, endPosition)
+
+            offset += 0
         }
 
         return SpannableStringBuilder(spannableString)
@@ -781,9 +784,11 @@ class ChannelChatAdapter(
 
 
 
-    private fun handleLinkClick(url: String) {
+
+    private fun handleLinkClick(_url: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val uri = getFullUri(url)
+            val uri = getFullUri(_url)
+            Log.d("shortlinkUri", uri!!)
             if (!uri.isNull) {
                 val url = extractUrl(uri)
                 if (!url.isNull) {
@@ -805,10 +810,15 @@ class ChannelChatAdapter(
 
                     }
                 }
+                else{
+                    withContext(Dispatchers.Main) {
+                        openInBrowser(_url)
+                    }
+                }
             }
             else{
                 withContext(Dispatchers.Main) {
-                    openInBrowser(url)
+                    openInBrowser(_url)
                 }
             }
         }
@@ -904,13 +914,13 @@ class ChannelChatAdapter(
 
     suspend fun getStyledSpannable(inputText: SpannableStringBuilder): SpannableStringBuilder {
         val dynamicLinkHost = BuildConfig.DYNAMIC_LINK_HOST
+        val pattern = Pattern.compile(Pattern.quote(dynamicLinkHost) + "[^\\s]+")
+        val matcher = pattern.matcher(inputText)
 
-        var startIndex = inputText.indexOf(dynamicLinkHost)
+        var offset = 0
 
-        while (startIndex != -1) {
-            val endIndex = inputText.indexOf(' ', startIndex)
-            val endPosition = if (endIndex != -1) endIndex else inputText.length
-            val _url = inputText.substring(startIndex, endPosition)
+        while (matcher.find()) {
+            val _url = matcher.group()
 
             if (!deepLinkMap.containsKey(_url)) {
                 val uri = getFullUri(_url)
@@ -925,12 +935,14 @@ class ChannelChatAdapter(
                             val clickableText = "  Task #${list[3]}-${list[1]}  "
                             val clickableSpan = createClickableSpanForTask(list)
 
-                            applySpanToText(inputText, startIndex, endPosition, clickableText, clickableSpan)
+                            applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                            offset += clickableText.length - (_url.length)
                         } else if (list.size == 2) {
                             val clickableText = "  Join Project - ${list[1].capitalize()}  "
                             val clickableSpan = createClickableSpanForProject(list)
 
-                            applySpanToText(inputText, startIndex, endPosition, clickableText, clickableSpan)
+                            applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                            offset += clickableText.length - (_url.length)
                         }
                     }
                 }
@@ -944,21 +956,21 @@ class ChannelChatAdapter(
                         val clickableText = "  Task #${list[3]}-${list[1]}  "
                         val clickableSpan = createClickableSpanForTask(list)
 
-                        applySpanToText(inputText, startIndex, endPosition, clickableText, clickableSpan)
+                        applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                        offset += clickableText.length - (_url.length)
                     } else if (list.size == 2) {
                         val clickableText = "  Join Project - ${list[1].capitalize()}  "
                         val clickableSpan = createClickableSpanForProject(list)
 
-                        applySpanToText(inputText, startIndex, endPosition, clickableText, clickableSpan)
+                        applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                        offset += clickableText.length - (_url.length)
                     }
                 }
             }
-            startIndex = inputText.indexOf(dynamicLinkHost, endPosition)
         }
 
         return makeClickableSpannable(inputText)
     }
-
 
     private fun createClickableSpanForTask(list: List<String>): ClickableSpan {
         return object : ClickableSpan() {
@@ -1005,6 +1017,7 @@ class ChannelChatAdapter(
         inputText.setSpan(clickableSpan, startIndex, startIndex + clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         inputText.setSpan(roundedBackgroundSpan, startIndex, startIndex + clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
+
 
 
 
