@@ -120,9 +120,14 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
         taskList.clear()
         taskList.addAll(newTaskList)
         diffResult.dispatchUpdatesTo(this)
-        notifyDataSetChanged()
     }
 
+    fun updateTaskList(newList: List<TaskItem>) {
+        val diffResult = DiffUtil.calculateDiff(TaskDiffCallback(taskList, newList))
+        taskList.clear()
+        taskList.addAll(newList)
+        diffResult.dispatchUpdatesTo(this)
+    }
     fun setTasks(newTaskList: List<Task>) {
         val taskItems: List<TaskItem> = newTaskList.map { task ->
             TaskItem(
@@ -164,6 +169,12 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
                 onClickListener!!.onCLick(position, taskList[position])
             }
         }
+        holder.itemView.setOnLongClickListener {
+            if (onClickListener != null) {
+                onClickListener!!.onLongClick(position, taskList[position])
+            }
+            true
+        }
 
 
     }
@@ -174,6 +185,8 @@ class TaskListAdapter(val repository: FirestoreRepository,val context: Context,v
 
     interface OnClickListener {
         fun onCLick(position: Int, task: TaskItem)
+
+        fun onLongClick(position: Int,task: TaskItem)
     }
 
     private class TaskDiffCallback(private val oldList: List<TaskItem>, private val newList: List<TaskItem>) : DiffUtil.Callback() {

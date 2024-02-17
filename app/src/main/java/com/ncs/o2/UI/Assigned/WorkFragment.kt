@@ -88,6 +88,10 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
+    override fun onLongClick(position: Int, task: TaskItem) {
+        TODO("Not yet implemented")
+    }
+
     private fun setUpViews(){
 
 
@@ -230,10 +234,10 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
     private fun setUpUserWorkspace(){
         CoroutineScope(Dispatchers.IO).launch {
 
-            val assignedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 2, assignee = PrefManager.getCurrentUserEmail())
-            val workingTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 3, assignee = PrefManager.getCurrentUserEmail())
-            val reviewTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 4, assignee = PrefManager.getCurrentUserEmail())
-            val completedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 5, assignee = PrefManager.getCurrentUserEmail())
+            val assignedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 2, assignee = PrefManager.getCurrentUserEmail()).filter { !it.archived }
+            val workingTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 3, assignee = PrefManager.getCurrentUserEmail()).filter { !it.archived }
+            val reviewTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 4, assignee = PrefManager.getCurrentUserEmail()).filter { !it.archived }
+            val completedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 5, assignee = PrefManager.getCurrentUserEmail()).filter { !it.archived }
 
             withContext(Dispatchers.Main){
                 binding.assigned.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_active_24))
@@ -293,7 +297,9 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
         viewModel.getTasksForID(PrefManager.getcurrentProject(), taskID) { result ->
             when (result) {
                 is DBResult.Success -> {
-                    filterTasks(result.data)
+                    if (!result.data.archived){
+                        filterTasks(result.data)
+                    }
                 }
 
                 is DBResult.Failure -> {

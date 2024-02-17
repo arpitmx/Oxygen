@@ -24,6 +24,8 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.HelperClasses.PrefManager
+import com.ncs.o2.R
+import com.ncs.o2.UI.Tasks.TaskPage.ArchivedTasksActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.databinding.MoreOptionBottomSheetBinding
 import com.ncs.o2.databinding.MoreProjectOptionBottomsheetBinding
@@ -74,6 +76,17 @@ class MoreProjectOptionsBottomSheet : BottomSheetDialogFragment(){
             else{
                toast("Error getting project link,you are offline")
             }
+        }
+        if (PrefManager.getcurrentUserdetails().ROLE>=3){
+            binding.arhivedTasks.visible()
+        }
+        else{
+            binding.arhivedTasks.gone()
+        }
+        binding.arhivedTasks.setOnClickThrottleBounceListener {
+            dismiss()
+            startActivity(Intent(requireContext(),ArchivedTasksActivity::class.java))
+            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
         }
     }
 

@@ -177,6 +177,12 @@ interface Repository {
         projectName: String
     ): ServerResult<Boolean>
 
+    suspend fun updateArchive(
+        id: String,
+        archive: Boolean,
+        projectName: String
+    ): ServerResult<Boolean>
+
     suspend fun updateDration(
         id: String,
         newDuration: String,

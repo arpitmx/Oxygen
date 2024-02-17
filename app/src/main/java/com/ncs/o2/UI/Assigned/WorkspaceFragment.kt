@@ -24,6 +24,7 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
@@ -32,6 +33,7 @@ import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsTasksBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentWorkspaceBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
@@ -44,7 +46,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
+class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener,MoreOptionsTasksBottomSheet.OnArchive {
 
     companion object {
         fun newInstance(sectionName: String): WorkspaceFragment {
@@ -366,5 +368,15 @@ class WorkspaceFragment : Fragment(), TaskListAdapter.OnClickListener {
         intent.putExtra("task_id", task.id)
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+    }
+
+    override fun onLongClick(position: Int, task: TaskItem) {
+        requireContext().performHapticFeedback()
+        val moreOptionsTasksBottomSheet = MoreOptionsTasksBottomSheet(task,this)
+        moreOptionsTasksBottomSheet.show(requireFragmentManager(), "More Task Options")
+    }
+
+    override fun onTaskArchive(taskItem: TaskItem) {
+        requireActivity().recreate()
     }
 }
