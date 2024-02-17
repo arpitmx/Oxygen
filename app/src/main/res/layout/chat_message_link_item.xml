@@ -141,7 +141,7 @@
                 android:id="@+id/linkPreviewImage"
                 android:layout_width="100dp"
                 android:layout_height="match_parent"
-                android:scaleType="center"
+                android:scaleType="centerCrop"
                 android:src="@drawable/placeholder_image" />
 
             <LinearLayout
