@@ -318,7 +318,6 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
             }
             else if (task.taskID == data.id && data.archived){
                 todays.removeAt(i)
-
             }
         }
     }

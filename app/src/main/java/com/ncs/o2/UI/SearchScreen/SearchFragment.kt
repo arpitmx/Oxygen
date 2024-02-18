@@ -354,7 +354,14 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         ) { result ->
             when (result) {
                 is DBResult.Success -> {
-                    recentsTaskList.add(result.data)
+                    if (result.data.archived){
+                        val _recents=PrefManager.getProjectRecents(PrefManager.getcurrentProject()).toMutableList()
+                        _recents.remove(taskID)
+                        PrefManager.saveProjectRecents(PrefManager.getcurrentProject(),_recents)
+                    }
+                    else{
+                        recentsTaskList.add(result.data)
+                    }
                     recentsTaskList.sortedByDescending { it.last_updated }
                     if (recentsTaskList.size==PrefManager.getProjectRecents(PrefManager.getcurrentProject()).size){
                         setRecentsRecyclerView()
