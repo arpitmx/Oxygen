@@ -394,10 +394,7 @@ class ArchivedTasksActivity : AppCompatActivity(),TaskListAdapter.OnClickListene
     }
 
     override fun onCLick(position: Int, task: TaskItem) {
-        val intent = Intent(this, TaskDetailActivity::class.java)
-        intent.putExtra("task_id", task.id)
-        startActivity(intent)
-        this.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+        toast("Un-Archive the task to view it, long press to unarchive")
     }
 
     override fun onLongClick(position: Int, task: TaskItem) {
