@@ -297,9 +297,7 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
         viewModel.getTasksForID(PrefManager.getcurrentProject(), taskID) { result ->
             when (result) {
                 is DBResult.Success -> {
-                    if (!result.data.archived){
-                        filterTasks(result.data)
-                    }
+                    filterTasks(result.data)
                 }
 
                 is DBResult.Failure -> {
@@ -315,7 +313,10 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
         val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
         for (i in 0 until todays.size) {
             val task = todays[i]
-            if (segments.any { it.segment_NAME == data.segment && it.archived } && task.taskID == data.id) {
+            if (segments.any { it.segment_NAME == data.segment && it.archived } && task.taskID == data.id ) {
+                todays.removeAt(i)
+            }
+            else if (task.taskID == data.id && data.archived){
                 todays.removeAt(i)
             }
         }

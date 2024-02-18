@@ -69,6 +69,7 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     var moderatorsList: MutableList<String> = mutableListOf()
     var moderators: MutableList<User> = mutableListOf()
     var assignee:String=""
+    var isTaskArchived : Boolean=false
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     private val viewModel: TaskDetailViewModel by viewModels()
 
@@ -97,11 +98,16 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
                         sectionName = task.section
                         moderatorsList = task.moderators.toMutableList()
                         assignee = task.assignee
+                        isTaskArchived=task.archived
                         withContext(Dispatchers.Main){
                             val isArchived=PrefManager.isSegmentArchived(PrefManager.getcurrentProject(),segmentName)
                             if (isArchived){
                                 toast("Can't open this task as segment was archived")
                                 startActivity(Intent(this@TaskDetailActivity,MainActivity::class.java))
+                            }
+                            else if (isTaskArchived){
+                                toast("Can't open this as task was archived")
+                                onBackPressed()
                             }
                         }
                     }
@@ -213,11 +219,16 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
                         sectionName = taskResult.data.section
                         moderatorsList = taskResult.data.moderators.toMutableList()
                         assignee = taskResult.data.assignee
+                        isTaskArchived=taskResult.data.archived
                         withContext(Dispatchers.Main){
                             val isArchived=PrefManager.isSegmentArchived(PrefManager.getcurrentProject(),segmentName)
                             if (isArchived){
                                 toast("Can't open this task as segment was archived")
                                 startActivity(Intent(this@TaskDetailActivity,MainActivity::class.java))
+                            }
+                            else if (isTaskArchived){
+                                toast("Can't open this as task was archived")
+                                onBackPressed()
                             }
                         }
                     }
