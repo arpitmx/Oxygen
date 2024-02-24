@@ -328,7 +328,5 @@ class TodayFragment : Fragment(),TodayTasksAdpater.OnClickListener,TodayTasksAdp
                 todays.removeAt(i)
             }
         }
-
-
     }
 }

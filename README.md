@@ -192,12 +192,10 @@ Task detail page provides comprehensive details about any task, issues which inc
 
 ### 7. Syntax highlighting, Code viewer ✦ <a name="code"></a> 
 
-Task detail page provides comprehensive details about any task, issues which includes : 
- 1. Issue `Type` ,`Priority`, `Duration`, `Difficulty` , `Status`, `Position in kanban`, `Fix in build version`, `Story points`
- 2. Issue Title
- 3. Extensive Issue summary with Markdown support
- 4. Moderator list
- 5. Resource links -> Files, Images, Video support
+- **Clear Code Presentation**: The code viewer provides a clear and structured presentation of code snippets, enabling users to easily view, understand, and analyze code within the project management app.
+- **Syntax Highlighting**: With syntax highlighting, the code viewer emphasizes different elements of the code, such as keywords, strings, and comments, enhancing readability and aiding in code comprehension. 
+- **Interactive Features**: The code viewer may include interactive features like line numbering, code folding, and search functionality, allowing users to navigate through code efficiently and locate specific sections with ease.
+
 
 <br>
 
