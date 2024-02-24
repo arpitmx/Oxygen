@@ -164,6 +164,9 @@ constructor(val notificationApiService: NotificationApiService,
     suspend fun updateDifficulty(taskID:String,newDifficulty:String,projectName: String):ServerResult<Boolean>{
         return firestoreRepository.updateDifficulty(id = taskID, newDifficulty = newDifficulty, projectName = projectName)
     }
+    suspend fun updateArchive(taskID:String,archive:Boolean,projectName: String):ServerResult<Boolean>{
+        return firestoreRepository.updateArchive(id = taskID, archive = archive, projectName = projectName)
+    }
     suspend fun updateDuration(taskID:String,newDuration:String,projectName: String):ServerResult<Boolean>{
         return firestoreRepository.updateDration(id = taskID, newDuration = newDuration, projectName = projectName)
     }

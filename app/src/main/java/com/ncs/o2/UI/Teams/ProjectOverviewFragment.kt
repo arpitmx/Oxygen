@@ -434,11 +434,11 @@ class ProjectOverviewFragment : Fragment(), ChannelsAdapter.OnClick, TeamsPagemo
     fun setUpProjectStats() {
         CoroutineScope(Dispatchers.IO).launch {
             val currentProject = PrefManager.getcurrentProject()
-            val submittedTasks = getFilteredTasksBySegmentState(currentProject, 1)
-            val openTasks = getFilteredTasksBySegmentState(currentProject, 2)
-            val ongoingTasks = getFilteredTasksBySegmentState(currentProject, 3)
-            val reviewTasks = getFilteredTasksBySegmentState(currentProject, 4)
-            val completedTasks = getFilteredTasksBySegmentState(currentProject, 5)
+            val submittedTasks = getFilteredTasksBySegmentState(currentProject, 1).filter { !it.archived }
+            val openTasks = getFilteredTasksBySegmentState(currentProject, 2).filter { !it.archived }
+            val ongoingTasks = getFilteredTasksBySegmentState(currentProject, 3).filter { !it.archived }
+            val reviewTasks = getFilteredTasksBySegmentState(currentProject, 4).filter { !it.archived }
+            val completedTasks = getFilteredTasksBySegmentState(currentProject, 5).filter { !it.archived }
 
             Log.d("listsizeTeams",submittedTasks.size.toString())
             Log.d("listsizeTeams",openTasks.size.toString())

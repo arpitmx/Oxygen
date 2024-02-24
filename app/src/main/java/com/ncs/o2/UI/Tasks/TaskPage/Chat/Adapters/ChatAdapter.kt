@@ -2,12 +2,14 @@ package com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
@@ -16,6 +18,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
@@ -35,6 +39,7 @@ import com.ncs.o2.Domain.Utility.ExtensionsUtil.loadProfileImg
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnDoubleClickListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
+import com.ncs.o2.HelperClasses.RoundedBackgroundSpan
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Details.ImageViewerActivity
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
@@ -93,6 +98,8 @@ class ChatAdapter(
     var db: UsersDao
     var users: MutableList<UserInMessage> = mutableListOf()
     private var lastTimestamp: Date? = null
+    private var deepLinkMap:MutableMap<String,String> =  mutableMapOf()
+    private var otherLinkMap: MutableMap<String,String> = mutableMapOf()
 
     init {
         messageDatabase = Room.databaseBuilder(
@@ -349,7 +356,7 @@ class ChatAdapter(
                     }
                 }
                 else{
-                    binding.linkPreviewImage.setImageDrawable(context.resources.getDrawable(R.drawable.apphd))
+                    binding.linkPreviewImage.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.apphd))
                 }
             }
             binding.linkPreview.setOnClickThrottleBounceListener {
@@ -847,9 +854,13 @@ class ChatAdapter(
     private fun setMessageView(message: String, binding: ChatMessageItemBinding) {
         if (message.contains("${BuildConfig.DYNAMIC_LINK_HOST}")){
             val links = convertLinksToHtml(message)
-            val newLinks=makeClickableSpannable(links)
-            val spannedMessage = processSpan(newLinks)
-            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+            val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
+            CoroutineScope(Dispatchers.IO).launch {
+                val styledLinks = getStyledSpannable(spannedMessage)
+                withContext(Dispatchers.Main){
+                    markwon.setParsedMarkdown(binding.descriptionTv, styledLinks)
+                }
+            }
         }
         else {
             val links = convertLinksToHtml(message)
@@ -886,9 +897,13 @@ class ChatAdapter(
     private fun setMessageReplyView(message: Message, binding: ChatMessageReplyItemBinding) {
         if (message.content.contains("${BuildConfig.DYNAMIC_LINK_HOST}")){
             val links = convertLinksToHtml(message.content)
-            val newLinks=makeClickableSpannable(links)
-            val spannedMessage = processSpan(newLinks)
-            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+            val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
+            CoroutineScope(Dispatchers.IO).launch {
+                val styledLinks = getStyledSpannable(spannedMessage)
+                withContext(Dispatchers.Main){
+                    markwon.setParsedMarkdown(binding.descriptionTv, styledLinks)
+                }
+            }
         }
         else {
             val links = convertLinksToHtml(message.content)
@@ -902,9 +917,13 @@ class ChatAdapter(
     private fun setMessageLinkView(message: Message, binding: ChatMessageLinkItemBinding) {
         if (message.content.contains("${BuildConfig.DYNAMIC_LINK_HOST}")){
             val links = convertLinksToHtml(message.content)
-            val newLinks=makeClickableSpannable(links)
-            val spannedMessage = processSpan(newLinks)
-            markwon.setParsedMarkdown(binding.descriptionTv, spannedMessage)
+            val spannedMessage = processSpan(markwon.render(markwon.parse(links)))
+            CoroutineScope(Dispatchers.IO).launch {
+                val styledLinks = getStyledSpannable(spannedMessage)
+                withContext(Dispatchers.Main){
+                    markwon.setParsedMarkdown(binding.descriptionTv, styledLinks)
+                }
+            }
         }
         else {
             val links = convertLinksToHtml(message.content)
@@ -915,57 +934,85 @@ class ChatAdapter(
 
     }
 
-    private fun makeClickableSpannable(text: String): Spannable {
-        val spannableString = SpannableString(text)
+    private fun makeClickableSpannable(text: SpannableStringBuilder): SpannableStringBuilder {
+        val spannableString = SpannableStringBuilder(text)
+        val dynamicLinkHost = BuildConfig.DYNAMIC_LINK_HOST
+        val pattern = Pattern.compile(Pattern.quote(dynamicLinkHost) + "[^\\s]+")
+        val matcher = pattern.matcher(text)
 
-        val startIndex = text.indexOf("${BuildConfig.DYNAMIC_LINK_HOST}")
+        var offset = 0
 
-        if (startIndex != -1) {
-            val endIndex = text.indexOf(' ', startIndex)
-            val endPosition = if (endIndex != -1) endIndex else text.length
+        while (matcher.find()) {
+
+            val startIndex = matcher.start() + offset
+            val endIndex = matcher.end() + offset
 
             val clickableSpan = object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    handleLinkClick(text.substring(startIndex, endPosition))
+                    handleLinkClick(spannableString.substring(startIndex, endIndex))
                 }
             }
 
             spannableString.setSpan(
                 clickableSpan,
                 startIndex,
-                endPosition,
+                endIndex,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
             spannableString.setSpan(
                 ForegroundColorSpan(context.resources.getColor(R.color.light_blue_A200)),
                 startIndex,
-                endPosition,
+                endIndex,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
+
+
+            offset += 0
         }
 
-        return spannableString
+        return SpannableStringBuilder(spannableString)
     }
 
 
-    private fun handleLinkClick(url: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val uri = getFullUri(url)
-            val url=extractUrl(uri)
-            withContext(Dispatchers.Main) {
-                Log.d("shortlink", url!!)
-                val list=extractPathAfterLink(url)
-                Log.d("shortlink", list.toString()!!)
-                if (list.size==2){
-                    onTaskLinkPreviewClick.onProjectClick(list[1])
-                }
-                if (list.size==4){
-                    val projectId=list[2]
-                    val taskId="#${list[3]}-${list[1]}"
-                    onTaskLinkPreviewClick.onTaskClick(projectId = projectId, taskId = taskId)
-                }
 
+
+
+    private fun handleLinkClick(_url: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val uri = getFullUri(_url)
+            Log.d("shortlinkUri", uri!!)
+            if (!uri.isNull) {
+                val url = extractUrl(uri)
+                if (!url.isNull) {
+                    withContext(Dispatchers.Main) {
+                        Log.d("shortlink", url!!)
+                        val list = extractPathAfterLink(url)
+                        Log.d("shortlink", list.toString()!!)
+                        if (list.size == 2) {
+                            onTaskLinkPreviewClick.onProjectClick(list[1])
+                        }
+                        if (list.size == 4) {
+                            val projectId = list[2]
+                            val taskId = "#${list[3]}-${list[1]}"
+                            onTaskLinkPreviewClick.onTaskClick(
+                                projectId = projectId,
+                                taskId = taskId
+                            )
+                        }
+
+                    }
+                }
+                else{
+                    withContext(Dispatchers.Main) {
+                        openInBrowser(_url)
+                    }
+                }
+            }
+            else{
+                withContext(Dispatchers.Main) {
+                    openInBrowser(_url)
+                }
             }
         }
     }
@@ -998,6 +1045,111 @@ class ChatAdapter(
         } else {
             null
         }
+    }
+    suspend fun getStyledSpannable(inputText: SpannableStringBuilder): SpannableStringBuilder {
+        val dynamicLinkHost = BuildConfig.DYNAMIC_LINK_HOST
+        val pattern = Pattern.compile(Pattern.quote(dynamicLinkHost) + "[^\\s]+")
+        val matcher = pattern.matcher(inputText)
+
+        var offset = 0
+
+        while (matcher.find()) {
+            val _url = matcher.group()
+
+            if (!deepLinkMap.containsKey(_url)) {
+                val uri = getFullUri(_url)
+                if (!uri.isNull) {
+                    val url = extractUrl(uri)
+                    if (!url.isNull) {
+                        deepLinkMap[_url] = url!!
+
+                        val list = extractPathAfterLink(url)
+
+                        if (list.size == 4) {
+                            val clickableText = "  Task #${list[3]}-${list[1]}  "
+                            val clickableSpan = createClickableSpanForTask(list)
+
+                            applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                            offset += clickableText.length - (_url.length)
+                        } else if (list.size == 2) {
+                            val clickableText = "  Join Project - ${list[1].capitalize()}  "
+                            val clickableSpan = createClickableSpanForProject(list)
+
+                            applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                            offset += clickableText.length - (_url.length)
+                        }
+                    }
+                }
+            } else {
+                val url = deepLinkMap[_url]
+
+                if (url != null) {
+                    val list = extractPathAfterLink(url)
+
+                    if (list.size == 4) {
+                        val clickableText = "  Task #${list[3]}-${list[1]}  "
+                        val clickableSpan = createClickableSpanForTask(list)
+
+                        applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                        offset += clickableText.length - (_url.length)
+                    } else if (list.size == 2) {
+                        val clickableText = "  Join Project - ${list[1].capitalize()}  "
+                        val clickableSpan = createClickableSpanForProject(list)
+
+                        applySpanToText(inputText, matcher.start() + offset, matcher.end() + offset, clickableText, clickableSpan)
+                        offset += clickableText.length - (_url.length)
+                    }
+                }
+            }
+        }
+
+        return makeClickableSpannable(inputText)
+    }
+
+    private fun createClickableSpanForTask(list: List<String>): ClickableSpan {
+        return object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                val projectId = list[2]
+                val taskId = "#${list[3]}-${list[1]}"
+                onTaskLinkPreviewClick.onTaskClick(projectId = projectId, taskId = taskId)
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                ds.color = Color.RED
+                ds.isUnderlineText = false
+            }
+        }
+    }
+
+    private fun createClickableSpanForProject(list: List<String>): ClickableSpan {
+        return object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                onTaskLinkPreviewClick.onProjectClick(list[1])
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                ds.color = Color.RED
+                ds.isUnderlineText = false
+            }
+        }
+    }
+
+    private fun applySpanToText(
+        inputText: SpannableStringBuilder,
+        startIndex: Int,
+        endPosition: Int,
+        clickableText: String,
+        clickableSpan: ClickableSpan
+    ) {
+        val roundedBackgroundSpan = RoundedBackgroundSpan(
+            ContextCompat.getColor(context, R.color.primary),
+            ContextCompat.getColor(context, R.color.pureblack),
+            10F
+        )
+
+        inputText.replace(startIndex, endPosition, clickableText)
+        inputText.setSpan(clickableSpan, startIndex, startIndex + clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        inputText.setSpan(roundedBackgroundSpan, startIndex, startIndex + clickableText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
 

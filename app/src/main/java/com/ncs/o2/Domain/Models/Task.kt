@@ -59,6 +59,7 @@ data class Task(
 
     var type:Int=0,
     val last_updated:Timestamp? = Timestamp.now(),
-    val version:Int?=4
+    val version:Int?=5,
+    var archived:Boolean=false
     )
 

@@ -354,7 +354,14 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         ) { result ->
             when (result) {
                 is DBResult.Success -> {
-                    recentsTaskList.add(result.data)
+                    if (result.data.archived){
+                        val _recents=PrefManager.getProjectRecents(PrefManager.getcurrentProject()).toMutableList()
+                        _recents.remove(taskID)
+                        PrefManager.saveProjectRecents(PrefManager.getcurrentProject(),_recents)
+                    }
+                    else{
+                        recentsTaskList.add(result.data)
+                    }
                     recentsTaskList.sortedByDescending { it.last_updated }
                     if (recentsTaskList.size==PrefManager.getProjectRecents(PrefManager.getcurrentProject()).size){
                         setRecentsRecyclerView()
@@ -686,6 +693,10 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
+    override fun onLongClick(position: Int, task: TaskItem) {
+
+    }
+
     override fun onSegmentSelected(segmentName: String) {
         binding.clear.visible()
         binding.segment.text=segmentName
@@ -727,7 +738,7 @@ class SearchFragment : Fragment(),FilterBottomSheet.SendText,UserListBottomSheet
             val segment = segments.find { it.segment_NAME == segmentName }
             segment?.archived != true
         }.toMutableList()
-        val sortedList = list.sortedByDescending { it.last_updated }
+        val sortedList = list.sortedByDescending { it.last_updated }.filter { !it.archived }
         return sortedList
     }
 

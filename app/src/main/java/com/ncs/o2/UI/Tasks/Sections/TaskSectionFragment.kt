@@ -25,6 +25,7 @@ import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.animFadein
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
+import com.ncs.o2.Domain.Utility.ExtensionsUtil.performHapticFeedback
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.runDelayed
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.setOnClickThrottleBounceListener
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.toast
@@ -36,8 +37,10 @@ import com.ncs.o2.UI.MainActivity
 import com.ncs.o2.UI.Tasks.TaskPage.Details.TaskDetailsFragment
 import com.ncs.o2.UI.Tasks.TaskPage.TaskDetailActivity
 import com.ncs.o2.UI.Tasks.TasksHolderFragment
+import com.ncs.o2.UI.UIComponents.BottomSheets.MoreOptionsTasksBottomSheet
 import com.ncs.o2.databinding.ActivityMainBinding
 import com.ncs.o2.databinding.FragmentTaskSectionBinding
+import com.ncs.o2.databinding.MoreOptionBottomSheetBinding
 import com.ncs.versa.HelperClasses.BounceEdgeEffectFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -49,10 +52,10 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
+class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener,MoreOptionsTasksBottomSheet.OnArchive {
 
     companion object {
-        fun newInstance(sectionName: String, ): TaskSectionFragment {
+        fun newInstance(sectionName: String): TaskSectionFragment {
             val fragment = TaskSectionFragment()
             val args = Bundle()
             args.putString("sectionName", sectionName)
@@ -386,22 +389,22 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
                                 last_updated = task.last_updated
                             )
                         }.toMutableList()
-                        val taskadapter = TaskListAdapter(
+                        taskListAdapter = TaskListAdapter(
                             firestoreRepository,
                             requireContext(),
                             taskItems.sortedByDescending { it.timestamp }.toMutableList(),
                             db
                         )
-                        taskadapter.setOnClickListener(this)
+                        taskListAdapter.setOnClickListener(this)
                         val layoutManager =
                             LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                         layoutManager.reverseLayout = false
                         with(recyclerView) {
                             this.layoutManager = layoutManager
-                            adapter = taskadapter
+                            adapter = taskListAdapter
                             edgeEffectFactory = BounceEdgeEffectFactory()
                         }
-                        taskadapter.notifyDataSetChanged()
+                        taskListAdapter.notifyDataSetChanged()
 
                         recyclerView.addOnScrollListener(object :
                             RecyclerView.OnScrollListener() {
@@ -519,6 +522,13 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
+    override fun onLongClick(position: Int, task: TaskItem) {
+        requireContext().performHapticFeedback()
+        val moreOptionsTasksBottomSheet = MoreOptionsTasksBottomSheet(task,this)
+        moreOptionsTasksBottomSheet.show(requireFragmentManager(), "More Task Options")
+
+    }
+
     private fun movetotaskspage() {
         val transaction = fragmentManager?.beginTransaction()!!
         val fragment = TasksHolderFragment()
@@ -537,8 +547,13 @@ class TaskSectionFragment() : Fragment(), TaskListAdapter.OnClickListener {
             val segment = segments.find { it.segment_NAME == segmentName }
             segment?.archived != true
         }.toMutableList()
-        val sortedList = list.sortedByDescending { it.time_STAMP }
+        val sortedList = list.sortedByDescending { it.time_STAMP }.filter { !it.archived }
         return sortedList
+    }
+
+    override fun onTaskArchive(taskItem: TaskItem) {
+//        fetchfromdb()
+        requireActivity().recreate()
     }
 
 }

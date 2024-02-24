@@ -2445,6 +2445,34 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateArchive(
+        id: String,
+        archive: Boolean,
+        projectName: String
+    ): ServerResult<Boolean> {
+        try {
+            firestore.runTransaction { transaction ->
+
+
+                val projectDocumentRef = firestore.collection(Endpoints.PROJECTS)
+                    .document(PrefManager.getcurrentProject())
+                    .collection(Endpoints.Project.TASKS)
+                    .document(id)
+
+                transaction.update(projectDocumentRef, "archived", archive)
+                ServerLogger().addRead(1)
+                updateLastUpdated(projectName,transaction)
+                updateTaskLastUpdated(projectName,transaction,id)
+
+                true
+            }
+
+            return ServerResult.Success(true)
+        } catch (e: Exception) {
+            return ServerResult.Failure(e)
+        }
+    }
+
     override suspend fun updateDration(
         id: String,
         newDuration: String,

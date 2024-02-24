@@ -88,6 +88,10 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
         requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
     }
 
+    override fun onLongClick(position: Int, task: TaskItem) {
+        TODO("Not yet implemented")
+    }
+
     private fun setUpViews(){
 
 
@@ -230,10 +234,10 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
     private fun setUpUserWorkspace(){
         CoroutineScope(Dispatchers.IO).launch {
 
-            val assignedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 2, assignee = PrefManager.getCurrentUserEmail())
-            val workingTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 3, assignee = PrefManager.getCurrentUserEmail())
-            val reviewTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 4, assignee = PrefManager.getCurrentUserEmail())
-            val completedTasks=db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 5, assignee = PrefManager.getCurrentUserEmail())
+            val assignedTasks=getfiltedTasks(db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 2, assignee = PrefManager.getCurrentUserEmail()))
+            val workingTasks=getfiltedTasks(db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 3, assignee = PrefManager.getCurrentUserEmail()))
+            val reviewTasks=getfiltedTasks(db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 4, assignee = PrefManager.getCurrentUserEmail()))
+            val completedTasks=getfiltedTasks(db.tasksDao().getTasksInProjectforStateForAssignee(projectId = PrefManager.getcurrentProject(), state = 5, assignee = PrefManager.getCurrentUserEmail()))
 
             withContext(Dispatchers.Main){
                 binding.assigned.statIcon.setImageDrawable(resources.getDrawable(R.drawable.baseline_active_24))
@@ -305,11 +309,27 @@ class WorkFragment : Fragment() , TaskListAdapter.OnClickListener {
         }
     }
 
+    fun getfiltedTasks(data: List<Task>): List<Task> {
+        var list = mutableListOf<Task>()
+        list.addAll(data)
+        val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
+        list = list.filter { task ->
+            val segmentName = task.segment
+            val segment = segments.find { it.segment_NAME == segmentName }
+            segment?.archived != true
+        }.toMutableList()
+        val sortedList = list.sortedByDescending { it.time_STAMP }.filter { !it.archived }
+        return sortedList
+    }
+
     fun filterTasks(data: Task) {
         val segments = PrefManager.getProjectSegments(PrefManager.getcurrentProject())
         for (i in 0 until todays.size) {
             val task = todays[i]
-            if (segments.any { it.segment_NAME == data.segment && it.archived } && task.taskID == data.id) {
+            if (segments.any { it.segment_NAME == data.segment && it.archived } && task.taskID == data.id ) {
+                todays.removeAt(i)
+            }
+            else if (task.taskID == data.id && data.archived){
                 todays.removeAt(i)
             }
         }
