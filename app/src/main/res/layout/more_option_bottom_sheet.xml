@@ -172,6 +172,53 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="24dp"
+            android:id="@+id/btn_archiveTask"
+            android:foreground="@drawable/ripplecustom"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/archive_ic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@null"
+                    android:src="@drawable/baseline_archive_24"
+                    app:tint="@color/dim_primary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:gravity="center_vertical"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:text="Archive Task"
+                    android:textColor="@color/subheading"
+                    android:textSize="@dimen/h2" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="15dp"
+                android:background="@color/seperator_light"
+                />
+
+        </LinearLayout>
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 

@@ -16,9 +16,11 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.ncs.o2.Data.Room.TasksRepository.TasksDatabase
+import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.ServerResult
 import com.ncs.o2.Domain.Models.User
 import com.ncs.o2.Domain.Models.UserInMessage
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.isNull
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.performShakeHapticFeedback
@@ -72,10 +74,12 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
     var isTaskArchived : Boolean=false
     private val networkChangeReceiver = NetworkChangeReceiver(this,this)
     private val viewModel: TaskDetailViewModel by viewModels()
-
+    @Inject
+    lateinit var firestoreRepository: FirestoreRepository
     @Inject
     lateinit var db:TasksDatabase
     private lateinit var shakeDetector: ShakeDetector
+    var checkLists:MutableList<CheckList> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -179,6 +183,9 @@ class TaskDetailActivity : AppCompatActivity(), TaskDetailsFragment.ViewVisibili
         }
 
     }
+
+
+
 
     private fun fetchTask(taskId:String){
         Log.d("taskFecthing","fetch from firebase")
