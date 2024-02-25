@@ -42,6 +42,7 @@ NCS Oxygen (O2) is a project management Android app designed to streamline and o
 # Technologies <a name="technologies"></a>
 * Android SDK
 * Kotlin Coroutine for Asynchronous tasks
+* Workmanager Api
 * AndroidX Jetpack for navigation
 * Dagger/Hilt for dependency injection
 * Retrofit/OkHttp/Gson for networking
