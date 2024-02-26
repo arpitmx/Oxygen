@@ -525,7 +525,9 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
 
     private fun filterList(query: String, mentionedUsers: List<User>) {
         val filteredList = contributorsData.filter { contributor ->
-            contributor.username!!.contains(query, ignoreCase = true)
+            contributor.username?.contains(query, ignoreCase = true) == true ||
+                    contributor.email?.contains(query, ignoreCase = true) == true ||
+                    contributor.fullName?.contains(query, ignoreCase = true) == true
         }
         mentionAdapter.updateList(filteredList)
     }
