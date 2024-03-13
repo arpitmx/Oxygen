@@ -150,7 +150,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
             else{
                 taskList.clear()
                 performTaskFetch(_type!!)
-                runDelayed(800) {
+                runDelayed(1500) {
                     when(viewModel.currentSelected){
                         "all"->{
                             setSelectedColor(binding.all)
@@ -301,7 +301,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         (segment.isEmpty() || it.segment == segment) &&
                         (type == 0 || it.type == type) &&
                         (creator.isEmpty() || it.assigner == creator)&&
-                        (it.id.contains(text, ignoreCase = true) || it.description.contains(text, ignoreCase = true))
+                        (it.id.contains(text, ignoreCase = true) || it.title.contains(text, ignoreCase = true))
 
             }.toMutableList()
 
@@ -317,7 +317,7 @@ class TasksHolderActivity : AppCompatActivity(),TaskListAdapter.OnClickListener,
                         (segment.isEmpty() || it.segment == segment) &&
                         (type == 0 || it.type == type) &&
                         (creator.isEmpty() || it.assigner == creator)&&
-                        (it.id.contains(text, ignoreCase = true) || it.description.contains(text, ignoreCase = true))
+                        (it.id.contains(text, ignoreCase = true) || it.title.contains(text, ignoreCase = true))
 
             }.toMutableList()
         }

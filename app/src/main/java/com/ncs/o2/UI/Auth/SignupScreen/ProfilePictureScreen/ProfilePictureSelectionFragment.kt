@@ -144,7 +144,7 @@ class ProfilePictureSelectionFragment : Fragment() {
         // For getting the bitmap from local storage (NEXT BUTTON)
 
         binding.next.setOnClickThrottleBounceListener {
-
+            binding.btnReselect.isClickable=false
             if (bitmap==null) {
                 Toast.makeText(requireContext(),"Profile Pic can't be empty",Toast.LENGTH_LONG).show()
                 util.singleBtnDialog("Select a photo", "Profile Picture cannot be kept empty", "Okay",{})
@@ -226,6 +226,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                         "There was an issue in uploading the profile picture, ${result.exception.message} \n\nplease retry",
                         "Retry"
                     ) {
+                        binding.btnReselect.isClickable=true
                         setUpLoader(false)
                     }
 
@@ -254,6 +255,7 @@ class ProfilePictureSelectionFragment : Fragment() {
                         "There was an issue in uploading the profile picture, ${result.exception.message},\n\nplease retry",
                         "Retry"
                     ) {
+                        binding.btnReselect.isClickable=true
                         setUpLoader(false)
                         imageRef.delete()
                     }
@@ -295,6 +297,7 @@ class ProfilePictureSelectionFragment : Fragment() {
 
                     }
                     .addOnFailureListener { e ->
+                        binding.btnReselect.isClickable=true
                         util.singleBtnDialog_InputError("Errors",
                             "There was an error : ${e.message} \nPlease retry",
                             "Retry"
@@ -302,13 +305,14 @@ class ProfilePictureSelectionFragment : Fragment() {
                             Toast.makeText(requireActivity(), "Retrying", Toast.LENGTH_SHORT).show()
                            addImageUrlToFirestore(imageUrl)
                         }
+
                     }
 
 
 
 
             } else {
-
+                binding.btnReselect.isClickable=true
                     util.singleBtnDialog_InputError("Upload Errors",
                         "There was an issue in uploading the profile picture,\n\nplease retry",
                         "Retry"

@@ -151,8 +151,22 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
     }
 
     private fun initViews(){
-
-        getCheckList()
+        if (activityBinding.checkLists.isEmpty()){
+            Log.d("checklistfetch","newFetch")
+            getCheckList()
+        }
+        else{
+            Log.d("checklistfetch","using from activity")
+            checkListArray.clear()
+            checkListArray.addAll(activityBinding.checkLists)
+            setCheckListRecyclerView(activityBinding.checkLists)
+            binding.progressbar.gone()
+            if (isModerator){
+                if (PrefManager.getAppMode()==Endpoints.ONLINE_MODE){
+                    binding.btnAddMoreCheckList.visible()
+                }
+            }
+        }
     }
 
     private fun setCheckListRecyclerView(_list: List<CheckList>) {
@@ -225,6 +239,8 @@ class TaskCheckListFragment : Fragment() ,CheckListAdapter.CheckListItemListener
 
                     is ServerResult.Success -> {
                         binding.swiperefresh.isRefreshing=false
+                        activityBinding.checkLists.clear()
+                        activityBinding.checkLists.addAll(result.data)
                         checkListArray.clear()
                         checkListArray.addAll(result.data)
                         setCheckListRecyclerView(result.data)

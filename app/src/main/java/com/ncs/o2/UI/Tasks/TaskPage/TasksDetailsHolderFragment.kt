@@ -14,7 +14,11 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.ncs.o2.Data.Room.MessageRepository.MessageDatabase
+import com.ncs.o2.Domain.Models.CheckList
 import com.ncs.o2.Domain.Models.Message
+import com.ncs.o2.Domain.Models.ServerResult
+import com.ncs.o2.Domain.Models.User
+import com.ncs.o2.Domain.Repositories.FirestoreRepository
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.gone
 import com.ncs.o2.Domain.Utility.ExtensionsUtil.visible
 import com.ncs.o2.HelperClasses.PrefManager
@@ -41,7 +45,9 @@ class TasksDetailsHolderFragment : Fragment() {
     private val activityBinding: TaskDetailActivity by lazy {
         (requireActivity() as TaskDetailActivity)
     }
-
+    @Inject
+    lateinit var firestoreRepository: FirestoreRepository
+    val checkList:MutableList<CheckList> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,7 +62,6 @@ class TasksDetailsHolderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpViewPager()
-
     }
 
     private fun setUpViewPager() {
@@ -91,7 +96,7 @@ class TasksDetailsHolderFragment : Fragment() {
             })
             when(position){
                 0-> {
-                    countParent.gone()
+                    countParent.visible()
                     tabText.text = "Details"
                 }
                 1-> {
@@ -112,8 +117,22 @@ class TasksDetailsHolderFragment : Fragment() {
 
                 }
                 2-> {
-                    countParent.gone()
-                    tabText.text = "Checklist"
+                    CoroutineScope(Dispatchers.IO).launch {
+                        getCheckList{
+                            if (it.isEmpty()){
+                                countParent.gone()
+                                tabText.text = "Checklist"
+                            }
+                            else{
+                                activityBinding.checkLists.clear()
+                                activityBinding.checkLists.addAll(it)
+                                countParent.visible()
+                                tabText.text = "Checklist"
+                                iconCount.text=it.size.toString()
+                            }
+                        }
+                    }
+
                 }
             }
             tab.customView = customTabView
@@ -121,6 +140,31 @@ class TasksDetailsHolderFragment : Fragment() {
 
         tabLayoutMediator.attach()
 
+    }
+
+    private fun getCheckList(returnList: (List<CheckList>) -> Unit){
+
+
+        CoroutineScope(Dispatchers.Main).launch {
+
+            firestoreRepository.getCheckList(
+                projectName = PrefManager.getcurrentProject(), taskId = activityBinding.taskId!!) { result ->
+
+                when (result) {
+
+                    is ServerResult.Failure -> {
+                    }
+
+                    ServerResult.Progress -> {
+                    }
+
+                    is ServerResult.Success -> {
+                        returnList(result.data)
+                    }
+
+                }
+            }
+        }
     }
     fun updateTabColors(selectedPosition: Int) {
         val selectedColor = ContextCompat.getColor(activityBinding.binding.tabLayout.context, R.color.selected_tab_color)
