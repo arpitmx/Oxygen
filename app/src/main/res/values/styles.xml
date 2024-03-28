@@ -16,7 +16,7 @@
     </style>
 
     <style name="chatbox_options" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:layout_width">65dp</item>
+        <item name="android:layout_width">50dp</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:background">@drawable/card_view_chatbox_options</item>
         <item name="android:drawableTint">@color/colorAccent</item>
@@ -28,6 +28,20 @@
         <item name="android:textAllCaps">false</item>
 
     </style>
+
+    <style name="chatbox_buttons" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">35dp</item>
+        <item name="android:drawableTint">@color/colorAccent</item>
+        <item name="android:textColor">@color/primary_bg</item>
+        <item name="android:fontFamily">@font/sf_pro_display_semibold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">false</item>
+
+    </style>
+
 
 
     <style name="body_regular">
