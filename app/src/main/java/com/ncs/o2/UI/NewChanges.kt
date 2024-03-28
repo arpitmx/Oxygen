@@ -36,44 +36,59 @@ class NewChanges : AppCompatActivity() {
 
 
         setViews()
-        val desc="## Release Notes [24.2.15] - [15/02/2024]\n" +
-                "\n ![img](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTFodDNscnE5b3E5Mm4yZDQ2cWh0bTdrNjZkamt0NHFiNXV4NGRodCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lKrfxjj5soCIw/giphy.gif) \n" +
-                "### New Features\n" +
-                " - Created project stats: Now you can easily track and analyze project statistics within the app.\n" +
-                " \n" +
-                " - Added Offline Mode: Now keep yourself on the go even when experiencing limited connectivity\n" +
-                "- Workspace Improvements: Be focused on your tasks with a more personalized workspace for both assignees and moderators.\n" +
-                "- Addition of Channels: Introducing channels for more organized and targeted conversations.\n" +
-                "\n" +
-                "### Enhancements\n" +
-                "\n" +
-                "- Task Drafting Enhancements: Improvements in saving the tasks as drafts in case of unexpected failures so that the progress is not lost.\n" +
-                "\n" +
-                "- Improvements for moderators: Now easily keep track for the tasks you are moderating in.\n" +
-                "\n" +
-                "- CheckLists creation: Moderators can add more checklists after the tasks has been created\n" +
-                "\n" +
-                "- Edit task summary: Task summary can be now edited after task has been created.\n" +
-                "\n" +
-                "### Bug Fixes\n" +
-                "- Possible bug fixes to crashes resolved\n" +
-                "\n" +
-                "### Performance Improvements\n" +
-                "- Improved opening of the screens and reduced load times.\n" +
-                "\n" +
-                "### User Interface Changes\n" +
-                "- Revamped UI of user's workspace\n" +
-                "\n" +
-                "- Made general improvements in UX\n" +
-                "\n" +
-                "### How to Update\n" +
-                "- Latest Version of O2 is 24.2.15, it can be downloaded from the release page, find version 24.2.15 at [Release Page](https://github.com/arpitmx/Oxygen/releases)\n" +
-                "\n" +
-                "### Feedback\n" +
-                "- Feedback is the key to enhancing user experience, it is our appeal to the users for providing any constructive feedback about any issues faced by them.\n" +
-                "\n" +
-                "### Thank You!\n" +
-                "\n"
+        val desc="""
+            ## Release Notes [24.2.24] - [24/02/2024]
+
+            <div style="width:100%;height:0;padding-bottom:83%;position:relative;"><iframe src="https://giphy.com/embed/o75ajIFH0QnQC3nCeD" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p><a href="https://giphy.com/gifs/theoffice-o75ajIFH0QnQC3nCeD"></a></p>
+            
+            ## Minor bug fixes, general UI and performance improvements.
+
+            ### Enhancements
+
+            - Task Drafting Enhancements: Improvements in saving the tasks as drafts in case of unexpected failures so that the progress is not lost.
+
+            - Improvements for moderators: Now easily keep track of the tasks you are moderating, UI improvements.
+
+            - Checklists creation: Moderators can add more checklists after the task has been created.
+
+            - Edit task summary: Task summary can now be edited after the task has been created.
+
+            - **Saturday Update:**
+              1. **Team Viewer:**
+                  1. Member count [resolved].
+                  2. Username addition [resolved].
+              2. **Bug Fixes:**
+                  1. **Channels:**
+                      1. Moderation tags were visible on images [resolved].
+                      2. Mention users duplication resolved [resolved].
+                  2. **Link Preview:**
+                      1. Regex not matching some types of links [resolved].
+                  3. Login related issues fixed.
+              3. **Task Archiving:**
+                  1. Tasks can be archived now.
+              4. Possible bug fixes to resolved crashes.
+
+
+            ### Performance Improvements
+
+            - Improved opening of the screens and reduced load times.
+
+            ### User Interface Changes
+
+            - Revamped UI of user's workspace.
+
+            - Made general improvements in UX.
+
+            ### How to Update
+
+            - Latest Version of O2 is 24.2.24, it can be downloaded from the release page, find version 24.2.15 at [Release Page](https://github.com/arpitmx/Oxygen/releases)
+
+            ### Feedback
+
+            - Feedback is the key to enhancing user experience, it is our appeal to the users for providing any constructive feedback about any issues faced by them.
+
+
+        """.trimIndent()
         setUpTaskDescription(desc)
 
         binding.gioActionbar.btnClose.setOnClickThrottleBounceListener{

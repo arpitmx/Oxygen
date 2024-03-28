@@ -69,7 +69,7 @@ class SettingsActivity : AppCompatActivity(), settingAdater.onSettingClick,Netwo
             settingOption("Edit Profile", R.drawable.round_edit_24, ""),
 
             settingTitle("what's new"),
-            settingOption("What's New", R.drawable.baseline_info_24, "Version 24.2.15"),
+            settingOption("What's New", R.drawable.baseline_info_24, "Version 24.2.24"),
 
             settingTitle("Report & Feedback"),
             settingOption("Feedback", R.drawable.baseline_feedback_24, ""),
