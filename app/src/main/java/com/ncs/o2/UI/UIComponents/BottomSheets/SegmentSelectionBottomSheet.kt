@@ -45,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 //import net.datafaker.Faker
 import javax.inject.Inject
 
@@ -155,9 +156,10 @@ class SegmentSelectionBottomSheet(private val type:String) : BottomSheetDialogFr
     }
 
     private fun setRecyclerView(segments: List<SegmentItem>) {
-        Log.d("segments",segments.toString())
-        val adapter = SegmentListAdapter(segments, this@SegmentSelectionBottomSheet)
+        Timber.tag("segments").d(segments.toString())
+        val adapter = SegmentListAdapter(segments.sortedBy { it.creation_DATETIME }, this@SegmentSelectionBottomSheet)
         val linearLayoutManager = LinearLayoutManager(requireContext())
+
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         recyclerView.layoutManager = linearLayoutManager
         recyclerView.adapter = adapter

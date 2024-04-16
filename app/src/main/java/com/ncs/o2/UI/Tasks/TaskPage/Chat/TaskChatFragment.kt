@@ -14,15 +14,19 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.DisplayMetrics
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
@@ -35,6 +39,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -77,6 +82,7 @@ import com.ncs.o2.Domain.Utility.FirebaseRepository
 import com.ncs.o2.Domain.Utility.GlobalUtils
 import com.ncs.o2.Domain.Utility.NotificationsUtils
 import com.ncs.o2.Domain.Utility.RandomIDGenerator
+import com.ncs.o2.HelperClasses.KeyboardTriggerBehavior
 import com.ncs.o2.HelperClasses.PrefManager
 import com.ncs.o2.R
 import com.ncs.o2.UI.Tasks.TaskPage.Chat.Adapters.ChatAdapter
@@ -205,15 +211,65 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
         mentionUserRv = binding.mentionUserRv
     }
 
-    private fun initViews() {
+
+    val inputBoxfocusListener = View.OnFocusChangeListener { v, hasFocus ->
+        if (hasFocus) {
+            binding.inputBox.btnAttach.gone()
+            binding.inputBox.btnTts.gone()
+            toggleChatOptions(visibility = true)
+
+        } else {
+
+            binding.inputBox.btnAttach.visible()
+            binding.inputBox.btnTts.visible()
+            toggleChatOptions(visibility = false)
+
+        }
+    }
+
+    private var keyboardTriggerBehavior: KeyboardTriggerBehavior? = null
+
+    private fun keyboardOpen(){
 
 
-        val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.inputBox.editboxMessage, InputMethodManager.SHOW_IMPLICIT)
+        binding.inputBox.btnAttach.gone()
+        binding.inputBox.btnTts.gone()
+        toggleChatOptions(visibility = true)
 
-        binding.chatboxOptionBox.gone()
-        mentionedUsers.clear()
-        mentionAdapter = MentionUsersAdapter(emptyList<User>().toMutableList(), this)
+
+
+    }
+
+    private fun keyboardClosed(){
+
+        binding.inputBox.btnAttach.visible()
+        binding.inputBox.btnTts.visible()
+        toggleChatOptions(visibility = false)
+
+        if (!binding.inputBox.editboxMessage.text.isNullOrEmpty()){
+            binding.inputBox.btnSendTop.visible()
+            binding.inputBox.btnTts.gone()
+        }
+
+    }
+
+
+    fun dpToPx(context: Context, valueInDp: Float): Float {
+        val metrics: DisplayMetrics = context.resources.displayMetrics
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics)
+    }
+
+    private fun initInputbox(){
+
+
+        keyboardTriggerBehavior = KeyboardTriggerBehavior(binding.root).apply {
+            observe(viewLifecycleOwner) {
+                when (it) {
+                    KeyboardTriggerBehavior.Status.OPEN -> keyboardOpen()
+                    KeyboardTriggerBehavior.Status.CLOSED -> keyboardClosed()
+                }
+            }
+        }
 
 
         binding.inputBox.progressBarSendMsg.gone()
@@ -283,6 +339,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
                 }
             }
         })
+
         binding.inputBox.btnSend.setOnClickThrottleBounceListener {
 
             if (binding.inputBox.editboxMessage.text.toString().trim().isNotEmpty()) {
@@ -299,11 +356,11 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
         }
 
-        binding.btnPaste.setOnClickThrottleBounceListener {
+        binding.inputBox.btnPaste.setOnClickThrottleBounceListener {
             pasteFromClipboard()
         }
 
-        binding.btnCodeBlock.setOnClickThrottleBounceListener {
+        binding.inputBox.btnCodeBlock.setOnClickThrottleBounceListener {
 
             binding.inputBox.editboxMessage.appendTextAtCursor(
                 " ``` Code_Lang \n Code \n``` "
@@ -311,39 +368,39 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
         }
 
-        binding.btnAttachBlockQuote.setOnClickThrottleBounceListener {
+        binding.inputBox.btnAttachBlockQuote.setOnClickThrottleBounceListener {
             binding.inputBox.editboxMessage.appendTextAtCursor(
                 ">"
             )
         }
 
-        binding.btnAttachBold.setOnClickThrottleBounceListener {
+        binding.inputBox.btnAttachBold.setOnClickThrottleBounceListener {
             binding.inputBox.editboxMessage.appendTextAtCursorMiddleCursor(
                 "****", type = 4
             )
 
         }
 
-        binding.btnAttachItalics.setOnClickThrottleBounceListener {
+        binding.inputBox.btnAttachItalics.setOnClickThrottleBounceListener {
             binding.inputBox.editboxMessage.appendTextAtCursorMiddleCursor(
                 "__", type = 2
             )
         }
 
-        binding.btnChecklist.setOnClickThrottleBounceListener {
+        binding.inputBox.btnChecklist.setOnClickThrottleBounceListener {
             binding.inputBox.editboxMessage.appendTextAtCursor(
                 " - [ ] List_Text "
             )
 
         }
 
-        binding.btnLink.setOnClickThrottleBounceListener {
+        binding.inputBox.btnLink.setOnClickThrottleBounceListener {
             binding.inputBox.editboxMessage.appendTextAtCursor(
                 " [Link Text](Link URL) "
             )
         }
 
-        binding.btnBackTick.setOnClickThrottleBounceListener {
+        binding.inputBox.btnBackTick.setOnClickThrottleBounceListener {
 
             binding.inputBox.editboxMessage.appendTextAtCursorMiddleCursor(
                 "` `", type = 2
@@ -355,6 +412,27 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             binding.inputBox.linkPreviewTitle.text="Getting link info..."
             binding.inputBox.linkPreviewDesc.text="Please wait..."
         }
+
+
+
+
+
+
+    }
+
+
+    private fun initViews() {
+
+        val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(binding.inputBox.editboxMessage, InputMethodManager.SHOW_IMPLICIT)
+
+        binding.inputBox.bottomTab.gone()
+        mentionedUsers.clear()
+        mentionAdapter = MentionUsersAdapter(emptyList<User>().toMutableList(), this)
+
+        initInputbox()
+
+
     }
     private fun extractLinks(input: String): String {
         val urlPattern = "([\\w+]+\\:\\/\\/)?([\\w\\d-]+\\.)*[\\w-]+[\\.\\:]\\w+([\\/\\?\\=\\&\\#\\.]?[\\w-]+)*\\/?".toRegex()
@@ -609,7 +687,7 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
             )
         )
 
-        binding.btnAttachImage.setOnClickThrottleBounceListener {
+        binding.inputBox.btnAttachImage.setOnClickThrottleBounceListener {
             selectImage()
             if (bitmap != null) {
                 binding.inputBox.msgBox.gone()
@@ -649,12 +727,12 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
 
     private fun toggleChatOptions(visibility: Boolean) {
         if (visibility) {
-            binding.chatboxOptionBox.slideUpAndVisible(100) {
+            binding.inputBox.bottomTab.slideUpAndVisible(100) {
                 chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS = true
             }
 
         } else {
-            binding.chatboxOptionBox.slideDownAndGone(100) {
+            binding.inputBox.bottomTab.slideDownAndGone(100) {
                 chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS = false
             }
 

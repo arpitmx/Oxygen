@@ -137,75 +137,75 @@
             android:background="#1DE3E1E1"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
-        <HorizontalScrollView
-            android:id="@+id/chatbox_option_box"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/primary_bg"
-            android:paddingTop="5dp"
-            android:scrollbars="none">
+<!--        <HorizontalScrollView-->
+<!--            android:id="@+id/chatbox_option_box"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@color/primary_bg"-->
+<!--            android:paddingTop="5dp"-->
+<!--            android:scrollbars="none">-->
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingStart="5dp"
-                android:paddingEnd="10dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:paddingStart="5dp"-->
+<!--                android:paddingEnd="10dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <ImageButton
-                    android:id="@+id/btnPaste"
-                    android:layout_width="70dp"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/outline_content_paste_24"
-                    />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnPaste"-->
+<!--                    android:layout_width="70dp"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/outline_content_paste_24"-->
+<!--                    />-->
 
-                <ImageButton
-                    android:id="@+id/btnAttachImage"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_image_24"
-                />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnAttachImage"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_image_24"-->
+<!--                />-->
 
-                <ImageButton
-                    android:id="@+id/btnCodeBlock"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_code_24"
-                  />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnCodeBlock"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_code_24"-->
+<!--                  />-->
 
-                <ImageButton
-                    android:id="@+id/btnLink"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_add_link_24" />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnLink"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_add_link_24" />-->
 
-                <ImageButton
-                    android:id="@+id/btnChecklist"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_check_box_outline_blank_24" />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnChecklist"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_check_box_outline_blank_24" />-->
 
-                <ImageButton
-                    android:id="@+id/btnAttachBold"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_format_bold_24"
-                    />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnAttachBold"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_format_bold_24"-->
+<!--                    />-->
 
-                <ImageButton
-                    android:id="@+id/btnAttachItalics"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_format_italic_24"
-                    />
-                <ImageButton
-                    android:id="@+id/btnAttachBlockQuote"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_format_quote_24"
-                    />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnAttachItalics"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_format_italic_24"-->
+<!--                    />-->
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnAttachBlockQuote"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_format_quote_24"-->
+<!--                    />-->
 
-                <ImageButton
-                    android:id="@+id/btnBackTick"
-                    style="@style/chatbox_options"
-                    android:src="@drawable/baseline_highlight_alt_24" />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btnBackTick"-->
+<!--                    style="@style/chatbox_options"-->
+<!--                    android:src="@drawable/baseline_highlight_alt_24" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-        </HorizontalScrollView>
+<!--        </HorizontalScrollView>-->
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/suggestion_box"
@@ -214,7 +214,6 @@
             android:background="@color/white"
             android:orientation="vertical"
             android:visibility="visible">
-
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/btn_select_image_from_storage"

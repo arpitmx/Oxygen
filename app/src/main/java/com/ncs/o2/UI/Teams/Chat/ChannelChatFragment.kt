@@ -200,17 +200,19 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
         mentionUserRv = binding.mentionUserRv
     }
 
+
+
+
     private fun initViews() {
-
-
 
         val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.inputBox.editboxMessage, InputMethodManager.SHOW_IMPLICIT)
 
-        binding.chatboxOptionBox.gone()
+        binding.inputBox.bottomTab.gone()
         mentionedUsers.clear()
         mentionAdapter = MentionUsersAdapter(emptyList<User>().toMutableList(), this)
         binding.inputBox.progressBarSendMsg.gone()
+
 
         binding.inputBox.editboxMessage.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -636,12 +638,12 @@ class ChannelChatFragment : Fragment(), ChannelChatAdapter.onChatDoubleClickList
 
     private fun toggleChatOptions(visibility: Boolean) {
         if (visibility) {
-            binding.chatboxOptionBox.slideUpAndVisible(100) {
+            binding.inputBox.bottomTab.slideUpAndVisible(100) {
                 chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS = true
             }
 
         } else {
-            binding.chatboxOptionBox.slideDownAndGone(100) {
+            binding.inputBox.bottomTab.slideDownAndGone(100) {
                 chatViewModel.CHAT_WINDOW_OPTION_BOX_STATUS = false
             }
 
