@@ -9,11 +9,7 @@
 
 NCS Oxygen (O2) is a project management Android app designed to streamline and optimize task and project management using modern project management techniques. With support for methodologies like sprints, kanban maps, and more, Oxygen empowers teams to efficiently plan, organize, and track their projects.
 
-<p float="left" height="auto">
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/5de16190-256d-466a-ac96-fcbf06486e32" width="250" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/90caaf73-42fd-4395-9ae3-0639dbcbb821" width="250" />
-  <img src="https://github.com/arpitmx/Oxygen/assets/59350776/635bfbbb-6a90-4c96-947c-d4a675eed491" width="250" />
-</p>
+![Group 6611](https://github.com/arpitmx/Oxygen/assets/59350776/179cd176-29b2-4473-8d8c-5c8c9f5cc29f)
 
 ---
 <br>
