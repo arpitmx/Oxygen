@@ -394,6 +394,9 @@ Oxygen has its own custom made crash reporting system called `Crashman` which li
 </p>
 
 ---
+## MAD Score
+![summary](https://user-images.githubusercontent.com/24237865/102366914-84f6b000-3ffc-11eb-8d49-b20694239782.png)
+![kotlin](https://user-images.githubusercontent.com/24237865/102366932-8a53fa80-3ffc-11eb-8131-fd6745a6f079.png)
 
  
 
@@ -495,3 +498,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+                    
+                      
+                      
+  
