@@ -54,7 +54,6 @@ class UserDetailsFragment : Fragment() {
     ): View {
         binding = FragmentUserDetailsBinding.inflate(inflater, container, false)
         setUpViews()
-
         return binding.root
     }
 
@@ -137,6 +136,7 @@ class UserDetailsFragment : Fragment() {
                 if (!querySnapshot.isEmpty) {
                     usernameResult(false)
                     binding.progressbar.gone()
+                    binding.error.setTextColor(resources.getColor(R.color.redx))
                     binding.error.text="This username is already used"
                     binding.error.visible()
 
@@ -145,6 +145,7 @@ class UserDetailsFragment : Fragment() {
                     binding.progressbar.gone()
                     binding.error.text="This username is available"
                     binding.error.visible()
+                    binding.error.setTextColor(resources.getColor(R.color.green))
 
 
                 }

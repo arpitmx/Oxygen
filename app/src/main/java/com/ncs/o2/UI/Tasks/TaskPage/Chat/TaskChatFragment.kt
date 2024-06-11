@@ -615,8 +615,11 @@ class TaskChatFragment : Fragment(), ChatAdapter.onChatDoubleClickListner,
     private fun filterList(query: String, mentionedUsers: List<User>) {
 
         val filteredList = contributorsData.filter { contributor ->
-            contributor.username!!.contains(query, ignoreCase = true)
+            contributor.username?.contains(query, ignoreCase = true) == true ||
+                    contributor.email?.contains(query, ignoreCase = true) == true ||
+                        contributor.fullName?.contains(query, ignoreCase = true) == true
         }
+
         val uniqueList = filteredList.toSet().toMutableList()
         mentionAdapter.updateList(uniqueList)
     }

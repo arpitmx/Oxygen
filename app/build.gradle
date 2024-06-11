@@ -38,6 +38,7 @@ android {
         targetSdkVersion 34
         versionCode 15
         versionName "24.2.25"
+        versionName "24.2.24"
         multiDexEnabled true
 
 
